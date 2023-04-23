@@ -1,0 +1,14 @@
+version: "3.4"
+services:
+  capju-front:
+    image: node:alpine
+    container_name: capju-front
+    entrypoint: /bin/sh
+    ports:
+      - 3000:3000
+    working_dir: /srv/app
+    volumes:
+      - type: bind
+        source: ./
+        target: /srv/app
+    tty: true
