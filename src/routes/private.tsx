@@ -1,5 +1,19 @@
-import { Routes } from "react-router-dom";
+// import { lazy } from "react";
+import { Navigate } from "react-router-dom";
 
-export function PrivateRouter() {
-  return <Routes>{/* <Route path="*" element={<NotFound />} /> */}</Routes>;
-}
+// const Home = lazy(() => import("pages/Home"));
+
+export const PrivateRoutes: MenuItem[] = [
+  {
+    index: true,
+    name: "Home",
+    element: <></>,
+    authorizedRoles: [],
+  },
+  {
+    path: "*",
+    name: "404",
+    element:  <Navigate to="/" replace />,
+    authorizedRoles: [],
+  }
+];

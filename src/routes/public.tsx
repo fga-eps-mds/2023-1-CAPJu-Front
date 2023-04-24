@@ -1,11 +1,19 @@
-import { Routes } from "react-router-dom";
+import { lazy } from "react";
+import { Navigate } from "react-router-dom";
 
-import { PublicLayout } from "layouts/Public";
+const Login = lazy(() => import("pages/Login"));
 
-export function PublicRouter() {
-  return (
-    <PublicLayout>
-      <Routes>{/* <Route path="*" element={<NotFound />} /> */}</Routes>
-    </PublicLayout>
-  );
-}
+export const PublicRoutes: MenuItem[] = [
+  {
+    index: true,
+    name: "Login",
+    element: <Login />,
+    authorizedRoles: [],
+  },
+  {
+    path: "*",
+    name: "404",
+    element:  <Navigate to="/" replace />,
+    authorizedRoles: [],
+  }
+];

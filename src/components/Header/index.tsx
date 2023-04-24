@@ -31,7 +31,7 @@ export function Header() {
           </Button>
         ) : (
           <Flex gap={["3", "4"]} alignItems="center" justifyContent="end">
-            <HeaderLink href="/login">Login</HeaderLink>
+            <HeaderLink href="/">Login</HeaderLink>
             <HeaderLink href="/cadastro">Cadastro</HeaderLink>
           </Flex>
         )}

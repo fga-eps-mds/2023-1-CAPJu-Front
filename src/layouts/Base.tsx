@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
+import { Outlet } from "react-router-dom";
 import { Flex } from "@chakra-ui/react";
 
 import { Header } from "components/Header";
 
 interface BaseLayoutProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export function BaseLayout({ children }: BaseLayoutProps) {
@@ -19,6 +20,7 @@ export function BaseLayout({ children }: BaseLayoutProps) {
     >
       <Header />
       {children}
+      <Outlet />
     </Flex>
   );
 }
