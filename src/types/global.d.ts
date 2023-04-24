@@ -12,6 +12,11 @@ declare global {
     idUnit: number;
   };
 
+  type Unit = {
+    idUnit: number;
+    name: string;
+  };
+
   type ApiResponse<Data> = {
     data: Data;
     error: null | string;

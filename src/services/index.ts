@@ -1,6 +1,8 @@
 export const Services = {
   user: {
     baseURL: import.meta.env.VITE_USER_SERVICE_URL,
-    resourceURL: "user",
+  },
+  units: {
+    baseURL: import.meta.env.VITE_UNITS_SERVICE_URL,
   },
 };
