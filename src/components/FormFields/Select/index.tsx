@@ -1,0 +1,44 @@
+import { FieldError } from "react-hook-form";
+import {
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  forwardRef,
+  Select as ChakraSelect,
+  InputGroup,
+  SelectProps as ChakraSelectProps,
+} from "@chakra-ui/react";
+
+type Option = {
+  label: string;
+  value: string | number;
+};
+
+export interface SelectProps extends ChakraSelectProps {
+  options: Option[];
+  label?: string | JSX.Element;
+  errors?: FieldError | undefined;
+}
+
+export const Select = forwardRef<SelectProps, "select">((props, ref) => {
+  const { label, errors, options, ...rest } = props;
+
+  return (
+    <FormControl
+      isInvalid={Boolean(errors)}
+      width={props.width || props.w || "100%"}
+    >
+      {label && <FormLabel>{label}</FormLabel>}
+      <InputGroup>
+        <ChakraSelect variant="outline" {...rest} ref={ref}>
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </ChakraSelect>
+      </InputGroup>
+      <FormErrorMessage color="red.400">{errors?.message}</FormErrorMessage>
+    </FormControl>
+  );
+});
