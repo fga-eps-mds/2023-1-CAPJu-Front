@@ -17,3 +17,26 @@ export const signIn = async (credentials: {
     };
   }
 };
+
+export const signUp = async (credentials: {
+  fullName: string;
+  cpf: string;
+  email: string;
+  password: string;
+  passwordConfirmation: string;
+  idUnit: string;
+  idRole: string;
+}): Promise<Result<User>> => {
+  try {
+    const res = await api.user.post<User>("/newUser", credentials);
+
+    return { type: "success", value: res } as unknown as Result<User>;
+  } catch (error) {
+    if (error instanceof Error) return { type: "error", error };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+    };
+  }
+};
