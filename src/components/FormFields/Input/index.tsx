@@ -1,0 +1,44 @@
+import { FieldError } from "react-hook-form";
+import {
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  forwardRef,
+  Input as ChakraInput,
+  InputGroup,
+  InputProps as ChakraInputProps,
+} from "@chakra-ui/react";
+import InputMask from "react-input-mask";
+
+export interface InputProps extends ChakraInputProps {
+  label?: string | JSX.Element;
+  errors?: FieldError | undefined;
+  mask?: string;
+}
+
+export const Input = forwardRef<InputProps, "input">((props, ref) => {
+  const { label, errors, mask, ...rest } = props;
+
+  return (
+    <FormControl
+      isInvalid={Boolean(errors)}
+      width={props.width || props.w || "100%"}
+    >
+      {label && <FormLabel>{label}</FormLabel>}
+      <InputGroup>
+        {mask ? (
+          <ChakraInput
+            variant="outline"
+            {...rest}
+            ref={ref}
+            mask={mask}
+            as={InputMask}
+          />
+        ) : (
+          <ChakraInput variant="outline" {...rest} ref={ref} />
+        )}
+      </InputGroup>
+      <FormErrorMessage color="red.400">{errors?.message}</FormErrorMessage>
+    </FormControl>
+  );
+});

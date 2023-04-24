@@ -20,32 +20,52 @@ O CAPJu é uma aplicação _Web_ compatível com qualquer navegador.
 
 
 ## Instalação
-### Configurando .env
+### Configurando .env.local
 
-Configure o arquivo .env dos repositório igual abaixo:
+Configure o arquivo .env.local dos repositório igual abaixo:
 
 ```
 JWT_SECRET=
-REACT_APP_API_SERVICE=
-REACT_APP_USER_SERVICE=
+VITE_API_SERVICE_URL=
+VITE_USER_SERVICE_URL=
 ```
 
 Obs: é necessário ser igual ao back-end.
 
-### Instalado bibliotecas do node
-
-Para instalar as bibliotecas de cada repositorio basta apenas dar o seguinte comando
-
-```
-yarn install
-```
 ## Execute o projeto
 
-Para executar o projeto é recomendar executar os comandos na ordem de repositórios de back-end primeiro e front-end ao final. E cada um em um terminal diferente
+Para executar o projeto é recomendar executar os comandos na ordem de repositórios de back-end primeiro e front-end ao final. E cada um em um terminal diferente. 
 
+Os comandos de execução do ambiente do projeto estão todos descritos no arquivo Makefile, desde sua instalação, passando pela execução até possíveis remoções, sendo aqui descritas apenas a sua instalação e execução:
+
+```bash
+# Para rodar o projeto pela primeira vez basta executar o comando:
+
+make first
+
+# Após sua execução a aplicação deve estar na porta 3000, bastando acessar o endereço localhost:3000 no navegador.
+# Para as próximas execução basta executar o comando:
+
+make start
+
+# Para interromper a execução da aplicação execute o comando:
+
+make stop
 ```
-yarn dev
+
+## Instalação local
+
+Para executar a aplicação localmente (fora do ambiente dockerizado), basta executar os comandos:
+
+```bash
+
+yarn # Instala as bibliotecas 
+
+# E em seguida
+
+yarn dev # Inicia a execução da aplicação na porta 3000
 ```
+
 ## Testes
 
 Para rodar os testes execute:
@@ -54,12 +74,26 @@ Para rodar os testes execute:
 yarn test
 ```
 
-## Instalando de Dependecias
+## Instalando Novas Dependecias
 
-Pode ser utilizado o seguinte comando para inserir novas dependencias no sistema
+Pode ser utilizado o seguinte comando para inserir novas dependencias na aplicação:
 
 ```bash
-yarn add "nome_da_dependencia"
+yarn add nome-da-dependencia
+```
+
+Veja que, o exemplo acima adiciona a biblioteca no ambiente local, para realizar a instalação no container docker execute:
+
+```bash
+# Esse comando deve abrir um terminal dentro do container, 
+# certifique-se que o nome do container (capju-front) coincide com o nome do ambiente em sua máquina
+docker-compose exec -it capju-front sh
+
+# Agora sim podemos instalar a biblioteca normalmente
+yarn add nome-da-dependencia
+
+# E para sair de dentro do container
+exit
 ```
 
 ### Deployment
