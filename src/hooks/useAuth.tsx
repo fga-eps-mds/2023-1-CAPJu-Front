@@ -4,44 +4,68 @@ import {
   useEffect,
   useContext,
   ReactNode,
+  useCallback,
 } from "react";
 
-type User = {
-  cpf: string;
-  email: string;
-  fullName: string;
-  token: string;
-  expiresIn: Date;
-  idRole: number;
-  idUnit: number;
-};
+import { signIn } from "services/user";
 
 type AuthContextType = {
   isAuthenticated: boolean;
   user: User | null;
-  handleLogin: () => void;
+  // eslint-disable-next-line no-unused-vars
+  handleLogin: (credentials: { cpf: string; password: string }) => void;
   handleLogout: () => void;
 };
 
 const AuthContext = createContext({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  async function handleLogin() {
-    return null;
+  const handleLogin = useCallback(
+    async (credentials: {
+      cpf: string;
+      password: string;
+    }): Promise<Result<User>> => {
+      const res = await signIn(credentials);
+
+      if (res.type === "success") {
+        localStorage.setItem("@CAPJu:user", JSON.stringify(res.value.data));
+        setUser(res.value.data);
+      }
+
+      return res;
+    },
+    []
+  );
+
+  function handleLogout() {
+    localStorage.removeItem("@CAPJu:user");
+    setUser(null);
   }
 
-  async function handleLogout() {
-    return null;
-  }
+  function validateAuthentication() {
+    const currentDate = new Date();
+    const localStorageUser = localStorage.getItem("@CAPJu:user");
 
-  function validateAuthentication() {}
+    if (!localStorageUser) {
+      setUser(null);
+      return;
+    }
+
+    if (
+      !JSON.parse(localStorageUser)?.expiresIn ||
+      new Date(JSON.parse(localStorageUser)?.expiresIn) < currentDate
+    ) {
+      setUser(null);
+      return;
+    }
+
+    setUser(JSON.parse(localStorageUser));
+  }
 
   useEffect(() => {
     validateAuthentication();
-
-    setTimeout(() => {}, 500);
   }, []);
 
   return (

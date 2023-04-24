@@ -7,7 +7,16 @@ import { theme } from "styles/theme";
 
 function App() {
   return (
-    <ChakraProvider theme={theme}>
+    <ChakraProvider
+      theme={theme}
+      toastOptions={{
+        defaultOptions: {
+          position: "top",
+          duration: 1500,
+          containerStyle: { marginTop: "28" },
+        },
+      }}
+    >
       <LoadingProvider>
         <AuthProvider>
           <Router />

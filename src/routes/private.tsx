@@ -13,7 +13,7 @@ export const PrivateRoutes: MenuItem[] = [
   {
     path: "*",
     name: "404",
-    element:  <Navigate to="/" replace />,
+    element: <Navigate to="/" replace />,
     authorizedRoles: [],
-  }
+  },
 ];
