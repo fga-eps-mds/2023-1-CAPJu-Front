@@ -1,19 +1,24 @@
-// import { lazy } from "react";
+import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 
-// const Home = lazy(() => import("pages/Home"));
+import { PrivateLayout } from "layouts/Private";
+
+const AcountEdition = lazy(() => import("pages/AccountEdition"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
     index: true,
     name: "Home",
-    element: <></>,
-    authorizedRoles: [],
+    element: <PrivateLayout />,
+  },
+  {
+    path: "editar-conta",
+    name: "AccountEdition",
+    element: <AcountEdition />,
   },
   {
     path: "*",
     name: "404",
     element: <Navigate to="/" replace />,
-    authorizedRoles: [],
   },
 ];
