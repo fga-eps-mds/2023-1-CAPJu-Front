@@ -2,10 +2,12 @@ import { Tabs, TabList, Tab, Flex } from "@chakra-ui/react";
 import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { getTabIndexes } from "utils/tabs";
+import { permissionsArray } from "utils/permissions";
+import { useAuth } from "hooks/useAuth";
+import { tabs } from "utils/tabs";
 
 export function NavigationTabs() {
-  const tabs = getTabIndexes();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const currentTabIndex = useMemo<number | undefined>(() => {
@@ -17,6 +19,16 @@ export function NavigationTabs() {
 
     return currentTab ? tabs.indexOf(currentTab) : undefined;
   }, [tabs, location]);
+
+  function isUserAllowedInTab(tabIndex: number) {
+    if (!user) return false;
+
+    return permissionsArray.some(
+      (item) =>
+        item.actions.some((action) => action === tabs[tabIndex].action) &&
+        item.users.some((userRole) => userRole === user.idRole)
+    );
+  }
 
   return (
     <Flex
@@ -46,14 +58,18 @@ export function NavigationTabs() {
         <TabList>
           {tabs.map((tab, index) => {
             const isCurrentTab = currentTabIndex === index;
+            let cursor = isCurrentTab ? "default" : "pointer";
+
+            if (!isUserAllowedInTab(index)) cursor = "not-allowed";
 
             return (
               <Tab
                 key={tab.label}
                 disabled={isCurrentTab}
                 onClick={() => (isCurrentTab ? {} : navigate(tab.path))}
-                cursor={isCurrentTab ? "default" : "pointer"}
+                cursor={cursor}
                 minW="fit-content"
+                opacity={isUserAllowedInTab(index) ? 1 : 0.25}
               >
                 {tab.label}
               </Tab>
