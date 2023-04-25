@@ -15,6 +15,7 @@ type AuthContextType = {
   // eslint-disable-next-line no-unused-vars
   handleLogin: (credentials: { cpf: string; password: string }) => void;
   handleLogout: () => void;
+  validateAuthentication: () => void;
 };
 
 const AuthContext = createContext({} as AuthContextType);
@@ -75,6 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         handleLogin,
         handleLogout,
+        validateAuthentication,
       }}
     >
       {children}

@@ -40,3 +40,36 @@ export const signUp = async (credentials: {
     };
   }
 };
+
+export const updateUser = async (data: { email: string }, cpf: string) => {
+  try {
+    const res = await api.user.put(`/updateUser/${cpf}`, data);
+
+    return { type: "success", value: res };
+  } catch (error) {
+    if (error instanceof Error) return { type: "error", error };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+    };
+  }
+};
+
+export const updateUserPassword = async (
+  data: { oldPassword: string; newPassword: string },
+  cpf: string
+) => {
+  try {
+    const res = await api.user.post(`/updateUserPassword/${cpf}`, data);
+
+    return { type: "success", value: res };
+  } catch (error) {
+    if (error instanceof Error) return { type: "error", error };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+    };
+  }
+};
