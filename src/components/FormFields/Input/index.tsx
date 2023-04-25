@@ -35,9 +35,7 @@ export const Input = forwardRef<InputProps, "input">((props, ref) => {
               label={infoText}
               hasArrow
               background="blackAlpha.900"
-              defaultIsOpen
               closeDelay={500}
-              closeOnScroll
             >
               <InfoIcon />
             </Tooltip>

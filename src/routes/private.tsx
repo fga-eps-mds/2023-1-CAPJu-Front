@@ -5,6 +5,7 @@ import { PrivateLayout } from "layouts/Private";
 
 const AccountEdition = lazy(() => import("pages/AccountEdition"));
 const EmailEdition = lazy(() => import("pages/EmailEdition"));
+const PasswordEdition = lazy(() => import("pages/PasswordEdition"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
@@ -21,6 +22,11 @@ export const PrivateRoutes: MenuItem[] = [
     path: "editar-conta/email",
     name: "EmailEdition",
     element: <EmailEdition />,
+  },
+  {
+    path: "editar-conta/senha",
+    name: "PasswordEdition",
+    element: <PasswordEdition />,
   },
   {
     path: "*",

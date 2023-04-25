@@ -31,18 +31,22 @@ function AccountEdition() {
             w="100%"
             alignItems="center"
             justifyContent="center"
-            gap="3"
+            gap="2"
             flexWrap="wrap"
           >
             <Button
+              w={["100%", "fit-content"]}
               colorScheme="blue"
-              onClick={() => navigate("/editar-conta/email")}
+              onClick={() => navigate("/editar-conta/email", { replace: true })}
+              size="sm"
             >
               Editar email
             </Button>
             <Button
+              w={["100%", "fit-content"]}
               colorScheme="red"
-              onClick={() => navigate("/editar-conta/senha")}
+              onClick={() => navigate("/editar-conta/senha", { replace: true })}
+              size="sm"
             >
               Editar senha
             </Button>

@@ -5,6 +5,7 @@ import {
   chakra,
   useToast,
   Text,
+  Stack,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -14,29 +15,28 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "components/FormFields";
 import { PrivateLayout } from "layouts/Private";
 import { useLoading } from "hooks/useLoading";
-import { updateUser } from "services/user";
+import { updateUserPassword } from "services/user";
 import { useAuth } from "hooks/useAuth";
 
 type FormValues = {
-  email: string;
-  newEmail: string;
+  oldPassword: string;
+  newPassword: string;
+  newPasswordConfirmation: string;
 };
 
 const validationSchema = yup.object({
-  email: yup
+  oldPassword: yup.string().required("Informe sua senha atual"),
+  newPassword: yup.string().required("Informe sua nova senha"),
+  newPasswordConfirmation: yup
     .string()
-    .required("Informe seu e-mail atual")
-    .email("Endereço de email inválido"),
-  newEmail: yup
-    .string()
-    .required("Informe um novo endereço de email")
-    .email("Endereço de email inválido"),
+    .oneOf([yup.ref("newPassword")], "Suas senhas não batem.")
+    .required("Confirme sua nova senha"),
 });
 
-function EmailEdition() {
+function PasswordEdition() {
   const toast = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, handleLogout } = useAuth();
   const { handleLoading } = useLoading();
   const {
     register,
@@ -50,20 +50,12 @@ function EmailEdition() {
   const onSubmit = handleSubmit(async (data) => {
     handleLoading(true);
 
-    if (user?.email !== data.email) {
-      handleLoading(false);
-      toast({
-        id: "login-error",
-        title: "Erro na edição de email",
-        // @ts-ignore
-        description: "O email atual informado está incorreto.",
-        status: "error",
-        isClosable: true,
-      });
+    if (!user) {
+      handleLogout();
       return;
     }
 
-    const res = await updateUser({ email: data.newEmail }, user.cpf);
+    const res = await updateUserPassword(data, user.cpf);
 
     // @ts-ignore
     if (res.type === "success") {
@@ -72,7 +64,7 @@ function EmailEdition() {
       toast({
         id: "login-success",
         title: "Sucesso!",
-        description: "Seu endereço de email foi atualizado.",
+        description: "Seu senha foi atualizada.",
         status: "success",
         duration: 7500,
       });
@@ -82,7 +74,7 @@ function EmailEdition() {
     handleLoading(false);
     toast({
       id: "login-error",
-      title: "Erro na edição de email",
+      title: "Erro na edição de senha",
       // @ts-ignore
       description: res.error?.message,
       status: "error",
@@ -115,18 +107,32 @@ function EmailEdition() {
             onSubmit={onSubmit}
           >
             <Input
-              type="text"
-              label="Email atual"
-              placeholder="exemplo@mail.com"
-              errors={errors.email}
-              {...register("email")}
+              type="password"
+              label="Senha atual"
+              placeholder="Informe sua senha"
+              errors={errors.oldPassword}
+              {...register("oldPassword")}
             />
             <Input
-              type="text"
-              label="Email novo"
-              placeholder="exemplo@mail.com"
-              errors={errors.newEmail}
-              {...register("newEmail")}
+              type="password"
+              label="Nova senha"
+              placeholder="Crie uma nova senha"
+              errors={errors.newPassword}
+              infoText={
+                <Stack spacing="0">
+                  <Text>Deve conter ao menos um dígito;</Text>
+                  <Text>Deve conter ao menos uma letra maiúscula;</Text>
+                  <Text>Deve conter ao menos 6 caracteres;</Text>
+                </Stack>
+              }
+              {...register("newPassword")}
+            />
+            <Input
+              type="password"
+              label="Confirmação de senha"
+              placeholder="Confirme sua nova senha"
+              errors={errors.newPasswordConfirmation}
+              {...register("newPasswordConfirmation")}
             />
             <Button colorScheme="green" w="100%" type="submit">
               Salvar
@@ -144,4 +150,4 @@ function EmailEdition() {
   );
 }
 
-export default EmailEdition;
+export default PasswordEdition;

@@ -55,3 +55,21 @@ export const updateUser = async (data: { email: string }, cpf: string) => {
     };
   }
 };
+
+export const updateUserPassword = async (
+  data: { oldPassword: string; newPassword: string },
+  cpf: string
+) => {
+  try {
+    const res = await api.user.post(`/updateUserPassword/${cpf}`, data);
+
+    return { type: "success", value: res };
+  } catch (error) {
+    if (error instanceof Error) return { type: "error", error };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+    };
+  }
+};
