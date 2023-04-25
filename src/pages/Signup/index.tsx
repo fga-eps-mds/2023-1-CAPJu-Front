@@ -79,7 +79,7 @@ function Signup() {
         // @ts-ignore
         description: "Houve um erro ao carregar unidades, tentando novamente.",
         status: "error",
-        position: "top",
+
         isClosable: true,
       });
     },
@@ -114,7 +114,6 @@ function Signup() {
         title: "Solicitação enviada com sucesso!",
         description: "Sua solicitação de cadastro logo será analisada.",
         status: "success",
-        position: "top",
       });
       return;
     }
@@ -126,7 +125,7 @@ function Signup() {
       // @ts-ignore
       description: res.error?.message,
       status: "error",
-      position: "top",
+
       isClosable: true,
     });
   });
@@ -141,7 +140,7 @@ function Signup() {
       description:
         "Houve um erro ao tentar buscar unidades, favor tentar novamente.",
       status: "error",
-      position: "top",
+
       duration: 9000,
       isClosable: true,
     });

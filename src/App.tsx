@@ -14,7 +14,7 @@ function App() {
       theme={theme}
       toastOptions={{
         defaultOptions: {
-          position: "top",
+          position: "top-right",
           duration: 10000,
           containerStyle: { marginTop: "28" },
         },

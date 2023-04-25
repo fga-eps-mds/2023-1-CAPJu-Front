@@ -3,7 +3,8 @@ import { Navigate } from "react-router-dom";
 
 import { PrivateLayout } from "layouts/Private";
 
-const AcountEdition = lazy(() => import("pages/AccountEdition"));
+const AccountEdition = lazy(() => import("pages/AccountEdition"));
+const EmailEdition = lazy(() => import("pages/EmailEdition"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
@@ -14,7 +15,12 @@ export const PrivateRoutes: MenuItem[] = [
   {
     path: "editar-conta",
     name: "AccountEdition",
-    element: <AcountEdition />,
+    element: <AccountEdition />,
+  },
+  {
+    path: "editar-conta/email",
+    name: "EmailEdition",
+    element: <EmailEdition />,
   },
   {
     path: "*",

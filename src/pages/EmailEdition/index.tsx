@@ -1,39 +1,42 @@
 import {
-  Flex,
   Card,
   CardBody,
-  Image,
   Button,
   chakra,
   useToast,
   Text,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigate } from "react-router-dom";
 
-import { useAuth } from "hooks/useAuth";
-import { useLoading } from "hooks/useLoading";
 import { Input } from "components/FormFields";
+import { PrivateLayout } from "layouts/Private";
+import { useLoading } from "hooks/useLoading";
+import { updateUser } from "services/user";
+import { useAuth } from "hooks/useAuth";
 
 type FormValues = {
-  cpf: string;
-  password: string;
+  email: string;
+  newEmail: string;
 };
 
 const validationSchema = yup.object({
-  cpf: yup
+  email: yup
     .string()
-    .required("Preencha seu CPF")
-    .matches(/^([0-9]){3}\.([0-9]){3}\.([0-9]){3}-([0-9]){2}$/, "CPF inválido"),
-  password: yup.string().required("Preencha sua Senha"),
+    .required("Informe seu e-mail atual")
+    .email("Endereço de email inválido"),
+  newEmail: yup
+    .string()
+    .required("Informe um novo endereço de email")
+    .email("Endereço de email inválido"),
 });
 
-function Login() {
+function EmailEdition() {
   const toast = useToast();
   const navigate = useNavigate();
-  const { handleLogin } = useAuth();
+  const { user } = useAuth();
   const { handleLoading } = useLoading();
   const {
     register,
@@ -46,17 +49,32 @@ function Login() {
 
   const onSubmit = handleSubmit(async (data) => {
     handleLoading(true);
-    const res = await handleLogin(data);
+
+    if (user?.email !== data.email) {
+      handleLoading(false);
+      toast({
+        id: "login-error",
+        title: "Erro na edição de email",
+        // @ts-ignore
+        description: "O email atual informado está incorreto.",
+        status: "error",
+        isClosable: true,
+      });
+      return;
+    }
+
+    const res = await updateUser({ email: data.newEmail }, user.cpf);
 
     // @ts-ignore
     if (res.type === "success") {
       handleLoading(false);
-      navigate("/", { replace: true });
+      navigate("/editar-conta");
       toast({
         id: "login-success",
-        title: "Bem vindo!",
-        description: "Login efetuado com sucesso!",
+        title: "Sucesso!",
+        description: "Seu endereço de email foi atualizado.",
         status: "success",
+        duration: 7500,
       });
       return;
     }
@@ -64,19 +82,17 @@ function Login() {
     handleLoading(false);
     toast({
       id: "login-error",
-      title: "Erro no login",
+      title: "Erro na edição de email",
       // @ts-ignore
       description: res.error?.message,
       status: "error",
-
-      duration: 3500,
       isClosable: true,
     });
   });
 
   return (
-    <Flex flex="1" alignItems="center" justifyContent="center" w="100%">
-      <Card p={["10", "20"]} w="90%" maxW="454">
+    <PrivateLayout>
+      <Card p="10" w="90%" maxW="454" mt="16" mb={["28", 0]}>
         <CardBody
           w="100%"
           p={0}
@@ -86,9 +102,8 @@ function Login() {
           justifyContent="center"
           gap="3"
         >
-          <Image w="100%" maxW="36" src="/assets/logo.png" m="0 auto" />
           <Text fontSize={["lg", "xl"]} fontWeight="semibold">
-            Faça Login
+            Edite seu email
           </Text>
           <chakra.form
             w="100%"
@@ -101,27 +116,26 @@ function Login() {
           >
             <Input
               type="text"
-              label="CPF"
-              placeholder="000.000.000-00"
-              mask="999.999.999-99"
-              errors={errors.cpf}
-              {...register("cpf")}
+              label="Email atual"
+              placeholder="exemplo@mail.com"
+              errors={errors.email}
+              {...register("email")}
             />
             <Input
-              type="password"
-              label="Senha"
-              placeholder="********"
-              errors={errors.password}
-              {...register("password")}
+              type="text"
+              label="Email novo"
+              placeholder="exemplo@mail.com"
+              errors={errors.newEmail}
+              {...register("newEmail")}
             />
             <Button colorScheme="green" w="100%" type="submit">
-              Entrar
+              Salvar
             </Button>
           </chakra.form>
         </CardBody>
       </Card>
-    </Flex>
+    </PrivateLayout>
   );
 }
 
-export default Login;
+export default EmailEdition;
