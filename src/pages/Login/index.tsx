@@ -7,6 +7,7 @@ import {
   chakra,
   useToast,
   Text,
+  Link,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -123,6 +124,7 @@ function Login() {
             <Button colorScheme="green" w="100%" type="submit">
               Entrar
             </Button>
+            <Link href="/recuperar-senha">Esqueceu sua senha?</Link>
           </chakra.form>
         </CardBody>
       </Card>
