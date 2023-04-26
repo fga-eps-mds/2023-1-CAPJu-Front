@@ -247,8 +247,9 @@ function Signup() {
             </Button>
             <Alert status="info" variant="left-accent">
               <AlertIcon />
-              Este cadastro se trata apenas de uma solicitação, após o envio seu
-              cadastro ainda será analisado para ser aceito.
+              Esta etapa consiste apenas em uma solicitação de cadastro. O
+              efetivo login no sistema será possível após a aprovação de sua
+              solicitação.
             </Alert>
           </chakra.form>
         </CardBody>

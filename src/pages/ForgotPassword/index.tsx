@@ -3,38 +3,30 @@ import {
   Card,
   CardBody,
   Image,
-  Button,
-  chakra,
-  useToast,
   Text,
-  Link,
+  Button,
+  useToast,
+  chakra,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-
-import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
 import { Input } from "components/FormFields";
+import { forgotPassword } from "services/user";
 
 type FormValues = {
-  cpf: string;
-  password: string;
+  email: string;
 };
 
 const validationSchema = yup.object({
-  cpf: yup
-    .string()
-    .required("Preencha seu CPF")
-    .matches(/^([0-9]){3}\.([0-9]){3}\.([0-9]){3}-([0-9]){2}$/, "CPF inválido"),
-  password: yup.string().required("Preencha sua Senha"),
+  email: yup.string().required("Preencha seu Email").email("Email inválido"),
 });
 
-function Login() {
+function ForgotPassword() {
   const toast = useToast();
   const navigate = useNavigate();
-  const { handleLogin } = useAuth();
   const { handleLoading } = useLoading();
   const {
     register,
@@ -47,16 +39,14 @@ function Login() {
 
   const onSubmit = handleSubmit(async (data) => {
     handleLoading(true);
-    const res = await handleLogin(data);
-
-    // @ts-ignore
+    const res = await forgotPassword(data);
     if (res.type === "success") {
       handleLoading(false);
       navigate("/", { replace: true });
       toast({
         id: "login-success",
-        title: "Bem vindo!",
-        description: "Login efetuado com sucesso!",
+        title: "Email enviado com sucesso!",
+        description: "Acesse seu email para a recuperar sua senha",
         status: "success",
         duration: 3500,
       });
@@ -65,14 +55,15 @@ function Login() {
 
     handleLoading(false);
     toast({
-      id: "login-error",
-      title: "Erro no login",
+      id: "email-error",
+      title: "Erro no envio de email",
       // @ts-ignore
       description: res.error?.message,
       status: "error",
       duration: 3500,
       isClosable: true,
     });
+    handleLoading(false);
   });
 
   return (
@@ -95,7 +86,7 @@ function Login() {
         >
           <Image w="100%" maxW="36" src="/assets/logo.png" m="0 auto" />
           <Text fontSize={["lg", "xl"]} fontWeight="semibold">
-            Faça Login
+            Recuperação de senha
           </Text>
           <chakra.form
             w="100%"
@@ -107,24 +98,18 @@ function Login() {
             onSubmit={onSubmit}
           >
             <Input
-              type="text"
-              label="CPF"
-              placeholder="000.000.000-00"
-              mask="999.999.999-99"
-              errors={errors.cpf}
-              {...register("cpf")}
-            />
-            <Input
-              type="password"
-              label="Senha"
-              placeholder="********"
-              errors={errors.password}
-              {...register("password")}
+              type="email"
+              label="Email"
+              placeholder="exemplo@email.com"
+              errors={errors.email}
+              {...register("email")}
             />
             <Button colorScheme="green" w="100%" type="submit">
-              Entrar
+              Enviar
             </Button>
-            <Link href="/recuperar-senha">Esqueceu sua senha?</Link>
+            <Button w="100%" onClick={() => navigate("/", { replace: true })}>
+              Cancelar
+            </Button>
           </chakra.form>
         </CardBody>
       </Card>
@@ -132,4 +117,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ForgotPassword;

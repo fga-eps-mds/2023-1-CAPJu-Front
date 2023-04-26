@@ -73,3 +73,16 @@ export const updateUserPassword = async (
     };
   }
 };
+
+export const forgotPassword = async (data: { email: string }) => {
+  try {
+    const res = await api.user.post("/requestRecovery", data);
+    return { type: "success", value: res };
+  } catch (error) {
+    if (error instanceof Error) return { type: "error", error };
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+    };
+  }
+};
