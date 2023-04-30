@@ -42,5 +42,6 @@ declare global {
     icon: JSX.Element;
     actionName: string;
     action: () => any;
+    disabled?: boolean;
   };
 }
