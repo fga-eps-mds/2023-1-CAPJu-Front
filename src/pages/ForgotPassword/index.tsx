@@ -57,7 +57,6 @@ function ForgotPassword() {
     toast({
       id: "email-error",
       title: "Erro no envio de email",
-      // @ts-ignore
       description: res.error?.message,
       status: "error",
       duration: 3500,

@@ -7,13 +7,15 @@ export const signIn = async (credentials: {
   try {
     const res = await api.user.post<User>("/login", credentials);
 
-    return { type: "success", value: res } as unknown as Result<User>;
+    return { type: "success", value: res.data } as unknown as Result<User>;
   } catch (error) {
-    if (error instanceof Error) return { type: "error", error };
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
 
     return {
       type: "error",
       error: new Error("Erro desconhecido"),
+      value: undefined,
     };
   }
 };
@@ -30,13 +32,15 @@ export const signUp = async (credentials: {
   try {
     const res = await api.user.post<User>("/newUser", credentials);
 
-    return { type: "success", value: res } as unknown as Result<User>;
+    return { type: "success", value: res.data } as unknown as Result<User>;
   } catch (error) {
-    if (error instanceof Error) return { type: "error", error };
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
 
     return {
       type: "error",
       error: new Error("Erro desconhecido"),
+      value: undefined,
     };
   }
 };
@@ -45,13 +49,15 @@ export const updateUser = async (data: { email: string }, cpf: string) => {
   try {
     const res = await api.user.put(`/updateUser/${cpf}`, data);
 
-    return { type: "success", value: res };
+    return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error) return { type: "error", error };
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
 
     return {
       type: "error",
       error: new Error("Erro desconhecido"),
+      value: undefined,
     };
   }
 };
@@ -63,13 +69,15 @@ export const updateUserPassword = async (
   try {
     const res = await api.user.post(`/updateUserPassword/${cpf}`, data);
 
-    return { type: "success", value: res };
+    return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error) return { type: "error", error };
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
 
     return {
       type: "error",
       error: new Error("Erro desconhecido"),
+      value: undefined,
     };
   }
 };
@@ -77,12 +85,15 @@ export const updateUserPassword = async (
 export const forgotPassword = async (data: { email: string }) => {
   try {
     const res = await api.user.post("/requestRecovery", data);
-    return { type: "success", value: res };
+    return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error) return { type: "error", error };
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
     return {
       type: "error",
       error: new Error("Erro desconhecido"),
+      value: undefined,
     };
   }
 };

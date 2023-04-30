@@ -76,7 +76,6 @@ function Signup() {
       toast({
         id: "units-error",
         title: "Erro ao carregar unidade",
-        // @ts-ignore
         description: "Houve um erro ao carregar unidades, tentando novamente.",
         status: "error",
 
@@ -86,7 +85,6 @@ function Signup() {
   });
   const units = useMemo(() => {
     return (
-      // @ts-ignore
       unitsData?.value?.map((unit) => {
         return { label: unit.name, value: unit.idUnit };
       }) || []
@@ -105,7 +103,6 @@ function Signup() {
     handleLoading(true);
     const res = await signUp(data);
 
-    // @ts-ignore
     if (res.type === "success") {
       handleLoading(false);
       navigate("/", { replace: true });
@@ -122,7 +119,6 @@ function Signup() {
     toast({
       id: "login-error",
       title: "Erro no cadastro",
-      // @ts-ignore
       description: res.error?.message,
       status: "error",
 
@@ -136,7 +132,6 @@ function Signup() {
     toast({
       id: "units-error",
       title: "Erro ao buscar unidades",
-      // @ts-ignore
       description:
         "Houve um erro ao tentar buscar unidades, favor tentar novamente.",
       status: "error",

@@ -24,8 +24,8 @@ declare global {
   };
 
   type Result<T> = ResultSuccess<T> | ResultError;
-  type ResultSuccess<T> = { type: "success"; value: { data: T } };
-  type ResultError = { type: "error"; error: Error };
+  type ResultSuccess<T> = { type: "success"; value: T };
+  type ResultError = { type: "error"; error: Error; value: undefined };
 
   type RouteObject = import("react-router-dom").RouteObject;
 
@@ -35,5 +35,12 @@ declare global {
     icon?: string;
     element?: JSX.Element;
     children?: MenuItem[];
+  };
+
+  type TableAction = {
+    label: string;
+    icon: JSX.Element;
+    actionName: string;
+    action: () => any;
   };
 }

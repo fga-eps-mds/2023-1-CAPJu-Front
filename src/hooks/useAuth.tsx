@@ -13,7 +13,10 @@ type AuthContextType = {
   isAuthenticated: boolean;
   user: User | null;
   // eslint-disable-next-line no-unused-vars
-  handleLogin: (credentials: { cpf: string; password: string }) => void;
+  handleLogin: (credentials: {
+    cpf: string;
+    password: string;
+  }) => Promise<Result<User>>;
   handleLogout: () => void;
   validateAuthentication: () => void;
 };
@@ -31,8 +34,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const res = await signIn(credentials);
 
       if (res.type === "success") {
-        localStorage.setItem("@CAPJu:user", JSON.stringify(res.value.data));
-        setUser(res.value.data);
+        localStorage.setItem("@CAPJu:user", JSON.stringify(res.value));
+        setUser(res.value);
       }
 
       return res;

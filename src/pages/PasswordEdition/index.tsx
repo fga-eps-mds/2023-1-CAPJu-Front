@@ -57,7 +57,6 @@ function PasswordEdition() {
 
     const res = await updateUserPassword(data, user.cpf);
 
-    // @ts-ignore
     if (res.type === "success") {
       handleLoading(false);
       navigate("/editar-conta");
@@ -75,7 +74,6 @@ function PasswordEdition() {
     toast({
       id: "login-error",
       title: "Erro na edição de senha",
-      // @ts-ignore
       description: res.error?.message,
       status: "error",
       isClosable: true,

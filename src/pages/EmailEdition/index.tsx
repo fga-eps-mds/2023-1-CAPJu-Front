@@ -55,7 +55,6 @@ function EmailEdition() {
       toast({
         id: "login-error",
         title: "Erro na edição de email",
-        // @ts-ignore
         description: "O email atual informado está incorreto.",
         status: "error",
         isClosable: true,
@@ -65,7 +64,6 @@ function EmailEdition() {
 
     const res = await updateUser({ email: data.newEmail }, user.cpf);
 
-    // @ts-ignore
     if (res.type === "success") {
       handleLoading(false);
       navigate("/editar-conta");
@@ -83,7 +81,6 @@ function EmailEdition() {
     toast({
       id: "login-error",
       title: "Erro na edição de email",
-      // @ts-ignore
       description: res.error?.message,
       status: "error",
       isClosable: true,

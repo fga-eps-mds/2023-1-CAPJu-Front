@@ -49,7 +49,6 @@ function Login() {
     handleLoading(true);
     const res = await handleLogin(data);
 
-    // @ts-ignore
     if (res.type === "success") {
       handleLoading(false);
       navigate("/", { replace: true });
@@ -67,7 +66,6 @@ function Login() {
     toast({
       id: "login-error",
       title: "Erro no login",
-      // @ts-ignore
       description: res.error?.message,
       status: "error",
       duration: 3500,
