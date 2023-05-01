@@ -21,8 +21,8 @@ import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { ActionButton } from "./ActionButton";
 
 export type DataTableProps<Data extends object> = {
-  data: Data[];
-  columns: ColumnDef<Data, any>[];
+  data: (Data & { actionsProps: any })[];
+  columns: ColumnDef<Data & { actionsProps: any }, any>[];
   isDataFetching?: boolean;
 };
 
@@ -105,9 +105,17 @@ export function DataTable<Data extends object>({
                   justifyContent="end"
                   borderBottomWidth={isLastRow ? 0 : 1}
                 >
-                  {(value as TableAction[])?.map((actionItem: TableAction) => (
-                    <ActionButton key={actionItem.label} {...actionItem} />
-                  ))}
+                  {(value as TableAction[])?.map((actionItem: TableAction) => {
+                    return (
+                      <ActionButton
+                        key={actionItem.label}
+                        {...actionItem}
+                        action={() =>
+                          actionItem.action(row.original.actionsProps)
+                        }
+                      />
+                    );
+                  })}
                 </Td>
               ) : (
                 <Td key={id} borderBottomWidth={isLastRow ? 0 : 1}>

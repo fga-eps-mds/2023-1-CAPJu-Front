@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, useToast, Text, Button } from "@chakra-ui/react";
+import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon, ViewIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -10,22 +10,29 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
+import { CreationModal } from "./CreationModal";
 
 interface UnitTableRow extends Unit {
-  tableActions?: TableAction[];
+  tableActions: TableAction[];
+  actionsProps: any;
 }
 
 function Units() {
   const toast = useToast();
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
-  const { data, isFetched } = useQuery({
+  const {
+    isOpen: isCreationOpen,
+    onOpen: onCreationOpen,
+    onClose: onCreationClose,
+  } = useDisclosure();
+  const { data, isFetched, refetch } = useQuery({
     queryKey: ["units"],
     queryFn: getUnits,
     onError: () => {
       toast({
         id: "units-error",
-        title: "Erro ao carregar unidade",
+        title: "Erro ao carregar unidades",
         description:
           "Houve um erro ao carregar unidades, favor tentar novamente.",
         status: "error",
@@ -44,21 +51,21 @@ function Units() {
       {
         label: "Visualizar Admins",
         icon: <ViewIcon boxSize={4} />,
-        action: () => console.log("Visualizar admins"),
+        action: () => {},
         actionName: "view-admins",
         disabled: isActionDisabled("view-admins"),
       },
       {
         label: "Adicionar Admins",
         icon: <AddIcon boxSize={4} />,
-        action: () => console.log("Adicionar admins"),
+        action: () => {},
         actionName: "add-admin-in-unit",
         disabled: isActionDisabled("add-admin-in-unit"),
       },
     ],
     [userData]
   );
-  const filteredUnits = useMemo(() => {
+  const filteredUnits = useMemo<UnitTableRow[]>(() => {
     if (!isFetched) return [];
 
     const value =
@@ -69,15 +76,15 @@ function Units() {
         : data?.value;
 
     return (
-      value?.reduce(
+      (value?.reduce(
         (acc: UnitTableRow[] | Unit[], curr: UnitTableRow | Unit) => [
           ...acc,
           { ...curr, tableActions },
         ],
         []
-      ) || []
+      ) as UnitTableRow[]) || []
     );
-  }, [filter, isFetched]);
+  }, [data, filter, isFetched]);
 
   const tableColumnHelper = createColumnHelper<UnitTableRow>();
   const tableColumns = [
@@ -110,7 +117,7 @@ function Units() {
             fontSize="sm"
             colorScheme="green"
             isDisabled={isActionDisabled("create-unit")}
-            onClick={() => {}}
+            onClick={onCreationOpen}
           >
             <AddIcon mr="2" boxSize={3} /> Criar unidade
           </Button>
@@ -133,6 +140,11 @@ function Units() {
         data={filteredUnits}
         columns={tableColumns}
         isDataFetching={!isFetched}
+      />
+      <CreationModal
+        isOpen={isCreationOpen}
+        onClose={onCreationClose}
+        afterSubmission={refetch}
       />
     </PrivateLayout>
   );

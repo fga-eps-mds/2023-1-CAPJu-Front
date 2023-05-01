@@ -41,7 +41,7 @@ declare global {
     label: string;
     icon: JSX.Element;
     actionName: string;
-    action: () => any;
+    action: (actionProps?: any) => any;
     disabled?: boolean;
   };
 }
