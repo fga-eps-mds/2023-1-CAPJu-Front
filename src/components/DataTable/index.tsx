@@ -7,6 +7,7 @@ import {
   Td,
   Skeleton,
   chakra,
+  Text,
 } from "@chakra-ui/react";
 import {
   useReactTable,
@@ -24,12 +25,20 @@ export type DataTableProps<Data extends object> = {
   data: (Data & { actionsProps: any })[];
   columns: ColumnDef<Data & { actionsProps: any }, any>[];
   isDataFetching?: boolean;
+  width?: string | number;
+  maxWidth?: string | number;
+  size?: string | string[];
+  emptyTableMessage?: string;
 };
 
 export function DataTable<Data extends object>({
   data,
   columns,
   isDataFetching = false,
+  width = "90%",
+  maxWidth = 1120,
+  size = ["sm", "md"],
+  emptyTableMessage = "Esta tabela está vazia no momento.",
 }: DataTableProps<Data>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
@@ -44,9 +53,9 @@ export function DataTable<Data extends object>({
   });
 
   return isDataFetching ? (
-    <Skeleton w="90%" maxW={1120} h="272" />
+    <Skeleton w={width} maxW={maxWidth} h="272" />
   ) : (
-    <Table bg="white" w="90%" maxW={1120} borderRadius="4">
+    <Table bg="white" w={width} maxW={maxWidth} borderRadius="4" size={size}>
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>
@@ -91,40 +100,55 @@ export function DataTable<Data extends object>({
         ))}
       </Thead>
       <Tbody>
-        {table.getRowModel().rows.map((row, index) => (
-          <Tr key={row.id}>
-            {row.getVisibleCells().map(({ id, column, getValue }) => {
-              const { meta } = column.columnDef;
-              const isLastRow = table.getRowModel().rows?.length - 1 === index;
-              const value = getValue();
-
-              return meta?.isTableActions ? (
-                <Td
-                  key={id}
-                  display="flex"
-                  justifyContent="end"
-                  borderBottomWidth={isLastRow ? 0 : 1}
-                >
-                  {(value as TableAction[])?.map((actionItem: TableAction) => {
-                    return (
-                      <ActionButton
-                        key={actionItem.label}
-                        {...actionItem}
-                        action={() =>
-                          actionItem.action(row.original.actionsProps)
-                        }
-                      />
-                    );
-                  })}
-                </Td>
-              ) : (
-                <Td key={id} borderBottomWidth={isLastRow ? 0 : 1}>
-                  {value as ReactNode}
-                </Td>
-              );
-            })}
+        {!data?.length ? (
+          <Tr>
+            <Td colSpan={columns.length}>
+              <Text textAlign="center" py="4">
+                {emptyTableMessage}
+              </Text>
+            </Td>
           </Tr>
-        ))}
+        ) : (
+          <>
+            {table.getRowModel().rows.map((row, index) => (
+              <Tr key={row.id}>
+                {row.getVisibleCells().map(({ id, column, getValue }) => {
+                  const { meta } = column.columnDef;
+                  const isLastRow =
+                    table.getRowModel().rows?.length - 1 === index;
+                  const value = getValue();
+
+                  return meta?.isTableActions ? (
+                    <Td
+                      key={id}
+                      display="flex"
+                      justifyContent="end"
+                      borderBottomWidth={isLastRow ? 0 : 1}
+                    >
+                      {(value as TableAction[])?.map(
+                        (actionItem: TableAction) => {
+                          return (
+                            <ActionButton
+                              key={actionItem.label}
+                              {...actionItem}
+                              action={() =>
+                                actionItem.action(row.original.actionsProps)
+                              }
+                            />
+                          );
+                        }
+                      )}
+                    </Td>
+                  ) : (
+                    <Td key={id} borderBottomWidth={isLastRow ? 0 : 1}>
+                      {value as ReactNode}
+                    </Td>
+                  );
+                })}
+              </Tr>
+            ))}
+          </>
+        )}
       </Tbody>
     </Table>
   );

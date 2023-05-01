@@ -11,20 +11,22 @@ import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { CreationModal } from "./CreationModal";
-
-interface UnitTableRow extends Unit {
-  tableActions: TableAction[];
-  actionsProps: any;
-}
+import { AdminsListModal } from "./AdminsListModal";
 
 function Units() {
   const toast = useToast();
+  const [selectedUnit, selectUnit] = useState<Unit | null>(null);
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
   const {
     isOpen: isCreationOpen,
     onOpen: onCreationOpen,
     onClose: onCreationClose,
+  } = useDisclosure();
+  const {
+    isOpen: isAdminsListOpen,
+    onOpen: onAdminsListOpen,
+    onClose: onAdminsListClose,
   } = useDisclosure();
   const { data, isFetched, refetch } = useQuery({
     queryKey: ["units"],
@@ -40,7 +42,7 @@ function Units() {
       });
     },
   });
-  const { data: userData } = useQuery({
+  const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
@@ -51,7 +53,10 @@ function Units() {
       {
         label: "Visualizar Admins",
         icon: <ViewIcon boxSize={4} />,
-        action: () => {},
+        action: ({ unit }: { unit: Unit }) => {
+          selectUnit(unit);
+          onAdminsListOpen();
+        },
         actionName: "view-admins",
         disabled: isActionDisabled("view-admins"),
       },
@@ -65,7 +70,7 @@ function Units() {
     ],
     [userData]
   );
-  const filteredUnits = useMemo<UnitTableRow[]>(() => {
+  const filteredUnits = useMemo<TableRow<Unit>[]>(() => {
     if (!isFetched) return [];
 
     const value =
@@ -77,16 +82,16 @@ function Units() {
 
     return (
       (value?.reduce(
-        (acc: UnitTableRow[] | Unit[], curr: UnitTableRow | Unit) => [
+        (acc: TableRow<Unit>[] | Unit[], curr: TableRow<Unit> | Unit) => [
           ...acc,
-          { ...curr, tableActions },
+          { ...curr, tableActions, actionsProps: { unit: curr } },
         ],
         []
-      ) as UnitTableRow[]) || []
+      ) as TableRow<Unit>[]) || []
     );
   }, [data, filter, isFetched]);
 
-  const tableColumnHelper = createColumnHelper<UnitTableRow>();
+  const tableColumnHelper = createColumnHelper<TableRow<Unit>>();
   const tableColumns = [
     tableColumnHelper.accessor("name", {
       cell: (info) => info.getValue(),
@@ -139,13 +144,21 @@ function Units() {
       <DataTable
         data={filteredUnits}
         columns={tableColumns}
-        isDataFetching={!isFetched}
+        isDataFetching={!isFetched || !isUserFetched}
+        emptyTableMessage="Não foram encontradas unidades."
       />
       <CreationModal
         isOpen={isCreationOpen}
         onClose={onCreationClose}
         afterSubmission={refetch}
       />
+      {selectedUnit && isAdminsListOpen ? (
+        <AdminsListModal
+          unit={selectedUnit}
+          isOpen={isAdminsListOpen}
+          onClose={onAdminsListClose}
+        />
+      ) : null}
     </PrivateLayout>
   );
 }

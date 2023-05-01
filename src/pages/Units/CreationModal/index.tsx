@@ -103,10 +103,10 @@ export function CreationModal({
             />
           </ModalBody>
           <ModalFooter gap="2">
-            <Button variant="ghost" onClick={onClose}>
+            <Button variant="ghost" onClick={onClose} size="sm">
               Cancelar
             </Button>
-            <Button colorScheme="blue" type="submit">
+            <Button colorScheme="blue" type="submit" size="sm">
               Criar
             </Button>
           </ModalFooter>

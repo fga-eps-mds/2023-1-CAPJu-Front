@@ -44,4 +44,9 @@ declare global {
     action: (actionProps?: any) => any;
     disabled?: boolean;
   };
+
+  type TableRow<T> = T & {
+    tableActions: TableAction[];
+    actionsProps: any;
+  };
 }
