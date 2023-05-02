@@ -55,7 +55,7 @@ export function DenyModal({ user, isOpen, onClose, refetch }: DenyModalProps) {
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Visualizar Administradores</ModalHeader>
+        <ModalHeader>Recusar Solicitação</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Text>

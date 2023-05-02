@@ -10,6 +10,7 @@ import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { getUsersRequests } from "services/user";
+import { getUnits } from "services/units";
 import { AcceptModal } from "./AcceptModal";
 import { DenyModal } from "./DenyModal";
 
@@ -40,6 +41,14 @@ function Requests() {
     queryKey: ["requests"],
     queryFn: getUsersRequests,
   });
+  const {
+    data: unitsData,
+    isFetched: isUnitsFetched,
+    refetch: refetchUnits,
+  } = useQuery({
+    queryKey: ["units"],
+    queryFn: getUnits,
+  });
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
   const tableActions = useMemo(
@@ -68,7 +77,7 @@ function Requests() {
     []
   );
   const requests = useMemo<TableRow<User>[]>(() => {
-    if (!isRequestsFetched) return [];
+    if (!isRequestsFetched || !isUnitsFetched) return [];
 
     return (
       (requestsData?.value?.reduce(
@@ -78,19 +87,34 @@ function Requests() {
 
           return [
             ...acc,
-            { ...curr, tableActions, actionsProps: { user: curr } },
+            {
+              ...curr,
+              unit:
+                unitsData?.value?.find(
+                  (item) => item.idUnit === userData?.value?.idUnit
+                )?.name || "-",
+              tableActions,
+              actionsProps: { user: curr },
+            },
           ];
         },
         []
       ) as TableRow<User>[]) || []
     );
-  }, [requestsData, isRequestsFetched, filter]);
+  }, [requestsData, unitsData, isRequestsFetched, isUnitsFetched, filter]);
 
   const tableColumnHelper = createColumnHelper<TableRow<User>>();
   const tableColumns = [
     tableColumnHelper.accessor("fullName", {
       cell: (info) => info.getValue(),
       header: "Nomes",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("unit", {
+      cell: (info) => info.getValue(),
+      header: "Unidades",
       meta: {
         isSortable: true,
       },
@@ -111,6 +135,11 @@ function Requests() {
       },
     }),
   ];
+
+  function refetchAll() {
+    refetchRequests();
+    refetchUnits();
+  }
 
   return (
     <PrivateLayout>
@@ -145,7 +174,7 @@ function Requests() {
           isOpen={isAcceptOpen}
           onClose={onAcceptClose}
           user={selectedUser}
-          refetch={refetchRequests}
+          refetch={() => refetchAll()}
         />
       ) : null}
       {userData?.value && selectedUser && isDenyOpen ? (
@@ -153,7 +182,7 @@ function Requests() {
           isOpen={isDenyOpen}
           onClose={onDenyClose}
           user={selectedUser}
-          refetch={refetchRequests}
+          refetch={() => refetchAll()}
         />
       ) : null}
     </PrivateLayout>

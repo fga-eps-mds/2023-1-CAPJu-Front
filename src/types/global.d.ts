@@ -9,8 +9,9 @@ declare global {
     token: string;
     expiresIn: Date;
     idRole: number;
-    role: string;
+    role?: string;
     idUnit: number;
+    unit?: string;
   };
 
   type Unit = {

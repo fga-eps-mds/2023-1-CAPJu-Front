@@ -60,7 +60,7 @@ export function AcceptModal({
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Visualizar Administradores</ModalHeader>
+        <ModalHeader>Aceitar Solicitação</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Text>
