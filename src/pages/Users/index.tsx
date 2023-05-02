@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex, Text, useDisclosure } from "@chakra-ui/react";
 import { DeleteIcon, Icon } from "@chakra-ui/icons";
 import { MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -13,17 +13,26 @@ import { hasPermission } from "utils/permissions";
 import { getAcceptedUsers } from "services/user";
 import { getUnits } from "services/units";
 import { roleNameById } from "utils/roles";
+import { DeleteModal } from "./DeleteModal";
 
 function Users() {
-  // const toast = useToast();
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
   const { getUserData } = useAuth();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const { data: usersData, isFetched: isUsersFetched } = useQuery({
+  const {
+    data: usersData,
+    isFetched: isUsersFetched,
+    refetch: refetchUsers,
+  } = useQuery({
     queryKey: ["accepted-users"],
     queryFn: getAcceptedUsers,
   });
@@ -49,6 +58,7 @@ function Users() {
         icon: <DeleteIcon boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
+          onDeleteOpen();
         },
         actionName: "delete-user",
         disabled: isActionDisabled("delete-user"),
@@ -65,6 +75,8 @@ function Users() {
           if (!curr.fullName.toLowerCase().includes(filter.toLowerCase()))
             return acc;
 
+          const role = roleNameById(curr.idRole);
+
           return [
             ...acc,
             {
@@ -72,9 +84,9 @@ function Users() {
               unit:
                 unitsData?.value?.find((item) => item.idUnit === curr.idUnit)
                   ?.name || "-",
-              role: roleNameById(curr.idRole),
+              role,
               tableActions,
-              actionsProps: { user: curr },
+              actionsProps: { user: { ...curr, role } },
             },
           ];
         },
@@ -144,6 +156,14 @@ function Users() {
         isDataFetching={!isUsersFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas solicitações no momento."
       />
+      {userData?.value && selectedUser && isDeleteOpen ? (
+        <DeleteModal
+          isOpen={isDeleteOpen}
+          onClose={onDeleteClose}
+          user={selectedUser}
+          refetch={refetchUsers}
+        />
+      ) : null}
     </PrivateLayout>
   );
 }

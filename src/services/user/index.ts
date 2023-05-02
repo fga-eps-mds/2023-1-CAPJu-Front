@@ -186,3 +186,20 @@ export const denyRequest = async (userId: string): Promise<Result<null>> => {
     };
   }
 };
+
+export const deleteUser = async (userId: string): Promise<Result<null>> => {
+  try {
+    await api.user.delete(`/deleteUser/${userId}`);
+
+    return { type: "success", value: null };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
