@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
-import { AddIcon, ViewIcon } from "@chakra-ui/icons";
+import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
+import { MdPersonAddAlt1 } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { PrivateLayout } from "layouts/Private";
@@ -12,6 +13,7 @@ import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { CreationModal } from "./CreationModal";
 import { AdminsListModal } from "./AdminsListModal";
+import { AddAdminModal } from "./AddAdminModal";
 
 function Units() {
   const toast = useToast();
@@ -28,7 +30,16 @@ function Units() {
     onOpen: onAdminsListOpen,
     onClose: onAdminsListClose,
   } = useDisclosure();
-  const { data, isFetched, refetch } = useQuery({
+  const {
+    isOpen: isAdminAdditionOpen,
+    onOpen: onAdminAdditionOpen,
+    onClose: onAdminAdditionClose,
+  } = useDisclosure();
+  const {
+    data: unitsData,
+    isFetched: isUnitsFetched,
+    refetch: refetchUnits,
+  } = useQuery({
     queryKey: ["units"],
     queryFn: getUnits,
     onError: () => {
@@ -62,23 +73,26 @@ function Units() {
       },
       {
         label: "Adicionar Admins",
-        icon: <AddIcon boxSize={4} />,
-        action: () => {},
+        icon: <Icon as={MdPersonAddAlt1} boxSize={4} />,
+        action: ({ unit }: { unit: Unit }) => {
+          selectUnit(unit);
+          onAdminAdditionOpen();
+        },
         actionName: "add-admin-in-unit",
         disabled: isActionDisabled("add-admin-in-unit"),
       },
     ],
-    [userData]
+    [isUnitsFetched, isUserFetched]
   );
   const filteredUnits = useMemo<TableRow<Unit>[]>(() => {
-    if (!isFetched) return [];
+    if (!isUnitsFetched) return [];
 
     const value =
       filter !== ""
-        ? data?.value?.filter((unit) =>
+        ? unitsData?.value?.filter((unit) =>
             unit.name.toLowerCase().includes(filter.toLocaleLowerCase())
           )
-        : data?.value;
+        : unitsData?.value;
 
     return (
       (value?.reduce(
@@ -89,7 +103,7 @@ function Units() {
         []
       ) as TableRow<Unit>[]) || []
     );
-  }, [data, filter, isFetched]);
+  }, [unitsData, filter, isUnitsFetched]);
 
   const tableColumnHelper = createColumnHelper<TableRow<Unit>>();
   const tableColumns = [
@@ -144,19 +158,27 @@ function Units() {
       <DataTable
         data={filteredUnits}
         columns={tableColumns}
-        isDataFetching={!isFetched || !isUserFetched}
+        isDataFetching={!isUnitsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas unidades."
       />
       <CreationModal
         isOpen={isCreationOpen}
         onClose={onCreationClose}
-        afterSubmission={refetch}
+        afterSubmission={refetchUnits}
       />
-      {selectedUnit && isAdminsListOpen ? (
+      {userData?.value && selectedUnit && isAdminsListOpen ? (
         <AdminsListModal
+          userCpf={userData?.value?.cpf}
           unit={selectedUnit}
           isOpen={isAdminsListOpen}
           onClose={onAdminsListClose}
+        />
+      ) : null}
+      {userData?.value && selectedUnit && isAdminAdditionOpen ? (
+        <AddAdminModal
+          unit={selectedUnit}
+          isOpen={isAdminAdditionOpen}
+          onClose={onAdminAdditionClose}
         />
       ) : null}
     </PrivateLayout>

@@ -75,6 +75,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       ...res.value,
     });
 
+    localStorage.setItem("@CAPJu:user", JSON.stringify(user));
+
     return res;
   };
 

@@ -114,3 +114,20 @@ export const forgotPassword = async (data: { email: string }) => {
     };
   }
 };
+
+export const getAcceptedUsers = async (): Promise<Result<User[]>> => {
+  try {
+    const res = await api.user.get<User[]>(`/allUser?accepted=true`);
+
+    return { type: "success", value: res.data };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};

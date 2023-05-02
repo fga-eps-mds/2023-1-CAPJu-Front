@@ -82,6 +82,26 @@ export const getUnitAdmins = async (
   }
 };
 
+export const addUnitAdmin = async (data: {
+  idUnit: number;
+  cpf: string;
+}): Promise<Result<null>> => {
+  try {
+    await api.units.put("/setUnitAdmin/", { ...data });
+
+    return { type: "success", value: null };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
 export const removeUnitAdmin = async (data: {
   idUnit: number;
   cpf: string;

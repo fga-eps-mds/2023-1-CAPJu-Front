@@ -25,6 +25,7 @@ export type DataTableProps<Data extends object> = {
   data: (Data & { actionsProps: any })[];
   columns: ColumnDef<Data & { actionsProps: any }, any>[];
   isDataFetching?: boolean;
+  skeletonHeight?: string | number;
   width?: string | number;
   maxWidth?: string | number;
   size?: string | string[];
@@ -35,6 +36,7 @@ export function DataTable<Data extends object>({
   data,
   columns,
   isDataFetching = false,
+  skeletonHeight = 272,
   width = "90%",
   maxWidth = 1120,
   size = ["sm", "md"],
@@ -53,7 +55,7 @@ export function DataTable<Data extends object>({
   });
 
   return isDataFetching ? (
-    <Skeleton w={width} maxW={maxWidth} h="272" />
+    <Skeleton w={width} maxW={maxWidth} h={skeletonHeight} />
   ) : (
     <Table bg="white" w={width} maxW={maxWidth} borderRadius="4" size={size}>
       <Thead>

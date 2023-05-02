@@ -65,7 +65,6 @@ function PasswordEdition() {
         title: "Sucesso!",
         description: "Seu senha foi atualizada.",
         status: "success",
-        duration: 7500,
       });
       return;
     }

@@ -135,8 +135,6 @@ function Signup() {
       description:
         "Houve um erro ao tentar buscar unidades, favor tentar novamente.",
       status: "error",
-
-      duration: 9000,
       isClosable: true,
     });
   }, [unitsData]);

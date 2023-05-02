@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
-import { DeleteIcon } from "@chakra-ui/icons";
+import { Icon } from "@chakra-ui/icons";
+import { MdPersonAddAlt1 } from "react-icons/md";
 import {
   Modal,
   ModalOverlay,
@@ -12,75 +13,68 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { DataTable } from "components/DataTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "react-query";
 
-import { getUnitAdmins, removeUnitAdmin } from "services/units";
+import { addUnitAdmin } from "services/units";
+import { getAcceptedUsers } from "services/user";
 import { useLoading } from "hooks/useLoading";
+import { DataTable } from "components/DataTable";
 
-interface AdminsListProps {
-  userCpf: string;
+interface AddAdminModalProps {
   unit: Unit;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function AdminsListModal({
-  userCpf,
-  unit,
-  isOpen,
-  onClose,
-}: AdminsListProps) {
+export function AddAdminModal({ unit, isOpen, onClose }: AddAdminModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
   const { data, isFetched, refetch } = useQuery({
-    queryKey: ["unit-admins", unit.idUnit],
-    queryFn: () => getUnitAdmins(unit.idUnit),
+    queryKey: ["accepted-users", unit.idUnit],
+    queryFn: getAcceptedUsers,
   });
-  const tableActions = useMemo(
-    () => [
-      {
-        label: "Remover Admin da Unidade",
-        icon: <DeleteIcon boxSize={4} />,
-        action: async ({ cpf }: { cpf: string }) => {
-          handleLoading(true);
+  const tableActions: TableAction[] = [
+    {
+      label: "Tornar Administrador da Unidade",
+      icon: <Icon as={MdPersonAddAlt1} boxSize={4} />,
+      action: async ({ cpf }: { cpf: string }) => {
+        handleLoading(true);
 
-          try {
-            await removeUnitAdmin({ idUnit: unit.idUnit, cpf });
-            handleLoading(false);
-            toast({
-              id: "adm-removal-success",
-              title: "Aministrador removido",
-              description: "O usuário não é mais administrador da unidade.",
-              status: "success",
-              isClosable: true,
-            });
-            refetch();
-          } catch {
-            handleLoading(false);
-            toast({
-              id: "adm-removal-error",
-              title: "Erro ao remover administrador",
-              description: "Favor tentar novamente.",
-              status: "error",
-              isClosable: true,
-            });
-          }
-        },
-        actionName: "remove-admin-from-unit",
-        disabled: false,
+        try {
+          await addUnitAdmin({ idUnit: unit.idUnit, cpf });
+          handleLoading(false);
+          toast({
+            id: "adm-addition-success",
+            title: "Aministrador adicionado",
+            description:
+              "O usuário selecionado se tornou administrador da unidade.",
+            status: "success",
+            isClosable: true,
+          });
+          refetch();
+        } catch {
+          handleLoading(false);
+          toast({
+            id: "adm-addition-error",
+            title: "Erro ao tornar usuário administrador",
+            description: "Favor tentar novamente.",
+            status: "error",
+            isClosable: true,
+          });
+        }
       },
-    ],
-    []
-  );
+      actionName: "add-admin-in-unit",
+      disabled: false,
+    },
+  ];
   const admins = useMemo<TableRow<User>[]>(() => {
-    if (!isFetched) return [];
+    if (!isFetched || data?.type === "error" || !data?.value) return [];
 
     return (
       (data?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (curr.cpf === userCpf) return acc;
+          if (curr.idRole === 5 || curr.idUnit !== unit.idUnit) return acc;
 
           return [
             ...acc,
@@ -119,11 +113,11 @@ export function AdminsListModal({
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Visualizar Administradores</ModalHeader>
+        <ModalHeader>Adicionar Administradores</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Text mb="3" pl="4">
-            Administradores da unidade {unit?.name}
+            Torne usuários administradores da unidade {unit?.name}.
           </Text>
           <DataTable
             data={admins}
@@ -132,7 +126,7 @@ export function AdminsListModal({
             skeletonHeight="28"
             width="100%"
             size="sm"
-            emptyTableMessage="Não foi possível encontrar nenhum administrador para esta unidade."
+            emptyTableMessage="Não foram encontrados usuários disponíveis para se tornarem administradores desta unidade."
           />
         </ModalBody>
         <ModalFooter gap="2">

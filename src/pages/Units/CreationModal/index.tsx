@@ -66,7 +66,6 @@ export function CreationModal({
         title: "Sucesso!",
         description: "A unidade foi criada.",
         status: "success",
-        duration: 3500,
       });
       return;
     }
@@ -77,7 +76,6 @@ export function CreationModal({
       title: "Erro ao criar unidade",
       description: res.error?.message,
       status: "error",
-      duration: 3500,
       isClosable: true,
     });
   });
