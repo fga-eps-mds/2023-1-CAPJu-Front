@@ -14,6 +14,7 @@ import { getAcceptedUsers } from "services/user";
 import { getUnits } from "services/units";
 import { roleNameById } from "utils/roles";
 import { DeleteModal } from "./DeleteModal";
+import { EditModal } from "./EditModal";
 
 function Users() {
   const [filter, setFilter] = useState<string>("");
@@ -22,6 +23,11 @@ function Users() {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
     onClose: onDeleteClose,
+  } = useDisclosure();
+  const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onClose: onEditClose,
   } = useDisclosure();
   const { getUserData } = useAuth();
   const { data: userData, isFetched: isUserFetched } = useQuery({
@@ -49,6 +55,7 @@ function Users() {
         icon: <Icon as={MdEdit} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
+          onEditOpen();
         },
         actionName: "edit-user",
         disabled: isActionDisabled("accept-user"),
@@ -72,7 +79,10 @@ function Users() {
     return (
       (usersData?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (!curr.fullName.toLowerCase().includes(filter.toLowerCase()))
+          if (
+            !curr.fullName.toLowerCase().includes(filter.toLowerCase()) ||
+            curr.cpf === userData?.value?.cpf
+          )
             return acc;
 
           const role = roleNameById(curr.idRole);
@@ -160,6 +170,14 @@ function Users() {
         <DeleteModal
           isOpen={isDeleteOpen}
           onClose={onDeleteClose}
+          user={selectedUser}
+          refetch={refetchUsers}
+        />
+      ) : null}
+      {userData?.value && selectedUser && isEditOpen ? (
+        <EditModal
+          isOpen={isEditOpen}
+          onClose={onEditClose}
           user={selectedUser}
           refetch={refetchUsers}
         />

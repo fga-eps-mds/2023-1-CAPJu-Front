@@ -18,6 +18,10 @@ export const errorResponseHandler = (
       );
     }
 
+    if (typeof error?.response?.data?.error === "string") {
+      return Promise.reject(new Error(error.response.data.error));
+    }
+
     return Promise.reject(
       new Error("Something went wrong", {
         cause: error,

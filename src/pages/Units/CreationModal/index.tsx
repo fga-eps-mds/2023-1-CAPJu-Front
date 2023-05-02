@@ -24,7 +24,7 @@ type FormValues = {
 };
 
 const validationSchema = yup.object({
-  name: yup.string().required("Dê um nome à unidadee"),
+  name: yup.string().required("Dê um nome à unidade"),
 });
 
 interface CreationModalProps {

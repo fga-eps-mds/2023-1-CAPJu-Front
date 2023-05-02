@@ -203,3 +203,26 @@ export const deleteUser = async (userId: string): Promise<Result<null>> => {
     };
   }
 };
+
+export const updateUserRole = async (
+  cpf: string,
+  idRole: number
+): Promise<Result<null>> => {
+  try {
+    await api.user.put(`/updateUserRole/`, {
+      cpf,
+      idRole,
+    });
+
+    return { type: "success", value: null };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
