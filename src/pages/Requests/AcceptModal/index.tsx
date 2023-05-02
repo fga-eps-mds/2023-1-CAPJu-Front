@@ -8,20 +8,52 @@ import {
   ModalFooter,
   Button,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 
-interface AdminsListProps {
+import { acceptRequest } from "services/user";
+import { useLoading } from "hooks/useLoading";
+
+interface AcceptModalProps {
   user: User;
   isOpen: boolean;
   onClose: () => void;
+  refetch: () => void;
 }
 
-export function AcceptModal({ user, isOpen, onClose }: AdminsListProps) {
-  // const toast = useToast();
-  // const { handleLoading } = useLoading();
+export function AcceptModal({
+  user,
+  isOpen,
+  onClose,
+  refetch,
+}: AcceptModalProps) {
+  const toast = useToast();
+  const { handleLoading } = useLoading();
 
   async function handleAcceptUser() {
+    handleLoading(true);
+
+    try {
+      await acceptRequest(user.cpf);
+      toast({
+        id: "accept-request-success",
+        title: "Usuário aceito",
+        description: `O usuário ${user.fullName} foi aceito com sucesso.`,
+        status: "success",
+        isClosable: true,
+      });
+    } catch {
+      toast({
+        id: "accept-request-error",
+        title: `Erro ao aceitar ${user.fullName}`,
+        description: "Favor tentar novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    }
     onClose();
+    refetch();
+    handleLoading(false);
   }
 
   return (

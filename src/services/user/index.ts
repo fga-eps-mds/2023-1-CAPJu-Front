@@ -152,3 +152,37 @@ export const getUsersRequests = async (): Promise<Result<User[]>> => {
     };
   }
 };
+
+export const acceptRequest = async (userId: string): Promise<Result<null>> => {
+  try {
+    await api.user.post(`/acceptRequest/${userId}`);
+
+    return { type: "success", value: null };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const denyRequest = async (userId: string): Promise<Result<null>> => {
+  try {
+    await api.user.delete(`/deleteRequest/${userId}`);
+
+    return { type: "success", value: null };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};

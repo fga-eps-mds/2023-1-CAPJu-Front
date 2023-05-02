@@ -35,7 +35,7 @@ function Requests() {
   const {
     data: requestsData,
     isFetched: isRequestsFetched,
-    // refetch: refetchRequests,
+    refetch: refetchRequests,
   } = useQuery({
     queryKey: ["requests"],
     queryFn: getUsersRequests,
@@ -145,6 +145,7 @@ function Requests() {
           isOpen={isAcceptOpen}
           onClose={onAcceptClose}
           user={selectedUser}
+          refetch={refetchRequests}
         />
       ) : null}
       {userData?.value && selectedUser && isDenyOpen ? (
@@ -152,6 +153,7 @@ function Requests() {
           isOpen={isDenyOpen}
           onClose={onDenyClose}
           user={selectedUser}
+          refetch={refetchRequests}
         />
       ) : null}
     </PrivateLayout>
