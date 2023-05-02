@@ -1,4 +1,5 @@
 import { api } from "services/api";
+import { roleNameById } from "utils/roles";
 
 export const signIn = async (credentials: {
   cpf: string;
@@ -120,6 +121,26 @@ export const getAcceptedUsers = async (): Promise<Result<User[]>> => {
     const res = await api.user.get<User[]>(`/allUser?accepted=true`);
 
     return { type: "success", value: res.data };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const getUsersRequests = async (): Promise<Result<User[]>> => {
+  try {
+    const res = await api.user.get<User[]>(`/allUser?accepted=false`);
+    const value = res.data?.map((item: User) => {
+      return { ...item, role: roleNameById(item.idRole) };
+    });
+
+    return { type: "success", value };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };

@@ -14,3 +14,6 @@ export const roleOptions = roles
       label: role.name,
     };
   });
+
+export const roleNameById = (id: number | undefined) =>
+  roles.find((roleItem) => roleItem.idRole === id)?.name || "";

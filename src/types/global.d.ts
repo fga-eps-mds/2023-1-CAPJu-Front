@@ -9,6 +9,7 @@ declare global {
     token: string;
     expiresIn: Date;
     idRole: number;
+    role: string;
     idUnit: number;
   };
 
