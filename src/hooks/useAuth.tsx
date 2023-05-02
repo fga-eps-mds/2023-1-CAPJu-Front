@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import { signIn, getUserById } from "services/user";
+import { roleNameById } from "utils/roles";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -33,10 +34,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       password: string;
     }): Promise<Result<User>> => {
       const res = await signIn(credentials);
+      const role = roleNameById(res.value?.idRole);
 
       if (res.type === "success") {
-        localStorage.setItem("@CAPJu:user", JSON.stringify(res.value));
-        setUser(res.value);
+        localStorage.setItem(
+          "@CAPJu:user",
+          JSON.stringify({
+            ...res.value,
+            role,
+          })
+        );
+        setUser({
+          ...res.value,
+          role,
+        });
       }
 
       return res;
@@ -60,6 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const res = await getUserById(user?.cpf);
+    const role = roleNameById(res.value?.idRole);
 
     if (res.type === "error" || res.value?.idRole !== user.idRole) {
       handleLogout();
@@ -73,6 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser({
       ...user,
       ...res.value,
+      role,
     });
 
     localStorage.setItem("@CAPJu:user", JSON.stringify(user));

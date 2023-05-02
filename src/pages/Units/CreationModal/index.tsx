@@ -24,7 +24,7 @@ type FormValues = {
 };
 
 const validationSchema = yup.object({
-  name: yup.string().required("Dê um nome à unidadee"),
+  name: yup.string().required("Dê um nome à unidade"),
 });
 
 interface CreationModalProps {
@@ -85,7 +85,7 @@ export function CreationModal({
   }, [isOpen]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Criar unidade</ModalHeader>

@@ -21,7 +21,7 @@ export interface SelectProps extends ChakraSelectProps {
 }
 
 export const Select = forwardRef<SelectProps, "select">((props, ref) => {
-  const { label, errors, options, ...rest } = props;
+  const { label, errors, options, defaultValue, ...rest } = props;
 
   return (
     <FormControl
@@ -32,7 +32,11 @@ export const Select = forwardRef<SelectProps, "select">((props, ref) => {
       <InputGroup>
         <ChakraSelect variant="outline" {...rest} ref={ref}>
           {options.map((option) => (
-            <option key={option.value} value={option.value}>
+            <option
+              key={option.value}
+              value={option.value}
+              selected={defaultValue === option.value}
+            >
               {option.label}
             </option>
           ))}

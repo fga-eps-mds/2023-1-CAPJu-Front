@@ -8,6 +8,8 @@ const AccountEdition = lazy(() => import("pages/AccountEdition"));
 const EmailEdition = lazy(() => import("pages/EmailEdition"));
 const PasswordEdition = lazy(() => import("pages/PasswordEdition"));
 const Units = lazy(() => import("pages/Units"));
+const Requests = lazy(() => import("pages/Requests"));
+const Users = lazy(() => import("pages/Users"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
@@ -45,7 +47,7 @@ export const PrivateRoutes: MenuItem[] = [
   {
     path: "solicitacoes",
     name: "UserRequests",
-    element: <PrivateLayout />,
+    element: <Requests />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("accept-user")
     )?.users,
@@ -53,7 +55,7 @@ export const PrivateRoutes: MenuItem[] = [
   {
     path: "perfil-de-acesso",
     name: "Users",
-    element: <PrivateLayout />,
+    element: <Users />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-user")
     )?.users,

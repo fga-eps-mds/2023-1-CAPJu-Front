@@ -6,11 +6,16 @@ export const roles = [
   { name: "Administrador", idRole: 5 },
 ];
 
-export const roleOptions = roles
-  .filter((role) => role.idRole !== 5)
-  .map((role) => {
-    return {
-      value: role.idRole,
-      label: role.name,
-    };
-  });
+export const roleOptions = (withAdm: boolean) => {
+  return roles
+    .filter((role) => (withAdm ? !!role : role.idRole !== 5))
+    .map((role) => {
+      return {
+        value: role.idRole,
+        label: role.name,
+      };
+    });
+};
+
+export const roleNameById = (id: number | undefined) =>
+  roles.find((roleItem) => roleItem.idRole === id)?.name || "";

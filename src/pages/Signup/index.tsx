@@ -226,7 +226,7 @@ function Signup() {
               label="Perfil"
               placeholder="Selecione seu perfil"
               errors={errors.idRole}
-              options={roleOptions}
+              options={roleOptions(false)}
               {...register("idRole")}
             />
             <Button
