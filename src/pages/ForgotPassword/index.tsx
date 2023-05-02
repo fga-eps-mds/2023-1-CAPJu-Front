@@ -48,7 +48,6 @@ function ForgotPassword() {
         title: "Email enviado com sucesso!",
         description: "Acesse seu email para a recuperar sua senha",
         status: "success",
-        duration: 3500,
       });
       return;
     }
@@ -59,7 +58,6 @@ function ForgotPassword() {
       title: "Erro no envio de email",
       description: res.error?.message,
       status: "error",
-      duration: 3500,
       isClosable: true,
     });
     handleLoading(false);

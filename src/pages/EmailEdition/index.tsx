@@ -72,7 +72,6 @@ function EmailEdition() {
         title: "Sucesso!",
         description: "Seu endereço de email foi atualizado.",
         status: "success",
-        duration: 7500,
       });
       return;
     }

@@ -7,12 +7,13 @@ import { permissionsArray } from "utils/permissions";
 const AccountEdition = lazy(() => import("pages/AccountEdition"));
 const EmailEdition = lazy(() => import("pages/EmailEdition"));
 const PasswordEdition = lazy(() => import("pages/PasswordEdition"));
+const Units = lazy(() => import("pages/Units"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
     index: true,
     name: "Unidades",
-    element: <PrivateLayout />,
+    element: <Units />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-unit")
     )?.users,

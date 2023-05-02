@@ -87,9 +87,8 @@ export const permissionsArray = [
 ];
 
 export function hasPermission(user: User, permissionName: string) {
-  if (user == null) {
-    return false;
-  }
+  if (!user) return false;
+
   return permissionsArray
     .find((p) => p.actions.includes(permissionName))
     ?.users.includes(user.idRole);

@@ -10,7 +10,6 @@ export function PrivateLayout({ children }: BaseLayoutProps) {
   return (
     <Flex
       w="100%"
-      maxW={1120}
       flex="1"
       flexDirection="column"
       alignItems="center"

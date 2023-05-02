@@ -7,7 +7,7 @@ import {
   useCallback,
 } from "react";
 
-import { signIn } from "services/user";
+import { signIn, getUserById } from "services/user";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -18,6 +18,7 @@ type AuthContextType = {
     password: string;
   }) => Promise<Result<User>>;
   handleLogout: () => void;
+  getUserData: () => Promise<Result<User>>;
   validateAuthentication: () => void;
 };
 
@@ -47,6 +48,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("@CAPJu:user");
     setUser(null);
   }
+
+  const getUserData = async (): Promise<Result<User>> => {
+    if (!user?.cpf) {
+      handleLogout();
+      return {
+        type: "error",
+        error: new Error("Autenticação inválida."),
+        value: undefined,
+      };
+    }
+
+    const res = await getUserById(user?.cpf);
+
+    if (res.type === "error" || res.value?.idRole !== user.idRole) {
+      handleLogout();
+      return {
+        type: "error",
+        error: new Error("Autenticação inválida."),
+        value: undefined,
+      };
+    }
+
+    setUser({
+      ...user,
+      ...res.value,
+    });
+
+    localStorage.setItem("@CAPJu:user", JSON.stringify(user));
+
+    return res;
+  };
 
   function validateAuthentication() {
     const currentDate = new Date();
@@ -79,6 +111,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         handleLogin,
         handleLogout,
+        getUserData,
         validateAuthentication,
       }}
     >

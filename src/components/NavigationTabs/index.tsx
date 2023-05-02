@@ -1,13 +1,18 @@
 import { Tabs, TabList, Tab, Flex } from "@chakra-ui/react";
 import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useQuery } from "react-query";
 
 import { permissionsArray } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { tabs } from "utils/tabs";
 
 export function NavigationTabs() {
-  const { user } = useAuth();
+  const { getUserData } = useAuth();
+  const { data: userData } = useQuery({
+    queryKey: ["user-data"],
+    queryFn: getUserData,
+  });
   const navigate = useNavigate();
   const location = useLocation();
   const currentTabIndex = useMemo<number | undefined>(() => {
@@ -21,18 +26,19 @@ export function NavigationTabs() {
   }, [tabs, location]);
 
   function isUserAllowedInTab(tabIndex: number) {
-    if (!user) return false;
+    if (!userData?.value) return false;
 
     return permissionsArray.some(
       (item) =>
         item.actions.some((action) => action === tabs[tabIndex].action) &&
-        item.users.some((userRole) => userRole === user.idRole)
+        item.users.some((userRole) => userRole === userData?.value?.idRole)
     );
   }
 
   return (
     <Flex
       w="100%"
+      maxW={1120}
       pl={["5vw", "5vw", "5vw", "5vw", 0]}
       justifyContent="start"
       marginBottom={["6", "8"]}

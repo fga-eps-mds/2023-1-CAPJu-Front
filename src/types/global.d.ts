@@ -41,6 +41,12 @@ declare global {
     label: string;
     icon: JSX.Element;
     actionName: string;
-    action: () => any;
+    action: (actionProps?: any) => any;
+    disabled?: boolean;
+  };
+
+  type TableRow<T> = T & {
+    tableActions: TableAction[];
+    actionsProps: any;
   };
 }

@@ -57,7 +57,6 @@ function Login() {
         title: "Bem vindo!",
         description: "Login efetuado com sucesso!",
         status: "success",
-        duration: 3500,
       });
       return;
     }
@@ -68,7 +67,6 @@ function Login() {
       title: "Erro no login",
       description: res.error?.message,
       status: "error",
-      duration: 3500,
       isClosable: true,
     });
   });
