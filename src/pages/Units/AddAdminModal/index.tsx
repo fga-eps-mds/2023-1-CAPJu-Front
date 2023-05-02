@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Icon } from "@chakra-ui/icons";
 import { MdPersonAddAlt1 } from "react-icons/md";
 import {
@@ -20,6 +20,7 @@ import { addUnitAdmin } from "services/units";
 import { getAcceptedUsers } from "services/user";
 import { useLoading } from "hooks/useLoading";
 import { DataTable } from "components/DataTable";
+import { Input } from "components/FormFields/Input";
 
 interface AddAdminModalProps {
   unit: Unit;
@@ -28,6 +29,7 @@ interface AddAdminModalProps {
 }
 
 export function AddAdminModal({ unit, isOpen, onClose }: AddAdminModalProps) {
+  const [filter, setFilter] = useState("");
   const toast = useToast();
   const { handleLoading } = useLoading();
   const { data, isFetched, refetch } = useQuery({
@@ -74,7 +76,12 @@ export function AddAdminModal({ unit, isOpen, onClose }: AddAdminModalProps) {
     return (
       (data?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (curr.idRole === 5 || curr.idUnit !== unit.idUnit) return acc;
+          if (
+            curr.idRole === 5 ||
+            curr.idUnit !== unit.idUnit ||
+            !curr.fullName.toLowerCase().includes(filter.toLowerCase())
+          )
+            return acc;
 
           return [
             ...acc,
@@ -84,7 +91,7 @@ export function AddAdminModal({ unit, isOpen, onClose }: AddAdminModalProps) {
         []
       ) as TableRow<User>[]) || []
     );
-  }, [data, isFetched]);
+  }, [data, isFetched, filter]);
 
   const tableColumnHelper = createColumnHelper<TableRow<User>>();
   const tableColumns = [
@@ -116,9 +123,17 @@ export function AddAdminModal({ unit, isOpen, onClose }: AddAdminModalProps) {
         <ModalHeader>Adicionar Administradores</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text mb="3" pl="4">
+          <Text mb="3">
             Torne usuários administradores da unidade {unit?.name}.
           </Text>
+          <Input
+            placeholder="Pesquisar usuários"
+            value={filter}
+            onChange={({ target }) => setFilter(target.value)}
+            variant="filled"
+            mb="3"
+            w="100%"
+          />
           <DataTable
             data={admins}
             columns={tableColumns}

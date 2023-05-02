@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DeleteIcon } from "@chakra-ui/icons";
 import {
   Modal,
@@ -12,10 +12,11 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { DataTable } from "components/DataTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "react-query";
 
+import { DataTable } from "components/DataTable";
+import { Input } from "components/FormFields/Input";
 import { getUnitAdmins, removeUnitAdmin } from "services/units";
 import { useLoading } from "hooks/useLoading";
 
@@ -33,6 +34,7 @@ export function AdminsListModal({
   onClose,
 }: AdminsListProps) {
   const toast = useToast();
+  const [filter, setFilter] = useState<string>("");
   const { handleLoading } = useLoading();
   const { data, isFetched, refetch } = useQuery({
     queryKey: ["unit-admins", unit.idUnit],
@@ -80,7 +82,11 @@ export function AdminsListModal({
     return (
       (data?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (curr.cpf === userCpf) return acc;
+          if (
+            curr.cpf === userCpf ||
+            !curr.fullName.toLowerCase().includes(filter.toLowerCase())
+          )
+            return acc;
 
           return [
             ...acc,
@@ -90,7 +96,7 @@ export function AdminsListModal({
         []
       ) as TableRow<User>[]) || []
     );
-  }, [data, isFetched]);
+  }, [data, isFetched, filter]);
 
   const tableColumnHelper = createColumnHelper<TableRow<User>>();
   const tableColumns = [
@@ -122,9 +128,15 @@ export function AdminsListModal({
         <ModalHeader>Visualizar Administradores</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text mb="3" pl="4">
-            Administradores da unidade {unit?.name}
-          </Text>
+          <Text mb="3">Administradores da unidade {unit?.name}</Text>
+          <Input
+            placeholder="Pesquisar usuários"
+            value={filter}
+            onChange={({ target }) => setFilter(target.value)}
+            variant="filled"
+            mb="3"
+            w="100%"
+          />
           <DataTable
             data={admins}
             columns={tableColumns}
