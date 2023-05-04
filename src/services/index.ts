@@ -5,4 +5,7 @@ export const Services = {
   units: {
     baseURL: import.meta.env.VITE_UNITS_SERVICE_URL,
   },
+  stages: {
+    baseURL: import.meta.env.VITE_STAGES_SERVICE_URL,
+  },
 };
