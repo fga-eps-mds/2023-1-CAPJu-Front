@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, useToast, Text, Button } from "@chakra-ui/react";
-import { AddIcon, ViewIcon } from "@chakra-ui/icons";
+import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
+import { AddIcon, Icon } from "@chakra-ui/icons";
+import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { useAuth } from "hooks/useAuth";
@@ -10,12 +11,18 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { hasPermission } from "utils/permissions";
 import { getStages } from "../../services/stage";
+import { CreationModal } from "./CreationModal";
 
 function Stages() {
   const toast = useToast();
-  const [selectedStage, selectStage] = useState<Unit | null>(null);
+  const [selectedStage, selectStage] = useState<Stage | null>(null);
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
+  const {
+    isOpen: isCreationOpen,
+    onOpen: onCreationOpen,
+    onClose: onCreationClose,
+  } = useDisclosure();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
@@ -23,7 +30,7 @@ function Stages() {
   const {
     data: stagesData,
     isFetched: isStagesFetched,
-    // refetch: refetchStages,
+    refetch: refetchStages,
   } = useQuery({
     queryKey: ["stages"],
     queryFn: getStages,
@@ -43,10 +50,11 @@ function Stages() {
   const tableActions = useMemo(
     () => [
       {
-        label: "Visualizar Etapas",
-        icon: <ViewIcon boxSize={4} />,
-        action: ({ stage }: { stage: Stage }) => {
+        label: "Excluir Etapa",
+        icon: <Icon as={MdDelete} boxSize={5} />,
+        action: async ({ stage }: { stage: Stage }) => {
           selectStage(stage);
+          handleDeleteStage(stage);
         },
         actionName: "view-stages",
         disabled: isActionDisabled("view-stage"),
@@ -80,7 +88,14 @@ function Stages() {
   const tableColumns = [
     tableColumnHelper.accessor("name", {
       cell: (info) => info.getValue(),
-      header: "Unidades",
+      header: "Etapas",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("duration", {
+      cell: (info) => info.getValue(),
+      header: "Duração",
       meta: {
         isSortable: true,
       },
@@ -95,7 +110,9 @@ function Stages() {
     }),
   ];
 
-  console.log("SELECTED STAGE", selectedStage);
+  const handleDeleteStage = async (stage: Stage) => {
+    console.log("handleDeleteStage", stage, selectedStage);
+  };
 
   return (
     <PrivateLayout>
@@ -109,7 +126,7 @@ function Stages() {
             fontSize="sm"
             colorScheme="green"
             isDisabled={isActionDisabled("create-stage")}
-            onClick={() => console.log("Criar Etapa")}
+            onClick={onCreationOpen}
           >
             <AddIcon mr="2" boxSize={3} /> Criar etapa
           </Button>
@@ -133,6 +150,12 @@ function Stages() {
         columns={tableColumns}
         isDataFetching={!isStagesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas etapas."
+      />
+      <CreationModal
+        user={userData?.value!}
+        isOpen={isCreationOpen}
+        onClose={onCreationClose}
+        afterSubmission={refetchStages}
       />
     </PrivateLayout>
   );
