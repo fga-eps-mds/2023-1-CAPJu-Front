@@ -6,16 +6,17 @@ import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { useAuth } from "hooks/useAuth";
+import { useLoading } from "hooks/useLoading";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { hasPermission } from "utils/permissions";
-import { getStages } from "../../services/stage";
+import { getStages, deleteStage } from "../../services/stage";
 import { CreationModal } from "./CreationModal";
 
 function Stages() {
   const toast = useToast();
-  const [selectedStage, selectStage] = useState<Stage | null>(null);
+  const { handleLoading } = useLoading();
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
   const {
@@ -53,7 +54,6 @@ function Stages() {
         label: "Excluir Etapa",
         icon: <Icon as={MdDelete} boxSize={5} />,
         action: async ({ stage }: { stage: Stage }) => {
-          selectStage(stage);
           handleDeleteStage(stage);
         },
         actionName: "view-stages",
@@ -111,7 +111,27 @@ function Stages() {
   ];
 
   const handleDeleteStage = async (stage: Stage) => {
-    console.log("handleDeleteStage", stage, selectedStage);
+    handleLoading(true);
+    const res = await deleteStage(stage.idStage);
+    if (res.type === "success") {
+      handleLoading(false);
+      refetchStages();
+      toast({
+        id: "login-success",
+        title: "Sucesso!",
+        description: "Etapa deletada com sucesso!",
+        status: "success",
+      });
+      return;
+    }
+    handleLoading(false);
+    toast({
+      id: "delete-error",
+      title: "Erro na deleção da etaoa.",
+      description: res.error?.message,
+      status: "error",
+      isClosable: true,
+    });
   };
 
   return (
