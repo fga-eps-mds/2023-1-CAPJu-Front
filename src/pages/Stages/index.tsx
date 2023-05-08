@@ -6,23 +6,28 @@ import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { useAuth } from "hooks/useAuth";
-import { useLoading } from "hooks/useLoading";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { hasPermission } from "utils/permissions";
-import { getStages, deleteStage } from "../../services/stage";
+import { getStages } from "../../services/stages";
 import { CreationModal } from "./CreationModal";
+import { ExclusionModal } from "./ExclusionModal";
 
 function Stages() {
   const toast = useToast();
-  const { handleLoading } = useLoading();
+  const [selectedStage, selectStage] = useState<Stage>();
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
   const {
     isOpen: isCreationOpen,
     onOpen: onCreationOpen,
     onClose: onCreationClose,
+  } = useDisclosure();
+  const {
+    isOpen: isExclusionOpen,
+    onOpen: onExclusionOpen,
+    onClose: onExclusionClose,
   } = useDisclosure();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
@@ -54,7 +59,8 @@ function Stages() {
         label: "Excluir Etapa",
         icon: <Icon as={MdDelete} boxSize={5} />,
         action: async ({ stage }: { stage: Stage }) => {
-          handleDeleteStage(stage);
+          selectStage(stage);
+          onExclusionOpen();
         },
         actionName: "view-stages",
         disabled: isActionDisabled("view-stage"),
@@ -110,30 +116,6 @@ function Stages() {
     }),
   ];
 
-  const handleDeleteStage = async (stage: Stage) => {
-    handleLoading(true);
-    const res = await deleteStage(stage.idStage);
-    if (res.type === "success") {
-      handleLoading(false);
-      refetchStages();
-      toast({
-        id: "login-success",
-        title: "Sucesso!",
-        description: "Etapa deletada com sucesso!",
-        status: "success",
-      });
-      return;
-    }
-    handleLoading(false);
-    toast({
-      id: "delete-error",
-      title: "Erro na deleção da etaoa.",
-      description: res.error?.message,
-      status: "error",
-      isClosable: true,
-    });
-  };
-
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -177,6 +159,14 @@ function Stages() {
         onClose={onCreationClose}
         afterSubmission={refetchStages}
       />
+      {selectedStage && (
+        <ExclusionModal
+          stage={selectedStage}
+          isOpen={isExclusionOpen}
+          onClose={onExclusionClose}
+          refetchStages={refetchStages}
+        />
+      )}
     </PrivateLayout>
   );
 }
