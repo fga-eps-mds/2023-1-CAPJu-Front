@@ -10,6 +10,7 @@ const PasswordEdition = lazy(() => import("pages/PasswordEdition"));
 const Units = lazy(() => import("pages/Units"));
 const Requests = lazy(() => import("pages/Requests"));
 const Users = lazy(() => import("pages/Users"));
+const Stages = lazy(() => import("pages/Stages"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
@@ -23,7 +24,7 @@ export const PrivateRoutes: MenuItem[] = [
   {
     path: "etapas",
     name: "Stages",
-    element: <PrivateLayout />,
+    element: <Stages />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-stage")
     )?.users,

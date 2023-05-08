@@ -19,6 +19,13 @@ declare global {
     name: string;
   };
 
+  type Stage = {
+    idStage: number;
+    idUnit: number;
+    name: string;
+    duration: number;
+  };
+
   type ApiResponse<Data> = {
     data: Data;
     error: null | string;
