@@ -13,7 +13,6 @@ const Users = lazy(() => import("pages/Users"));
 const Stages = lazy(() => import("pages/Stages"));
 const Processes = lazy(() => import("pages/Processes"));
 
-
 export const PrivateRoutes: MenuItem[] = [
   {
     index: true,
