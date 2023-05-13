@@ -37,7 +37,7 @@ function Processes() {
   const {
     data: processesData,
     isFetched: isProcessesFetched,
-    refetch: refetchProcesses,
+    // refetch: refetchProcesses,
   } = useQuery({
     queryKey: ["processes"],
     queryFn: getProcesses,
@@ -92,16 +92,21 @@ function Processes() {
     [isProcessesFetched, isUserFetched]
   );
 
+  const filterByPriority = (processes: any) => {
+    return processes?.filter((process: any) => process.idPriority !== 3);
+  };
+
   const filteredProcess = useMemo<TableRow<Process>[]>(() => {
     if (!isProcessesFetched) return [];
 
-    const value =
+    let value =
       filter !== ""
         ? processesData?.value?.filter((process) =>
             process.record.toLowerCase().includes(filter.toLocaleLowerCase())
           )
         : processesData?.value;
 
+    if (legalPriority) value = filterByPriority(value);
     return (
       (value?.reduce(
         (
@@ -114,7 +119,9 @@ function Processes() {
         []
       ) as TableRow<Process>[]) || []
     );
-  }, [processesData, filter, isProcessesFetched]);
+  }, [legalPriority, processesData, filter, isProcessesFetched]);
+
+  console.log("selectedProcess", selectedProcess);
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [
@@ -156,14 +163,6 @@ function Processes() {
     }),
   ];
 
-  console.log("processesData", processesData);
-  console.log(
-    "selectedProcess",
-    processesData,
-    selectedProcess,
-    refetchProcesses
-  );
-
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -185,6 +184,7 @@ function Processes() {
           <Input
             placeholder="Pesquisar processo (Registro ou apelido)"
             width={["100%", "100%", "60%"]}
+            maxW={["100%", "100%", 365]}
             value={filter}
             onChange={({ target }) => setFilter(target.value)}
             variant="filled"
@@ -196,9 +196,9 @@ function Processes() {
           />
           <Checkbox
             colorScheme="green"
-            borderColor="green"
+            borderColor="gray.600"
             checked={legalPriority}
-            onClick={() => setLegalPriority(!legalPriority)}
+            onChange={() => setLegalPriority(!legalPriority)}
           >
             Mostrar processos com prioridade legal
           </Checkbox>

@@ -28,7 +28,8 @@ declare global {
 
   type Process = {
     effectiveDate: Date;
-    // idFlow:
+    idFlow: number[];
+    idPriority: number;
     idStage: number;
     idUnit: number;
     nickname: string;
