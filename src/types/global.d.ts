@@ -26,6 +26,15 @@ declare global {
     duration: number;
   };
 
+  type Process = {
+    effectiveDate: Date;
+    // idFlow:
+    idStage: number;
+    idUnit: number;
+    nickname: string;
+    record: string;
+  };
+
   type ApiResponse<Data> = {
     data: Data;
     error: null | string;
