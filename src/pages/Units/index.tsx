@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
-import { MdPersonAddAlt1 } from "react-icons/md";
+import { MdPersonAddAlt1, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { PrivateLayout } from "layouts/Private";
@@ -35,6 +35,8 @@ function Units() {
     onOpen: onAdminAdditionOpen,
     onClose: onAdminAdditionClose,
   } = useDisclosure();
+  const { onOpen: onDeleteOpen } = useDisclosure();
+
   const {
     data: unitsData,
     isFetched: isUnitsFetched,
@@ -61,6 +63,16 @@ function Units() {
     userData?.value ? !hasPermission(userData.value, actionName) : true;
   const tableActions = useMemo(
     () => [
+      {
+        label: "Excluir Unidade",
+        icon: <Icon as={MdDelete} boxSize={4} />,
+        action: ({ unit }: { unit: Unit }) => {
+          selectUnit(unit);
+          onDeleteOpen();
+        },
+        actionName: "delete-unit",
+        disabled: isActionDisabled("delete-unit"),
+      },
       {
         label: "Visualizar Admins",
         icon: <ViewIcon boxSize={4} />,
