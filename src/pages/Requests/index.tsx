@@ -4,7 +4,6 @@ import { Flex, Text, useDisclosure } from "@chakra-ui/react";
 import { DeleteIcon, CheckIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
 
-import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
@@ -142,8 +141,8 @@ function Requests() {
   }
 
   return (
-    <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
+    <>
+      <Flex mt="4" w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Text fontSize="lg" fontWeight="semibold">
             Solicitações
@@ -185,7 +184,7 @@ function Requests() {
           refetch={() => refetchAll()}
         />
       ) : null}
-    </PrivateLayout>
+    </>
   );
 }
 

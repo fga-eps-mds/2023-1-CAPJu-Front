@@ -18,23 +18,18 @@ export const tabs = [
     action: "view-flow",
   },
   {
+    label: "Cadastro",
+    pathIndex: "/cadastro-menu",
+    path: "/cadastro-menu",
+    action: "view-user",
+  },
+  {
     label: "Processos",
     pathIndex: "/processos",
     path: "/processos",
     action: "view-process",
   },
-  {
-    label: "Solicitações",
-    pathIndex: "/solicitacoes",
-    path: "/solicitacoes",
-    action: "accept-user",
-  },
-  {
-    label: "Perfil de Acesso",
-    pathIndex: "/perfil-de-acesso",
-    path: "/perfil-de-acesso",
-    action: "view-user",
-  },
+
   {
     label: "Editar Conta",
     pathIndex: "/editar-conta",

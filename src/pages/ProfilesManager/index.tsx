@@ -11,6 +11,7 @@ import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { getAcceptedUsers } from "services/user";
+import Requests from "pages/Requests";
 import { getUnits } from "services/units";
 import { roleNameById } from "utils/roles";
 import { DeleteModal } from "./DeleteModal";
@@ -182,6 +183,7 @@ function Users() {
           refetch={refetchUsers}
         />
       ) : null}
+      <Requests />
     </PrivateLayout>
   );
 }
