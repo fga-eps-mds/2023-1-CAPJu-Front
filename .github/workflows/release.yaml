@@ -1,0 +1,37 @@
+name: Interface-Release
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    types: [closed]
+
+jobs:
+  generate-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get file name
+        id: name
+        run: echo "::set-output name=file_name::fga-eps-mds-2023-1-Capju-Interface-$(TZ='America/Sao_Paulo' date +'%m-%d-%Y-%H-%M-%S')-${{github.ref_name}}"
+
+      - name: Copy repository
+        uses: actions/checkout@v2
+      - run: wget $METRICS_URL -O ${{ steps.name.outputs.file_name }}.json
+        env:
+          METRICS_URL: ${{ secrets.METRICS_URL }}
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.name.outputs.file_name }}.json
+          path: ${{ steps.name.outputs.file_name }}.json
+
+      - name: Send metrics to doc repo
+        uses: dmnemec/copy_file_to_another_repo_action@v1.1.1
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source_file: ${{ steps.name.outputs.file_name }}.json
+          destination_repo: 'fga-eps-mds/2023-1-CAPJu-Doc'
+          destination_folder: 'analytics-raw-data/2023-1-CAPJu'
+          user_email: ${{ secrets.GIT_EMAIL}}
+          user_name: ${{ secrets.GIT_USER }}
+          commit_message: Métricas automáticas da release ${{github.ref_name}} - ${{ github.event.repository.name }}
