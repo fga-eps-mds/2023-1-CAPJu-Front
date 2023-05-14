@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
+import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
+import { MdPersonAddAlt1, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { PrivateLayout } from "layouts/Private";
@@ -14,6 +15,7 @@ import { CreationModal } from "./CreationModal";
 
 function Units() {
   const toast = useToast();
+  const [unit,selectUnit] = useState<Unit| null>(null)
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
   const {
@@ -21,6 +23,8 @@ function Units() {
     onOpen: onCreationOpen,
     onClose: onCreationClose,
   } = useDisclosure();
+  const { onOpen: onDeleteOpen } = useDisclosure();
+
   const {
     data: unitsData,
     isFetched: isUnitsFetched,
@@ -45,7 +49,21 @@ function Units() {
   });
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
-  const tableActions = useMemo(() => [], [isUnitsFetched, isUserFetched]);
+  const tableActions = useMemo(
+    () => [
+      {
+        label: "Excluir Unidade",
+        icon: <Icon as={MdDelete} boxSize={4} />,
+        action: ({ unit }: { unit: Unit }) => {
+          selectUnit(unit);
+          onDeleteOpen();
+        },
+        actionName: "delete-unit",
+        disabled: isActionDisabled("delete-unit"),
+      },
+    ],
+    [isUnitsFetched, isUserFetched]
+  );
   const filteredUnits = useMemo<TableRow<Unit>[]>(() => {
     if (!isUnitsFetched) return [];
 
