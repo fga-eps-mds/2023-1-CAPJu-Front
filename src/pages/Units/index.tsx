@@ -14,6 +14,7 @@ import { hasPermission } from "utils/permissions";
 import { CreationModal } from "./CreationModal";
 import { AdminsListModal } from "./AdminsListModal";
 import { AddAdminModal } from "./AddAdminModal";
+import { DeleteModal } from "./DeleteModal";
 
 function Units() {
   const toast = useToast();
@@ -35,7 +36,11 @@ function Units() {
     onOpen: onAdminAdditionOpen,
     onClose: onAdminAdditionClose,
   } = useDisclosure();
-  const { onOpen: onDeleteOpen } = useDisclosure();
+  const {
+    isOpen: isUnitDeleteOpen,
+    onOpen: onUnitDeleteOpen,
+    onClose: onUnitDeleteClose,
+  } = useDisclosure(); 
 
   const {
     data: unitsData,
@@ -68,7 +73,7 @@ function Units() {
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ unit }: { unit: Unit }) => {
           selectUnit(unit);
-          onDeleteOpen();
+          onUnitDeleteOpen();
         },
         actionName: "delete-unit",
         disabled: isActionDisabled("delete-unit"),
@@ -193,6 +198,14 @@ function Units() {
           onClose={onAdminAdditionClose}
         />
       ) : null}
+      {selectedUnit && (
+        <DeleteModal
+          unit={selectedUnit}
+          isOpen={isUnitDeleteOpen}
+          onClose={onUnitDeleteClose}
+          refetchUnits={refetchUnits}       
+        />
+      )}
     </PrivateLayout>
   );
 }
