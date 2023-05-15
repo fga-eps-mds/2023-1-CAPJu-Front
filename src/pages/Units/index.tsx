@@ -12,10 +12,11 @@ import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { CreationModal } from "./CreationModal";
+import { DeleteModal } from "./DeleteModal";
 
 function Units() {
   const toast = useToast();
-  const [unit,selectUnit] = useState<Unit| null>(null)
+  const [selectedUnit,selectUnit] = useState<Unit| null>(null)
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
   const {
@@ -23,7 +24,11 @@ function Units() {
     onOpen: onCreationOpen,
     onClose: onCreationClose,
   } = useDisclosure();
-  const { onOpen: onDeleteOpen } = useDisclosure();
+  const {
+    isOpen: isUnitDeleteOpen,
+    onOpen: onUnitDeleteOpen,
+    onClose: onUnitDeleteClose,
+  } = useDisclosure(); 
 
   const {
     data: unitsData,
@@ -56,7 +61,7 @@ function Units() {
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ unit }: { unit: Unit }) => {
           selectUnit(unit);
-          onDeleteOpen();
+          onUnitDeleteOpen();
         },
         actionName: "delete-unit",
         disabled: isActionDisabled("delete-unit"),
@@ -146,6 +151,14 @@ function Units() {
         onClose={onCreationClose}
         afterSubmission={refetchUnits}
       />
+      {selectedUnit && (
+        <DeleteModal
+          unit={selectedUnit}
+          isOpen={isUnitDeleteOpen}
+          onClose={onUnitDeleteClose}
+          refetchUnits={refetchUnits}       
+        />
+      )}
     </PrivateLayout>
   );
 }
