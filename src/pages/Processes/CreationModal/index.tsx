@@ -33,19 +33,19 @@ type FormValues = {
 };
 
 const validationSchema = yup.object({
-  name: yup.string().required("Dê um nome à etapa"),
-  duration: yup.string().required("Dê uma duração para esta etapa"),
+  record: yup.string().required("Digite o número do Registro."),
+  nickname: yup.string().required("Dê um apelido para esse Registro."),
+  idFlow: yup.string().required("Selecione um fluxo para esse Registro"),
+  idPriority: yup.string().notRequired(),
 });
 
 interface CreationModalProps {
-  user: User | User;
   isOpen: boolean;
   onClose: () => void;
   afterSubmission: () => void;
 }
 
 export function CreationModal({
-  user,
   isOpen,
   onClose,
   afterSubmission,
@@ -125,7 +125,7 @@ export function CreationModal({
 
   console.log("priorities", priorities);
   console.log("flows", flows);
-  console.log("user", user);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />

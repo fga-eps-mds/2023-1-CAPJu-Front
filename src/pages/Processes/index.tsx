@@ -215,7 +215,6 @@ function Processes() {
         emptyTableMessage="Não foram encontrados processos."
       />
       <CreationModal
-        user={userData?.value!}
         isOpen={isCreationOpen}
         onClose={onCreationClose}
         afterSubmission={refetchProcesses}
