@@ -26,6 +26,25 @@ declare global {
     duration: number;
   };
 
+  type Sequence = {
+    from: number;
+    comentary: string;
+    to: number;
+  };
+
+  type Flow = {
+    idFlow: number;
+    idUnit: number;
+    name: string;
+    sequences: Sequence[];
+    stage: Stage[];
+  };
+
+  type Priority = {
+    idPriority: number;
+    description: string;
+  };
+
   type Process = {
     effectiveDate: Date;
     idFlow: number[];
