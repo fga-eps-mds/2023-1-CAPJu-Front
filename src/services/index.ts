@@ -11,4 +11,7 @@ export const Services = {
   processes: {
     baseURL: import.meta.env.VITE_PROCESSES_SERVICE_URL,
   },
+  flows: {
+    baseURL: import.meta.env.VITE_FLOWS_SERVICE_URL,
+  },
 };
