@@ -9,6 +9,7 @@ import {
   Checkbox,
   useToast,
 } from "@chakra-ui/react";
+import { hasPermission } from "utils/permissions";
 import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -16,7 +17,7 @@ import { getProcesses } from "services/processes";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
-import { hasPermission } from "utils/permissions";
+import { ExclusionModal } from "./ExclusionModal";
 
 function Processes() {
   const toast = useToast();
@@ -35,9 +36,14 @@ function Processes() {
     // onClose: onCreationClose,
   } = useDisclosure();
   const {
+    isOpen: isExclusionOpen,
+    onOpen: onExclusionOpen,
+    onClose: onExclusionClose,
+  } = useDisclosure();
+  const {
     data: processesData,
     isFetched: isProcessesFetched,
-    // refetch: refetchProcesses,
+    refetch: refetchProcesses,
   } = useQuery({
     queryKey: ["processes"],
     queryFn: getProcesses,
@@ -83,7 +89,7 @@ function Processes() {
         icon: <Icon as={MdDelete} boxSize={5} />,
         action: async ({ process }: { process: Process }) => {
           selectProcess(process);
-          // onExclusionOpen();
+          onExclusionOpen();
         },
         actionName: "delete-process",
         disabled: isActionDisabled("delete-process"),
@@ -210,6 +216,14 @@ function Processes() {
         isDataFetching={!isProcessesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados processos."
       />
+      {selectedProcess && (
+        <ExclusionModal
+          process={selectedProcess}
+          isOpen={isExclusionOpen}
+          onClose={onExclusionClose}
+          refetchStages={refetchProcesses}
+        />
+      )}
     </PrivateLayout>
   );
 }
