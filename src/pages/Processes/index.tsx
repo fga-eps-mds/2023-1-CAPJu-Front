@@ -18,12 +18,12 @@ import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { ExclusionModal } from "./ExclusionModal";
+import { CreationModal } from "./CreationModal";
 
 function Processes() {
   const toast = useToast();
   const { getUserData } = useAuth();
   const [selectedProcess, selectProcess] = useState<Process>();
-
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
@@ -31,9 +31,9 @@ function Processes() {
   const [filter, setFilter] = useState<string>("");
   const [legalPriority, setLegalPriority] = useState(false);
   const {
-    // isOpen: isCreationOpen,
+    isOpen: isCreationOpen,
     onOpen: onCreationOpen,
-    // onClose: onCreationClose,
+    onClose: onCreationClose,
   } = useDisclosure();
   const {
     isOpen: isExclusionOpen,
@@ -127,8 +127,6 @@ function Processes() {
     );
   }, [legalPriority, processesData, filter, isProcessesFetched]);
 
-  console.log("selectedProcess", selectedProcess);
-
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [
     tableColumnHelper.accessor("record", {
@@ -215,6 +213,12 @@ function Processes() {
         columns={tableColumns}
         isDataFetching={!isProcessesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados processos."
+      />
+      <CreationModal
+        user={userData?.value!}
+        isOpen={isCreationOpen}
+        onClose={onCreationClose}
+        afterSubmission={refetchProcesses}
       />
       {selectedProcess && (
         <ExclusionModal
