@@ -142,7 +142,7 @@ function Requests() {
 
   return (
     <>
-      <Flex mt="4" w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
+      <Flex  w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Text fontSize="lg" fontWeight="semibold">
             Solicitações

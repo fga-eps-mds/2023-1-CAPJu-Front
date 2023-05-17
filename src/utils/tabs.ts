@@ -6,6 +6,12 @@ export const tabs = [
     action: "view-unit",
   },
   {
+    label: "Cadastro",
+    pathIndex: "/cadastro-menu",
+    path: "/cadastro-menu",
+    action: "view-user",
+  },
+  {
     label: "Etapas",
     pathIndex: "/etapas",
     path: "/etapas",
@@ -18,18 +24,11 @@ export const tabs = [
     action: "view-flow",
   },
   {
-    label: "Cadastro",
-    pathIndex: "/cadastro-menu",
-    path: "/cadastro-menu",
-    action: "view-user",
-  },
-  {
     label: "Processos",
     pathIndex: "/processos",
     path: "/processos",
     action: "view-process",
   },
-
   {
     label: "Editar Conta",
     pathIndex: "/editar-conta",

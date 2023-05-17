@@ -141,7 +141,8 @@ function Users() {
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
+      <Requests />
+      <Flex mt = "4" w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Text fontSize="lg" fontWeight="semibold">
             Perfil de Acesso
@@ -183,7 +184,7 @@ function Users() {
           refetch={refetchUsers}
         />
       ) : null}
-      <Requests />
+      
     </PrivateLayout>
   );
 }
