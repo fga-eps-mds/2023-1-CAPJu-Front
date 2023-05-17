@@ -6,12 +6,6 @@ export const tabs = [
     action: "view-unit",
   },
   {
-    label: "Cadastro",
-    pathIndex: "/cadastro-menu",
-    path: "/cadastro-menu",
-    action: "view-user",
-  },
-  {
     label: "Etapas",
     pathIndex: "/etapas",
     path: "/etapas",
@@ -28,6 +22,13 @@ export const tabs = [
     pathIndex: "/processos",
     path: "/processos",
     action: "view-process",
+  },
+  // Realocação da aba cadastro na barra de navegação
+  {
+    label: "Cadastro",
+    pathIndex: "/cadastro-menu",
+    path: "/cadastro-menu",
+    action: "view-user",
   },
   {
     label: "Editar Conta",
