@@ -73,7 +73,7 @@ function Processes() {
   const handleRedirect = (process: Process) =>
     navigate(`/processos/${process.record}`, {
       state: {
-        process: process,
+        process,
       },
       replace: false,
     });
