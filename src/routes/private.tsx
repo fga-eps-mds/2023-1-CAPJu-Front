@@ -48,7 +48,7 @@ export const PrivateRoutes: MenuItem[] = [
     )?.users,
   },
   {
-    path: "processos/detalhes-do-processo",
+    path: "processos/:record",
     name: "ProcessDetail",
     element: <ProcessDetail />,
     authorizedRoles: permissionsArray.find((item) =>

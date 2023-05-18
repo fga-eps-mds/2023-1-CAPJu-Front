@@ -70,6 +70,14 @@ function Processes() {
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
 
+  const handleRedirect = (process: Process) =>
+    navigate(`/processos/${process.record}`, {
+      state: {
+        process: process,
+      },
+      replace: false,
+    });
+
   const tableActions = useMemo(
     () => [
       {
@@ -77,9 +85,7 @@ function Processes() {
         icon: <ViewIcon boxSize={4} />,
         action: ({ process }: { process: Process }) => {
           selectProcess(process);
-          navigate(`/detalhes-do-processo?record=${process.record}`, {
-            replace: true,
-          });
+          handleRedirect(process);
         },
         actionName: "view-process",
         disabled: isActionDisabled("view-process"),
@@ -117,8 +123,14 @@ function Processes() {
 
     let value =
       filter !== ""
-        ? processesData?.value?.filter((process) =>
-            process.record.toLowerCase().includes(filter.toLocaleLowerCase())
+        ? processesData?.value?.filter(
+            (process) =>
+              process.record
+                .toLowerCase()
+                .includes(filter.toLocaleLowerCase()) ||
+              process.nickname
+                .toLowerCase()
+                .includes(filter.toLocaleLowerCase())
           )
         : processesData?.value;
 
