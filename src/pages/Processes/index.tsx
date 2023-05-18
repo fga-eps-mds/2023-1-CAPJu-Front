@@ -9,6 +9,7 @@ import {
   Checkbox,
   useToast,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import { hasPermission } from "utils/permissions";
 import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
@@ -23,6 +24,7 @@ import { EditModal } from "./EditModal";
 
 function Processes() {
   const toast = useToast();
+  const navigate = useNavigate();
   const { getUserData } = useAuth();
   const [selectedProcess, selectProcess] = useState<Process>();
   const { data: userData, isFetched: isUserFetched } = useQuery({
@@ -75,7 +77,9 @@ function Processes() {
         icon: <ViewIcon boxSize={4} />,
         action: ({ process }: { process: Process }) => {
           selectProcess(process);
-          // onAdminsListOpen();
+          navigate(`/detalhes-do-processo?record=${process.record}`, {
+            replace: true,
+          });
         },
         actionName: "view-process",
         disabled: isActionDisabled("view-process"),
@@ -86,7 +90,6 @@ function Processes() {
         action: ({ process }: { process: Process }) => {
           selectProcess(process);
           onEditionOpen();
-          // onAdminsListOpen();
         },
         actionName: "edit-process",
         disabled: isActionDisabled("edit-process"),
