@@ -122,7 +122,7 @@ export function CreationModal({
               Cancelar
             </Button>
             <Button colorScheme="blue" type="submit" size="sm">
-              Criar
+              Salvar
             </Button>
           </ModalFooter>
         </chakra.form>
