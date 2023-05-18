@@ -19,6 +19,7 @@ import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { ExclusionModal } from "./ExclusionModal";
 import { CreationModal } from "./CreationModal";
+import { EditModal } from "./EditModal";
 
 function Processes() {
   const toast = useToast();
@@ -39,6 +40,11 @@ function Processes() {
     isOpen: isExclusionOpen,
     onOpen: onExclusionOpen,
     onClose: onExclusionClose,
+  } = useDisclosure();
+  const {
+    isOpen: isEditionOpen,
+    onOpen: onEditionOpen,
+    onClose: onEditionClose,
   } = useDisclosure();
   const {
     data: processesData,
@@ -79,6 +85,7 @@ function Processes() {
         icon: <Icon as={MdEdit} boxSize={4} />,
         action: ({ process }: { process: Process }) => {
           selectProcess(process);
+          onEditionOpen();
           // onAdminsListOpen();
         },
         actionName: "edit-process",
@@ -219,6 +226,14 @@ function Processes() {
         onClose={onCreationClose}
         afterSubmission={refetchProcesses}
       />
+      {selectedProcess && (
+        <EditModal
+          selectedProcess={selectedProcess}
+          isOpen={isEditionOpen}
+          onClose={onEditionClose}
+          afterSubmission={refetchProcesses}
+        />
+      )}
       {selectedProcess && (
         <ExclusionModal
           process={selectedProcess}

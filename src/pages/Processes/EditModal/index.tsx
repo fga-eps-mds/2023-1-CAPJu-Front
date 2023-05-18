@@ -14,6 +14,7 @@ import {
   Text,
   Checkbox,
   Box,
+  Stack,
 } from "@chakra-ui/react";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
@@ -23,7 +24,7 @@ import { Input } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
 import { getPriorities } from "services/priorities";
 import { getFlows } from "services/flows";
-import { createProcess } from "services/processes";
+import { updateProcess } from "services/processes";
 
 type FormValues = {
   record: string;
@@ -39,17 +40,19 @@ const validationSchema = yup.object({
   idPriority: yup.string().notRequired(),
 });
 
-interface CreationModalProps {
+interface EditionModalProps {
+  selectedProcess: Process;
   isOpen: boolean;
   onClose: () => void;
   afterSubmission: () => void;
 }
 
-export function CreationModal({
+export function EditModal({
+  selectedProcess,
   isOpen,
   onClose,
   afterSubmission,
-}: CreationModalProps) {
+}: EditionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
   const [legalPriority, setLegalPriority] = useState(false);
@@ -67,17 +70,16 @@ export function CreationModal({
   });
 
   const onSubmit = handleSubmit(async (formData) => {
-    console.log("ENTREI SUBMIT");
     handleLoading(true);
     const body = {
-      record: formData.record,
+      record: selectedProcess?.record,
       nickname: formData.nickname,
       idFlow: formData.idFlow,
       priority: legalPriority ? formData.idPriority : 0,
       effectiveDate: new Date(),
     };
 
-    const res = await createProcess(body);
+    const res = await updateProcess(body);
 
     onClose();
     afterSubmission();
@@ -86,9 +88,9 @@ export function CreationModal({
       handleLoading(false);
 
       toast({
-        id: "create-process-success",
+        id: "edit-process-success",
         title: "Sucesso!",
-        description: "O Processo foi criado.",
+        description: "Processo editado com sucesso!",
         status: "success",
       });
       return;
@@ -96,13 +98,17 @@ export function CreationModal({
 
     handleLoading(false);
     toast({
-      id: "create-process-error",
-      title: "Erro ao criar processo",
+      id: "edit-process-error",
+      title: "Erro ao editar processo",
       description: res.error?.message,
       status: "error",
       isClosable: true,
     });
   });
+
+  const handlePriority = async () => {
+    setLegalPriority(selectedProcess?.idPriority !== 0);
+  };
 
   const handleGetPriorities = async () => {
     const res = (await getPriorities()).value;
@@ -115,9 +121,10 @@ export function CreationModal({
   };
 
   useEffect(() => {
+    handlePriority();
     handleGetFlows();
     handleGetPriorities();
-  }, []);
+  }, [selectedProcess]);
 
   useEffect(() => {
     reset();
@@ -125,13 +132,15 @@ export function CreationModal({
 
   console.log("priorities", priorities);
   console.log("flows", flows);
+  console.log("selectedProcess", selectedProcess);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Criar Processo</ModalHeader>
+        <ModalHeader>Editar Processo</ModalHeader>
         <ModalCloseButton />
+
         <chakra.form onSubmit={onSubmit}>
           <ModalBody>
             <Input
@@ -139,6 +148,16 @@ export function CreationModal({
               label="Registro"
               placeholder="N do Registro "
               errors={errors.record}
+              backgroundColor="gray.200"
+              value={selectedProcess?.record}
+              readOnly
+              infoText={
+                <Stack spacing="0">
+                  <Text>
+                    Não é possível editar o número do registro do processo.
+                  </Text>
+                </Stack>
+              }
               marginBottom={2}
               {...register("record")}
             />
@@ -146,6 +165,7 @@ export function CreationModal({
               type="text"
               label="Apelido"
               placeholder="Escolha um apelido para o registro"
+              defaultValue={selectedProcess?.nickname}
               errors={errors.nickname}
               marginBottom={2}
               {...register("nickname")}
@@ -156,6 +176,7 @@ export function CreationModal({
               marginBottom={2}
               color="gray.500"
               {...register("idFlow")}
+              defaultValue={selectedProcess?.idFlow[0]}
             >
               {flows &&
                 flows.map((flow) => {
@@ -179,6 +200,7 @@ export function CreationModal({
                   marginBottom={2}
                   color="gray.500"
                   {...register("idPriority")}
+                  defaultValue={selectedProcess?.idPriority}
                 >
                   {priorities &&
                     priorities.map((priority) => {
