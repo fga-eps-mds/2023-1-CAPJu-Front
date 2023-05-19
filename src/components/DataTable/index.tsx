@@ -136,9 +136,13 @@ export function DataTable<Data extends object>({
                               key={actionItem.label}
                               {...actionItem}
                               action={() => {
-                                actionItem.action(row.original.actionsProps);
+                                if (actionItem.action)
+                                  actionItem.action(row.original.actionsProps);
 
-                                if (row.original.actionsProps.pathname)
+                                if (
+                                  row.original.actionsProps.pathname &&
+                                  actionItem.isNavigate
+                                )
                                   navigate(row.original.actionsProps.pathname, {
                                     state: row.original.actionsProps.state,
                                   });

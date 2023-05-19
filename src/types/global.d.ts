@@ -84,8 +84,9 @@ declare global {
     label: string;
     icon: JSX.Element;
     actionName: string;
-    action: (actionProps?: any) => any;
+    action?: (actionProps?: any) => any;
     disabled?: boolean;
+    isNavigate?: boolean;
   };
 
   type TableRow<T> = T & {

@@ -9,7 +9,6 @@ import {
   Checkbox,
   useToast,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
 import { hasPermission } from "utils/permissions";
 import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
@@ -24,7 +23,6 @@ import { EditModal } from "./EditModal";
 
 function Processes() {
   const toast = useToast();
-  const navigate = useNavigate();
   const { getUserData } = useAuth();
   const [selectedProcess, selectProcess] = useState<Process>();
   const { data: userData, isFetched: isUserFetched } = useQuery({
@@ -70,23 +68,12 @@ function Processes() {
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
 
-  const handleRedirect = (process: Process) =>
-    navigate(`/processos/${process.record}`, {
-      state: {
-        process,
-      },
-      replace: false,
-    });
-
-  const tableActions = useMemo(
+  const tableActions = useMemo<TableAction[]>(
     () => [
       {
         label: "Visualizar Processo",
         icon: <ViewIcon boxSize={4} />,
-        action: ({ process }: { process: Process }) => {
-          selectProcess(process);
-          handleRedirect(process);
-        },
+        isNavigate: true,
         actionName: "view-process",
         disabled: isActionDisabled("view-process"),
       },
@@ -142,7 +129,17 @@ function Processes() {
           curr: TableRow<Process> | Process
         ) => [
           ...acc,
-          { ...curr, tableActions, actionsProps: { process: curr } },
+          {
+            ...curr,
+            tableActions,
+            actionsProps: {
+              process: curr,
+              pathname: `/processos/${curr.record}`,
+              state: {
+                process: curr,
+              },
+            },
+          },
         ],
         []
       ) as TableRow<Process>[]) || []
@@ -203,7 +200,7 @@ function Processes() {
             isDisabled={isActionDisabled("create-process")}
             onClick={onCreationOpen}
           >
-            <AddIcon mr="2" boxSize={3} /> Adicionar Processo
+            <AddIcon mr="2" boxSize={3} /> Criar Processo
           </Button>
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">

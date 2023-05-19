@@ -59,14 +59,12 @@ function Flows() {
   });
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
-  const tableActions = useMemo(
+  const tableActions = useMemo<TableAction[]>(
     () => [
       {
         label: "Visualizar Processos do Fluxo",
         icon: <ViewIcon boxSize={4} />,
-        action: ({ flow }: { flow: Flow }) => {
-          selectFlow(flow);
-        },
+        isNavigate: true,
         actionName: "view-flow",
         disabled: isActionDisabled("view-flow"),
       },
@@ -82,12 +80,13 @@ function Flows() {
       },
       {
         label: "Deletar Fluxo",
+        actionName: "delete-flow",
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ flow }: { flow: Flow }) => {
           selectFlow(flow);
           onDeleteOpen();
         },
-        disabled: false,
+        disabled: isActionDisabled("delete-flow"),
       },
     ],
     [isFlowsFetched, isUserFetched]

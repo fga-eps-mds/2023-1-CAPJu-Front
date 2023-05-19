@@ -1,12 +1,18 @@
 import { Flex, Text, Button } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/icons";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
 import { PrivateLayout } from "layouts/Private";
+import { useEffect } from "react";
 
 function ProcessDetail() {
+  const navigate = useNavigate();
   const location = useLocation();
   const { process } = location.state;
+
+  useEffect(() => {
+    if (!process) navigate(-1);
+  }, []);
 
   return (
     <PrivateLayout>
@@ -18,12 +24,11 @@ function ProcessDetail() {
           <Button
             size="xs"
             fontSize="sm"
-            marginTop={1}
             colorScheme="blue"
-            onClick={() => console.log("voltar")}
+            onClick={() => navigate(-1)}
           >
             <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar aos
-            processos
+            Processos
           </Button>
         </Flex>
       </Flex>
