@@ -17,6 +17,25 @@ export const getFlows = async (): Promise<Result<Flow[]>> => {
   }
 };
 
+export const getFlowById = async (
+  id: string | number
+): Promise<Result<Flow>> => {
+  try {
+    const res = await api.flows.get<Flow>(`/flow/${id}`);
+
+    return { type: "success", value: res.data };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
 export const createFlow = async (data: {
   name: string;
   sequences: FlowSequence[];
