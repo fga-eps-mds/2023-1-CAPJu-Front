@@ -40,6 +40,21 @@ declare global {
     stages: number[];
   };
 
+  type Priority = {
+    idPriority: number;
+    description: string;
+  };
+
+  type Process = {
+    effectiveDate: Date;
+    idFlow: number[];
+    idPriority: number;
+    idStage: number;
+    idUnit: number;
+    nickname: string;
+    record: string;
+  };
+
   type SelectOption = {
     label: string;
     value: number | string;
