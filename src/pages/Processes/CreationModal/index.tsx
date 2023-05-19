@@ -16,6 +16,7 @@ import {
   Box,
 } from "@chakra-ui/react";
 import * as yup from "yup";
+import { useQuery } from "react-query";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -53,8 +54,34 @@ export function CreationModal({
   const toast = useToast();
   const { handleLoading } = useLoading();
   const [legalPriority, setLegalPriority] = useState(false);
-  const [priorities, setPriorities] = useState<Priority[]>();
-  const [flows, setFlows] = useState<Flow[]>();
+  const { data: prioritiesData } = useQuery({
+    queryKey: ["priorities"],
+    queryFn: getPriorities,
+    onError: () => {
+      toast({
+        id: "priorities-error",
+        title: "Erro ao carregar prioridades",
+        description:
+          "Houve um erro ao carregar prioriaddes, favor tentar novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    },
+  });
+  const { data: flowsData } = useQuery({
+    queryKey: ["flows"],
+    queryFn: getFlows,
+    onError: () => {
+      toast({
+        id: "flows-error",
+        title: "Erro ao carregar fluxos",
+        description:
+          "Houve um erro ao carregar fluxos, favor tentar novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    },
+  });
 
   const {
     register,
@@ -104,27 +131,9 @@ export function CreationModal({
     });
   });
 
-  const handleGetPriorities = async () => {
-    const res = (await getPriorities()).value;
-    setPriorities(res);
-  };
-
-  const handleGetFlows = async () => {
-    const res = (await getFlows()).value;
-    setFlows(res);
-  };
-
-  useEffect(() => {
-    handleGetFlows();
-    handleGetPriorities();
-  }, []);
-
   useEffect(() => {
     reset();
   }, [isOpen]);
-
-  console.log("priorities", priorities);
-  console.log("flows", flows);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
@@ -157,8 +166,8 @@ export function CreationModal({
               color="gray.500"
               {...register("idFlow")}
             >
-              {flows &&
-                flows.map((flow) => {
+              {flowsData?.value &&
+                flowsData.value.map((flow) => {
                   return <option value={flow.idFlow}>{flow.name}</option>;
                 })}
             </Select>
@@ -180,8 +189,8 @@ export function CreationModal({
                   color="gray.500"
                   {...register("idPriority")}
                 >
-                  {priorities &&
-                    priorities.map((priority) => {
+                  {prioritiesData?.value &&
+                    prioritiesData.value.map((priority) => {
                       return (
                         <option value={priority.idPriority}>
                           {priority.description}

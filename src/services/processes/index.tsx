@@ -22,7 +22,9 @@ export const deleteProcess = async (
   registro: string
 ): Promise<Result<Process>> => {
   try {
-    const res = await api.processes.delete<Stage>(`/deleteProcess/${registro}`);
+    const res = await api.processes.delete<Process>(
+      `/deleteProcess/${registro}`
+    );
     return {
       type: "success",
       value: res.data,
@@ -45,13 +47,13 @@ export const createProcess = async (data: {
   idFlow: number;
   priority: number;
   effectiveDate: Date;
-}): Promise<Result<Stage>> => {
+}): Promise<Result<Process>> => {
   try {
-    const res = await api.stages.post<Process>("/newProcess", data);
+    const res = await api.processes.post<Process>("/newProcess", data);
     return {
       type: "success",
       value: res.data,
-    } as unknown as ResultSuccess<Stage>;
+    } as unknown as ResultSuccess<Process>;
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
@@ -70,13 +72,13 @@ export const updateProcess = async (data: {
   idFlow: number;
   priority: number;
   effectiveDate: Date;
-}): Promise<Result<Stage>> => {
+}): Promise<Result<Process>> => {
   try {
-    const res = await api.stages.put<Process>("/updateProcess", data);
+    const res = await api.processes.put<Process>("/updateProcess", data);
     return {
       type: "success",
       value: res.data,
-    } as unknown as ResultSuccess<Stage>;
+    } as unknown as ResultSuccess<Process>;
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };

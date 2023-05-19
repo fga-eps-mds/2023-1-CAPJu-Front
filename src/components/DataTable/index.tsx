@@ -57,14 +57,7 @@ export function DataTable<Data extends object>({
   return isDataFetching ? (
     <Skeleton w={width} maxW={maxWidth} h={skeletonHeight} />
   ) : (
-    <Table
-      bg="white"
-      w={width}
-      maxW={maxWidth}
-      borderRadius="4"
-      size={size}
-      marginBottom={10}
-    >
+    <Table bg="white" w={width} maxW={maxWidth} borderRadius="4" size={size}>
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>

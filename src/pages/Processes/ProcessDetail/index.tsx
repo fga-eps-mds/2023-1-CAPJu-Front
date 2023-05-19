@@ -8,8 +8,6 @@ function ProcessDetail() {
   const location = useLocation();
   const { process } = location.state;
 
-  console.log("CURRENT PROCESS", process);
-
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">

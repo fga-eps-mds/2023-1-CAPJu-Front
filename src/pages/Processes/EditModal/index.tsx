@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
+import { useQuery } from "react-query";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input } from "components/FormFields";
@@ -56,8 +57,34 @@ export function EditModal({
   const toast = useToast();
   const { handleLoading } = useLoading();
   const [legalPriority, setLegalPriority] = useState(false);
-  const [priorities, setPriorities] = useState<Priority[]>();
-  const [flows, setFlows] = useState<Flow[]>();
+  const { data: prioritiesData } = useQuery({
+    queryKey: ["priorities"],
+    queryFn: getPriorities,
+    onError: () => {
+      toast({
+        id: "priorities-error",
+        title: "Erro ao carregar prioridades",
+        description:
+          "Houve um erro ao carregar prioriaddes, favor tentar novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    },
+  });
+  const { data: flowsData } = useQuery({
+    queryKey: ["flows"],
+    queryFn: getFlows,
+    onError: () => {
+      toast({
+        id: "flows-error",
+        title: "Erro ao carregar fluxos",
+        description:
+          "Houve um erro ao carregar fluxos, favor tentar novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    },
+  });
 
   const {
     register,
@@ -110,29 +137,13 @@ export function EditModal({
     setLegalPriority(selectedProcess?.idPriority !== 0);
   };
 
-  const handleGetPriorities = async () => {
-    const res = (await getPriorities()).value;
-    setPriorities(res);
-  };
-
-  const handleGetFlows = async () => {
-    const res = (await getFlows()).value;
-    setFlows(res);
-  };
-
   useEffect(() => {
     handlePriority();
-    handleGetFlows();
-    handleGetPriorities();
   }, [selectedProcess]);
 
   useEffect(() => {
     reset();
   }, [isOpen]);
-
-  console.log("priorities", priorities);
-  console.log("flows", flows);
-  console.log("selectedProcess", selectedProcess);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
@@ -178,8 +189,8 @@ export function EditModal({
               {...register("idFlow")}
               defaultValue={selectedProcess?.idFlow[0]}
             >
-              {flows &&
-                flows.map((flow) => {
+              {flowsData?.value &&
+                flowsData.value.map((flow) => {
                   return <option value={flow.idFlow}>{flow.name}</option>;
                 })}
             </Select>
@@ -202,8 +213,8 @@ export function EditModal({
                   {...register("idPriority")}
                   defaultValue={selectedProcess?.idPriority}
                 >
-                  {priorities &&
-                    priorities.map((priority) => {
+                  {prioritiesData?.value &&
+                    prioritiesData.value.map((priority) => {
                       return (
                         <option value={priority.idPriority}>
                           {priority.description}
