@@ -8,4 +8,10 @@ export const Services = {
   stages: {
     baseURL: import.meta.env.VITE_STAGES_SERVICE_URL,
   },
+  processes: {
+    baseURL: import.meta.env.VITE_PROCESSES_SERVICE_URL,
+  },
+  flows: {
+    baseURL: import.meta.env.VITE_FLOWS_SERVICE_URL,
+  },
 };
