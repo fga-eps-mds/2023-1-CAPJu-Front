@@ -13,7 +13,7 @@ const Users = lazy(() => import("pages/Users"));
 const Stages = lazy(() => import("pages/Stages"));
 const Flows = lazy(() => import("pages/Flows"));
 const Processes = lazy(() => import("pages/Processes"));
-const ProcessDetail = lazy(() => import("pages/Processes/ProcessDetail"));
+const SingleProcess = lazy(() => import("pages/SingleProcess"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
@@ -58,8 +58,8 @@ export const PrivateRoutes: MenuItem[] = [
   },
   {
     path: "processos/:record",
-    name: "ProcessDetail",
-    element: <ProcessDetail />,
+    name: "SingleProcess",
+    element: <SingleProcess />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-process")
     )?.users,
