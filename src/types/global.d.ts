@@ -24,6 +24,7 @@ declare global {
     idUnit: number;
     name: string;
     duration: number;
+    createdAt: string;
   };
 
   type FlowSequence = {

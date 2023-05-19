@@ -57,7 +57,7 @@ function ProcessDetail() {
             gap="1"
           >
             Processo {process?.nickname}
-            <Text fontSize="md" fontWeight="300">
+            <Text as="span" fontSize="md" fontWeight="300">
               ({process?.record})
             </Text>
           </Text>
@@ -76,6 +76,7 @@ function ProcessDetail() {
           stages={stages || []}
           minHeight={650}
           currentStage={process?.idStage}
+          effectiveDate={process?.effectiveDate}
         />
       </Flex>
     </PrivateLayout>
