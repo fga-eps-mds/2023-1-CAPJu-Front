@@ -39,6 +39,14 @@ export const PrivateRoutes: MenuItem[] = [
     )?.users,
   },
   {
+    path: "fluxos/:id",
+    name: "FlowProcesses",
+    element: <PrivateLayout />,
+    authorizedRoles: permissionsArray.find((item) =>
+      item.actions.includes("view-flow")
+    )?.users,
+  },
+  {
     path: "processos",
     name: "Processes",
     element: <PrivateLayout />,

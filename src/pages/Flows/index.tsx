@@ -106,7 +106,15 @@ function Flows() {
       (value?.reduce(
         (acc: TableRow<Flow>[] | Flow[], curr: TableRow<Flow> | Flow) => [
           ...acc,
-          { ...curr, tableActions, actionsProps: { flow: curr } },
+          {
+            ...curr,
+            tableActions,
+            actionsProps: {
+              flow: curr,
+              state: { flow: curr },
+              pathname: `/fluxos/${curr.idFlow}`,
+            },
+          },
         ],
         []
       ) as TableRow<Flow>[]) || []

@@ -18,6 +18,7 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { useNavigate } from "react-router-dom";
 
 import { ActionButton } from "./ActionButton";
 
@@ -42,6 +43,7 @@ export function DataTable<Data extends object>({
   size = ["sm", "md"],
   emptyTableMessage = "Esta tabela está vazia no momento.",
 }: DataTableProps<Data>) {
+  const navigate = useNavigate();
   const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
     columns,
@@ -133,9 +135,14 @@ export function DataTable<Data extends object>({
                             <ActionButton
                               key={actionItem.label}
                               {...actionItem}
-                              action={() =>
-                                actionItem.action(row.original.actionsProps)
-                              }
+                              action={() => {
+                                actionItem.action(row.original.actionsProps);
+
+                                if (row.original.actionsProps.pathname)
+                                  navigate(row.original.actionsProps.pathname, {
+                                    state: row.original.actionsProps.state,
+                                  });
+                              }}
                             />
                           );
                         }
