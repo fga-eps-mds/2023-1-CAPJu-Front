@@ -26,6 +26,25 @@ declare global {
     duration: number;
   };
 
+  type FlowSequence = {
+    from: number;
+    to: number;
+    commentary: string;
+  };
+
+  type Flow = {
+    idFlow: number;
+    idUnit: number;
+    name: string;
+    sequences: FlowSequence[];
+    stages: number[];
+  };
+
+  type SelectOption = {
+    label: string;
+    value: number | string;
+  };
+
   type ApiResponse<Data> = {
     data: Data;
     error: null | string;
