@@ -11,6 +11,7 @@ const Units = lazy(() => import("pages/Units"));
 const Requests = lazy(() => import("pages/Requests"));
 const Users = lazy(() => import("pages/Users"));
 const Stages = lazy(() => import("pages/Stages"));
+const Flows = lazy(() => import("pages/Flows"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
@@ -32,7 +33,7 @@ export const PrivateRoutes: MenuItem[] = [
   {
     path: "fluxos",
     name: "Flows",
-    element: <PrivateLayout />,
+    element: <Flows />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-flow")
     )?.users,
