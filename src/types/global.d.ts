@@ -47,13 +47,13 @@ declare global {
   };
 
   type Process = {
-    effectiveDate: Date;
     idFlow: number[];
     idPriority: number;
     idStage: number;
     idUnit: number;
     nickname: string;
     record: string;
+    effectiveDate: string;
   };
 
   type SelectOption = {

@@ -92,3 +92,49 @@ export const updateProcess = async (data: {
     };
   }
 };
+
+export const getProcessById = async (id: number): Promise<Result<Process>> => {
+  try {
+    const res = await api.processes.get<Process>(`/getOneProcess/${id}`);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const advanceStage = async (data: {
+  record: string;
+  from: number;
+  to: number;
+  commentary: string;
+  idFlow: number;
+}): Promise<Result<Process>> => {
+  try {
+    const res = await api.processes.put<Process>("/processNextStage", data);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};

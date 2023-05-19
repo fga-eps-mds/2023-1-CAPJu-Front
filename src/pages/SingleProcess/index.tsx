@@ -1,7 +1,8 @@
-import { Flex, Text, Button } from "@chakra-ui/react";
+import { Flex, Text, Button, useToast } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
+import { FiSkipForward } from "react-icons/fi";
 import { useEffect, useMemo } from "react";
 import { useQuery } from "react-query";
 
@@ -9,23 +10,43 @@ import { PrivateLayout } from "layouts/Private";
 import { getFlowById } from "services/flows";
 import { Flow } from "components/Flow";
 import { getStages } from "services/stages";
+import { hasPermission } from "utils/permissions";
+import { useAuth } from "hooks/useAuth";
+import { useLoading } from "hooks/useLoading";
+import { advanceStage, getProcessById } from "services/processes";
 
 function ProcessDetail() {
   const navigate = useNavigate();
   const location = useLocation();
+  const toast = useToast();
+  const { handleLoading } = useLoading();
   const { process } = location.state;
+  const { getUserData } = useAuth();
+  const {
+    data: processData,
+    isFetched: isProcessFetched,
+    refetch: refetchProcess,
+  } = useQuery({
+    queryKey: ["process", process.id],
+    queryFn: async () => {
+      const res = await getProcessById(process.record);
+      return res;
+    },
+  });
   const { data: stagesData } = useQuery({
     queryKey: ["stages"],
     queryFn: getStages,
   });
-  const { data: flowData } = useQuery({
-    queryKey: `flow-${process.idFlow[0]}`,
+  const { data: userData } = useQuery({
+    queryKey: ["user-data"],
+    queryFn: getUserData,
+  });
+  const { data: flowData, refetch: refetchFlow } = useQuery({
+    queryKey: ["flow", ...(process.idFlow || [])],
     queryFn: async () => {
-      if (!process.idFlow[0]) {
-        return { type: "error", value: undefined };
-      }
-
-      const res = await getFlowById(process.idFlow[0]);
+      const res = process.idFlow
+        ? await getFlowById(process.idFlow[0])
+        : { type: "error", value: {} as Flow };
 
       return res;
     },
@@ -40,6 +61,56 @@ function ProcessDetail() {
       }, []) || []
     );
   }, [flowData]);
+  const nextStageId = useMemo<number>(() => {
+    return (
+      flowData?.value?.sequences?.find(
+        (item) => item.from === processData?.value?.idStage
+      )?.to || -1
+    );
+  }, [flowData, processData]);
+  const isActionDisabled = (actionName: string) =>
+    userData?.value ? !hasPermission(userData.value, actionName) : true;
+
+  async function handleNextStage() {
+    handleLoading(true);
+
+    const res = processData?.value
+      ? await advanceStage({
+          record: processData?.value?.record,
+          from: processData?.value?.idStage,
+          to: nextStageId,
+          commentary: "",
+          idFlow: process.idFlow[0],
+        })
+      : ({
+          type: "error",
+          error: new Error(
+            "Houve um problema com as informações sobre o processo"
+          ),
+          value: undefined,
+        } as ResultError);
+
+    if (res.type === "success") {
+      toast({
+        id: "advance-stage-success",
+        title: "Sucesso!",
+        description: `Seu processo avançou para a próxima etapa.`,
+        status: "success",
+      });
+    } else {
+      toast({
+        id: "advance-stage-error",
+        title: "Erro ao avançar etapa",
+        description: res.error?.message,
+        status: "error",
+        isClosable: true,
+      });
+    }
+
+    handleLoading(false);
+    refetchProcess();
+    refetchFlow();
+  }
 
   useEffect(() => {
     if (!process) navigate(-1);
@@ -47,7 +118,7 @@ function ProcessDetail() {
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="8" mb="4">
+      <Flex w="90%" maxW={1120} flexDir="column" gap="4" mb="4">
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Text
             fontSize="lg"
@@ -56,9 +127,9 @@ function ProcessDetail() {
             alignItems="center"
             gap="1"
           >
-            Processo {process?.nickname}
+            Processo {process.nickname}
             <Text as="span" fontSize="md" fontWeight="300">
-              ({process?.record})
+              ({process.record})
             </Text>
           </Text>
           <Button
@@ -71,13 +142,26 @@ function ProcessDetail() {
             Processos
           </Button>
         </Flex>
-        <Flow
-          sequences={flowData?.value?.sequences || []}
-          stages={stages || []}
-          minHeight={650}
-          currentStage={process?.idStage}
-          effectiveDate={process?.effectiveDate}
-        />
+        <Flex w="100%" justifyContent="center" gap="2" flexWrap="wrap">
+          <Button
+            size="sm"
+            colorScheme="green"
+            onClick={() => handleNextStage()}
+            disabled={isActionDisabled("advance-stage")}
+          >
+            Avançar de Etapa
+            <Icon as={FiSkipForward} ml="2" boxSize={4} />
+          </Button>
+        </Flex>
+        {isProcessFetched ? (
+          <Flow
+            sequences={flowData?.value?.sequences || []}
+            stages={stages || []}
+            minHeight={650}
+            currentStage={processData?.value?.idStage}
+            effectiveDate={processData?.value?.effectiveDate}
+          />
+        ) : null}
       </Flex>
     </PrivateLayout>
   );

@@ -102,7 +102,7 @@ export function Flow({
           : {
               background: colors.gray["200"],
             }),
-        width: deadline ? 230 : 180,
+        width: deadline ? 240 : 180,
       },
     } as Node;
   });
