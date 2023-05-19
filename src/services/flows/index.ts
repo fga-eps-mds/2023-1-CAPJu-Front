@@ -39,6 +39,28 @@ export const createFlow = async (data: {
   }
 };
 
+export const updateFlow = async (data: {
+  name: string;
+  sequences: FlowSequence[];
+  idUsersToNotify: (string | number)[];
+  idFlow: number;
+}) => {
+  try {
+    const res = await api.flows.put<Flow>(`/flow/`, data);
+
+    return { type: "success", value: res.data };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
 export const deleteFlow = async (id: number) => {
   try {
     const res = await api.flows.delete<Flow[]>(`/flow/${id}`);

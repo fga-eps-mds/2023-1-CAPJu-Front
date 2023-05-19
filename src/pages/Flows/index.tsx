@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
 import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -13,6 +13,7 @@ import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { DeleteModal } from "./DeleteModal";
 import { CreationModal } from "./CreationModal";
+import { EditionModal } from "./EditionModal";
 
 function Flows() {
   const toast = useToast();
@@ -23,6 +24,11 @@ function Flows() {
     isOpen: isCreationOpen,
     onOpen: onCreationOpen,
     onClose: onCreationClose,
+  } = useDisclosure();
+  const {
+    isOpen: isEditionOpen,
+    onOpen: onEditionOpen,
+    onClose: onEditionClose,
   } = useDisclosure();
   const {
     isOpen: isDeleteOpen,
@@ -56,13 +62,23 @@ function Flows() {
   const tableActions = useMemo(
     () => [
       {
-        label: "Visualizar Fluxo",
+        label: "Visualizar Processos do Fluxo",
         icon: <ViewIcon boxSize={4} />,
         action: ({ flow }: { flow: Flow }) => {
           selectFlow(flow);
         },
         actionName: "view-flow",
         disabled: isActionDisabled("view-flow"),
+      },
+      {
+        label: "Editar Fluxo",
+        icon: <Icon as={MdEdit} boxSize={4} />,
+        action: ({ flow }: { flow: Flow }) => {
+          selectFlow(flow);
+          onEditionOpen();
+        },
+        actionName: "edit-flow",
+        disabled: isActionDisabled("edit-flow"),
       },
       {
         label: "Deletar Fluxo",
@@ -153,7 +169,15 @@ function Flows() {
         isDataFetching={!isFlowsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados fluxos."
       />
-      {userData?.value?.idUnit ? (
+      {selectedFlow && isEditionOpen ? (
+        <EditionModal
+          flow={selectedFlow}
+          isOpen={isEditionOpen}
+          onClose={onEditionClose}
+          afterSubmission={refetchFlows}
+        />
+      ) : null}
+      {userData?.value?.idUnit && isCreationOpen ? (
         <CreationModal
           isOpen={isCreationOpen}
           onClose={onCreationClose}

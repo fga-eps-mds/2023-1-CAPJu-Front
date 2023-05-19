@@ -9,17 +9,14 @@ import {
 } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
 
-type Option = {
-  label: string;
-  value: string | number;
-};
-
-export interface MultiSelectProps extends Omit<ChakraSelectProps, "onChange"> {
-  options: Option[];
+export interface MultiSelectProps
+  extends Omit<ChakraSelectProps, "onChange" | "defaultValue"> {
+  options: SelectOption[];
   label?: string | JSX.Element;
   errors?: FieldError | undefined;
   // eslint-disable-next-line no-unused-vars
   onChange?: (value: SelectOption[]) => void;
+  defaultValue?: SelectOption[];
 }
 
 export const MultiSelect = forwardRef<MultiSelectProps, "select">(
@@ -40,6 +37,8 @@ export const MultiSelect = forwardRef<MultiSelectProps, "select">(
           options={options}
           ref={ref}
           noOptionsMessage={() => <Text>Não há mais opções disponíveis.</Text>}
+          // @ts-ignore
+          defaultValue={defaultValue || undefined}
           {...rest}
         />
         <FormErrorMessage color="red.400">{errors?.message}</FormErrorMessage>
