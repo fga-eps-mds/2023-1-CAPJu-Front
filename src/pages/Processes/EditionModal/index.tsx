@@ -62,7 +62,10 @@ export function EditionModal({
   const { handleLoading } = useLoading();
   const { data: prioritiesData } = useQuery({
     queryKey: ["priorities"],
-    queryFn: getPriorities,
+    queryFn: async () => {
+      const res = await getPriorities();
+      return res;
+    },
     onError: () => {
       toast({
         id: "priorities-error",
@@ -209,12 +212,14 @@ export function EditionModal({
                 color="gray.500"
                 options={
                   prioritiesData?.value
-                    ? prioritiesData.value.map((priority) => {
-                        return {
-                          value: priority.idPriority,
-                          label: priority.description,
-                        };
-                      })
+                    ? (prioritiesData.value as Priority[]).map(
+                        (priority: Priority) => {
+                          return {
+                            value: priority.idPriority,
+                            label: priority.description,
+                          };
+                        }
+                      )
                     : []
                 }
                 defaultValue={selectedProcess?.idPriority}

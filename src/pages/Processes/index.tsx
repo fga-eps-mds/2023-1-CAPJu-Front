@@ -13,7 +13,8 @@ import {
 import { AddIcon, ArrowUpIcon, Icon, ViewIcon } from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { IoReturnDownBackOutline } from "react-icons/io5";
 
 import { getProcesses } from "services/processes";
 import { getFlows } from "services/flows";
@@ -28,6 +29,7 @@ import { EditionModal } from "./EditionModal";
 function Processes() {
   const { getUserData } = useAuth();
   const { state } = useLocation();
+  const navigate = useNavigate();
   const flow = state?.flow;
   const toast = useToast();
   const [selectedProcess, selectProcess] = useState<Process>();
@@ -274,15 +276,33 @@ function Processes() {
           <Text fontSize="lg" fontWeight="semibold">
             Processos{flow ? ` - Fluxo ${flow?.name}` : ""}
           </Text>
-          <Button
-            size="xs"
-            fontSize="sm"
-            colorScheme="green"
-            isDisabled={isActionDisabled("create-process")}
-            onClick={onCreationOpen}
+          <Flex
+            alignItems="center"
+            justifyContent="start"
+            gap="2"
+            flexWrap="wrap"
           >
-            <AddIcon mr="2" boxSize={3} /> Criar Processo
-          </Button>
+            {flow ? (
+              <Button
+                size="xs"
+                fontSize="sm"
+                colorScheme="blue"
+                onClick={() => navigate("/fluxos", { replace: true })}
+              >
+                <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar
+                aos Fluxos
+              </Button>
+            ) : null}
+            <Button
+              size="xs"
+              fontSize="sm"
+              colorScheme="green"
+              isDisabled={isActionDisabled("create-process")}
+              onClick={onCreationOpen}
+            >
+              <AddIcon mr="2" boxSize={3} /> Criar Processo
+            </Button>
+          </Flex>
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Input
@@ -312,7 +332,9 @@ function Processes() {
         data={filteredProcess}
         columns={tableColumns}
         isDataFetching={!isProcessesFetched || !isUserFetched}
-        emptyTableMessage="Não foram encontrados processos."
+        emptyTableMessage={`Não foram encontrados processos${
+          flow ? ` no fluxo ${flow.name}` : ""
+        }.`}
       />
       <CreationModal
         isOpen={isCreationOpen}

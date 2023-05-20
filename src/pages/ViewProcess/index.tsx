@@ -14,8 +14,9 @@ import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
 import { advanceStage, getProcessByRecord } from "services/processes";
+import { getPriorities } from "services/priorities";
 
-function ProcessDetail() {
+function ViewProcess() {
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -61,6 +62,13 @@ function ProcessDetail() {
           )
         : { type: "error", value: {} as Flow };
 
+      return res;
+    },
+  });
+  const { data: priorityData, isFetched: isPriorityFetched } = useQuery({
+    queryKey: ["priority", process?.idPriority],
+    queryFn: async () => {
+      const res = await getPriorities(process?.idPriority);
       return res;
     },
   });
@@ -134,8 +142,14 @@ function ProcessDetail() {
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="4" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
+      <Flex w="90%" maxW={1120} flexDir="column" gap="3">
+        <Flex
+          w="100%"
+          justifyContent="space-between"
+          alignItems="end"
+          gap="2"
+          flexWrap="wrap"
+        >
           <Text
             fontSize="lg"
             fontWeight="semibold"
@@ -158,12 +172,34 @@ function ProcessDetail() {
             Processos{flow ? ` do Fluxo ${flow?.name}` : ""}
           </Button>
         </Flex>
-        <Flex w="100%" justifyContent="center" gap="2" flexWrap="wrap">
+        <Flex
+          w="100%"
+          flexDirection="column"
+          justifyContent="space-between"
+          alignItems="center"
+          gap="1"
+          flexWrap="wrap"
+        >
+          <Text fontWeight="semibold">
+            Fluxo:{" "}
+            <Text as="span" fontWeight="300">
+              {flowData?.value?.name}
+            </Text>
+          </Text>
+          {isPriorityFetched ? (
+            <Text fontWeight="semibold">
+              Prioridade Legal:{" "}
+              <Text as="span" fontWeight="300">
+                {(priorityData?.value as Priority)?.description || "Não tem"}
+              </Text>
+            </Text>
+          ) : null}
           <Button
             size="sm"
             colorScheme="green"
             onClick={() => handleNextStage()}
             disabled={isActionDisabled("advance-stage")}
+            my="1"
           >
             Avançar de Etapa
             <Icon as={FiSkipForward} ml="2" boxSize={4} />
@@ -182,4 +218,4 @@ function ProcessDetail() {
   );
 }
 
-export default ProcessDetail;
+export default ViewProcess;
