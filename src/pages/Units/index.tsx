@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
-import { MdPersonAddAlt1, MdDelete } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { PrivateLayout } from "layouts/Private";
@@ -16,7 +16,7 @@ import { DeleteModal } from "./DeleteModal";
 
 function Units() {
   const toast = useToast();
-  const [selectedUnit,selectUnit] = useState<Unit| null>(null)
+  const [selectedUnit, selectUnit] = useState<Unit | null>(null);
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
   const {
@@ -28,8 +28,7 @@ function Units() {
     isOpen: isUnitDeleteOpen,
     onOpen: onUnitDeleteOpen,
     onClose: onUnitDeleteClose,
-  } = useDisclosure(); 
-
+  } = useDisclosure();
   const {
     data: unitsData,
     isFetched: isUnitsFetched,
@@ -59,6 +58,16 @@ function Units() {
       {
         label: "Excluir Unidade",
         icon: <Icon as={MdDelete} boxSize={4} />,
+        action: ({ unit }: { unit: Unit }) => {
+          selectUnit(unit);
+          onUnitDeleteOpen();
+        },
+        actionName: "delete-unit",
+        disabled: isActionDisabled("delete-unit"),
+      },
+      {
+        label: "Visualizar Admins",
+        icon: <ViewIcon boxSize={4} />,
         action: ({ unit }: { unit: Unit }) => {
           selectUnit(unit);
           onUnitDeleteOpen();
@@ -99,14 +108,14 @@ function Units() {
         isSortable: true,
       },
     }),
-    // tableColumnHelper.accessor("tableActions", {
-    //   cell: (info) => info.getValue(),
-    //   header: "Ações",
-    //   meta: {
-    //     isTableActions: true,
-    //     isSortable: false,
-    //   },
-    // }),
+    tableColumnHelper.accessor("tableActions", {
+      cell: (info) => info.getValue(),
+      header: "Ações",
+      meta: {
+        isTableActions: true,
+        isSortable: false,
+      },
+    }),
   ];
 
   return (
@@ -151,14 +160,14 @@ function Units() {
         onClose={onCreationClose}
         afterSubmission={refetchUnits}
       />
-      {selectedUnit && (
+      {selectedUnit ? (
         <DeleteModal
           unit={selectedUnit}
           isOpen={isUnitDeleteOpen}
           onClose={onUnitDeleteClose}
-          refetchUnits={refetchUnits}       
+          refetchUnits={refetchUnits}
         />
-      )}
+      ) : null}
     </PrivateLayout>
   );
 }
