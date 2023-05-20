@@ -5,8 +5,6 @@ export function validateCPF(cpf: string) {
   let rest;
   cpf = cpf.replace(/\D/g, "");
 
-  console.log(cpf);
-
   const cpfBlocked = [
     "00000000000",
     "11111111111",

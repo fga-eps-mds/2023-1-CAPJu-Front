@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -12,7 +12,6 @@ import {
   useToast,
   Text,
   Checkbox,
-  Box,
 } from "@chakra-ui/react";
 import * as yup from "yup";
 import { useQuery } from "react-query";
@@ -29,14 +28,20 @@ type FormValues = {
   record: string;
   nickname: string;
   idFlow: number;
+  hasLegalPriority: boolean;
   idPriority: number;
 };
 
 const validationSchema = yup.object({
-  record: yup.string().required("Digite o número do Registro."),
-  nickname: yup.string().required("Dê um apelido para esse Registro."),
-  idFlow: yup.string().required("Selecione um fluxo para esse Registro"),
-  idPriority: yup.string().notRequired(),
+  record: yup.string().required("Digite o registro do processo."),
+  nickname: yup.string().required("Dê um apelido para o processo."),
+  idFlow: yup.string().required("Selecione um fluxo para o processo."),
+  hasLegalPriority: yup.bool(),
+  idPriority: yup.string().when("hasLegalPriority", (hasLegalPriority) => {
+    return hasLegalPriority[0]
+      ? yup.string().required("Escolha a prioridade legal do processo.")
+      : yup.string().notRequired();
+  }),
 });
 
 interface CreationModalProps {
@@ -52,7 +57,6 @@ export function CreationModal({
 }: CreationModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
-  const [legalPriority, setLegalPriority] = useState(false);
   const { data: prioritiesData } = useQuery({
     queryKey: ["priorities"],
     queryFn: getPriorities,
@@ -81,53 +85,51 @@ export function CreationModal({
       });
     },
   });
-
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<FormValues>({
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });
+  const hasLegalPriority = watch("hasLegalPriority");
 
   const onSubmit = handleSubmit(async (formData) => {
-    console.log("ENTREI SUBMIT");
     handleLoading(true);
+
     const body = {
       record: formData.record,
       nickname: formData.nickname,
       idFlow: formData.idFlow,
-      priority: legalPriority ? formData.idPriority : 0,
+      priority: formData.hasLegalPriority ? formData.idPriority : 0,
       effectiveDate: new Date(),
     };
 
     const res = await createProcess(body);
 
-    onClose();
-    afterSubmission();
-
     if (res.type === "success") {
-      handleLoading(false);
-
       toast({
         id: "create-process-success",
         title: "Sucesso!",
         description: "O Processo foi criado.",
         status: "success",
       });
-      return;
+    } else {
+      toast({
+        id: "create-process-error",
+        title: "Erro ao criar processo",
+        description: res.error?.message,
+        status: "error",
+        isClosable: true,
+      });
     }
 
+    onClose();
+    afterSubmission();
     handleLoading(false);
-    toast({
-      id: "create-process-error",
-      title: "Erro ao criar processo",
-      description: res.error?.message,
-      status: "error",
-      isClosable: true,
-    });
   });
 
   useEffect(() => {
@@ -170,36 +172,36 @@ export function CreationModal({
                     })
                   : []
               }
+              errors={errors.idFlow}
               {...register("idFlow")}
             />
             <Checkbox
               colorScheme="green"
               borderColor="gray.600"
-              isChecked={legalPriority}
-              onChange={() => setLegalPriority(!legalPriority)}
+              isChecked={hasLegalPriority}
+              {...register("hasLegalPriority")}
             >
               Com prioridade legal
             </Checkbox>
-            {legalPriority && (
-              <Box>
-                <Text fontWeight={500}>Prioridade Legal</Text>
-                <Select
-                  placeholder="Selecionar Prioriadade"
-                  color="gray.500"
-                  options={
-                    prioritiesData?.value
-                      ? prioritiesData.value.map((priority) => {
-                          return {
-                            value: priority.idPriority,
-                            label: priority.description,
-                          };
-                        })
-                      : []
-                  }
-                  {...register("idPriority")}
-                />
-              </Box>
-            )}
+            {hasLegalPriority ? (
+              <Select
+                label="Prioridade Legal"
+                placeholder="Selecionar Prioriadade"
+                color="gray.500"
+                options={
+                  prioritiesData?.value
+                    ? prioritiesData.value.map((priority) => {
+                        return {
+                          value: priority.idPriority,
+                          label: priority.description,
+                        };
+                      })
+                    : []
+                }
+                errors={errors.idPriority}
+                {...register("idPriority")}
+              />
+            ) : null}
           </ModalBody>
           <ModalFooter gap="2">
             <Button variant="ghost" onClick={onClose} size="sm">
