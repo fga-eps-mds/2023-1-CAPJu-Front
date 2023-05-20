@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
+import { AddIcon, Icon } from "@chakra-ui/icons";
+import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { PrivateLayout } from "layouts/Private";
@@ -11,15 +12,22 @@ import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { CreationModal } from "./CreationModal";
+import { DeletionModal } from "./DeletionModal";
 
 function Units() {
   const toast = useToast();
+  const [selectedUnit, selectUnit] = useState<Unit | null>(null);
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
   const {
     isOpen: isCreationOpen,
     onOpen: onCreationOpen,
     onClose: onCreationClose,
+  } = useDisclosure();
+  const {
+    isOpen: isDeletionOpen,
+    onOpen: onDeletionOpen,
+    onClose: onDeletionClose,
   } = useDisclosure();
   const {
     data: unitsData,
@@ -45,7 +53,21 @@ function Units() {
   });
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
-  const tableActions = useMemo(() => [], [isUnitsFetched, isUserFetched]);
+  const tableActions = useMemo(
+    () => [
+      {
+        label: "Excluir Unidade",
+        icon: <Icon as={MdDelete} boxSize={4} />,
+        action: ({ unit }: { unit: Unit }) => {
+          selectUnit(unit);
+          onDeletionOpen();
+        },
+        actionName: "delete-unit",
+        disabled: isActionDisabled("delete-unit"),
+      },
+    ],
+    [isUnitsFetched, isUserFetched]
+  );
   const filteredUnits = useMemo<TableRow<Unit>[]>(() => {
     if (!isUnitsFetched) return [];
 
@@ -76,14 +98,14 @@ function Units() {
         isSortable: true,
       },
     }),
-    // tableColumnHelper.accessor("tableActions", {
-    //   cell: (info) => info.getValue(),
-    //   header: "Ações",
-    //   meta: {
-    //     isTableActions: true,
-    //     isSortable: false,
-    //   },
-    // }),
+    tableColumnHelper.accessor("tableActions", {
+      cell: (info) => info.getValue(),
+      header: "Ações",
+      meta: {
+        isTableActions: true,
+        isSortable: false,
+      },
+    }),
   ];
 
   return (
@@ -128,6 +150,14 @@ function Units() {
         onClose={onCreationClose}
         afterSubmission={refetchUnits}
       />
+      {selectedUnit ? (
+        <DeletionModal
+          unit={selectedUnit}
+          isOpen={isDeletionOpen}
+          onClose={onDeletionClose}
+          refetchUnits={refetchUnits}
+        />
+      ) : null}
     </PrivateLayout>
   );
 }
