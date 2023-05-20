@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "react-query";
 import {
   Flex,
@@ -8,24 +8,30 @@ import {
   Input,
   Checkbox,
   useToast,
+  Tooltip,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
-import { hasPermission } from "utils/permissions";
-import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
+import { AddIcon, ArrowUpIcon, Icon, ViewIcon } from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useLocation, useNavigate } from "react-router-dom";
+import { IoReturnDownBackOutline } from "react-icons/io5";
+
 import { getProcesses } from "services/processes";
+import { getFlows } from "services/flows";
+import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
-import { ExclusionModal } from "./ExclusionModal";
+import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
-import { EditModal } from "./EditModal";
+import { EditionModal } from "./EditionModal";
 
 function Processes() {
-  const toast = useToast();
-  const navigate = useNavigate();
   const { getUserData } = useAuth();
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  const flow = state?.flow;
+  const toast = useToast();
   const [selectedProcess, selectProcess] = useState<Process>();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
@@ -39,22 +45,77 @@ function Processes() {
     onClose: onCreationClose,
   } = useDisclosure();
   const {
-    isOpen: isExclusionOpen,
-    onOpen: onExclusionOpen,
-    onClose: onExclusionClose,
+    isOpen: isDeletionOpen,
+    onOpen: onDeletionOpen,
+    onClose: onDeletionClose,
   } = useDisclosure();
   const {
     isOpen: isEditionOpen,
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+  const { data: flowsData } = useQuery({
+    queryKey: ["flows"],
+    queryFn: async () => {
+      const res = await getFlows();
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
+    onError: () => {
+      toast({
+        id: "flows-error",
+        title: "Erro ao carregar fluxos",
+        description:
+          "Houve um erro ao carregar fluxos, favor tentar novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    },
+  });
   const {
     data: processesData,
     isFetched: isProcessesFetched,
     refetch: refetchProcesses,
   } = useQuery({
     queryKey: ["processes"],
-    queryFn: getProcesses,
+    queryFn: async () => {
+      const res = await getProcesses(flow?.idFlow);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return {
+        ...res,
+        value: res?.value?.reduce((acc: Process[], curr: Process) => {
+          const currFlow = flowsData?.value?.find(
+            (item) =>
+              item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
+          );
+          const currIndexInFlow =
+            currFlow?.stages?.indexOf(curr?.idStage) || -1;
+          const currentState =
+            currFlow?.stages && currIndexInFlow !== -1
+              ? parseInt(
+                  (
+                    (currIndexInFlow / currFlow?.stages?.length) *
+                    100
+                  ).toString(),
+                  10
+                )
+              : 0;
+
+          return [
+            ...acc,
+            {
+              ...curr,
+              currentState: `${currentState}%`,
+              flowName: currFlow?.name,
+            },
+          ];
+        }, []),
+      };
+    },
     onError: () => {
       toast({
         id: "processes-error",
@@ -70,23 +131,12 @@ function Processes() {
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
 
-  const handleRedirect = (process: Process) =>
-    navigate(`/processos/${process.record}`, {
-      state: {
-        process,
-      },
-      replace: false,
-    });
-
-  const tableActions = useMemo(
+  const tableActions = useMemo<TableAction[]>(
     () => [
       {
         label: "Visualizar Processo",
         icon: <ViewIcon boxSize={4} />,
-        action: ({ process }: { process: Process }) => {
-          selectProcess(process);
-          handleRedirect(process);
-        },
+        isNavigate: true,
         actionName: "view-process",
         disabled: isActionDisabled("view-process"),
       },
@@ -105,7 +155,7 @@ function Processes() {
         icon: <Icon as={MdDelete} boxSize={5} />,
         action: async ({ process }: { process: Process }) => {
           selectProcess(process);
-          onExclusionOpen();
+          onDeletionOpen();
         },
         actionName: "delete-process",
         disabled: isActionDisabled("delete-process"),
@@ -114,8 +164,8 @@ function Processes() {
     [isProcessesFetched, isUserFetched]
   );
 
-  const filterByPriority = (processes: any) => {
-    return processes?.filter((process: any) => process.idPriority !== 3);
+  const filterByPriority = (processes: Process[]) => {
+    return processes?.filter((process: Process) => process.idPriority);
   };
 
   const filteredProcess = useMemo<TableRow<Process>[]>(() => {
@@ -124,9 +174,9 @@ function Processes() {
     let value =
       filter !== ""
         ? processesData?.value?.filter(
-            (process) =>
-              process.record
-                .toLowerCase()
+            (process: Process) =>
+              (process.record as string)
+                ?.toLowerCase()
                 .includes(filter.toLocaleLowerCase()) ||
               process.nickname
                 .toLowerCase()
@@ -134,7 +184,8 @@ function Processes() {
           )
         : processesData?.value;
 
-    if (legalPriority) value = filterByPriority(value);
+    if (legalPriority && value) value = filterByPriority(value);
+
     return (
       (value?.reduce(
         (
@@ -142,7 +193,34 @@ function Processes() {
           curr: TableRow<Process> | Process
         ) => [
           ...acc,
-          { ...curr, tableActions, actionsProps: { process: curr } },
+          {
+            ...curr,
+            tableActions,
+            actionsProps: {
+              process: curr,
+              pathname: `/processos/${curr.record}`,
+              state: {
+                process: curr,
+                ...(state || {}),
+              },
+            },
+            // @ts-ignore
+            record: curr.idPriority ? (
+              <Flex flex="1" alignItems="center" gap="1">
+                {curr.record}
+                <Tooltip
+                  label="Prioridade legal"
+                  hasArrow
+                  background="blackAlpha.900"
+                  placement="right"
+                >
+                  <ArrowUpIcon boxSize={3.5} />
+                </Tooltip>
+              </Flex>
+            ) : (
+              curr.record
+            ),
+          },
         ],
         []
       ) as TableRow<Process>[]) || []
@@ -165,16 +243,16 @@ function Processes() {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("idStage", {
+    tableColumnHelper.accessor("currentState", {
       cell: (info) => info.getValue(),
-      header: "Etapa Atual",
+      header: "Situação atual",
       meta: {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("idStageFinal", {
+    tableColumnHelper.accessor("flowName", {
       cell: (info) => info.getValue(),
-      header: "Etapa Final",
+      header: "Fluxo",
       meta: {
         isSortable: true,
       },
@@ -189,26 +267,48 @@ function Processes() {
     }),
   ];
 
+  useEffect(() => {
+    refetchProcesses();
+  }, [flowsData]);
+
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Text fontSize="lg" fontWeight="semibold">
-            Processos
+            Processos{flow ? ` - Fluxo ${flow?.name}` : ""}
           </Text>
-          <Button
-            size="xs"
-            fontSize="sm"
-            colorScheme="green"
-            isDisabled={isActionDisabled("create-process")}
-            onClick={onCreationOpen}
+          <Flex
+            alignItems="center"
+            justifyContent="start"
+            gap="2"
+            flexWrap="wrap"
           >
-            <AddIcon mr="2" boxSize={3} /> Adicionar Processo
-          </Button>
+            {flow ? (
+              <Button
+                size="xs"
+                fontSize="sm"
+                colorScheme="blue"
+                onClick={() => navigate("/fluxos", { replace: true })}
+              >
+                <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar
+                aos Fluxos
+              </Button>
+            ) : null}
+            <Button
+              size="xs"
+              fontSize="sm"
+              colorScheme="green"
+              isDisabled={isActionDisabled("create-process")}
+              onClick={onCreationOpen}
+            >
+              <AddIcon mr="2" boxSize={3} /> Criar Processo
+            </Button>
+          </Flex>
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Input
-            placeholder="Pesquisar processo (Registro ou apelido)"
+            placeholder="Pesquisar processos (por registro ou apelido)"
             width={["100%", "100%", "60%"]}
             maxW={["100%", "100%", 365]}
             value={filter}
@@ -234,7 +334,9 @@ function Processes() {
         data={filteredProcess}
         columns={tableColumns}
         isDataFetching={!isProcessesFetched || !isUserFetched}
-        emptyTableMessage="Não foram encontrados processos."
+        emptyTableMessage={`Não foram encontrados processos${
+          flow ? ` no fluxo ${flow.name}` : ""
+        }.`}
       />
       <CreationModal
         isOpen={isCreationOpen}
@@ -242,7 +344,7 @@ function Processes() {
         afterSubmission={refetchProcesses}
       />
       {selectedProcess && (
-        <EditModal
+        <EditionModal
           selectedProcess={selectedProcess}
           isOpen={isEditionOpen}
           onClose={onEditionClose}
@@ -250,10 +352,10 @@ function Processes() {
         />
       )}
       {selectedProcess && (
-        <ExclusionModal
+        <DeletionModal
           process={selectedProcess}
-          isOpen={isExclusionOpen}
-          onClose={onExclusionClose}
+          isOpen={isDeletionOpen}
+          onClose={onDeletionClose}
           refetchStages={refetchProcesses}
         />
       )}

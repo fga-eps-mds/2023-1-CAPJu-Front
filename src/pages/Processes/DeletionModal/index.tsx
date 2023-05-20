@@ -13,25 +13,25 @@ import {
 import { deleteProcess } from "services/processes";
 import { useLoading } from "hooks/useLoading";
 
-interface ExclusionModalProps {
+interface DeletionModalProps {
   process: Process;
   isOpen: boolean;
   onClose: () => void;
   refetchStages: () => void;
 }
 
-export function ExclusionModal({
+export function DeletionModal({
   process,
   isOpen,
   onClose,
   refetchStages,
-}: ExclusionModalProps) {
+}: DeletionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
 
   const handleDeleteProcess = async () => {
     handleLoading(true);
-    const res = await deleteProcess(process?.record);
+    const res = await deleteProcess(process?.record as string);
     if (res.type === "success") {
       refetchStages();
       toast({

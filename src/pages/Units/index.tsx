@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
-import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
-import { MdPersonAddAlt1 } from "react-icons/md";
+import { AddIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { PrivateLayout } from "layouts/Private";
@@ -12,28 +11,15 @@ import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { CreationModal } from "./CreationModal";
-import { AdminsListModal } from "./AdminsListModal";
-import { AddAdminModal } from "./AddAdminModal";
 
 function Units() {
   const toast = useToast();
-  const [selectedUnit, selectUnit] = useState<Unit | null>(null);
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
   const {
     isOpen: isCreationOpen,
     onOpen: onCreationOpen,
     onClose: onCreationClose,
-  } = useDisclosure();
-  const {
-    isOpen: isAdminsListOpen,
-    onOpen: onAdminsListOpen,
-    onClose: onAdminsListClose,
-  } = useDisclosure();
-  const {
-    isOpen: isAdminAdditionOpen,
-    onOpen: onAdminAdditionOpen,
-    onClose: onAdminAdditionClose,
   } = useDisclosure();
   const {
     data: unitsData,
@@ -59,31 +45,7 @@ function Units() {
   });
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
-  const tableActions = useMemo(
-    () => [
-      {
-        label: "Visualizar Admins",
-        icon: <ViewIcon boxSize={4} />,
-        action: ({ unit }: { unit: Unit }) => {
-          selectUnit(unit);
-          onAdminsListOpen();
-        },
-        actionName: "view-admins",
-        disabled: isActionDisabled("view-admins"),
-      },
-      {
-        label: "Adicionar Admins",
-        icon: <Icon as={MdPersonAddAlt1} boxSize={4} />,
-        action: ({ unit }: { unit: Unit }) => {
-          selectUnit(unit);
-          onAdminAdditionOpen();
-        },
-        actionName: "add-admin-in-unit",
-        disabled: isActionDisabled("add-admin-in-unit"),
-      },
-    ],
-    [isUnitsFetched, isUserFetched]
-  );
+  const tableActions = useMemo(() => [], [isUnitsFetched, isUserFetched]);
   const filteredUnits = useMemo<TableRow<Unit>[]>(() => {
     if (!isUnitsFetched) return [];
 
@@ -109,19 +71,19 @@ function Units() {
   const tableColumns = [
     tableColumnHelper.accessor("name", {
       cell: (info) => info.getValue(),
-      header: "Unidades",
+      header: "Unidade",
       meta: {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("tableActions", {
-      cell: (info) => info.getValue(),
-      header: "Ações",
-      meta: {
-        isTableActions: true,
-        isSortable: false,
-      },
-    }),
+    // tableColumnHelper.accessor("tableActions", {
+    //   cell: (info) => info.getValue(),
+    //   header: "Ações",
+    //   meta: {
+    //     isTableActions: true,
+    //     isSortable: false,
+    //   },
+    // }),
   ];
 
   return (
@@ -138,7 +100,7 @@ function Units() {
             isDisabled={isActionDisabled("create-unit")}
             onClick={onCreationOpen}
           >
-            <AddIcon mr="2" boxSize={3} /> Criar unidade
+            <AddIcon mr="2" boxSize={3} /> Criar Unidade
           </Button>
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
@@ -166,21 +128,6 @@ function Units() {
         onClose={onCreationClose}
         afterSubmission={refetchUnits}
       />
-      {userData?.value && selectedUnit && isAdminsListOpen ? (
-        <AdminsListModal
-          userCpf={userData?.value?.cpf}
-          unit={selectedUnit}
-          isOpen={isAdminsListOpen}
-          onClose={onAdminsListClose}
-        />
-      ) : null}
-      {userData?.value && selectedUnit && isAdminAdditionOpen ? (
-        <AddAdminModal
-          unit={selectedUnit}
-          isOpen={isAdminAdditionOpen}
-          onClose={onAdminAdditionClose}
-        />
-      ) : null}
     </PrivateLayout>
   );
 }

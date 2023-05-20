@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 /* eslint-disable no-unused-vars */
 export {};
 
@@ -24,20 +26,21 @@ declare global {
     idUnit: number;
     name: string;
     duration: number;
+    createdAt: string;
   };
 
-  type Sequence = {
+  type FlowSequence = {
     from: number;
-    comentary: string;
     to: number;
+    commentary: string;
   };
 
   type Flow = {
     idFlow: number;
     idUnit: number;
     name: string;
-    sequences: Sequence[];
-    stage: Stage[];
+    sequences: FlowSequence[];
+    stages: number[];
   };
 
   type Priority = {
@@ -46,13 +49,18 @@ declare global {
   };
 
   type Process = {
-    effectiveDate: Date;
-    idFlow: number[];
+    record: string | ReactNode;
+    nickname: string;
+    idFlow: number[] | number;
     idPriority: number;
     idStage: number;
     idUnit: number;
-    nickname: string;
-    record: string;
+    effectiveDate: string;
+  };
+
+  type SelectOption = {
+    label: string;
+    value: number | string;
   };
 
   type ApiResponse<Data> = {
@@ -79,8 +87,9 @@ declare global {
     label: string;
     icon: JSX.Element;
     actionName: string;
-    action: (actionProps?: any) => any;
+    action?: (actionProps?: any) => any;
     disabled?: boolean;
+    isNavigate?: boolean;
   };
 
   type TableRow<T> = T & {

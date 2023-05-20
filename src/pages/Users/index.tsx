@@ -13,8 +13,8 @@ import { hasPermission } from "utils/permissions";
 import { getAcceptedUsers } from "services/user";
 import { getUnits } from "services/units";
 import { roleNameById } from "utils/roles";
-import { DeleteModal } from "./DeleteModal";
-import { EditModal } from "./EditModal";
+import { DeletionModal } from "./DeletionModal";
+import { EditionModal } from "./EditionModal";
 
 function Users() {
   const [filter, setFilter] = useState<string>("");
@@ -109,21 +109,21 @@ function Users() {
   const tableColumns = [
     tableColumnHelper.accessor("fullName", {
       cell: (info) => info.getValue(),
-      header: "Nomes",
+      header: "Nome",
       meta: {
         isSortable: true,
       },
     }),
     tableColumnHelper.accessor("unit", {
       cell: (info) => info.getValue(),
-      header: "Unidades",
+      header: "Unidade",
       meta: {
         isSortable: true,
       },
     }),
     tableColumnHelper.accessor("role", {
       cell: (info) => info.getValue(),
-      header: "Perfis",
+      header: "Perfil",
       meta: {
         isSortable: true,
       },
@@ -148,7 +148,7 @@ function Users() {
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Input
-            placeholder="Pesquisar usuário pelo nome"
+            placeholder="Pesquisar usuários por nome"
             value={filter}
             onChange={({ target }) => setFilter(target.value)}
             variant="filled"
@@ -167,7 +167,7 @@ function Users() {
         emptyTableMessage="Não foram encontradas solicitações no momento."
       />
       {userData?.value && selectedUser && isDeleteOpen ? (
-        <DeleteModal
+        <DeletionModal
           isOpen={isDeleteOpen}
           onClose={onDeleteClose}
           user={selectedUser}
@@ -175,7 +175,7 @@ function Users() {
         />
       ) : null}
       {userData?.value && selectedUser && isEditOpen ? (
-        <EditModal
+        <EditionModal
           isOpen={isEditOpen}
           onClose={onEditClose}
           user={selectedUser}

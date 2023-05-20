@@ -11,13 +11,14 @@ const Units = lazy(() => import("pages/Units"));
 const Requests = lazy(() => import("pages/Requests"));
 const Users = lazy(() => import("pages/Users"));
 const Stages = lazy(() => import("pages/Stages"));
+const Flows = lazy(() => import("pages/Flows"));
 const Processes = lazy(() => import("pages/Processes"));
-const ProcessDetail = lazy(() => import("pages/Processes/ProcessDetail"));
+const ViewProcess = lazy(() => import("pages/ViewProcess"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
     index: true,
-    name: "Unidades",
+    name: "Unidade",
     element: <Units />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-unit")
@@ -34,7 +35,7 @@ export const PrivateRoutes: MenuItem[] = [
   {
     path: "fluxos",
     name: "Flows",
-    element: <PrivateLayout />,
+    element: <Flows />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-flow")
     )?.users,
@@ -49,8 +50,8 @@ export const PrivateRoutes: MenuItem[] = [
   },
   {
     path: "processos/:record",
-    name: "ProcessDetail",
-    element: <ProcessDetail />,
+    name: "ViewProcess",
+    element: <ViewProcess />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-process")
     )?.users,

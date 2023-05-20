@@ -3,9 +3,8 @@ import { api } from "services/api";
 export const getStages = async (): Promise<Result<Stage[]>> => {
   try {
     const res = await api.stages.get<Stage[]>("/stages");
-    return { type: "success", value: res.data } as unknown as ResultSuccess<
-      Stage[]
-    >;
+
+    return { type: "success", value: res.data };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
@@ -29,7 +28,7 @@ export const createStage = async (data: {
     return {
       type: "success",
       value: res.data,
-    } as unknown as ResultSuccess<Stage>;
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
@@ -45,10 +44,11 @@ export const createStage = async (data: {
 export const deleteStage = async (idStage: number): Promise<Result<Stage>> => {
   try {
     const res = await api.stages.delete<Stage>(`/deleteStage/${idStage}`);
+
     return {
       type: "success",
       value: res.data,
-    } as unknown as ResultSuccess<Stage>;
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
