@@ -48,7 +48,7 @@ interface EditionModalProps {
   afterSubmission: () => void;
 }
 
-export function EditModal({
+export function EditionModal({
   selectedProcess,
   isOpen,
   onClose,

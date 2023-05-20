@@ -13,8 +13,8 @@ import { hasPermission } from "utils/permissions";
 import { getAcceptedUsers } from "services/user";
 import { getUnits } from "services/units";
 import { roleNameById } from "utils/roles";
-import { DeleteModal } from "./DeleteModal";
-import { EditModal } from "./EditModal";
+import { DeletionModal } from "./DeletionModal";
+import { EditionModal } from "./EditionModal";
 
 function Users() {
   const [filter, setFilter] = useState<string>("");
@@ -167,7 +167,7 @@ function Users() {
         emptyTableMessage="Não foram encontradas solicitações no momento."
       />
       {userData?.value && selectedUser && isDeleteOpen ? (
-        <DeleteModal
+        <DeletionModal
           isOpen={isDeleteOpen}
           onClose={onDeleteClose}
           user={selectedUser}
@@ -175,7 +175,7 @@ function Users() {
         />
       ) : null}
       {userData?.value && selectedUser && isEditOpen ? (
-        <EditModal
+        <EditionModal
           isOpen={isEditOpen}
           onClose={onEditClose}
           user={selectedUser}

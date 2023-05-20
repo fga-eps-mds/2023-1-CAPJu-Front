@@ -10,63 +10,59 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-
-import { deleteUser } from "services/user";
+import { deleteProcess } from "services/processes";
 import { useLoading } from "hooks/useLoading";
 
-interface DeleteModalProps {
-  user: User;
+interface DeletionModalProps {
+  process: Process;
   isOpen: boolean;
   onClose: () => void;
-  refetch: () => void;
+  refetchStages: () => void;
 }
 
-export function DeleteModal({
-  user,
+export function DeletionModal({
+  process,
   isOpen,
   onClose,
-  refetch,
-}: DeleteModalProps) {
+  refetchStages,
+}: DeletionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
 
-  async function handleDeleteUser() {
+  const handleDeleteProcess = async () => {
     handleLoading(true);
-
-    try {
-      await deleteUser(user.cpf);
+    const res = await deleteProcess(process?.record);
+    if (res.type === "success") {
+      refetchStages();
       toast({
-        id: "delete-user-success",
-        title: "Usuário removido",
-        description: `O usuário ${user.fullName} foi deletado com sucesso.`,
+        id: "delete-process-success",
+        title: "Sucesso!",
+        description: "Processo deletado com sucesso!",
         status: "success",
-        isClosable: true,
       });
-    } catch {
+    } else {
       toast({
-        id: "delete-user-error",
-        title: `Erro ao remover ${user.fullName}`,
-        description: "Favor tentar novamente.",
+        id: "delete-process-error",
+        title: "Erro na deleção do processo.",
+        description: res.error?.message,
         status: "error",
         isClosable: true,
       });
     }
     onClose();
-    refetch();
     handleLoading(false);
-  }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Deletar Usuário</ModalHeader>
+        <ModalHeader>Excluir Processo</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Text>
-            Tem certeza que deseja deletar o usuário{" "}
-            <strong>{user.fullName}</strong>, do perfil{" "}
-            <strong>{user.role}</strong>?
+            Tem certeza que deseja excluir o registro{" "}
+            <strong>{process?.record}</strong>?
           </Text>
         </ModalBody>
         <ModalFooter gap="2">
@@ -75,10 +71,10 @@ export function DeleteModal({
           </Button>
           <Button
             colorScheme="red"
-            onClick={() => handleDeleteUser()}
+            onClick={() => handleDeleteProcess()}
             size="sm"
           >
-            Deletar
+            Excluir
           </Button>
         </ModalFooter>
       </ModalContent>

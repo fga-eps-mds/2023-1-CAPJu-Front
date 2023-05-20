@@ -13,19 +13,19 @@ import {
 import { deleteStage } from "services/stages";
 import { useLoading } from "hooks/useLoading";
 
-interface ExclusionModalProps {
+interface DeletionModalProps {
   stage: Stage;
   isOpen: boolean;
   onClose: () => void;
   refetchStages: () => void;
 }
 
-export function ExclusionModal({
+export function DeletionModal({
   stage,
   isOpen,
   onClose,
   refetchStages,
-}: ExclusionModalProps) {
+}: DeletionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
 

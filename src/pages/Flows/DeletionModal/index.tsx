@@ -13,19 +13,19 @@ import {
 import { deleteFlow } from "services/flows";
 import { useLoading } from "hooks/useLoading";
 
-interface DeleteModalProps {
+interface DeletionModalProps {
   flow: Flow;
   isOpen: boolean;
   onClose: () => void;
   refetchFlows: () => void;
 }
 
-export function DeleteModal({
+export function DeletionModal({
   flow,
   isOpen,
   onClose,
   refetchFlows,
-}: DeleteModalProps) {
+}: DeletionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
 

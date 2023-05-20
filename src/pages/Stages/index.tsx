@@ -12,7 +12,7 @@ import { Input } from "components/FormFields";
 import { hasPermission } from "utils/permissions";
 import { getStages } from "../../services/stages";
 import { CreationModal } from "./CreationModal";
-import { ExclusionModal } from "./ExclusionModal";
+import { DeletionModal } from "./DeletionModal";
 
 function Stages() {
   const toast = useToast();
@@ -25,9 +25,9 @@ function Stages() {
     onClose: onCreationClose,
   } = useDisclosure();
   const {
-    isOpen: isExclusionOpen,
-    onOpen: onExclusionOpen,
-    onClose: onExclusionClose,
+    isOpen: isDeletionOpen,
+    onOpen: onDeletionOpen,
+    onClose: onDeletionClose,
   } = useDisclosure();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
@@ -60,7 +60,7 @@ function Stages() {
         icon: <Icon as={MdDelete} boxSize={5} />,
         action: async ({ stage }: { stage: Stage }) => {
           selectStage(stage);
-          onExclusionOpen();
+          onDeletionOpen();
         },
         actionName: "view-stages",
         disabled: isActionDisabled("view-stage"),
@@ -160,10 +160,10 @@ function Stages() {
         afterSubmission={refetchStages}
       />
       {selectedStage && (
-        <ExclusionModal
+        <DeletionModal
           stage={selectedStage}
-          isOpen={isExclusionOpen}
-          onClose={onExclusionClose}
+          isOpen={isDeletionOpen}
+          onClose={onDeletionClose}
           refetchStages={refetchStages}
         />
       )}

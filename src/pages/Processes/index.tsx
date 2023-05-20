@@ -19,9 +19,9 @@ import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
-import { ExclusionModal } from "./ExclusionModal";
+import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
-import { EditModal } from "./EditModal";
+import { EditionModal } from "./EditionModal";
 
 function Processes() {
   const { getUserData } = useAuth();
@@ -41,9 +41,9 @@ function Processes() {
     onClose: onCreationClose,
   } = useDisclosure();
   const {
-    isOpen: isExclusionOpen,
-    onOpen: onExclusionOpen,
-    onClose: onExclusionClose,
+    isOpen: isDeletionOpen,
+    onOpen: onDeletionOpen,
+    onClose: onDeletionClose,
   } = useDisclosure();
   const {
     isOpen: isEditionOpen,
@@ -102,7 +102,7 @@ function Processes() {
         icon: <Icon as={MdDelete} boxSize={5} />,
         action: async ({ process }: { process: Process }) => {
           selectProcess(process);
-          onExclusionOpen();
+          onDeletionOpen();
         },
         actionName: "delete-process",
         disabled: isActionDisabled("delete-process"),
@@ -250,7 +250,7 @@ function Processes() {
         afterSubmission={refetchProcesses}
       />
       {selectedProcess && (
-        <EditModal
+        <EditionModal
           selectedProcess={selectedProcess}
           isOpen={isEditionOpen}
           onClose={onEditionClose}
@@ -258,10 +258,10 @@ function Processes() {
         />
       )}
       {selectedProcess && (
-        <ExclusionModal
+        <DeletionModal
           process={selectedProcess}
-          isOpen={isExclusionOpen}
-          onClose={onExclusionClose}
+          isOpen={isDeletionOpen}
+          onClose={onDeletionClose}
           refetchStages={refetchProcesses}
         />
       )}

@@ -11,7 +11,7 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
-import { DeleteModal } from "./DeleteModal";
+import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
 
@@ -193,7 +193,7 @@ function Flows() {
         />
       ) : null}
       {selectedFlow && isDeleteOpen ? (
-        <DeleteModal
+        <DeletionModal
           flow={selectedFlow}
           isOpen={isDeleteOpen}
           onClose={onDeleteClose}
