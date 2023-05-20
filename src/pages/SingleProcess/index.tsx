@@ -24,11 +24,7 @@ function ProcessDetail() {
   const { process, flow }: { process: Process; flow: Flow | undefined } =
     location.state;
   const { getUserData } = useAuth();
-  const {
-    data: processData,
-    isFetched: isProcessFetched,
-    refetch: refetchProcess,
-  } = useQuery({
+  const { data: processData, refetch: refetchProcess } = useQuery({
     queryKey: ["process", params.record],
     queryFn: async () => {
       const res = await getProcessByRecord(params.record || process.record);
@@ -43,7 +39,11 @@ function ProcessDetail() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const { data: flowData, refetch: refetchFlow } = useQuery({
+  const {
+    data: flowData,
+    isFetching: isFlowFetching,
+    refetch: refetchFlow,
+  } = useQuery({
     queryKey: ["flow", process?.idFlow],
     queryFn: async () => {
       const res = process.idFlow
@@ -155,15 +155,14 @@ function ProcessDetail() {
             <Icon as={FiSkipForward} ml="2" boxSize={4} />
           </Button>
         </Flex>
-        {isProcessFetched ? (
-          <Flow
-            sequences={flowData?.value?.sequences || []}
-            stages={stages || []}
-            minHeight={650}
-            currentStage={processData?.value?.idStage}
-            effectiveDate={processData?.value?.effectiveDate}
-          />
-        ) : null}
+        <Flow
+          sequences={flowData?.value?.sequences || []}
+          stages={stages || []}
+          minHeight={650}
+          currentStage={processData?.value?.idStage}
+          effectiveDate={processData?.value?.effectiveDate}
+          isFetching={isFlowFetching}
+        />
       </Flex>
     </PrivateLayout>
   );

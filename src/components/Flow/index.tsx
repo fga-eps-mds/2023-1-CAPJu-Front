@@ -1,4 +1,4 @@
-import { Card } from "@chakra-ui/react";
+import { Card, Skeleton } from "@chakra-ui/react";
 import { useMemo } from "react";
 import ReactFlow, {
   Controls,
@@ -20,6 +20,7 @@ interface FlowProps {
   minHeight?: string | number;
   currentStage?: string | number | undefined;
   effectiveDate?: string | undefined;
+  isFetching?: boolean;
 }
 
 export function Flow({
@@ -30,6 +31,7 @@ export function Flow({
   minHeight = 350,
   currentStage = undefined,
   effectiveDate = undefined,
+  isFetching = false,
 }: FlowProps) {
   const startDate = effectiveDate ? new Date(effectiveDate) : null;
   const sortedStages = useMemo(
@@ -120,18 +122,24 @@ export function Flow({
     } as Edge;
   });
 
-  return !!nodes.length && !!edges.length ? (
-    <Card
-      variant="elevated"
-      w={width}
-      maxW={maxWidth}
-      minH={minHeight}
-      css={{ "> *": { flex: 1 } }}
-    >
-      <ReactFlow nodes={nodes} edges={edges} fitView>
-        <Controls />
-        <Background />
-      </ReactFlow>
-    </Card>
-  ) : null;
+  return isFetching ? (
+    <Skeleton w={width} maxW={maxWidth} h={minHeight} />
+  ) : (
+    <>
+      {!!nodes.length && !!edges.length ? (
+        <Card
+          variant="elevated"
+          w={width}
+          maxW={maxWidth}
+          minH={minHeight}
+          css={{ "> *": { flex: 1 } }}
+        >
+          <ReactFlow nodes={nodes} edges={edges} fitView>
+            <Controls />
+            <Background />
+          </ReactFlow>
+        </Card>
+      ) : null}
+    </>
+  );
 }
