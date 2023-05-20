@@ -39,7 +39,7 @@ export const createUnit = async (data: {
   }
 };
 
-export const deleteUnit = async (idUnit: string): Promise<Result<any>> => {
+export const deleteUnit = async (idUnit: number): Promise<Result<any>> => {
   try {
     const res = await api.units.delete<Unit>("/deleteUnit", {
       data: { idUnit },

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
-import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
+import { AddIcon, Icon } from "@chakra-ui/icons";
 import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -12,7 +12,7 @@ import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { CreationModal } from "./CreationModal";
-import { DeleteModal } from "./DeleteModal";
+import { DeletionModal } from "./DeletionModal";
 
 function Units() {
   const toast = useToast();
@@ -25,9 +25,9 @@ function Units() {
     onClose: onCreationClose,
   } = useDisclosure();
   const {
-    isOpen: isUnitDeleteOpen,
-    onOpen: onUnitDeleteOpen,
-    onClose: onUnitDeleteClose,
+    isOpen: isDeletionOpen,
+    onOpen: onDeletionOpen,
+    onClose: onDeletionClose,
   } = useDisclosure();
   const {
     data: unitsData,
@@ -60,17 +60,7 @@ function Units() {
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ unit }: { unit: Unit }) => {
           selectUnit(unit);
-          onUnitDeleteOpen();
-        },
-        actionName: "delete-unit",
-        disabled: isActionDisabled("delete-unit"),
-      },
-      {
-        label: "Visualizar Admins",
-        icon: <ViewIcon boxSize={4} />,
-        action: ({ unit }: { unit: Unit }) => {
-          selectUnit(unit);
-          onUnitDeleteOpen();
+          onDeletionOpen();
         },
         actionName: "delete-unit",
         disabled: isActionDisabled("delete-unit"),
@@ -161,10 +151,10 @@ function Units() {
         afterSubmission={refetchUnits}
       />
       {selectedUnit ? (
-        <DeleteModal
+        <DeletionModal
           unit={selectedUnit}
-          isOpen={isUnitDeleteOpen}
-          onClose={onUnitDeleteClose}
+          isOpen={isDeletionOpen}
+          onClose={onDeletionClose}
           refetchUnits={refetchUnits}
         />
       ) : null}

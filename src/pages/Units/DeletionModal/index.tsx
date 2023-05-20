@@ -13,25 +13,25 @@ import {
 import { deleteUnit } from "services/units";
 import { useLoading } from "hooks/useLoading";
 
-interface DeleteModalProps {
+interface DeletionModalProps {
   unit: Unit;
   isOpen: boolean;
   onClose: () => void;
   refetchUnits: () => void;
 }
 
-export function DeleteModal({
+export function DeletionModal({
   unit,
   isOpen,
   onClose,
   refetchUnits,
-}: DeleteModalProps) {
+}: DeletionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
 
   const handleDeleteUnit = async () => {
     handleLoading(true);
-    const res = await deleteUnit(unit.idUnit.toString());
+    const res = await deleteUnit(unit.idUnit);
     if (res.type === "success") {
       refetchUnits();
       toast({
