@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "react-query";
 import {
   Flex,
@@ -15,6 +15,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation } from "react-router-dom";
 
 import { getProcesses } from "services/processes";
+import { getFlows } from "services/flows";
 import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
@@ -50,6 +51,26 @@ function Processes() {
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+  const { data: flowsData } = useQuery({
+    queryKey: ["flows"],
+    queryFn: async () => {
+      const res = await getFlows();
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
+    onError: () => {
+      toast({
+        id: "flows-error",
+        title: "Erro ao carregar fluxos",
+        description:
+          "Houve um erro ao carregar fluxos, favor tentar novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    },
+  });
   const {
     data: processesData,
     isFetched: isProcessesFetched,
@@ -61,7 +82,34 @@ function Processes() {
 
       if (res.type === "error") throw new Error(res.error.message);
 
-      return res;
+      return {
+        ...res,
+        value: res?.value?.reduce((acc: Process[], curr: Process) => {
+          const currFlow = flowsData?.value?.find(
+            (item) =>
+              item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
+          );
+          const currentState = currFlow?.stages
+            ? parseInt(
+                (
+                  (currFlow?.stages?.indexOf(curr?.idStage) /
+                    currFlow?.stages?.length) *
+                  100
+                ).toString(),
+                10
+              )
+            : 0;
+
+          return [
+            ...acc,
+            {
+              ...curr,
+              currentState: `${currentState}%`,
+              nameFlow: currFlow?.name,
+            },
+          ];
+        }, []),
+      };
     },
     onError: () => {
       toast({
@@ -173,16 +221,16 @@ function Processes() {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("idStage", {
+    tableColumnHelper.accessor("currentState", {
       cell: (info) => info.getValue(),
-      header: "Etapa Atual",
+      header: "Situação atual",
       meta: {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("idStageFinal", {
+    tableColumnHelper.accessor("nameFlow", {
       cell: (info) => info.getValue(),
-      header: "Etapa Final",
+      header: "Fluxo",
       meta: {
         isSortable: true,
       },
@@ -196,6 +244,10 @@ function Processes() {
       },
     }),
   ];
+
+  useEffect(() => {
+    refetchProcesses();
+  }, [flowsData]);
 
   return (
     <PrivateLayout>

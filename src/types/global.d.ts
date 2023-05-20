@@ -49,7 +49,7 @@ declare global {
   type Process = {
     record: string;
     nickname: string;
-    idFlow: number;
+    idFlow: number[] | number;
     idPriority: number;
     idStage: number;
     idUnit: number;

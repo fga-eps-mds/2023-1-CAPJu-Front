@@ -44,10 +44,19 @@ function ProcessDetail() {
     isFetching: isFlowFetching,
     refetch: refetchFlow,
   } = useQuery({
-    queryKey: ["flow", process?.idFlow],
+    queryKey: [
+      "flow",
+      typeof process?.idFlow === "number"
+        ? process?.idFlow
+        : process?.idFlow[0],
+    ],
     queryFn: async () => {
       const res = process.idFlow
-        ? await getFlowById(process.idFlow)
+        ? await getFlowById(
+            typeof process?.idFlow === "number"
+              ? process?.idFlow
+              : process.idFlow[0]
+          )
         : { type: "error", value: {} as Flow };
 
       return res;
@@ -82,7 +91,10 @@ function ProcessDetail() {
           from: processData?.value?.idStage,
           to: nextStageId,
           commentary: "",
-          idFlow: process.idFlow,
+          idFlow:
+            typeof process.idFlow === "number"
+              ? process.idFlow
+              : process.idFlow[0],
         })
       : ({
           type: "error",

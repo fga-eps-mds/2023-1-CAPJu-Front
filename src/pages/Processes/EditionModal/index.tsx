@@ -187,7 +187,11 @@ export function EditionModal({
               marginBottom={2}
               color="gray.500"
               {...register("idFlow")}
-              defaultValue={selectedProcess?.idFlow}
+              defaultValue={
+                typeof selectedProcess?.idFlow === "number"
+                  ? selectedProcess?.idFlow
+                  : selectedProcess?.idFlow[0]
+              }
             >
               {flowsData?.value &&
                 flowsData.value.map((flow) => {
