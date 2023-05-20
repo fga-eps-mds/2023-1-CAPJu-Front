@@ -111,7 +111,7 @@ function Flows() {
             actionsProps: {
               flow: curr,
               state: { flow: curr },
-              pathname: `/fluxos/${curr.idFlow}`,
+              pathname: `/processos`,
             },
           },
         ],

@@ -187,7 +187,7 @@ export function EditModal({
               marginBottom={2}
               color="gray.500"
               {...register("idFlow")}
-              defaultValue={selectedProcess?.idFlow[0]}
+              defaultValue={selectedProcess?.idFlow}
             >
               {flowsData?.value &&
                 flowsData.value.map((flow) => {

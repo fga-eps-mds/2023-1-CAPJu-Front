@@ -9,11 +9,13 @@ import {
   Checkbox,
   useToast,
 } from "@chakra-ui/react";
-import { hasPermission } from "utils/permissions";
 import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useLocation } from "react-router-dom";
+
 import { getProcesses } from "services/processes";
+import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
@@ -22,8 +24,10 @@ import { CreationModal } from "./CreationModal";
 import { EditModal } from "./EditModal";
 
 function Processes() {
-  const toast = useToast();
   const { getUserData } = useAuth();
+  const { state } = useLocation();
+  const flow = state?.flow;
+  const toast = useToast();
   const [selectedProcess, selectProcess] = useState<Process>();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
@@ -52,7 +56,13 @@ function Processes() {
     refetch: refetchProcesses,
   } = useQuery({
     queryKey: ["processes"],
-    queryFn: getProcesses,
+    queryFn: async () => {
+      const res = await getProcesses(flow?.idFlow);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
     onError: () => {
       toast({
         id: "processes-error",
@@ -137,6 +147,7 @@ function Processes() {
               pathname: `/processos/${curr.record}`,
               state: {
                 process: curr,
+                ...(state || {}),
               },
             },
           },
@@ -191,7 +202,7 @@ function Processes() {
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Text fontSize="lg" fontWeight="semibold">
-            Processos
+            Processos{flow ? ` - Fluxo ${flow?.name}` : ""}
           </Text>
           <Button
             size="xs"

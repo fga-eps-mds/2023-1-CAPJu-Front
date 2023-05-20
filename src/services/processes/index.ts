@@ -1,8 +1,12 @@
 import { api } from "services/api";
 
-export const getProcesses = async (): Promise<Result<Process[]>> => {
+export const getProcesses = async (
+  flowId: number | undefined
+): Promise<Result<Process[]>> => {
   try {
-    const res = await api.processes.get<Process[]>("/processes");
+    const res = await api.processes.get<Process[]>(
+      `/processes${flowId ? `/${flowId}` : ""}`
+    );
 
     return { type: "success", value: res.data };
   } catch (error) {
@@ -93,9 +97,11 @@ export const updateProcess = async (data: {
   }
 };
 
-export const getProcessById = async (id: number): Promise<Result<Process>> => {
+export const getProcessByRecord = async (
+  record: string
+): Promise<Result<Process>> => {
   try {
-    const res = await api.processes.get<Process>(`/getOneProcess/${id}`);
+    const res = await api.processes.get<Process>(`/getOneProcess/${record}`);
 
     return {
       type: "success",

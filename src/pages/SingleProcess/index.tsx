@@ -1,6 +1,6 @@
 import { Flex, Text, Button, useToast } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/icons";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
 import { FiSkipForward } from "react-icons/fi";
 import { useEffect, useMemo } from "react";
@@ -13,23 +13,25 @@ import { getStages } from "services/stages";
 import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
-import { advanceStage, getProcessById } from "services/processes";
+import { advanceStage, getProcessByRecord } from "services/processes";
 
 function ProcessDetail() {
+  const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
   const { handleLoading } = useLoading();
-  const { process } = location.state;
+  const { process, flow }: { process: Process; flow: Flow | undefined } =
+    location.state;
   const { getUserData } = useAuth();
   const {
     data: processData,
     isFetched: isProcessFetched,
     refetch: refetchProcess,
   } = useQuery({
-    queryKey: ["process", process.id],
+    queryKey: ["process", params.record],
     queryFn: async () => {
-      const res = await getProcessById(process.record);
+      const res = await getProcessByRecord(params.record || process.record);
       return res;
     },
   });
@@ -42,10 +44,10 @@ function ProcessDetail() {
     queryFn: getUserData,
   });
   const { data: flowData, refetch: refetchFlow } = useQuery({
-    queryKey: ["flow", ...(process.idFlow || [])],
+    queryKey: ["flow", process?.idFlow],
     queryFn: async () => {
       const res = process.idFlow
-        ? await getFlowById(process.idFlow[0])
+        ? await getFlowById(process.idFlow)
         : { type: "error", value: {} as Flow };
 
       return res;
@@ -80,7 +82,7 @@ function ProcessDetail() {
           from: processData?.value?.idStage,
           to: nextStageId,
           commentary: "",
-          idFlow: process.idFlow[0],
+          idFlow: process.idFlow,
         })
       : ({
           type: "error",
@@ -127,7 +129,7 @@ function ProcessDetail() {
             alignItems="center"
             gap="1"
           >
-            Processo {process.nickname}
+            Processo - {process.nickname}
             <Text as="span" fontSize="md" fontWeight="300">
               ({process.record})
             </Text>
@@ -139,7 +141,7 @@ function ProcessDetail() {
             onClick={() => navigate(-1)}
           >
             <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar aos
-            Processos
+            Processos{flow ? ` do Fluxo ${flow?.name}` : ""}
           </Button>
         </Flex>
         <Flex w="100%" justifyContent="center" gap="2" flexWrap="wrap">

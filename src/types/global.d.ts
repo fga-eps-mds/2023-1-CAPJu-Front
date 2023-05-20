@@ -47,12 +47,12 @@ declare global {
   };
 
   type Process = {
-    idFlow: number[];
+    record: string;
+    nickname: string;
+    idFlow: number;
     idPriority: number;
     idStage: number;
     idUnit: number;
-    nickname: string;
-    record: string;
     effectiveDate: string;
   };
 
