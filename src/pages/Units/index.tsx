@@ -138,7 +138,7 @@ function Units() {
             isDisabled={isActionDisabled("create-unit")}
             onClick={onCreationOpen}
           >
-            <AddIcon mr="2" boxSize={3} /> Criar unidade
+            <AddIcon mr="2" boxSize={3} /> Criar Unidade
           </Button>
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">

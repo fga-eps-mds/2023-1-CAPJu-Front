@@ -268,7 +268,7 @@ function Processes() {
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Input
-            placeholder="Pesquisar processo (Registro ou apelido)"
+            placeholder="Pesquisar processos (por registro ou apelido)"
             width={["100%", "100%", "60%"]}
             maxW={["100%", "100%", 365]}
             value={filter}

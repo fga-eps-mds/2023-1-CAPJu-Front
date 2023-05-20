@@ -101,7 +101,7 @@ function Stages() {
     }),
     tableColumnHelper.accessor("duration", {
       cell: (info) => info.getValue(),
-      header: "Duração",
+      header: "Duração (em dias)",
       meta: {
         isSortable: true,
       },
@@ -130,7 +130,7 @@ function Stages() {
             isDisabled={isActionDisabled("create-stage")}
             onClick={onCreationOpen}
           >
-            <AddIcon mr="2" boxSize={3} /> Criar etapa
+            <AddIcon mr="2" boxSize={3} /> Criar Etapa
           </Button>
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">

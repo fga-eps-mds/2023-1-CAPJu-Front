@@ -10,7 +10,6 @@ import {
   chakra,
   Button,
   useToast,
-  Select,
   Text,
   Checkbox,
   Box,
@@ -20,7 +19,7 @@ import { useQuery } from "react-query";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import { Input } from "components/FormFields";
+import { Input, Select } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
 import { getPriorities } from "services/priorities";
 import { getFlows } from "services/flows";
@@ -142,13 +141,12 @@ export function CreationModal({
         <ModalHeader>Criar Processo</ModalHeader>
         <ModalCloseButton />
         <chakra.form onSubmit={onSubmit}>
-          <ModalBody>
+          <ModalBody display="flex" flexDir="column" gap="3">
             <Input
               type="text"
               label="Registro"
               placeholder="N do Registro "
               errors={errors.record}
-              marginBottom={2}
               {...register("record")}
             />
             <Input
@@ -156,27 +154,29 @@ export function CreationModal({
               label="Apelido"
               placeholder="Escolha um apelido para o registro"
               errors={errors.nickname}
-              marginBottom={2}
               {...register("nickname")}
             />
             <Text fontWeight={500}>Fluxo</Text>
             <Select
               placeholder="Selecionar Fluxo"
-              marginBottom={2}
               color="gray.500"
+              options={
+                flowsData?.value
+                  ? flowsData?.value?.map((flow) => {
+                      return {
+                        value: flow.idFlow,
+                        label: flow.name,
+                      };
+                    })
+                  : []
+              }
               {...register("idFlow")}
-            >
-              {flowsData?.value &&
-                flowsData.value.map((flow) => {
-                  return <option value={flow.idFlow}>{flow.name}</option>;
-                })}
-            </Select>
+            />
             <Checkbox
               colorScheme="green"
               borderColor="gray.600"
               isChecked={legalPriority}
               onChange={() => setLegalPriority(!legalPriority)}
-              marginBottom={2}
             >
               Com prioridade legal
             </Checkbox>
@@ -185,19 +185,19 @@ export function CreationModal({
                 <Text fontWeight={500}>Prioridade Legal</Text>
                 <Select
                   placeholder="Selecionar Prioriadade"
-                  marginBottom={2}
                   color="gray.500"
+                  options={
+                    prioritiesData?.value
+                      ? prioritiesData.value.map((priority) => {
+                          return {
+                            value: priority.idPriority,
+                            label: priority.description,
+                          };
+                        })
+                      : []
+                  }
                   {...register("idPriority")}
-                >
-                  {prioritiesData?.value &&
-                    prioritiesData.value.map((priority) => {
-                      return (
-                        <option value={priority.idPriority}>
-                          {priority.description}
-                        </option>
-                      );
-                    })}
-                </Select>
+                />
               </Box>
             )}
           </ModalBody>

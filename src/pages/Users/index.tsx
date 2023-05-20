@@ -148,7 +148,7 @@ function Users() {
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Input
-            placeholder="Pesquisar usuário pelo nome"
+            placeholder="Pesquisar usuários por nome"
             value={filter}
             onChange={({ target }) => setFilter(target.value)}
             variant="filled"
