@@ -99,7 +99,7 @@ export function EditionModal({
   const onSubmit = handleSubmit(async (formData) => {
     handleLoading(true);
     const body = {
-      record: selectedProcess?.record,
+      record: selectedProcess?.record as string,
       nickname: formData.nickname,
       idFlow: formData.idFlow,
       priority: legalPriority ? formData.idPriority : 0,
@@ -160,7 +160,7 @@ export function EditionModal({
               placeholder="N do Registro "
               errors={errors.record}
               backgroundColor="gray.200"
-              value={selectedProcess?.record}
+              value={selectedProcess?.record as string}
               readOnly
               infoText={
                 <Stack spacing="0">

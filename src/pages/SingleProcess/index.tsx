@@ -27,7 +27,9 @@ function ProcessDetail() {
   const { data: processData, refetch: refetchProcess } = useQuery({
     queryKey: ["process", params.record],
     queryFn: async () => {
-      const res = await getProcessByRecord(params.record || process.record);
+      const res = await getProcessByRecord(
+        params.record || (process.record as string)
+      );
       return res;
     },
   });
@@ -87,7 +89,7 @@ function ProcessDetail() {
 
     const res = processData?.value
       ? await advanceStage({
-          record: processData?.value?.record,
+          record: processData?.value?.record as string,
           from: processData?.value?.idStage,
           to: nextStageId,
           commentary: "",

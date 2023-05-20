@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 /* eslint-disable no-unused-vars */
 export {};
 
@@ -47,7 +49,7 @@ declare global {
   };
 
   type Process = {
-    record: string;
+    record: string | ReactNode;
     nickname: string;
     idFlow: number[] | number;
     idPriority: number;

@@ -8,8 +8,9 @@ import {
   Input,
   Checkbox,
   useToast,
+  Tooltip,
 } from "@chakra-ui/react";
-import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
+import { AddIcon, ArrowUpIcon, Icon, ViewIcon } from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation } from "react-router-dom";
@@ -159,8 +160,8 @@ function Processes() {
     [isProcessesFetched, isUserFetched]
   );
 
-  const filterByPriority = (processes: any) => {
-    return processes?.filter((process: any) => process.idPriority !== 3);
+  const filterByPriority = (processes: Process[]) => {
+    return processes?.filter((process: Process) => process.idPriority);
   };
 
   const filteredProcess = useMemo<TableRow<Process>[]>(() => {
@@ -169,9 +170,9 @@ function Processes() {
     let value =
       filter !== ""
         ? processesData?.value?.filter(
-            (process) =>
-              process.record
-                .toLowerCase()
+            (process: Process) =>
+              (process.record as string)
+                ?.toLowerCase()
                 .includes(filter.toLocaleLowerCase()) ||
               process.nickname
                 .toLowerCase()
@@ -179,7 +180,8 @@ function Processes() {
           )
         : processesData?.value;
 
-    if (legalPriority) value = filterByPriority(value);
+    if (legalPriority && value) value = filterByPriority(value);
+
     return (
       (value?.reduce(
         (
@@ -189,6 +191,22 @@ function Processes() {
           ...acc,
           {
             ...curr,
+            // @ts-ignore
+            record: curr.idPriority ? (
+              <Flex flex="1" alignItems="center" gap="1">
+                {curr.record}
+                <Tooltip
+                  label="Prioridade legal"
+                  hasArrow
+                  background="blackAlpha.900"
+                  placement="right"
+                >
+                  <ArrowUpIcon boxSize={3.5} />
+                </Tooltip>
+              </Flex>
+            ) : (
+              curr.record
+            ),
             tableActions,
             actionsProps: {
               process: curr,
