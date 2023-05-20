@@ -94,7 +94,7 @@ function Stages() {
   const tableColumns = [
     tableColumnHelper.accessor("name", {
       cell: (info) => info.getValue(),
-      header: "Etapas",
+      header: "Etapa",
       meta: {
         isSortable: true,
       },

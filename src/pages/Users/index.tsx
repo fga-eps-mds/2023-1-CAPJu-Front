@@ -109,21 +109,21 @@ function Users() {
   const tableColumns = [
     tableColumnHelper.accessor("fullName", {
       cell: (info) => info.getValue(),
-      header: "Nomes",
+      header: "Nome",
       meta: {
         isSortable: true,
       },
     }),
     tableColumnHelper.accessor("unit", {
       cell: (info) => info.getValue(),
-      header: "Unidades",
+      header: "Unidade",
       meta: {
         isSortable: true,
       },
     }),
     tableColumnHelper.accessor("role", {
       cell: (info) => info.getValue(),
-      header: "Perfis",
+      header: "Perfil",
       meta: {
         isSortable: true,
       },

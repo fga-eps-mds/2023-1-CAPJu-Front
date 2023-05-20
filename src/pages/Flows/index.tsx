@@ -124,7 +124,7 @@ function Flows() {
   const tableColumns = [
     tableColumnHelper.accessor("name", {
       cell: (info) => info.getValue(),
-      header: "Fluxo",
+      header: "Nome",
       meta: {
         isSortable: true,
       },

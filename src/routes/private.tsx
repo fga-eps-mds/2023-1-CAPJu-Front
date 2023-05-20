@@ -18,7 +18,7 @@ const SingleProcess = lazy(() => import("pages/SingleProcess"));
 export const PrivateRoutes: MenuItem[] = [
   {
     index: true,
-    name: "Unidades",
+    name: "Unidade",
     element: <Units />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-unit")

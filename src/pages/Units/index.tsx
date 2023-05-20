@@ -109,7 +109,7 @@ function Units() {
   const tableColumns = [
     tableColumnHelper.accessor("name", {
       cell: (info) => info.getValue(),
-      header: "Unidades",
+      header: "Unidade",
       meta: {
         isSortable: true,
       },
