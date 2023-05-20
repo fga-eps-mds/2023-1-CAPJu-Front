@@ -7,6 +7,7 @@ import {
   chakra,
   useToast,
   Text,
+  Link,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -48,7 +49,6 @@ function Login() {
     handleLoading(true);
     const res = await handleLogin(data);
 
-    // @ts-ignore
     if (res.type === "success") {
       handleLoading(false);
       navigate("/", { replace: true });
@@ -57,7 +57,6 @@ function Login() {
         title: "Bem vindo!",
         description: "Login efetuado com sucesso!",
         status: "success",
-        position: "top",
       });
       return;
     }
@@ -66,17 +65,20 @@ function Login() {
     toast({
       id: "login-error",
       title: "Erro no login",
-      // @ts-ignore
       description: res.error?.message,
       status: "error",
-      position: "top",
-      duration: 3500,
       isClosable: true,
     });
   });
 
   return (
-    <Flex flex="1" alignItems="center" justifyContent="center" w="100%">
+    <Flex
+      flex="1"
+      alignItems="center"
+      justifyContent="center"
+      w="100%"
+      py={["16", 0]}
+    >
       <Card p={["10", "20"]} w="90%" maxW="454">
         <CardBody
           w="100%"
@@ -118,6 +120,7 @@ function Login() {
             <Button colorScheme="green" w="100%" type="submit">
               Entrar
             </Button>
+            <Link href="/recuperar-senha">Esqueceu sua senha?</Link>
           </chakra.form>
         </CardBody>
       </Card>

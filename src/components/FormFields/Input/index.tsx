@@ -7,24 +7,41 @@ import {
   Input as ChakraInput,
   InputGroup,
   InputProps as ChakraInputProps,
+  Tooltip,
 } from "@chakra-ui/react";
+import { InfoIcon } from "@chakra-ui/icons";
 import InputMask from "react-input-mask";
 
 export interface InputProps extends ChakraInputProps {
+  infoText?: string | JSX.Element;
   label?: string | JSX.Element;
   errors?: FieldError | undefined;
   mask?: string;
 }
 
 export const Input = forwardRef<InputProps, "input">((props, ref) => {
-  const { label, errors, mask, ...rest } = props;
+  const { label, errors, mask, infoText, ...rest } = props;
 
   return (
     <FormControl
       isInvalid={Boolean(errors)}
       width={props.width || props.w || "100%"}
     >
-      {label && <FormLabel>{label}</FormLabel>}
+      {label && (
+        <FormLabel>
+          {label}{" "}
+          {infoText && (
+            <Tooltip
+              label={infoText}
+              hasArrow
+              background="blackAlpha.900"
+              closeDelay={500}
+            >
+              <InfoIcon />
+            </Tooltip>
+          )}
+        </FormLabel>
+      )}
       <InputGroup>
         {mask ? (
           <ChakraInput

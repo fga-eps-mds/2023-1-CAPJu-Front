@@ -11,8 +11,8 @@ export function Header() {
   return (
     <Flex
       py="4"
-      mb="8"
-      w="100vw"
+      mb={isAuthenticated ? "8" : 0}
+      w="100%"
       alignItems="center"
       justifyContent="center"
       backgroundColor="white"

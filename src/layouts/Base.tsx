@@ -11,12 +11,13 @@ interface BaseLayoutProps {
 export function BaseLayout({ children }: BaseLayoutProps) {
   return (
     <Flex
-      w="100vw"
+      w="100%"
       minH="100vh"
       flexDirection="column"
       alignItems="center"
       justifyContent="start"
       backgroundColor="gray.200"
+      overflowX="hidden"
     >
       <Header />
       {children}
