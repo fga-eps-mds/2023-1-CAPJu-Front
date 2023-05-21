@@ -1,7 +1,6 @@
 import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 
-import { PrivateLayout } from "layouts/Private";
 import { permissionsArray } from "utils/permissions";
 
 const AccountEdition = lazy(() => import("pages/AccountEdition"));
@@ -10,11 +9,14 @@ const PasswordEdition = lazy(() => import("pages/PasswordEdition"));
 const Units = lazy(() => import("pages/Units"));
 const Users = lazy(() => import("pages/ProfilesManager"));
 const Stages = lazy(() => import("pages/Stages"));
+const Flows = lazy(() => import("pages/Flows"));
+const Processes = lazy(() => import("pages/Processes"));
+const ViewProcess = lazy(() => import("pages/ViewProcess"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
     index: true,
-    name: "Unidades",
+    name: "Unidade",
     element: <Units />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-unit")
@@ -31,7 +33,7 @@ export const PrivateRoutes: MenuItem[] = [
   {
     path: "fluxos",
     name: "Flows",
-    element: <PrivateLayout />,
+    element: <Flows />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-flow")
     )?.users,
@@ -39,7 +41,15 @@ export const PrivateRoutes: MenuItem[] = [
   {
     path: "processos",
     name: "Processes",
-    element: <PrivateLayout />,
+    element: <Processes />,
+    authorizedRoles: permissionsArray.find((item) =>
+      item.actions.includes("view-process")
+    )?.users,
+  },
+  {
+    path: "processos/:record",
+    name: "ViewProcess",
+    element: <ViewProcess />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-process")
     )?.users,

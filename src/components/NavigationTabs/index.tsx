@@ -41,7 +41,7 @@ export function NavigationTabs() {
       maxW={1120}
       pl={["5vw", "5vw", "5vw", "5vw", 0]}
       justifyContent="start"
-      marginBottom={["6", "8"]}
+      marginBottom="4"
       overflow="scroll"
       css={{
         "&::-webkit-scrollbar": {
