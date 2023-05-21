@@ -8,7 +8,7 @@ export const signIn = async (credentials: {
   try {
     const res = await api.user.post<User>("/login", credentials);
 
-    return { type: "success", value: res.data } as unknown as Result<User>;
+    return { type: "success", value: res.data };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
@@ -33,7 +33,7 @@ export const signUp = async (credentials: {
   try {
     const res = await api.user.post<User>("/newUser", credentials);
 
-    return { type: "success", value: res.data } as unknown as Result<User>;
+    return { type: "success", value: res.data };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
@@ -50,7 +50,7 @@ export const getUserById = async (userId: string): Promise<Result<User>> => {
   try {
     const res = await api.user.get<User>(`/user/${userId}`);
 
-    return { type: "success", value: res.data } as unknown as Result<User>;
+    return { type: "success", value: res.data };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
@@ -103,6 +103,7 @@ export const updateUserPassword = async (
 export const forgotPassword = async (data: { email: string }) => {
   try {
     const res = await api.user.post("/requestRecovery", data);
+
     return { type: "success", value: res.data };
   } catch (error) {
     if (error instanceof Error)

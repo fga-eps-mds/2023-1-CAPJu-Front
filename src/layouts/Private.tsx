@@ -14,6 +14,7 @@ export function PrivateLayout({ children }: BaseLayoutProps) {
       flexDirection="column"
       alignItems="center"
       justifyContent="start"
+      pb="8"
     >
       <NavigationTabs />
       {children}

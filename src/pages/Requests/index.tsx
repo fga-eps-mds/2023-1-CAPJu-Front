@@ -106,21 +106,21 @@ function Requests() {
   const tableColumns = [
     tableColumnHelper.accessor("fullName", {
       cell: (info) => info.getValue(),
-      header: "Nomes",
+      header: "Nome",
       meta: {
         isSortable: true,
       },
     }),
     tableColumnHelper.accessor("unit", {
       cell: (info) => info.getValue(),
-      header: "Unidades",
+      header: "Unidade",
       meta: {
         isSortable: true,
       },
     }),
     tableColumnHelper.accessor("role", {
       cell: (info) => info.getValue(),
-      header: "Perfis",
+      header: "Perfil",
       meta: {
         isSortable: true,
       },
@@ -142,7 +142,7 @@ function Requests() {
 
   return (
     <>
-      <Flex  w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
+      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Text fontSize="lg" fontWeight="semibold">
             Solicitações
@@ -150,7 +150,7 @@ function Requests() {
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Input
-            placeholder="Pesquisar usuário pelo nome"
+            placeholder="Pesquisar usuários por nome"
             value={filter}
             onChange={({ target }) => setFilter(target.value)}
             variant="filled"

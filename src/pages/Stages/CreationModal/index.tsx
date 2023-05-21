@@ -101,7 +101,7 @@ export function CreationModal({
         <ModalHeader>Criar etapa</ModalHeader>
         <ModalCloseButton />
         <chakra.form onSubmit={onSubmit}>
-          <ModalBody>
+          <ModalBody display="flex" flexDir="column" gap="3">
             <Input
               type="text"
               label="Nome"
@@ -111,7 +111,7 @@ export function CreationModal({
             />
             <Input
               type="number"
-              label="Duração"
+              label="Duração (em dias)"
               placeholder="Duração da etapa"
               errors={errors.duration}
               {...register("duration")}
@@ -122,7 +122,7 @@ export function CreationModal({
               Cancelar
             </Button>
             <Button colorScheme="blue" type="submit" size="sm">
-              Criar
+              Salvar
             </Button>
           </ModalFooter>
         </chakra.form>

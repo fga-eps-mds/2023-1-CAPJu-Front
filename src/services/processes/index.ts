@@ -1,8 +1,12 @@
 import { api } from "services/api";
 
-export const getUnits = async (): Promise<Result<Unit[]>> => {
+export const getProcesses = async (
+  flowId: number | undefined
+): Promise<Result<Process[]>> => {
   try {
-    const res = await api.units.get<Unit[]>("/units");
+    const res = await api.processes.get<Process[]>(
+      `/processes${flowId ? `/${flowId}` : ""}`
+    );
 
     return { type: "success", value: res.data };
   } catch (error) {
@@ -17,11 +21,13 @@ export const getUnits = async (): Promise<Result<Unit[]>> => {
   }
 };
 
-export const createUnit = async (data: {
-  name: string;
-}): Promise<Result<Unit>> => {
+export const deleteProcess = async (
+  registro: string
+): Promise<Result<Process>> => {
   try {
-    const res = await api.units.post<Unit>("/newUnit", data);
+    const res = await api.processes.delete<Process>(
+      `/deleteProcess/${registro}`
+    );
 
     return {
       type: "success",
@@ -39,11 +45,15 @@ export const createUnit = async (data: {
   }
 };
 
-export const deleteUnit = async (idUnit: number): Promise<Result<any>> => {
+export const createProcess = async (data: {
+  record: string;
+  nickname: string;
+  idFlow: number;
+  priority: number;
+  effectiveDate: Date;
+}): Promise<Result<Process>> => {
   try {
-    const res = await api.units.delete<Unit>("/deleteUnit", {
-      data: { idUnit },
-    });
+    const res = await api.processes.post<Process>("/newProcess", data);
 
     return {
       type: "success",
@@ -61,13 +71,20 @@ export const deleteUnit = async (idUnit: number): Promise<Result<any>> => {
   }
 };
 
-export const getUnitAdmins = async (
-  unitId: number
-): Promise<Result<User[]>> => {
+export const updateProcess = async (data: {
+  record: string;
+  nickname: string;
+  idFlow: number;
+  priority: number;
+  effectiveDate: Date;
+}): Promise<Result<Process>> => {
   try {
-    const res = await api.units.get<User[]>(`/unitAdmins/${unitId}`);
+    const res = await api.processes.put<Process>("/updateProcess", data);
 
-    return { type: "success", value: res.data };
+    return {
+      type: "success",
+      value: res.data,
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
@@ -80,14 +97,16 @@ export const getUnitAdmins = async (
   }
 };
 
-export const addUnitAdmin = async (data: {
-  idUnit: number;
-  cpf: string;
-}): Promise<Result<null>> => {
+export const getProcessByRecord = async (
+  record: string
+): Promise<Result<Process>> => {
   try {
-    await api.units.put("/setUnitAdmin/", { ...data });
+    const res = await api.processes.get<Process>(`/getOneProcess/${record}`);
 
-    return { type: "success", value: null };
+    return {
+      type: "success",
+      value: res.data,
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
@@ -100,14 +119,20 @@ export const addUnitAdmin = async (data: {
   }
 };
 
-export const removeUnitAdmin = async (data: {
-  idUnit: number;
-  cpf: string;
-}): Promise<Result<null>> => {
+export const advanceStage = async (data: {
+  record: string;
+  from: number;
+  to: number;
+  commentary: string;
+  idFlow: number;
+}): Promise<Result<Process>> => {
   try {
-    await api.units.put("/removeUnitAdmin/", { ...data });
+    const res = await api.processes.put<Process>("/processNextStage", data);
 
-    return { type: "success", value: null };
+    return {
+      type: "success",
+      value: res.data,
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };

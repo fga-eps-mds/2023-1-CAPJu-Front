@@ -10,63 +10,59 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-
-import { deleteUser } from "services/user";
+import { deleteUnit } from "services/units";
 import { useLoading } from "hooks/useLoading";
 
-interface DeleteModalProps {
-  user: User;
+interface DeletionModalProps {
+  unit: Unit;
   isOpen: boolean;
   onClose: () => void;
-  refetch: () => void;
+  refetchUnits: () => void;
 }
 
-export function DeleteModal({
-  user,
+export function DeletionModal({
+  unit,
   isOpen,
   onClose,
-  refetch,
-}: DeleteModalProps) {
+  refetchUnits,
+}: DeletionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
 
-  async function handleDeleteUser() {
+  const handleDeleteUnit = async () => {
     handleLoading(true);
-
-    try {
-      await deleteUser(user.cpf);
+    const res = await deleteUnit(unit.idUnit);
+    if (res.type === "success") {
+      refetchUnits();
       toast({
-        id: "delete-user-success",
-        title: "Usuário removido",
-        description: `O usuário ${user.fullName} foi deletado com sucesso.`,
+        id: "delete-unit-success",
+        title: "Sucesso!",
+        description: "Unidade deletada com sucesso!",
         status: "success",
-        isClosable: true,
       });
-    } catch {
+    } else {
       toast({
-        id: "delete-user-error",
-        title: `Erro ao remover ${user.fullName}`,
-        description: "Favor tentar novamente.",
+        id: "delete-unit-error",
+        title: "Erro na deleção da unidade.",
+        description: res.error?.message,
         status: "error",
         isClosable: true,
       });
     }
     onClose();
-    refetch();
     handleLoading(false);
-  }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Deletar Usuário</ModalHeader>
+        <ModalHeader>Excluir unidade</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Text>
-            Tem certeza que deseja deletar o usuário{" "}
-            <strong>{user.fullName}</strong>, do perfil{" "}
-            <strong>{user.role}</strong>?
+            Tem certeza que deseja excluir a unidade{" "}
+            <strong>{unit?.name}</strong>?
           </Text>
         </ModalBody>
         <ModalFooter gap="2">
@@ -75,10 +71,10 @@ export function DeleteModal({
           </Button>
           <Button
             colorScheme="red"
-            onClick={() => handleDeleteUser()}
+            onClick={() => handleDeleteUnit()}
             size="sm"
           >
-            Deletar
+            Excluir
           </Button>
         </ModalFooter>
       </ModalContent>

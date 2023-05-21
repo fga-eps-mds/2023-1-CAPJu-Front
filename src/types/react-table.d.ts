@@ -5,5 +5,6 @@ declare module "@tanstack/table-core" {
   export interface ColumnMeta<TData extends RowData, TValue> {
     isTableActions?: boolean;
     isSortable?: boolean;
+    icon?: JSX.Element;
   }
 }
