@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, Text, useDisclosure } from "@chakra-ui/react";
-import { DeleteIcon, Icon } from "@chakra-ui/icons";
-import { MdEdit } from "react-icons/md";
+import { Icon } from "@chakra-ui/icons";
+import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { DataTable } from "components/DataTable";
@@ -61,7 +61,7 @@ export function Profiles() {
       },
       {
         label: "Remover Usuário",
-        icon: <DeleteIcon boxSize={4} />,
+        icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
           onDeleteOpen();

@@ -152,7 +152,7 @@ function Processes() {
       },
       {
         label: "Excluir Processo",
-        icon: <Icon as={MdDelete} boxSize={5} />,
+        icon: <Icon as={MdDelete} boxSize={4} />,
         action: async ({ process }: { process: Process }) => {
           selectProcess(process);
           onDeletionOpen();
