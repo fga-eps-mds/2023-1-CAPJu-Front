@@ -24,15 +24,9 @@ export const tabs = [
     action: "view-process",
   },
   {
-    label: "Solicitações",
-    pathIndex: "/solicitacoes",
-    path: "/solicitacoes",
-    action: "accept-user",
-  },
-  {
-    label: "Perfil de Acesso",
-    pathIndex: "/perfil-de-acesso",
-    path: "/perfil-de-acesso",
+    label: "Cadastro",
+    pathIndex: "/acessos",
+    path: "/acessos",
     action: "view-user",
   },
   {

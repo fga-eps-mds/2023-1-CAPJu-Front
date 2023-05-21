@@ -1,51 +1,47 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, Text, useDisclosure } from "@chakra-ui/react";
-import { DeleteIcon, CheckIcon } from "@chakra-ui/icons";
+import { Icon } from "@chakra-ui/icons";
+import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
-import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
-import { getUsersRequests } from "services/user";
+import { getAcceptedUsers } from "services/user";
 import { getUnits } from "services/units";
-import { AcceptModal } from "./AcceptModal";
-import { DenyModal } from "./DenyModal";
+import { roleNameById } from "utils/roles";
+import { DeletionModal } from "./DeletionModal";
+import { EditionModal } from "./EditionModal";
 
-function Requests() {
-  // const toast = useToast();
+export function Profiles() {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
+  const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onClose: onEditClose,
+  } = useDisclosure();
   const { getUserData } = useAuth();
-  const {
-    isOpen: isAcceptOpen,
-    onOpen: onAcceptOpen,
-    onClose: onAcceptClose,
-  } = useDisclosure();
-  const {
-    isOpen: isDenyOpen,
-    onOpen: onDenyOpen,
-    onClose: onDenyClose,
-  } = useDisclosure();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
   const {
-    data: requestsData,
-    isFetched: isRequestsFetched,
-    refetch: refetchRequests,
+    data: usersData,
+    isFetched: isUsersFetched,
+    refetch: refetchUsers,
   } = useQuery({
-    queryKey: ["requests"],
-    queryFn: getUsersRequests,
+    queryKey: ["accepted-users"],
+    queryFn: getAcceptedUsers,
   });
-  const {
-    data: unitsData,
-    isFetched: isUnitsFetched,
-    refetch: refetchUnits,
-  } = useQuery({
+  const { data: unitsData, isFetched: isUnitsFetched } = useQuery({
     queryKey: ["units"],
     queryFn: getUnits,
   });
@@ -54,21 +50,21 @@ function Requests() {
   const tableActions = useMemo(
     () => [
       {
-        label: "Aceitar Usuário",
-        icon: <CheckIcon boxSize={4} />,
+        label: "Editar Usuário",
+        icon: <Icon as={MdEdit} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
-          onAcceptOpen();
+          onEditOpen();
         },
-        actionName: "accept-user",
+        actionName: "edit-user",
         disabled: isActionDisabled("accept-user"),
       },
       {
-        label: "Recusar Usuário",
-        icon: <DeleteIcon boxSize={4} />,
+        label: "Remover Usuário",
+        icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
-          onDenyOpen();
+          onDeleteOpen();
         },
         actionName: "delete-user",
         disabled: isActionDisabled("delete-user"),
@@ -77,51 +73,56 @@ function Requests() {
     []
   );
   const requests = useMemo<TableRow<User>[]>(() => {
-    if (!isRequestsFetched || !isUnitsFetched) return [];
+    if (!isUsersFetched || !isUnitsFetched) return [];
 
     return (
-      (requestsData?.value?.reduce(
+      (usersData?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (!curr.fullName.toLowerCase().includes(filter.toLowerCase()))
+          if (
+            !curr.fullName.toLowerCase().includes(filter.toLowerCase()) ||
+            curr.cpf === userData?.value?.cpf
+          )
             return acc;
+
+          const role = roleNameById(curr.idRole);
 
           return [
             ...acc,
             {
               ...curr,
               unit:
-                unitsData?.value?.find(
-                  (item) => item.idUnit === userData?.value?.idUnit
-                )?.name || "-",
+                unitsData?.value?.find((item) => item.idUnit === curr.idUnit)
+                  ?.name || "-",
+              role,
               tableActions,
-              actionsProps: { user: curr },
+              actionsProps: { user: { ...curr, role } },
             },
           ];
         },
         []
       ) as TableRow<User>[]) || []
     );
-  }, [requestsData, unitsData, isRequestsFetched, isUnitsFetched, filter]);
+  }, [usersData, unitsData, isUsersFetched, isUnitsFetched, filter]);
 
   const tableColumnHelper = createColumnHelper<TableRow<User>>();
   const tableColumns = [
     tableColumnHelper.accessor("fullName", {
       cell: (info) => info.getValue(),
-      header: "Nome",
+      header: "Nomes",
       meta: {
         isSortable: true,
       },
     }),
     tableColumnHelper.accessor("unit", {
       cell: (info) => info.getValue(),
-      header: "Unidade",
+      header: "Unidades",
       meta: {
         isSortable: true,
       },
     }),
     tableColumnHelper.accessor("role", {
       cell: (info) => info.getValue(),
-      header: "Perfil",
+      header: "Perfis",
       meta: {
         isSortable: true,
       },
@@ -136,22 +137,17 @@ function Requests() {
     }),
   ];
 
-  function refetchAll() {
-    refetchRequests();
-    refetchUnits();
-  }
-
   return (
-    <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
+    <>
+      <Flex mt="4" w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Text fontSize="lg" fontWeight="semibold">
-            Solicitações
+            Perfil de Acesso
           </Text>
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Input
-            placeholder="Pesquisar usuários por nome"
+            placeholder="Pesquisar usuário pelo nome"
             value={filter}
             onChange={({ target }) => setFilter(target.value)}
             variant="filled"
@@ -166,27 +162,25 @@ function Requests() {
       <DataTable
         data={requests}
         columns={tableColumns}
-        isDataFetching={!isRequestsFetched || !isUserFetched}
-        emptyTableMessage="Não foram encontradas solicitações no momento."
+        isDataFetching={!isUsersFetched || !isUserFetched}
+        emptyTableMessage="Não foram encontrados usuários no momento."
       />
-      {userData?.value && selectedUser && isAcceptOpen ? (
-        <AcceptModal
-          isOpen={isAcceptOpen}
-          onClose={onAcceptClose}
+      {userData?.value && selectedUser && isDeleteOpen ? (
+        <DeletionModal
+          isOpen={isDeleteOpen}
+          onClose={onDeleteClose}
           user={selectedUser}
-          refetch={() => refetchAll()}
+          refetch={refetchUsers}
         />
       ) : null}
-      {userData?.value && selectedUser && isDenyOpen ? (
-        <DenyModal
-          isOpen={isDenyOpen}
-          onClose={onDenyClose}
+      {userData?.value && selectedUser && isEditOpen ? (
+        <EditionModal
+          isOpen={isEditOpen}
+          onClose={onEditClose}
           user={selectedUser}
-          refetch={() => refetchAll()}
+          refetch={refetchUsers}
         />
       ) : null}
-    </PrivateLayout>
+    </>
   );
 }
-
-export default Requests;

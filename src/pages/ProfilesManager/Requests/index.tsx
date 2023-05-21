@@ -1,48 +1,49 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, Text, useDisclosure } from "@chakra-ui/react";
-import { DeleteIcon, Icon } from "@chakra-ui/icons";
-import { MdEdit } from "react-icons/md";
+import { DeleteIcon, CheckIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
 
-import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
-import { getAcceptedUsers } from "services/user";
+import { getUsersRequests } from "services/user";
 import { getUnits } from "services/units";
-import { roleNameById } from "utils/roles";
-import { DeletionModal } from "./DeletionModal";
-import { EditionModal } from "./EditionModal";
+import { AcceptModal } from "./AcceptModal";
+import { DenyModal } from "./DenyModal";
 
-function Users() {
+export function Requests() {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose,
-  } = useDisclosure();
-  const {
-    isOpen: isEditOpen,
-    onOpen: onEditOpen,
-    onClose: onEditClose,
-  } = useDisclosure();
   const { getUserData } = useAuth();
+  const {
+    isOpen: isAcceptOpen,
+    onOpen: onAcceptOpen,
+    onClose: onAcceptClose,
+  } = useDisclosure();
+  const {
+    isOpen: isDenyOpen,
+    onOpen: onDenyOpen,
+    onClose: onDenyClose,
+  } = useDisclosure();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
   const {
-    data: usersData,
-    isFetched: isUsersFetched,
-    refetch: refetchUsers,
+    data: requestsData,
+    isFetched: isRequestsFetched,
+    refetch: refetchRequests,
   } = useQuery({
-    queryKey: ["accepted-users"],
-    queryFn: getAcceptedUsers,
+    queryKey: ["requests"],
+    queryFn: getUsersRequests,
   });
-  const { data: unitsData, isFetched: isUnitsFetched } = useQuery({
+  const {
+    data: unitsData,
+    isFetched: isUnitsFetched,
+    refetch: refetchUnits,
+  } = useQuery({
     queryKey: ["units"],
     queryFn: getUnits,
   });
@@ -51,21 +52,21 @@ function Users() {
   const tableActions = useMemo(
     () => [
       {
-        label: "Editar Usuário",
-        icon: <Icon as={MdEdit} boxSize={4} />,
+        label: "Aceitar Usuário",
+        icon: <CheckIcon boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
-          onEditOpen();
+          onAcceptOpen();
         },
-        actionName: "edit-user",
+        actionName: "accept-user",
         disabled: isActionDisabled("accept-user"),
       },
       {
-        label: "Remover Usuário",
+        label: "Recusar Usuário",
         icon: <DeleteIcon boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
-          onDeleteOpen();
+          onDenyOpen();
         },
         actionName: "delete-user",
         disabled: isActionDisabled("delete-user"),
@@ -74,36 +75,31 @@ function Users() {
     []
   );
   const requests = useMemo<TableRow<User>[]>(() => {
-    if (!isUsersFetched || !isUnitsFetched) return [];
+    if (!isRequestsFetched || !isUnitsFetched) return [];
 
     return (
-      (usersData?.value?.reduce(
+      (requestsData?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (
-            !curr.fullName.toLowerCase().includes(filter.toLowerCase()) ||
-            curr.cpf === userData?.value?.cpf
-          )
+          if (!curr.fullName.toLowerCase().includes(filter.toLowerCase()))
             return acc;
-
-          const role = roleNameById(curr.idRole);
 
           return [
             ...acc,
             {
               ...curr,
               unit:
-                unitsData?.value?.find((item) => item.idUnit === curr.idUnit)
-                  ?.name || "-",
-              role,
+                unitsData?.value?.find(
+                  (item) => item.idUnit === userData?.value?.idUnit
+                )?.name || "-",
               tableActions,
-              actionsProps: { user: { ...curr, role } },
+              actionsProps: { user: curr },
             },
           ];
         },
         []
       ) as TableRow<User>[]) || []
     );
-  }, [usersData, unitsData, isUsersFetched, isUnitsFetched, filter]);
+  }, [requestsData, unitsData, isRequestsFetched, isUnitsFetched, filter]);
 
   const tableColumnHelper = createColumnHelper<TableRow<User>>();
   const tableColumns = [
@@ -138,12 +134,17 @@ function Users() {
     }),
   ];
 
+  function refetchAll() {
+    refetchRequests();
+    refetchUnits();
+  }
+
   return (
-    <PrivateLayout>
+    <>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Text fontSize="lg" fontWeight="semibold">
-            Perfil de Acesso
+            Solicitações
           </Text>
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
@@ -163,27 +164,25 @@ function Users() {
       <DataTable
         data={requests}
         columns={tableColumns}
-        isDataFetching={!isUsersFetched || !isUserFetched}
+        isDataFetching={!isRequestsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas solicitações no momento."
       />
-      {userData?.value && selectedUser && isDeleteOpen ? (
-        <DeletionModal
-          isOpen={isDeleteOpen}
-          onClose={onDeleteClose}
+      {userData?.value && selectedUser && isAcceptOpen ? (
+        <AcceptModal
+          isOpen={isAcceptOpen}
+          onClose={onAcceptClose}
           user={selectedUser}
-          refetch={refetchUsers}
+          refetch={() => refetchAll()}
         />
       ) : null}
-      {userData?.value && selectedUser && isEditOpen ? (
-        <EditionModal
-          isOpen={isEditOpen}
-          onClose={onEditClose}
+      {userData?.value && selectedUser && isDenyOpen ? (
+        <DenyModal
+          isOpen={isDenyOpen}
+          onClose={onDenyClose}
           user={selectedUser}
-          refetch={refetchUsers}
+          refetch={() => refetchAll()}
         />
       ) : null}
-    </PrivateLayout>
+    </>
   );
 }
-
-export default Users;

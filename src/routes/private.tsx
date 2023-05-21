@@ -1,15 +1,13 @@
 import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 
-import { PrivateLayout } from "layouts/Private";
 import { permissionsArray } from "utils/permissions";
 
 const AccountEdition = lazy(() => import("pages/AccountEdition"));
 const EmailEdition = lazy(() => import("pages/EmailEdition"));
 const PasswordEdition = lazy(() => import("pages/PasswordEdition"));
 const Units = lazy(() => import("pages/Units"));
-const Requests = lazy(() => import("pages/Requests"));
-const Users = lazy(() => import("pages/Users"));
+const Users = lazy(() => import("pages/ProfilesManager"));
 const Stages = lazy(() => import("pages/Stages"));
 const Flows = lazy(() => import("pages/Flows"));
 const Processes = lazy(() => import("pages/Processes"));
@@ -56,17 +54,10 @@ export const PrivateRoutes: MenuItem[] = [
       item.actions.includes("view-process")
     )?.users,
   },
+
   {
-    path: "solicitacoes",
-    name: "UserRequests",
-    element: <Requests />,
-    authorizedRoles: permissionsArray.find((item) =>
-      item.actions.includes("accept-user")
-    )?.users,
-  },
-  {
-    path: "perfil-de-acesso",
-    name: "Users",
+    path: "acessos",
+    name: "ProfilesManager",
     element: <Users />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-user")
@@ -94,14 +85,6 @@ export const PrivateRoutes: MenuItem[] = [
     element: <PasswordEdition />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("edit-account")
-    )?.users,
-  },
-  {
-    path: "solicitacoes",
-    name: "UserRequests",
-    element: <PrivateLayout />,
-    authorizedRoles: permissionsArray.find((item) =>
-      item.actions.includes("accept-user")
     )?.users,
   },
   {

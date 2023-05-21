@@ -57,7 +57,7 @@ function Stages() {
     () => [
       {
         label: "Excluir Etapa",
-        icon: <Icon as={MdDelete} boxSize={5} />,
+        icon: <Icon as={MdDelete} boxSize={4} />,
         action: async ({ stage }: { stage: Stage }) => {
           selectStage(stage);
           onDeletionOpen();
