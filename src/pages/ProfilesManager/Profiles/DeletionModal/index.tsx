@@ -14,19 +14,19 @@ import {
 import { deleteUser } from "services/user";
 import { useLoading } from "hooks/useLoading";
 
-interface DeleteModalProps {
+interface DeletionModalProps {
   user: User;
   isOpen: boolean;
   onClose: () => void;
   refetch: () => void;
 }
 
-export function DeleteModal({
+export function DeletionModal({
   user,
   isOpen,
   onClose,
   refetch,
-}: DeleteModalProps) {
+}: DeletionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
 

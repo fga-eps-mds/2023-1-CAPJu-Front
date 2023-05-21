@@ -28,14 +28,19 @@ const validationSchema = yup.object({
   idRole: yup.string().required("Escolha um perfil"),
 });
 
-interface EditModalProps {
+interface EditionModalProps {
   user: User;
   isOpen: boolean;
   onClose: () => void;
   refetch: () => void;
 }
 
-export function EditModal({ user, isOpen, onClose, refetch }: EditModalProps) {
+export function EditionModal({
+  user,
+  isOpen,
+  onClose,
+  refetch,
+}: EditionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
   const {

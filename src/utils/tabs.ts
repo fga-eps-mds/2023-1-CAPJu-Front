@@ -23,11 +23,10 @@ export const tabs = [
     path: "/processos",
     action: "view-process",
   },
-  // Realocação da aba cadastro na barra de navegação
   {
     label: "Cadastro",
-    pathIndex: "/cadastro-menu",
-    path: "/cadastro-menu",
+    pathIndex: "/acessos",
+    path: "/acessos",
     action: "view-user",
   },
   {

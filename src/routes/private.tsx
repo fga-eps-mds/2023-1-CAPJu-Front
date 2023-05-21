@@ -46,8 +46,8 @@ export const PrivateRoutes: MenuItem[] = [
   },
 
   {
-    path: "cadastro-menu",
-    name: "Users",
+    path: "acessos",
+    name: "ProfilesManager",
     element: <Users />,
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("view-user")
