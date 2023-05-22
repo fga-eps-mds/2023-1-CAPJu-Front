@@ -1,4 +1,20 @@
-import { AxiosError } from "axios";
+import { AxiosError, InternalAxiosRequestConfig } from "axios";
+
+export function authorization(
+  config: InternalAxiosRequestConfig<any>
+): InternalAxiosRequestConfig<any> {
+  const localStorageUser = localStorage.getItem("@CAPJu:user");
+
+  if (!localStorageUser) return config;
+
+  const user = JSON.parse(localStorageUser);
+
+  const authConfig = config;
+
+  authConfig.headers.Authorization = user?.token ? `Bearer ${user?.token}` : "";
+
+  return authConfig;
+}
 
 export const errorResponseHandler = (
   error: AxiosError<ApiResponse<string>>
@@ -16,6 +32,10 @@ export const errorResponseHandler = (
           cause: new Error(error.response.data.data),
         })
       );
+    }
+
+    if (typeof error?.response?.data?.error === "string") {
+      return Promise.reject(new Error(error.response.data.error));
     }
 
     return Promise.reject(

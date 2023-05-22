@@ -25,9 +25,12 @@ O CAPJu é uma aplicação _Web_ compatível com qualquer navegador.
 Configure o arquivo .env.local dos repositório igual abaixo:
 
 ```
-JWT_SECRET=
 VITE_API_SERVICE_URL=
 VITE_USER_SERVICE_URL=
+VITE_UNITS_SERVICE_URL=
+VITE_STAGES_SERVICE_URL=
+VITE_PROCESSES_SERVICE_URL=
+VITE_FLOWS_SERVICE_URL=
 ```
 
 Obs: é necessário ser igual ao back-end.

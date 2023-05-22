@@ -22,7 +22,7 @@ export function PageSkeleton() {
       w="100%"
       flex="1"
     >
-      <Skeleton w="90%" maxW="420" h="420" />
+      <Skeleton w="90%" maxW="460" h="520" />
     </Flex>
   );
 }

@@ -7,14 +7,20 @@ import {
   useCallback,
 } from "react";
 
-import { signIn } from "services/user";
+import { signIn, getUserById } from "services/user";
+import { roleNameById } from "utils/roles";
 
 type AuthContextType = {
   isAuthenticated: boolean;
   user: User | null;
   // eslint-disable-next-line no-unused-vars
-  handleLogin: (credentials: { cpf: string; password: string }) => void;
+  handleLogin: (credentials: {
+    cpf: string;
+    password: string;
+  }) => Promise<Result<User>>;
   handleLogout: () => void;
+  getUserData: () => Promise<Result<User>>;
+  validateAuthentication: () => void;
 };
 
 const AuthContext = createContext({} as AuthContextType);
@@ -28,10 +34,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       password: string;
     }): Promise<Result<User>> => {
       const res = await signIn(credentials);
+      const role = roleNameById(res.value?.idRole);
 
       if (res.type === "success") {
-        localStorage.setItem("@CAPJu:user", JSON.stringify(res.value.data));
-        setUser(res.value.data);
+        localStorage.setItem(
+          "@CAPJu:user",
+          JSON.stringify({
+            ...res.value,
+            role,
+          })
+        );
+        setUser({
+          ...res.value,
+          role,
+        });
       }
 
       return res;
@@ -43,6 +59,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("@CAPJu:user");
     setUser(null);
   }
+
+  const getUserData = async (): Promise<Result<User>> => {
+    if (!user?.cpf) {
+      handleLogout();
+      return {
+        type: "error",
+        error: new Error("Autenticação inválida."),
+        value: undefined,
+      };
+    }
+
+    const res = await getUserById(user?.cpf);
+    const role = roleNameById(res.value?.idRole);
+
+    if (res.type === "error" || res.value?.idRole !== user.idRole) {
+      handleLogout();
+      return {
+        type: "error",
+        error: new Error("Autenticação inválida."),
+        value: undefined,
+      };
+    }
+
+    setUser({
+      ...user,
+      ...res.value,
+      role,
+    });
+
+    localStorage.setItem("@CAPJu:user", JSON.stringify(user));
+
+    return res;
+  };
 
   function validateAuthentication() {
     const currentDate = new Date();
@@ -75,6 +124,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         handleLogin,
         handleLogout,
+        getUserData,
+        validateAuthentication,
       }}
     >
       {children}
