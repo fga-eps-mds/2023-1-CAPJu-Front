@@ -2,10 +2,9 @@ name: front-ci
 
 on:
   push:
-    branches: [master, main, develop]
+    branches: [main, develop]
   pull_request:
     branches:
-      - master
       - main
       - develop
     types: [opened, synchronize, reopened]
