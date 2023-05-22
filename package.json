@@ -13,7 +13,7 @@
     "check-format": "prettier --check .",
     "check-lint": "eslint . --ext ts --ext tsx --ext js",
     "format": "prettier --write .",
-    "test": "vitest --environment jsdom"
+    "test": "vitest"
   },
   "dependencies": {
     "@chakra-ui/form-control": "^2.0.0",
@@ -47,7 +47,8 @@
     "reactflow": "^11.7.2",
     "vite": "^4.3.0",
     "vite-tsconfig-paths": "^4.2.0",
-    "yup": "^1.1.1"
+    "yup": "^1.1.1",
+    "vitest-sonar-reporter": "^0.4.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
