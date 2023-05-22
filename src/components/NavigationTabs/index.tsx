@@ -71,8 +71,8 @@ export function NavigationTabs() {
             return (
               <Tab
                 key={tab.label}
-                disabled={isCurrentTab}
-                onClick={() => (isCurrentTab ? {} : navigate(tab.path))}
+                disabled={!isUserAllowedInTab(index)}
+                onClick={() => navigate(tab.path)}
                 cursor={cursor}
                 minW="fit-content"
                 opacity={isUserAllowedInTab(index) ? 1 : 0.25}

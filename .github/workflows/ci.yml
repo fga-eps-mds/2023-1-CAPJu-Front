@@ -1,0 +1,182 @@
+name: front-ci
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches:
+      - main
+      - develop
+    types: [opened, synchronize, reopened]
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: 📬 Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/node_modules
+            ${{ github.workspace }}/dist
+          key: ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
+          restore-keys: |
+            ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-
+
+      - name: 🧰 Instala bibliotecas e dependências
+        run: npm i yarn -g && yarn
+
+      - name: 🔍 Verifica estilização do código
+        run: yarn check-format
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: 📬 Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/node_modules
+            ${{ github.workspace }}/dist
+          key: ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
+          restore-keys: |
+            ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-
+
+      - name: 🧰 Instala bibliotecas e dependências
+        run: npm i yarn -g && yarn
+        
+      - name: 🧹 Verifica eslint
+        run: yarn check-lint
+
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: 📬 Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/node_modules
+            ${{ github.workspace }}/dist
+          key: ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
+          restore-keys: |
+            ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-
+
+      - name: 🧰 Instala bibliotecas e dependências
+        run: npm i yarn -g && yarn
+        
+      - name: 🔧 Valida tipagens
+        run: yarn check-types
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: 📬 Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/node_modules
+            ${{ github.workspace }}/dist
+          key: ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
+          restore-keys: |
+            ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-
+
+      - name: 🧰 Instala bibliotecas e dependências
+        run: npm i yarn -g && yarn 
+
+      - name: 🧪 Roda suíte de testes
+        run: yarn test
+
+  build:
+    needs: [format, lint, type-check]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: 📬 Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/node_modules
+            ${{ github.workspace }}/dist
+          key: ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
+          restore-keys: |
+            ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-
+
+      - name: 🧰 Instala bibliotecas e dependências
+        run: npm i yarn -g && yarn
+
+      - name: 📦 Builda o projeto
+        run: yarn build
+        
+  sonarcloud:
+    name: sonarcloud
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 📬 Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/node_modules
+            ${{ github.workspace }}/dist
+          key: ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
+          restore-keys: |
+            ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-
+
+      - name: 🧰 Instala bibliotecas e dependências
+        run: npm i -g yarn && yarn
+
+      - name: 📜 Relatório do eslint
+        run: npx eslint -f json -o reports/eslint-report.json src || true
+
+      - name: 🧪 Testes e cobertura
+        run: yarn test --coverage --passWithNoTests
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
