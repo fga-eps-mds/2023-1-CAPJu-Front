@@ -1,0 +1,34 @@
+import { createContext, useState, useContext, ReactNode } from "react";
+
+type LoadingContextType = {
+  isLoading: boolean;
+  // eslint-disable-next-line no-unused-vars
+  handleLoading: (value: boolean) => void;
+};
+
+const LoadingContext = createContext({} as LoadingContextType);
+
+export const LoadingProvider = ({ children }: { children: ReactNode }) => {
+  const [isLoading, setLoading] = useState<boolean>(false);
+
+  function handleLoading(value: boolean) {
+    setLoading(value);
+  }
+
+  return (
+    <LoadingContext.Provider
+      value={{
+        isLoading,
+        handleLoading,
+      }}
+    >
+      {children}
+    </LoadingContext.Provider>
+  );
+};
+
+export function useLoading() {
+  const context = useContext(LoadingContext);
+
+  return context;
+}

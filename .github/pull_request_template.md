@@ -1,15 +1,27 @@
-# Titulo
-<!-- Defina o título com o mesmo nome da Issue -->
+## Issue
+<!-- Descrever qual issue esse Pull Requeste deve fechar  -->
 
-## Issue #
-<!-- Adicionar descrição breve sobre o que foi realizado>
-Closes #<numero da issue> <!-- Adicionar o numero da issue que será fechada com o merge da PR>
+Closes fga-eps-mds/2023-1-CAPJu-Doc#issue_number
 
 ## Descrição
-<!--- Descrição do problema solucionado -->
-<!--  Demostre que todos os criteiros de aceitacao foram solucionados-->
 
-## Screenshots (se apropriado):
-<!--- Forneça capturas de telas do problema solucionado caso seja necessário -->
-<!--  Forneca capturas de telas de antes e depois monstrando a mudança-->
+<!-- Descreve precisamente o que está sendo submetido e suas alterações -->
 
+## Revisão 
+<!-- Verifica se os critérios estabelecidos na issue foram realizados -->
+- [] Critério 1
+- [] Critério 1
+- [] Critério 1
+
+## Pre-merge checklist 
+
+- [] O Pull Request refere-se a um único assunto, um título claro e uma descrição em frases gramaticalmente corretas e completas.
+- [] A ramificação está atualizada com a branch Develop.
+- [] Os commits atendem o padrão especificado na política de contribuição.
+
+
+## Screenshots (Se necessário)
+
+| Antes | Depois |
+| ----- | ------ |
+| Image 1 | Image 2 |
