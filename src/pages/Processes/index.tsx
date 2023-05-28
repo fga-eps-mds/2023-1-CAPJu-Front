@@ -222,7 +222,7 @@ function Processes() {
               curr.record
             ),
             // @ts-ignore
-            status: labelByProcessStatus[curr.status] || "Não iniciado",
+            status: labelByProcessStatus[curr.status],
           },
         ],
         []
