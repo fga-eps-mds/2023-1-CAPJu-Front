@@ -92,7 +92,9 @@ function ViewProcess() {
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
   const isLastStage = useMemo(() => {
-    return flowData?.value?.stages.pop() === processData?.value?.idStage;
+    const lastStage = flowData?.value?.stages.pop();
+    flowData?.value?.stages.push(lastStage as number);
+    return lastStage === processData?.value?.idStage;
   }, [flowData?.value?.stages, processData?.value?.idStage]);
 
   async function handleNextStage() {
