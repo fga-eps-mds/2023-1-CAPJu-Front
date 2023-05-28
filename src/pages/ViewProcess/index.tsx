@@ -13,7 +13,11 @@ import { getStages } from "services/stages";
 import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
-import { advanceStage, getProcessByRecord } from "services/processes";
+import {
+  advanceStage,
+  getProcessByRecord,
+  updateProcessStatus,
+} from "services/processes";
 import { getPriorities } from "services/priorities";
 
 function ViewProcess() {
@@ -136,6 +140,50 @@ function ViewProcess() {
     refetchFlow();
   }
 
+  async function handleStartFlow() {
+    handleLoading(true);
+
+    const res = processData?.value
+      ? await updateProcessStatus({
+          record: processData?.value?.record as string,
+          nickname: processData?.value?.nickname as string,
+          idFlow:
+            typeof process.idFlow === "number"
+              ? process.idFlow
+              : process.idFlow[0],
+          priority: processData?.value?.idPriority as number,
+          status: "inProgress",
+        })
+      : ({
+          type: "error",
+          error: new Error(
+            "Houve um problema com as informações sobre o processo"
+          ),
+          value: undefined,
+        } as ResultError);
+
+    if (res.type === "success") {
+      toast({
+        id: "start-process-sucess",
+        title: "Sucesso!",
+        description: `Seu processo foi iniciado no fluxo com sucesso.`,
+        status: "success",
+      });
+    } else {
+      toast({
+        id: "start-process-error",
+        title: "Erro ao iniciar processo no fluxo",
+        description: res.error?.message,
+        status: "error",
+        isClosable: true,
+      });
+    }
+
+    handleLoading(true);
+    refetchProcess();
+    refetchFlow();
+  }
+
   useEffect(() => {
     if (!process) navigate(-1);
   }, []);
@@ -194,16 +242,29 @@ function ViewProcess() {
               </Text>
             </Text>
           ) : null}
-          <Button
-            size="sm"
-            colorScheme="green"
-            onClick={() => handleNextStage()}
-            disabled={isActionDisabled("advance-stage")}
-            my="1"
-          >
-            Avançar de Etapa
-            <Icon as={FiSkipForward} ml="2" boxSize={4} />
-          </Button>
+          {process?.status == "notStarted" ? (
+            <Button
+              size="sm"
+              colorScheme="green"
+              onClick={() => handleStartFlow()}
+              disabled={isActionDisabled("advance-stage")}
+              my="1"
+            >
+              <Icon as={FiSkipForward} ml="2" boxSize={4} />
+              Iniciar Fluxo
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              colorScheme="green"
+              onClick={() => handleNextStage()}
+              disabled={isActionDisabled("advance-stage")}
+              my="1"
+            >
+              Avançar de Etapa
+              <Icon as={FiSkipForward} ml="2" boxSize={4} />
+            </Button>
+          )}
         </Flex>
         <Flow
           sequences={flowData?.value?.sequences || []}
