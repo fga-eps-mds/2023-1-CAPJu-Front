@@ -91,6 +91,9 @@ function ViewProcess() {
   }, [flowData, processData]);
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
+  const isLastStage = useMemo(() => {
+    return flowData?.value?.stages.pop() === processData?.value?.idStage;
+  }, [flowData?.value?.stages, processData?.value?.idStage]);
 
   async function handleNextStage() {
     handleLoading(true);
@@ -202,26 +205,31 @@ function ViewProcess() {
             gap="1"
             flexWrap="wrap"
           >
-            <Button
-              size="sm"
-              colorScheme="green"
-              onClick={() => handleNextStage()}
-              disabled={isActionDisabled("advance-stage")}
-              my="1"
-            >
-              Avançar de Etapa
-              <Icon as={FiSkipForward} ml="2" boxSize={4} />
-            </Button>
-            <Button
-              size="sm"
-              colorScheme="red"
-              onClick={() => handleNextStage()}
-              // disabled={isActionDisabled("advance-stage")}
-              my="1"
-            >
-              Finalizar processo
-              <Icon as={FiSkipForward} ml="2" boxSize={4} />
-            </Button>
+            {!isLastStage ? (
+              <Button
+                size="sm"
+                colorScheme="green"
+                onClick={() => handleNextStage()}
+                disabled={isActionDisabled("advance-stage")}
+                my="1"
+              >
+                Avançar de Etapa
+                <Icon as={FiSkipForward} ml="2" boxSize={4} />
+              </Button>
+            ) : null}
+            {isLastStage ? (
+              <Button
+                size="sm"
+                colorScheme="red"
+                onClick={() => handleNextStage()}
+                disabled={isActionDisabled("advance-stage")}
+                my="1"
+                ml="auto"
+              >
+                <Icon as={FiSkipForward} mr="2" boxSize={4} />
+                Finalizar processo
+              </Button>
+            ) : null}
           </Flex>
         </Flex>
         <Flow
