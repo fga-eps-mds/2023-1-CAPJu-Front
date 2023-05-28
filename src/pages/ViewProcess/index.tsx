@@ -194,16 +194,35 @@ function ViewProcess() {
               </Text>
             </Text>
           ) : null}
-          <Button
-            size="sm"
-            colorScheme="green"
-            onClick={() => handleNextStage()}
-            disabled={isActionDisabled("advance-stage")}
-            my="1"
+          <Flex
+            w="100%"
+            flexDirection="row"
+            justifyContent="space-between"
+            alignItems="center"
+            gap="1"
+            flexWrap="wrap"
           >
-            Avançar de Etapa
-            <Icon as={FiSkipForward} ml="2" boxSize={4} />
-          </Button>
+            <Button
+              size="sm"
+              colorScheme="green"
+              onClick={() => handleNextStage()}
+              disabled={isActionDisabled("advance-stage")}
+              my="1"
+            >
+              Avançar de Etapa
+              <Icon as={FiSkipForward} ml="2" boxSize={4} />
+            </Button>
+            <Button
+              size="sm"
+              colorScheme="red"
+              onClick={() => handleNextStage()}
+              // disabled={isActionDisabled("advance-stage")}
+              my="1"
+            >
+              Finalizar processo
+              <Icon as={FiSkipForward} ml="2" boxSize={4} />
+            </Button>
+          </Flex>
         </Flex>
         <Flow
           sequences={flowData?.value?.sequences || []}
