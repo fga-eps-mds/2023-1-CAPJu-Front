@@ -34,23 +34,32 @@ export function Flow({
   isFetching = false,
 }: FlowProps) {
   const startDate = effectiveDate ? new Date(effectiveDate) : null;
-  const sortedStages = useMemo(
-    () =>
-      stages.sort((a, b) => {
-        const fromA =
-          sequences.find((item) => item.from === a.idStage) ||
-          ({} as FlowSequence);
-        const fromB =
-          sequences.find((item) => item.from === b.idStage) ||
-          ({} as FlowSequence);
+  const sortedStages = useMemo(() => {
+    const sequenceMap = new Map<number, number>();
 
-        const indexA = sequences.indexOf(fromA);
-        const indexB = sequences.indexOf(fromB);
+    sequences.forEach((sequence, index) => {
+      sequenceMap.set(sequence.from, index);
+    });
 
-        return indexA > indexB ? 1 : 0;
-      }),
-    [stages]
-  );
+    return stages.sort((a, b) => {
+      const indexA = sequenceMap.get(a.idStage);
+      const indexB = sequenceMap.get(b.idStage);
+
+      if (indexA === undefined && indexB === undefined) {
+        return 0;
+      }
+
+      if (indexA === undefined) {
+        return 1;
+      }
+
+      if (indexB === undefined) {
+        return -1;
+      }
+
+      return indexA - indexB;
+    });
+  }, [stages, sequences]);
 
   const getStageDeadline = (item: Stage, index: number): string | null => {
     if (!startDate || !effectiveDate) return null;
