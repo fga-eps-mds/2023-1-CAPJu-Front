@@ -152,6 +152,7 @@ function ViewProcess() {
               ? process.idFlow
               : process.idFlow[0],
           priority: processData?.value?.idPriority as number,
+          status: 'inProgress',
         })
       : ({
           type: "error",
@@ -163,14 +164,14 @@ function ViewProcess() {
 
     if (res.type === "success") {
       toast({
-        id: "advance-stage-sucess",
+        id: "start-process-sucess",
         title: "Sucesso!",
         description: `Seu processo foi iniciado no fluxo com sucesso.`,
         status: "success",
       });
     } else {
       toast({
-        id: "advance-stage-error",
+        id: "start-process-error",
         title: "Erro ao iniciar processo no fluxo",
         description: res.error?.message,
         status: "error",

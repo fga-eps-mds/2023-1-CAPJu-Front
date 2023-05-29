@@ -150,6 +150,7 @@ export const updateProcessStatus = async (data: {
   nickname: string;
   idFlow: number;
   priority: number;
+  status: string;
 }): Promise<Result<Process>> => {
   try {
     const res = await api.processes.put<Process>("/updateProcess", data);
