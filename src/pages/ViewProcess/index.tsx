@@ -1,4 +1,4 @@
-import { Flex, Text, Button, useToast } from "@chakra-ui/react";
+import { Flex, Text, Button, useDisclosure, useToast } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/icons";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
@@ -15,6 +15,7 @@ import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
 import { advanceStage, getProcessByRecord } from "services/processes";
 import { getPriorities } from "services/priorities";
+import { ConfirmationModal } from "./ConfirmationModal";
 
 function ViewProcess() {
   const params = useParams();
@@ -34,6 +35,11 @@ function ViewProcess() {
       return res;
     },
   });
+  const {
+    isOpen: isConfirmationOpen,
+    onOpen: onConfirmationOpen,
+    onClose: onConfirmationClose,
+  } = useDisclosure();
   const { data: stagesData } = useQuery({
     queryKey: ["stages"],
     queryFn: getStages,
@@ -209,7 +215,8 @@ function ViewProcess() {
           >
             {!isLastStage ? (
               <Button
-                size="sm"
+                size="xs"
+                fontSize="sm"
                 colorScheme="green"
                 onClick={() => handleNextStage()}
                 disabled={isActionDisabled("advance-stage")}
@@ -221,15 +228,16 @@ function ViewProcess() {
             ) : null}
             {isLastStage ? (
               <Button
-                size="sm"
+                size="xs"
+                fontSize="sm"
                 colorScheme="red"
-                onClick={() => handleNextStage()}
+                onClick={onConfirmationOpen}
                 disabled={isActionDisabled("advance-stage")}
                 my="1"
                 ml="auto"
               >
                 <Icon as={FiSkipForward} mr="2" boxSize={4} />
-                Finalizar processo
+                Finalizar Processo
               </Button>
             ) : null}
           </Flex>
@@ -243,6 +251,14 @@ function ViewProcess() {
           isFetching={isFlowFetching}
         />
       </Flex>
+      {process && (
+        <ConfirmationModal
+          process={process}
+          isOpen={isConfirmationOpen}
+          onClose={onConfirmationClose}
+          afterSubmition={refetchFlow}
+        />
+      )}
     </PrivateLayout>
   );
 }
