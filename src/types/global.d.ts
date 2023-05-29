@@ -56,7 +56,7 @@ declare global {
     idStage: number;
     idUnit: number;
     effectiveDate: string;
-    status: "notStarted" | "inProgress" | "archived" | "finished";
+    status: string;
   };
 
   type SelectOption = {

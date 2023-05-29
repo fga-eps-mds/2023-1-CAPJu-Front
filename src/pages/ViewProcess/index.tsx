@@ -19,6 +19,7 @@ import {
   updateProcessStatus,
 } from "services/processes";
 import { getPriorities } from "services/priorities";
+import { labelByProcessStatus } from "utils/constants";
 
 function ViewProcess() {
   const params = useParams();
@@ -152,7 +153,7 @@ function ViewProcess() {
               ? process.idFlow
               : process.idFlow[0],
           priority: processData?.value?.idPriority as number,
-          status: 'inProgress',
+          status: "inProgress",
         })
       : ({
           type: "error",
@@ -228,6 +229,13 @@ function ViewProcess() {
           gap="1"
           flexWrap="wrap"
         >
+          <Text fontWeight="semibold">
+            Status:{" "}
+            <Text as="span" fontWeight="300">
+              {/* @ts-ignore */}
+              {labelByProcessStatus[process.status]}
+            </Text>
+          </Text>
           <Text fontWeight="semibold">
             Fluxo:{" "}
             <Text as="span" fontWeight="300">

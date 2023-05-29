@@ -22,6 +22,7 @@ import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
+import { labelByProcessStatus } from "utils/constants";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
@@ -220,6 +221,8 @@ function Processes() {
             ) : (
               curr.record
             ),
+            // @ts-ignore
+            status: labelByProcessStatus[curr.status],
           },
         ],
         []
@@ -253,6 +256,13 @@ function Processes() {
     tableColumnHelper.accessor("flowName", {
       cell: (info) => info.getValue(),
       header: "Fluxo",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("status", {
+      cell: (info) => info.getValue(),
+      header: "Status",
       meta: {
         isSortable: true,
       },
