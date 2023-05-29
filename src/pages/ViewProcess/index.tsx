@@ -98,9 +98,10 @@ function ViewProcess() {
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
   const isLastStage = useMemo(() => {
-    const lastStage = flowData?.value?.stages.pop();
-    flowData?.value?.stages.push(lastStage as number);
-    return lastStage === processData?.value?.idStage;
+    return (
+      flowData?.value?.stages[flowData?.value?.stages?.length - 1] ===
+      processData?.value?.idStage
+    );
   }, [flowData?.value?.stages, processData?.value?.idStage]);
 
   async function handleNextStage() {
@@ -221,6 +222,7 @@ function ViewProcess() {
                 onClick={() => handleNextStage()}
                 disabled={isActionDisabled("advance-stage")}
                 my="1"
+                ml="auto"
               >
                 Avançar de Etapa
                 <Icon as={FiSkipForward} ml="2" boxSize={4} />
