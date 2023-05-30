@@ -89,7 +89,7 @@ function Flows() {
         disabled: isActionDisabled("delete-flow"),
       },
     ],
-    [isFlowsFetched, isUserFetched]
+    [isFlowsFetched, isUserFetched, userData]
   );
   const filteredFlows = useMemo<TableRow<Flow>[]>(() => {
     if (!isFlowsFetched) return [];
@@ -118,7 +118,14 @@ function Flows() {
         []
       ) as TableRow<Flow>[]) || []
     );
-  }, [flowsData, filter, isFlowsFetched]);
+  }, [
+    flowsData,
+    filter,
+    isFlowsFetched,
+    tableActions,
+    isUserFetched,
+    userData,
+  ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<Flow>>();
   const tableColumns = [

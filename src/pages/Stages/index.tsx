@@ -66,7 +66,7 @@ function Stages() {
         disabled: isActionDisabled("view-stage"),
       },
     ],
-    [isStagesFetched, isUserFetched]
+    [isStagesFetched, isUserFetched, userData]
   );
 
   const filteredStages = useMemo<TableRow<Stage>[]>(() => {
@@ -88,7 +88,14 @@ function Stages() {
         []
       ) as TableRow<Stage>[]) || []
     );
-  }, [stagesData, filter, isStagesFetched]);
+  }, [
+    stagesData,
+    filter,
+    isStagesFetched,
+    isUserFetched,
+    userData,
+    tableActions,
+  ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<Stage>>();
   const tableColumns = [
