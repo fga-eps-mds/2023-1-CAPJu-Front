@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useQuery } from "react-query";
+import _ from "lodash";
 
 import { useLoading } from "hooks/useLoading";
 import { Input } from "components/FormFields";
@@ -101,7 +102,11 @@ function Signup() {
 
   const onSubmit = handleSubmit(async (data) => {
     handleLoading(true);
-    const res = await signUp(data);
+    const res = await signUp({
+      ...data,
+      fullName: _.startCase(data.fullName.toLocaleLowerCase()),
+      email: data.email.toLocaleLowerCase(),
+    });
 
     if (res.type === "success") {
       handleLoading(false);
