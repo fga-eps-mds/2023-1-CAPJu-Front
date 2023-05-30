@@ -15,6 +15,7 @@ import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
 import { advanceStage, getProcessByRecord } from "services/processes";
 import { getPriorities } from "services/priorities";
+import { labelByProcessStatus } from "utils/constants";
 
 function ViewProcess() {
   const params = useParams();
@@ -194,6 +195,13 @@ function ViewProcess() {
               </Text>
             </Text>
           ) : null}
+          <Text fontWeight="semibold">
+            Status:{" "}
+            <Text as="span" fontWeight="300">
+              {/* @ts-ignore */}
+              {labelByProcessStatus[process.status]}
+            </Text>
+          </Text>
           <Button
             size="sm"
             colorScheme="green"
