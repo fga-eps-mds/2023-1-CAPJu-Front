@@ -67,9 +67,9 @@ export function EditionModal({
       handleLoading(false);
 
       toast({
-        id: "create-unit-success",
+        id: "edit-unit-success",
         title: "Sucesso!",
-        description: "A unidade foi criada.",
+        description: "A unidade foi editada.",
         status: "success",
       });
       return;
@@ -77,8 +77,8 @@ export function EditionModal({
 
     handleLoading(false);
     toast({
-      id: "create-unit-error",
-      title: "Erro ao criar unidade",
+      id: "edit-unit-error",
+      title: "Erro ao editar unidade",
       description: res.error?.message,
       status: "error",
       isClosable: true,

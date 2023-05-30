@@ -89,7 +89,7 @@ export function Requests({
         disabled: isActionDisabled("delete-user"),
       },
     ],
-    []
+    [isUserFetched, userData]
   );
   const requests = useMemo<TableRow<User>[]>(() => {
     if (!isRequestsFetched || !isUnitsFetched) return [];
@@ -120,7 +120,16 @@ export function Requests({
         []
       ) as TableRow<User>[]) || []
     );
-  }, [requestsData, unitsData, isRequestsFetched, isUnitsFetched, filter]);
+  }, [
+    requestsData,
+    unitsData,
+    isRequestsFetched,
+    isUnitsFetched,
+    filter,
+    isUserFetched,
+    userData,
+    tableActions,
+  ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<User>>();
   const tableColumns = [

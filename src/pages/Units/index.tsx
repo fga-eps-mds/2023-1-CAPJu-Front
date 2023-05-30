@@ -68,8 +68,8 @@ function Units() {
           selectUnit(unit);
           onEditionOpen();
         },
-        actionName: "delete-unit",
-        disabled: userData?.value?.idRole !== 5,
+        actionName: "edit-unit",
+        disabled: isActionDisabled("edit-unit"),
       },
       {
         label: "Excluir Unidade",
@@ -79,10 +79,10 @@ function Units() {
           onDeletionOpen();
         },
         actionName: "delete-unit",
-        disabled: userData?.value?.idRole !== 5,
+        disabled: isActionDisabled("delete-unit"),
       },
     ],
-    [isUnitsFetched, isUserFetched]
+    [isUnitsFetched, isUserFetched, userData]
   );
   const filteredUnits = useMemo<TableRow<Unit>[]>(() => {
     if (!isUnitsFetched) return [];
@@ -103,7 +103,14 @@ function Units() {
         []
       ) as TableRow<Unit>[]) || []
     );
-  }, [unitsData, filter, isUnitsFetched]);
+  }, [
+    unitsData,
+    filter,
+    isUnitsFetched,
+    isUserFetched,
+    userData,
+    tableActions,
+  ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<Unit>>();
   const tableColumns = [

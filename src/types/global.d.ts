@@ -56,6 +56,7 @@ declare global {
     idStage: number;
     idUnit: number;
     effectiveDate: string;
+    status: string;
   };
 
   type SelectOption = {

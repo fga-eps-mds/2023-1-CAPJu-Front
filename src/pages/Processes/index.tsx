@@ -22,6 +22,7 @@ import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
+import { labelByProcessStatus } from "utils/constants";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
@@ -161,7 +162,7 @@ function Processes() {
         disabled: isActionDisabled("delete-process"),
       },
     ],
-    [isProcessesFetched, isUserFetched]
+    [isProcessesFetched, isUserFetched, userData]
   );
 
   const filterByPriority = (processes: Process[]) => {
@@ -220,12 +221,22 @@ function Processes() {
             ) : (
               curr.record
             ),
+            // @ts-ignore
+            status: labelByProcessStatus[curr.status],
           },
         ],
         []
       ) as TableRow<Process>[]) || []
     );
-  }, [legalPriority, processesData, filter, isProcessesFetched]);
+  }, [
+    legalPriority,
+    processesData,
+    filter,
+    isProcessesFetched,
+    isUserFetched,
+    userData,
+    tableActions,
+  ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [
@@ -253,6 +264,13 @@ function Processes() {
     tableColumnHelper.accessor("flowName", {
       cell: (info) => info.getValue(),
       header: "Fluxo",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("status", {
+      cell: (info) => info.getValue(),
+      header: "Status",
       meta: {
         isSortable: true,
       },
