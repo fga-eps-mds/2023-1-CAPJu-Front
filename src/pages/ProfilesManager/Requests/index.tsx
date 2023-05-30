@@ -9,13 +9,22 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
-import { getUsersRequests } from "services/user";
 import { getUnits } from "services/units";
 import { AcceptModal } from "./AcceptModal";
 import { DenyModal } from "./DenyModal";
 import { ViewModal } from "./ViewModal";
 
-export function Requests() {
+interface RequestsProps {
+  requestsData: Result<User[]> | undefined;
+  isRequestsFetched: boolean;
+  refetchRequests: () => void;
+}
+
+export function Requests({
+  requestsData,
+  isRequestsFetched,
+  refetchRequests,
+}: RequestsProps) {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
   const { getUserData } = useAuth();
@@ -38,14 +47,6 @@ export function Requests() {
     onOpen: onViewOpen,
     onClose: onViewClose,
   } = useDisclosure();
-  const {
-    data: requestsData,
-    isFetched: isRequestsFetched,
-    refetch: refetchRequests,
-  } = useQuery({
-    queryKey: ["requests"],
-    queryFn: getUsersRequests,
-  });
   const {
     data: unitsData,
     isFetched: isUnitsFetched,

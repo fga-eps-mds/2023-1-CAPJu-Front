@@ -9,14 +9,23 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
-import { getAcceptedUsers } from "services/user";
 import { getUnits } from "services/units";
 import { roleNameById } from "utils/roles";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
 import { ViewModal } from "./ViewModal";
 
-export function Profiles() {
+interface ProfilesProps {
+  usersData: Result<User[]> | undefined;
+  isUsersFetched: boolean;
+  refetchUsers: () => void;
+}
+
+export function Profiles({
+  usersData,
+  isUsersFetched,
+  refetchUsers,
+}: ProfilesProps) {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
   const {
@@ -38,14 +47,6 @@ export function Profiles() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
-  });
-  const {
-    data: usersData,
-    isFetched: isUsersFetched,
-    refetch: refetchUsers,
-  } = useQuery({
-    queryKey: ["accepted-users"],
-    queryFn: getAcceptedUsers,
   });
   const { data: unitsData, isFetched: isUnitsFetched } = useQuery({
     queryKey: ["units"],
