@@ -108,21 +108,14 @@ export function Profiles() {
   const tableColumns = [
     tableColumnHelper.accessor("fullName", {
       cell: (info) => info.getValue(),
-      header: "Nomes",
-      meta: {
-        isSortable: true,
-      },
-    }),
-    tableColumnHelper.accessor("unit", {
-      cell: (info) => info.getValue(),
-      header: "Unidades",
+      header: "Nome",
       meta: {
         isSortable: true,
       },
     }),
     tableColumnHelper.accessor("role", {
       cell: (info) => info.getValue(),
-      header: "Perfis",
+      header: "Perfil",
       meta: {
         isSortable: true,
       },

@@ -98,7 +98,7 @@ export function EditionModal({
             <Select
               placeholder="Novo perfil de usuário"
               errors={errors.idRole}
-              options={roleOptions(true)}
+              options={roleOptions(false)}
               defaultValue={user.idRole}
               {...register("idRole")}
             />

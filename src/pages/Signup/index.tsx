@@ -146,9 +146,8 @@ function Signup() {
       justifyContent="center"
       w="100%"
       maxW="100vw"
-      py="16"
     >
-      <Card p={["10", "20"]} w="90%" maxW="520">
+      <Card p={["10", "20"]} w="90%" maxW="520" my="16">
         <CardBody
           w="100%"
           p={0}

@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, Text, useDisclosure } from "@chakra-ui/react";
-import { DeleteIcon, CheckIcon } from "@chakra-ui/icons";
+import { Icon, CheckIcon } from "@chakra-ui/icons";
+import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { DataTable } from "components/DataTable";
@@ -63,7 +64,7 @@ export function Requests() {
       },
       {
         label: "Recusar Usuário",
-        icon: <DeleteIcon boxSize={4} />,
+        icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
           onDenyOpen();
@@ -106,13 +107,6 @@ export function Requests() {
     tableColumnHelper.accessor("fullName", {
       cell: (info) => info.getValue(),
       header: "Nome",
-      meta: {
-        isSortable: true,
-      },
-    }),
-    tableColumnHelper.accessor("unit", {
-      cell: (info) => info.getValue(),
-      header: "Unidade",
       meta: {
         isSortable: true,
       },
