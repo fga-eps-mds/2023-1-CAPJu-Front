@@ -128,6 +128,13 @@ export function Profiles() {
         isSortable: true,
       },
     }),
+    tableColumnHelper.accessor("unit", {
+      cell: (info) => info.getValue(),
+      header: "Unidade",
+      meta: {
+        isSortable: true,
+      },
+    }),
     tableColumnHelper.accessor("role", {
       cell: (info) => info.getValue(),
       header: "Perfil",
@@ -169,7 +176,11 @@ export function Profiles() {
       </Flex>
       <DataTable
         data={requests}
-        columns={tableColumns}
+        columns={
+          userData?.value?.idRole !== 5
+            ? tableColumns.filter((_, index) => index !== 1)
+            : tableColumns
+        }
         isDataFetching={!isUsersFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados usuários no momento."
       />

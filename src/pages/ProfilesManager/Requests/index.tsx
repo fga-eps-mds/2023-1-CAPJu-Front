@@ -126,6 +126,13 @@ export function Requests() {
         isSortable: true,
       },
     }),
+    tableColumnHelper.accessor("unit", {
+      cell: (info) => info.getValue(),
+      header: "Unidade",
+      meta: {
+        isSortable: true,
+      },
+    }),
     tableColumnHelper.accessor("role", {
       cell: (info) => info.getValue(),
       header: "Perfil",
@@ -172,7 +179,11 @@ export function Requests() {
       </Flex>
       <DataTable
         data={requests}
-        columns={tableColumns}
+        columns={
+          userData?.value?.idRole !== 5
+            ? tableColumns.filter((_, index) => index !== 1)
+            : tableColumns
+        }
         isDataFetching={!isRequestsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas solicitações no momento."
       />
