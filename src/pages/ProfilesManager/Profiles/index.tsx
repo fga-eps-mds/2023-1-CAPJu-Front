@@ -95,7 +95,9 @@ export function Profiles() {
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
           if (
             !curr.fullName.toLowerCase().includes(filter.toLowerCase()) ||
-            curr.cpf === userData?.value?.cpf
+            (userData?.value?.idRole &&
+              userData?.value?.idRole !== 5 &&
+              curr?.idRole <= userData?.value?.idRole)
           )
             return acc;
 
