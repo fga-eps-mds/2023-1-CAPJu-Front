@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, Text, useDisclosure } from "@chakra-ui/react";
-import { Icon } from "@chakra-ui/icons";
+import { Icon, ViewIcon } from "@chakra-ui/icons";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -14,6 +14,7 @@ import { getUnits } from "services/units";
 import { roleNameById } from "utils/roles";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
+import { ViewModal } from "./ViewModal";
 
 export function Profiles() {
   const [filter, setFilter] = useState<string>("");
@@ -27,6 +28,11 @@ export function Profiles() {
     isOpen: isEditOpen,
     onOpen: onEditOpen,
     onClose: onEditClose,
+  } = useDisclosure();
+  const {
+    isOpen: isViewOpen,
+    onOpen: onViewOpen,
+    onClose: onViewClose,
   } = useDisclosure();
   const { getUserData } = useAuth();
   const { data: userData, isFetched: isUserFetched } = useQuery({
@@ -49,6 +55,15 @@ export function Profiles() {
     userData?.value ? !hasPermission(userData.value, actionName) : true;
   const tableActions = useMemo(
     () => [
+      {
+        label: "Visualizar Usuário",
+        icon: <ViewIcon boxSize={4} />,
+        action: ({ user }: { user: User }) => {
+          selectUser(user);
+          onViewOpen();
+        },
+        disabled: false,
+      },
       {
         label: "Editar Usuário",
         icon: <Icon as={MdEdit} boxSize={4} />,
@@ -172,6 +187,13 @@ export function Profiles() {
           onClose={onEditClose}
           user={selectedUser}
           refetch={refetchUsers}
+        />
+      ) : null}
+      {userData?.value && selectedUser && isViewOpen ? (
+        <ViewModal
+          isOpen={isViewOpen}
+          onClose={onViewClose}
+          user={selectedUser}
         />
       ) : null}
     </>

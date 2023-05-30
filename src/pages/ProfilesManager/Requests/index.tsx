@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, Text, useDisclosure } from "@chakra-ui/react";
-import { Icon, CheckIcon } from "@chakra-ui/icons";
+import { Icon, CheckIcon, ViewIcon } from "@chakra-ui/icons";
 import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -13,6 +13,7 @@ import { getUsersRequests } from "services/user";
 import { getUnits } from "services/units";
 import { AcceptModal } from "./AcceptModal";
 import { DenyModal } from "./DenyModal";
+import { ViewModal } from "./ViewModal";
 
 export function Requests() {
   const [filter, setFilter] = useState<string>("");
@@ -33,6 +34,11 @@ export function Requests() {
     queryFn: getUserData,
   });
   const {
+    isOpen: isViewOpen,
+    onOpen: onViewOpen,
+    onClose: onViewClose,
+  } = useDisclosure();
+  const {
     data: requestsData,
     isFetched: isRequestsFetched,
     refetch: refetchRequests,
@@ -52,6 +58,15 @@ export function Requests() {
     userData?.value ? !hasPermission(userData.value, actionName) : true;
   const tableActions = useMemo(
     () => [
+      {
+        label: "Visualizar Usuário",
+        icon: <ViewIcon boxSize={4} />,
+        action: ({ user }: { user: User }) => {
+          selectUser(user);
+          onViewOpen();
+        },
+        disabled: false,
+      },
       {
         label: "Aceitar Usuário",
         icon: <CheckIcon boxSize={4} />,
@@ -175,6 +190,13 @@ export function Requests() {
           onClose={onDenyClose}
           user={selectedUser}
           refetch={() => refetchAll()}
+        />
+      ) : null}
+      {userData?.value && selectedUser && isViewOpen ? (
+        <ViewModal
+          isOpen={isViewOpen}
+          onClose={onViewClose}
+          user={selectedUser}
         />
       ) : null}
     </>
