@@ -109,9 +109,8 @@ export function Requests() {
             {
               ...curr,
               unit:
-                unitsData?.value?.find(
-                  (item) => item.idUnit === userData?.value?.idUnit
-                )?.name || "-",
+                unitsData?.value?.find((item) => item.idUnit === curr?.idUnit)
+                  ?.name || "-",
               tableActions,
               actionsProps: { user: curr },
             },
