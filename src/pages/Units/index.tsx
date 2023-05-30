@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon, Icon } from "@chakra-ui/icons";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { PrivateLayout } from "layouts/Private";
@@ -13,6 +13,7 @@ import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
+import { EditionModal } from "./EditionModal";
 
 function Units() {
   const toast = useToast();
@@ -28,6 +29,11 @@ function Units() {
     isOpen: isDeletionOpen,
     onOpen: onDeletionOpen,
     onClose: onDeletionClose,
+  } = useDisclosure();
+  const {
+    isOpen: isEditionOpen,
+    onOpen: onEditionOpen,
+    onClose: onEditionClose,
   } = useDisclosure();
   const {
     data: unitsData,
@@ -56,6 +62,16 @@ function Units() {
   const tableActions = useMemo(
     () => [
       {
+        label: "Editar Unidade",
+        icon: <Icon as={MdEdit} boxSize={4} />,
+        action: ({ unit }: { unit: Unit }) => {
+          selectUnit(unit);
+          onEditionOpen();
+        },
+        actionName: "delete-unit",
+        disabled: userData?.value?.idRole !== 5,
+      },
+      {
         label: "Excluir Unidade",
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ unit }: { unit: Unit }) => {
@@ -63,7 +79,7 @@ function Units() {
           onDeletionOpen();
         },
         actionName: "delete-unit",
-        disabled: isActionDisabled("delete-unit"),
+        disabled: userData?.value?.idRole !== 5,
       },
     ],
     [isUnitsFetched, isUserFetched]
@@ -156,6 +172,14 @@ function Units() {
           isOpen={isDeletionOpen}
           onClose={onDeletionClose}
           refetchUnits={refetchUnits}
+        />
+      ) : null}
+      {selectedUnit ? (
+        <EditionModal
+          unit={selectedUnit}
+          isOpen={isEditionOpen}
+          onClose={onEditionClose}
+          afterSubmission={refetchUnits}
         />
       ) : null}
     </PrivateLayout>
