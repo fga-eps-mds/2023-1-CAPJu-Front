@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -6,47 +7,47 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
+  chakra,
   Button,
   useToast,
-  chakra,
-  Text,
 } from "@chakra-ui/react";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import { updateUserRole } from "services/user";
-import { Select } from "components/FormFields/Select";
+import { updateUnit } from "services/units";
+import { Input } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
-import { roleOptions } from "utils/roles";
 
 type FormValues = {
-  idRole: string;
+  name: string;
 };
 
 const validationSchema = yup.object({
-  idRole: yup.string().required("Escolha um perfil"),
+  name: yup.string().required("Dê um nome à unidade"),
 });
 
 interface EditionModalProps {
-  user: User;
+  unit: Unit;
   isOpen: boolean;
   onClose: () => void;
-  refetch: () => void;
+  afterSubmission: () => void;
 }
 
 export function EditionModal({
-  user,
+  unit,
   isOpen,
   onClose,
-  refetch,
+  afterSubmission,
 }: EditionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<FormValues>({
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
@@ -54,60 +55,62 @@ export function EditionModal({
 
   const onSubmit = handleSubmit(async (formData) => {
     handleLoading(true);
-
-    try {
-      const res = await updateUserRole(user.cpf, Number(formData.idRole));
-
-      if (res.type === "error") {
-        throw new Error(res.error.message);
-      }
-
-      toast({
-        id: "edit-user-success",
-        title: "Usuário editado",
-        description: `O usuário ${user.fullName} teve seu perfil atualizado.`,
-        status: "success",
-        isClosable: true,
-      });
-    } catch (err: any) {
-      toast({
-        id: "edit-user-error",
-        title: `Erro ao atualizar perfil de ${user.fullName}`,
-        description: err?.message || "Favor tentar novamente.",
-        status: "error",
-        isClosable: true,
-      });
-    }
+    const res = await updateUnit({
+      ...formData,
+      idUnit: unit.idUnit,
+    });
 
     onClose();
-    refetch();
+    afterSubmission();
+
+    if (res.type === "success") {
+      handleLoading(false);
+
+      toast({
+        id: "create-unit-success",
+        title: "Sucesso!",
+        description: "A unidade foi criada.",
+        status: "success",
+      });
+      return;
+    }
+
     handleLoading(false);
+    toast({
+      id: "create-unit-error",
+      title: "Erro ao criar unidade",
+      description: res.error?.message,
+      status: "error",
+      isClosable: true,
+    });
   });
+
+  useEffect(() => {
+    reset();
+  }, [isOpen]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Atualizar Perfil de Usuário</ModalHeader>
+        <ModalHeader>Editar unidade</ModalHeader>
         <ModalCloseButton />
         <chakra.form onSubmit={onSubmit}>
           <ModalBody>
-            <Text mb="2">
-              Selecione perfil para <strong>{user.fullName}</strong>{" "}
-            </Text>
-            <Select
-              placeholder="Novo perfil de usuário"
-              errors={errors.idRole}
-              options={roleOptions(true)}
-              defaultValue={user.idRole}
-              {...register("idRole")}
+            <Input
+              type="text"
+              label="Nome"
+              placeholder="Nome da unidade"
+              errors={errors.name}
+              defaultValue={unit.name}
+              {...register("name")}
             />
           </ModalBody>
           <ModalFooter gap="2">
             <Button variant="ghost" onClick={onClose} size="sm">
               Cancelar
             </Button>
-            <Button colorScheme="blue" type="submit" size="sm">
+            <Button colorScheme="green" type="submit" size="sm">
               Salvar
             </Button>
           </ModalFooter>
