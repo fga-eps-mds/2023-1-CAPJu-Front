@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, Text, useDisclosure } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import { Icon, CheckIcon, ViewIcon } from "@chakra-ui/icons";
 import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
+import { useModals } from "contexts/Modals";
+import { Modals } from "utils/constants";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
@@ -28,25 +30,11 @@ export function Requests({
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
   const { getUserData } = useAuth();
-  const {
-    isOpen: isAcceptOpen,
-    onOpen: onAcceptOpen,
-    onClose: onAcceptClose,
-  } = useDisclosure();
-  const {
-    isOpen: isDenyOpen,
-    onOpen: onDenyOpen,
-    onClose: onDenyClose,
-  } = useDisclosure();
+  const { isModalOpen, handleModalOpen, handleModalClose } = useModals();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const {
-    isOpen: isViewOpen,
-    onOpen: onViewOpen,
-    onClose: onViewClose,
-  } = useDisclosure();
   const {
     data: unitsData,
     isFetched: isUnitsFetched,
@@ -64,7 +52,7 @@ export function Requests({
         icon: <ViewIcon boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
-          onViewOpen();
+          handleModalOpen(Modals.REQUESTS.VISUALIZATION);
         },
         disabled: false,
       },
@@ -73,7 +61,7 @@ export function Requests({
         icon: <CheckIcon boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
-          onAcceptOpen();
+          handleModalOpen(Modals.REQUESTS.ACCEPTION);
         },
         actionName: "accept-user",
         disabled: isActionDisabled("accept-user"),
@@ -83,7 +71,7 @@ export function Requests({
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
-          onDenyOpen();
+          handleModalOpen(Modals.REQUESTS.DENIAL);
         },
         actionName: "delete-user",
         disabled: isActionDisabled("delete-user"),
@@ -201,26 +189,26 @@ export function Requests({
         isDataFetching={!isRequestsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas solicitações no momento."
       />
-      {userData?.value && selectedUser && isAcceptOpen ? (
+      {userData?.value && selectedUser ? (
         <AcceptModal
-          isOpen={isAcceptOpen}
-          onClose={onAcceptClose}
+          isOpen={isModalOpen(Modals.REQUESTS.ACCEPTION)}
+          onClose={handleModalClose}
           user={selectedUser}
           refetch={() => refetchAll()}
         />
       ) : null}
-      {userData?.value && selectedUser && isDenyOpen ? (
+      {userData?.value && selectedUser ? (
         <DenyModal
-          isOpen={isDenyOpen}
-          onClose={onDenyClose}
+          isOpen={isModalOpen(Modals.REQUESTS.DENIAL)}
+          onClose={handleModalClose}
           user={selectedUser}
           refetch={() => refetchAll()}
         />
       ) : null}
-      {userData?.value && selectedUser && isViewOpen ? (
+      {userData?.value && selectedUser ? (
         <ViewModal
-          isOpen={isViewOpen}
-          onClose={onViewClose}
+          isOpen={isModalOpen(Modals.REQUESTS.VISUALIZATION)}
+          onClose={handleModalClose}
           user={selectedUser}
         />
       ) : null}

@@ -1,6 +1,7 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 
+import { ModalsProvider } from "contexts/Modals";
 import { AuthProvider } from "hooks/useAuth";
 import { LoadingProvider } from "hooks/useLoading";
 import { Router } from "routes";
@@ -20,13 +21,15 @@ function App() {
         },
       }}
     >
-      <LoadingProvider>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <Router />
-          </AuthProvider>
-        </QueryClientProvider>
-      </LoadingProvider>
+      <ModalsProvider>
+        <LoadingProvider>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <Router />
+            </AuthProvider>
+          </QueryClientProvider>
+        </LoadingProvider>
+      </ModalsProvider>
     </ChakraProvider>
   );
 }

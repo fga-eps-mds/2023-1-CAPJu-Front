@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, Text, useDisclosure } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import { Icon, ViewIcon } from "@chakra-ui/icons";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
+import { useModals } from "contexts/Modals";
+import { Modals } from "utils/constants";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
@@ -28,21 +30,7 @@ export function Profiles({
 }: ProfilesProps) {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose,
-  } = useDisclosure();
-  const {
-    isOpen: isEditOpen,
-    onOpen: onEditOpen,
-    onClose: onEditClose,
-  } = useDisclosure();
-  const {
-    isOpen: isViewOpen,
-    onOpen: onViewOpen,
-    onClose: onViewClose,
-  } = useDisclosure();
+  const { isModalOpen, handleModalOpen, handleModalClose } = useModals();
   const { getUserData } = useAuth();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
@@ -61,7 +49,7 @@ export function Profiles({
         icon: <ViewIcon boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
-          onViewOpen();
+          handleModalOpen(Modals.PROFILES.VISUALIZATION);
         },
         disabled: false,
       },
@@ -70,7 +58,7 @@ export function Profiles({
         icon: <Icon as={MdEdit} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
-          onEditOpen();
+          handleModalOpen(Modals.PROFILES.EDITION);
         },
         actionName: "edit-user",
         disabled: isActionDisabled("accept-user"),
@@ -80,7 +68,7 @@ export function Profiles({
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
-          onDeleteOpen();
+          handleModalOpen(Modals.PROFILES.DELETION);
         },
         actionName: "delete-user",
         disabled: isActionDisabled("delete-user"),
@@ -196,26 +184,26 @@ export function Profiles({
         isDataFetching={!isUsersFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados usuários no momento."
       />
-      {userData?.value && selectedUser && isDeleteOpen ? (
+      {userData?.value && selectedUser ? (
         <DeletionModal
-          isOpen={isDeleteOpen}
-          onClose={onDeleteClose}
+          isOpen={isModalOpen(Modals.PROFILES.DELETION)}
+          onClose={handleModalClose}
           user={selectedUser}
           refetch={refetchUsers}
         />
       ) : null}
-      {userData?.value && selectedUser && isEditOpen ? (
+      {userData?.value && selectedUser ? (
         <EditionModal
-          isOpen={isEditOpen}
-          onClose={onEditClose}
+          isOpen={isModalOpen(Modals.PROFILES.EDITION)}
+          onClose={handleModalClose}
           user={selectedUser}
           refetch={refetchUsers}
         />
       ) : null}
-      {userData?.value && selectedUser && isViewOpen ? (
+      {userData?.value && selectedUser ? (
         <ViewModal
-          isOpen={isViewOpen}
-          onClose={onViewClose}
+          isOpen={isModalOpen(Modals.PROFILES.VISUALIZATION)}
+          onClose={handleModalClose}
           user={selectedUser}
         />
       ) : null}

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
+import { Flex, useToast, Text, Button } from "@chakra-ui/react";
 import { AddIcon, Icon } from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -10,7 +10,9 @@ import { getUnits } from "services/units";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
+import { useModals } from "contexts/Modals";
 import { hasPermission } from "utils/permissions";
+import { Modals } from "utils/constants";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
@@ -20,21 +22,7 @@ function Units() {
   const [selectedUnit, selectUnit] = useState<Unit | null>(null);
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
-  const {
-    isOpen: isCreationOpen,
-    onOpen: onCreationOpen,
-    onClose: onCreationClose,
-  } = useDisclosure();
-  const {
-    isOpen: isDeletionOpen,
-    onOpen: onDeletionOpen,
-    onClose: onDeletionClose,
-  } = useDisclosure();
-  const {
-    isOpen: isEditionOpen,
-    onOpen: onEditionOpen,
-    onClose: onEditionClose,
-  } = useDisclosure();
+  const { isModalOpen, handleModalOpen, handleModalClose } = useModals();
   const {
     data: unitsData,
     isFetched: isUnitsFetched,
@@ -66,7 +54,7 @@ function Units() {
         icon: <Icon as={MdEdit} boxSize={4} />,
         action: ({ unit }: { unit: Unit }) => {
           selectUnit(unit);
-          onEditionOpen();
+          handleModalOpen(Modals.UNITS.EDITION);
         },
         actionName: "edit-unit",
         disabled: isActionDisabled("edit-unit"),
@@ -76,7 +64,7 @@ function Units() {
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ unit }: { unit: Unit }) => {
           selectUnit(unit);
-          onDeletionOpen();
+          handleModalOpen(Modals.UNITS.DELETION);
         },
         actionName: "delete-unit",
         disabled: isActionDisabled("delete-unit"),
@@ -143,7 +131,7 @@ function Units() {
             fontSize="sm"
             colorScheme="green"
             isDisabled={isActionDisabled("create-unit")}
-            onClick={onCreationOpen}
+            onClick={() => handleModalOpen(Modals.UNITS.CREATION)}
           >
             <AddIcon mr="2" boxSize={3} /> Criar Unidade
           </Button>
@@ -169,23 +157,23 @@ function Units() {
         emptyTableMessage="Não foram encontradas unidades."
       />
       <CreationModal
-        isOpen={isCreationOpen}
-        onClose={onCreationClose}
+        isOpen={isModalOpen(Modals.UNITS.CREATION)}
+        onClose={handleModalClose}
         afterSubmission={refetchUnits}
       />
       {selectedUnit ? (
         <DeletionModal
           unit={selectedUnit}
-          isOpen={isDeletionOpen}
-          onClose={onDeletionClose}
+          isOpen={isModalOpen(Modals.UNITS.DELETION)}
+          onClose={handleModalClose}
           refetchUnits={refetchUnits}
         />
       ) : null}
       {selectedUnit ? (
         <EditionModal
           unit={selectedUnit}
-          isOpen={isEditionOpen}
-          onClose={onEditionClose}
+          isOpen={isModalOpen(Modals.UNITS.EDITION)}
+          onClose={handleModalClose}
           afterSubmission={refetchUnits}
         />
       ) : null}

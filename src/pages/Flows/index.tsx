@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
+import { Flex, useToast, Text, Button } from "@chakra-ui/react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
 
+import { useModals } from "contexts/Modals";
+import { Modals } from "utils/constants";
 import { PrivateLayout } from "layouts/Private";
 import { getFlows } from "services/flows";
 import { DataTable } from "components/DataTable";
@@ -20,21 +22,7 @@ function Flows() {
   const [selectedFlow, selectFlow] = useState<Flow | null>(null);
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
-  const {
-    isOpen: isCreationOpen,
-    onOpen: onCreationOpen,
-    onClose: onCreationClose,
-  } = useDisclosure();
-  const {
-    isOpen: isEditionOpen,
-    onOpen: onEditionOpen,
-    onClose: onEditionClose,
-  } = useDisclosure();
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose,
-  } = useDisclosure();
+  const { isModalOpen, handleModalOpen, handleModalClose } = useModals();
   const {
     data: flowsData,
     isFetched: isFlowsFetched,
@@ -73,7 +61,7 @@ function Flows() {
         icon: <Icon as={MdEdit} boxSize={4} />,
         action: ({ flow }: { flow: Flow }) => {
           selectFlow(flow);
-          onEditionOpen();
+          handleModalOpen(Modals.FLOWS.EDITION);
         },
         actionName: "edit-flow",
         disabled: isActionDisabled("edit-flow"),
@@ -84,7 +72,7 @@ function Flows() {
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ flow }: { flow: Flow }) => {
           selectFlow(flow);
-          onDeleteOpen();
+          handleModalOpen(Modals.FLOWS.DELETION);
         },
         disabled: isActionDisabled("delete-flow"),
       },
@@ -158,7 +146,7 @@ function Flows() {
             fontSize="sm"
             colorScheme="green"
             isDisabled={isActionDisabled("create-flow")}
-            onClick={onCreationOpen}
+            onClick={() => handleModalOpen(Modals.FLOWS.CREATION)}
           >
             <AddIcon mr="2" boxSize={3} /> Criar Fluxo
           </Button>
@@ -183,27 +171,27 @@ function Flows() {
         isDataFetching={!isFlowsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados fluxos."
       />
-      {selectedFlow && isEditionOpen ? (
+      {selectedFlow ? (
         <EditionModal
           flow={selectedFlow}
-          isOpen={isEditionOpen}
-          onClose={onEditionClose}
+          isOpen={isModalOpen(Modals.FLOWS.EDITION)}
+          onClose={handleModalClose}
           afterSubmission={refetchFlows}
         />
       ) : null}
-      {userData?.value?.idUnit && isCreationOpen ? (
+      {userData?.value?.idUnit ? (
         <CreationModal
-          isOpen={isCreationOpen}
-          onClose={onCreationClose}
+          isOpen={isModalOpen(Modals.FLOWS.CREATION)}
+          onClose={handleModalClose}
           idUnit={userData?.value?.idUnit}
           afterSubmission={refetchFlows}
         />
       ) : null}
-      {selectedFlow && isDeleteOpen ? (
+      {selectedFlow ? (
         <DeletionModal
           flow={selectedFlow}
-          isOpen={isDeleteOpen}
-          onClose={onDeleteClose}
+          isOpen={isModalOpen(Modals.FLOWS.DELETION)}
+          onClose={handleModalClose}
           refetchFlows={refetchFlows}
         />
       ) : null}

@@ -1,16 +1,18 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
+import { Flex, useToast, Text, Button } from "@chakra-ui/react";
 import { AddIcon, Icon } from "@chakra-ui/icons";
 import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
+import { useModals } from "contexts/Modals";
+import { Modals } from "utils/constants";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { hasPermission } from "utils/permissions";
-import { getStages } from "../../services/stages";
+import { getStages } from "services/stages";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
 
@@ -19,16 +21,7 @@ function Stages() {
   const [selectedStage, selectStage] = useState<Stage>();
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
-  const {
-    isOpen: isCreationOpen,
-    onOpen: onCreationOpen,
-    onClose: onCreationClose,
-  } = useDisclosure();
-  const {
-    isOpen: isDeletionOpen,
-    onOpen: onDeletionOpen,
-    onClose: onDeletionClose,
-  } = useDisclosure();
+  const { isModalOpen, handleModalOpen, handleModalClose } = useModals();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
@@ -60,7 +53,7 @@ function Stages() {
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: async ({ stage }: { stage: Stage }) => {
           selectStage(stage);
-          onDeletionOpen();
+          handleModalOpen(Modals.STAGES.DELETION);
         },
         actionName: "view-stages",
         disabled: isActionDisabled("view-stage"),
@@ -135,7 +128,7 @@ function Stages() {
             fontSize="sm"
             colorScheme="green"
             isDisabled={isActionDisabled("create-stage")}
-            onClick={onCreationOpen}
+            onClick={() => handleModalOpen(Modals.STAGES.CREATION)}
           >
             <AddIcon mr="2" boxSize={3} /> Criar Etapa
           </Button>
@@ -162,15 +155,15 @@ function Stages() {
       />
       <CreationModal
         user={userData?.value!}
-        isOpen={isCreationOpen}
-        onClose={onCreationClose}
+        isOpen={isModalOpen(Modals.STAGES.CREATION)}
+        onClose={handleModalClose}
         afterSubmission={refetchStages}
       />
       {selectedStage && (
         <DeletionModal
           stage={selectedStage}
-          isOpen={isDeletionOpen}
-          onClose={onDeletionClose}
+          isOpen={isModalOpen(Modals.STAGES.DELETION)}
+          onClose={handleModalClose}
           refetchStages={refetchStages}
         />
       )}

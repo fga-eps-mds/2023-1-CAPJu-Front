@@ -4,7 +4,6 @@ import {
   Flex,
   Text,
   Button,
-  useDisclosure,
   Input,
   Checkbox,
   useToast,
@@ -16,23 +15,25 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
 
+import { useModals } from "contexts/Modals";
 import { getProcesses } from "services/processes";
 import { getFlows } from "services/flows";
 import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
-import { labelByProcessStatus } from "utils/constants";
+import { labelByProcessStatus, Modals } from "utils/constants";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
 
 function Processes() {
-  const { getUserData } = useAuth();
   const { state } = useLocation();
   const navigate = useNavigate();
   const flow = state?.flow;
   const toast = useToast();
+  const { getUserData } = useAuth();
+  const { isModalOpen, handleModalOpen, handleModalClose } = useModals();
   const [selectedProcess, selectProcess] = useState<Process>();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
@@ -40,21 +41,6 @@ function Processes() {
   });
   const [filter, setFilter] = useState<string>("");
   const [legalPriority, setLegalPriority] = useState(false);
-  const {
-    isOpen: isCreationOpen,
-    onOpen: onCreationOpen,
-    onClose: onCreationClose,
-  } = useDisclosure();
-  const {
-    isOpen: isDeletionOpen,
-    onOpen: onDeletionOpen,
-    onClose: onDeletionClose,
-  } = useDisclosure();
-  const {
-    isOpen: isEditionOpen,
-    onOpen: onEditionOpen,
-    onClose: onEditionClose,
-  } = useDisclosure();
   const { data: flowsData } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
@@ -146,7 +132,7 @@ function Processes() {
         icon: <Icon as={MdEdit} boxSize={4} />,
         action: ({ process }: { process: Process }) => {
           selectProcess(process);
-          onEditionOpen();
+          handleModalOpen(Modals.PROCESSES.EDITION);
         },
         actionName: "edit-process",
         disabled: isActionDisabled("edit-process"),
@@ -156,7 +142,7 @@ function Processes() {
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: async ({ process }: { process: Process }) => {
           selectProcess(process);
-          onDeletionOpen();
+          handleModalOpen(Modals.PROCESSES.DELETION);
         },
         actionName: "delete-process",
         disabled: isActionDisabled("delete-process"),
@@ -318,7 +304,7 @@ function Processes() {
               fontSize="sm"
               colorScheme="green"
               isDisabled={isActionDisabled("create-process")}
-              onClick={onCreationOpen}
+              onClick={() => handleModalOpen(Modals.PROCESSES.CREATION)}
             >
               <AddIcon mr="2" boxSize={3} /> Criar Processo
             </Button>
@@ -357,23 +343,23 @@ function Processes() {
         }.`}
       />
       <CreationModal
-        isOpen={isCreationOpen}
-        onClose={onCreationClose}
+        isOpen={isModalOpen(Modals.PROCESSES.CREATION)}
+        onClose={handleModalClose}
         afterSubmission={refetchProcesses}
       />
       {selectedProcess && (
         <EditionModal
           selectedProcess={selectedProcess}
-          isOpen={isEditionOpen}
-          onClose={onEditionClose}
+          isOpen={isModalOpen(Modals.PROCESSES.EDITION)}
+          onClose={handleModalClose}
           afterSubmission={refetchProcesses}
         />
       )}
       {selectedProcess && (
         <DeletionModal
           process={selectedProcess}
-          isOpen={isDeletionOpen}
-          onClose={onDeletionClose}
+          isOpen={isModalOpen(Modals.PROCESSES.DELETION)}
+          onClose={handleModalClose}
           refetchStages={refetchProcesses}
         />
       )}
