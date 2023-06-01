@@ -15,6 +15,7 @@ import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
 import { advanceStage, getProcessByRecord } from "services/processes";
 import { getPriorities } from "services/priorities";
+import { labelByProcessStatus } from "utils/constants";
 import { ConfirmationModal } from "./ConfirmationModal";
 
 function ViewProcess() {
@@ -214,6 +215,13 @@ function ViewProcess() {
             gap="1"
             flexWrap="wrap"
           >
+            <Text fontWeight="semibold">
+              Status:{" "}
+              <Text as="span" fontWeight="300">
+                {/* @ts-ignore */}
+                {labelByProcessStatus[process.status]}
+              </Text>
+            </Text>
             {!isLastStage ? (
               <Button
                 size="xs"

@@ -11,8 +11,10 @@ import {
   useToast,
 } from "@chakra-ui/react";
 // import { updateProcessStatus } from "services/processes";
-import { deleteProcess } from "services/processes";
+import { updateProcessStatus, getProcessByRecord } from "services/processes";
 import { useLoading } from "hooks/useLoading";
+import { useParams } from "react-router-dom";
+import { useQuery } from "react-query";
 
 interface ConfirmationModalProps {
   process: Process;
@@ -29,12 +31,29 @@ export function ConfirmationModal({
 }: ConfirmationModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
+  const params = useParams();
+  const { data: processData, refetch: refetchProcess } = useQuery({
+    queryKey: ["process", params.record],
+    queryFn: async () => {
+      const res = await getProcessByRecord(
+        params.record || (process.record as string)
+      );
+      return res;
+    },
+  });
 
   const handleFinalizedProcess = async () => {
     handleLoading(true);
     // updateProcessStatus deve ser criada esta função no back
     // const res = await updateProcessStatus(process?.record as string);
-    const res = await deleteProcess(process?.record as string);
+    const res = await updateProcessStatus({
+      record: processData?.value?.record as string,
+      nickname: processData?.value?.nickname as string,
+      idFlow:
+        typeof process.idFlow === "number" ? process.idFlow : process.idFlow[0],
+      priority: processData?.value?.idPriority as number,
+      status: "finished",
+    });
     if (res.type === "success") {
       afterSubmition();
       toast({
@@ -53,9 +72,9 @@ export function ConfirmationModal({
       });
     }
     onClose();
-    handleLoading(false);
+    handleLoading(true);
+    refetchProcess();
   };
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
