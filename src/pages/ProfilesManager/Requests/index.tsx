@@ -97,12 +97,7 @@ export function Requests({
     return (
       (requestsData?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (
-            !curr.fullName.toLowerCase().includes(filter.toLowerCase()) ||
-            (userData?.value?.idRole &&
-              userData?.value?.idRole !== 5 &&
-              curr?.idRole <= userData?.value?.idRole)
-          )
+          if (!curr.fullName.toLowerCase().includes(filter.toLowerCase()))
             return acc;
 
           return [
