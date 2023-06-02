@@ -39,6 +39,29 @@ export const createUnit = async (data: {
   }
 };
 
+export const updateUnit = async (data: {
+  idUnit: number;
+  name: string;
+}): Promise<Result<Unit>> => {
+  try {
+    const res = await api.units.put<Unit>("/updateUnit", data);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
 export const deleteUnit = async (idUnit: number): Promise<Result<any>> => {
   try {
     const res = await api.units.delete<Unit>("/deleteUnit", {
