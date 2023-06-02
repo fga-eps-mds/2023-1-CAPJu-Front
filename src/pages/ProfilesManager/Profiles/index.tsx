@@ -88,18 +88,13 @@ export function Profiles({
     ],
     [isUserFetched, userData]
   );
-  const requests = useMemo<TableRow<User>[]>(() => {
+  const users = useMemo<TableRow<User>[]>(() => {
     if (!isUsersFetched || !isUnitsFetched) return [];
 
     return (
       (usersData?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (
-            !curr.fullName.toLowerCase().includes(filter.toLowerCase()) ||
-            (userData?.value?.idRole &&
-              userData?.value?.idRole !== 5 &&
-              curr?.idRole <= userData?.value?.idRole)
-          )
+          if (!curr.fullName.toLowerCase().includes(filter.toLowerCase()))
             return acc;
 
           const role = roleNameById(curr.idRole);
@@ -187,7 +182,7 @@ export function Profiles({
         </Flex>
       </Flex>
       <DataTable
-        data={requests}
+        data={users}
         columns={
           userData?.value?.idRole !== 5
             ? tableColumns.filter((_, index) => index !== 1)
