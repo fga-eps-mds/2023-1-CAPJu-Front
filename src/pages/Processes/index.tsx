@@ -110,7 +110,9 @@ function Processes() {
             ...acc,
             {
               ...curr,
-              currentState: `${currentState}%`,
+              currentState: `${
+                curr.status === "finished" ? 100 : currentState
+              }%`,
               flowName: currFlow?.name,
             },
           ];

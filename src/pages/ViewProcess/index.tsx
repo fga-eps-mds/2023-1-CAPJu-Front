@@ -33,6 +33,9 @@ function ViewProcess() {
       const res = await getProcessByRecord(
         params.record || (process.record as string)
       );
+
+      console.log(res.value);
+
       return res;
     },
   });
@@ -150,8 +153,9 @@ function ViewProcess() {
   }
 
   useEffect(() => {
+    refetchProcess();
     if (!process) navigate(-1);
-  }, []);
+  }, [process]);
 
   return (
     <PrivateLayout>
@@ -207,6 +211,13 @@ function ViewProcess() {
               </Text>
             </Text>
           ) : null}
+          <Text fontWeight="semibold">
+            Status:{" "}
+            <Text as="span" fontWeight="300">
+              {/* @ts-ignore */}
+              {labelByProcessStatus[process.status]}
+            </Text>
+          </Text>
           <Flex
             w="100%"
             flexDirection="row"
@@ -215,14 +226,7 @@ function ViewProcess() {
             gap="1"
             flexWrap="wrap"
           >
-            <Text fontWeight="semibold">
-              Status:{" "}
-              <Text as="span" fontWeight="300">
-                {/* @ts-ignore */}
-                {labelByProcessStatus[process.status]}
-              </Text>
-            </Text>
-            {!isLastStage ? (
+            {!isLastStage && !(processData?.value?.status === "finished") ? (
               <Button
                 size="xs"
                 fontSize="sm"
@@ -256,7 +260,11 @@ function ViewProcess() {
           sequences={flowData?.value?.sequences || []}
           stages={stages || []}
           minHeight={650}
-          currentStage={processData?.value?.idStage}
+          currentStage={
+            processData?.value?.status === "finished"
+              ? undefined
+              : processData?.value?.idStage
+          }
           effectiveDate={processData?.value?.effectiveDate}
           isFetching={isFlowFetching}
         />

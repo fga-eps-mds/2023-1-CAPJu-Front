@@ -48,10 +48,6 @@ export function ConfirmationModal({
     // const res = await updateProcessStatus(process?.record as string);
     const res = await updateProcessStatus({
       record: processData?.value?.record as string,
-      nickname: processData?.value?.nickname as string,
-      idFlow:
-        typeof process.idFlow === "number" ? process.idFlow : process.idFlow[0],
-      priority: processData?.value?.idPriority as number,
       status: "finished",
     });
     if (res.type === "success") {

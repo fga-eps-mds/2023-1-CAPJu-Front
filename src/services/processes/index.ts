@@ -147,9 +147,6 @@ export const advanceStage = async (data: {
 
 export const updateProcessStatus = async (data: {
   record: string;
-  nickname: string;
-  idFlow: number;
-  priority: number;
   status: string;
 }): Promise<Result<Process>> => {
   try {
