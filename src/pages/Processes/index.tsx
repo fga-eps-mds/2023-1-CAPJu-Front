@@ -230,7 +230,7 @@ function Processes() {
         []
       ) as TableRow<Process>[]) || []
     );
-  }, [legalPriority, processesData, filter, isProcessesFetched]);
+  }, [legalPriority, processesData, filter, isProcessesFetched, flowsData]);
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [

@@ -16,7 +16,7 @@ import { useLoading } from "hooks/useLoading";
 import { advanceStage, getProcessByRecord } from "services/processes";
 import { getPriorities } from "services/priorities";
 import { labelByProcessStatus } from "utils/constants";
-import { ConfirmationModal } from "./ConfirmationModal";
+import { FinalizationModal } from "./FinalizationModal";
 
 function ViewProcess() {
   const params = useParams();
@@ -40,9 +40,9 @@ function ViewProcess() {
     },
   });
   const {
-    isOpen: isConfirmationOpen,
-    onOpen: onConfirmationOpen,
-    onClose: onConfirmationClose,
+    isOpen: isFinalizationOpen,
+    onOpen: onFinalizationOpen,
+    onClose: onFinalizationClose,
   } = useDisclosure();
   const { data: stagesData } = useQuery({
     queryKey: ["stages"],
@@ -215,7 +215,7 @@ function ViewProcess() {
             Status:{" "}
             <Text as="span" fontWeight="300">
               {/* @ts-ignore */}
-              {labelByProcessStatus[process.status]}
+              {labelByProcessStatus[processData?.value?.status]}
             </Text>
           </Text>
           <Flex
@@ -245,7 +245,7 @@ function ViewProcess() {
                 size="xs"
                 fontSize="sm"
                 colorScheme="red"
-                onClick={onConfirmationOpen}
+                onClick={onFinalizationOpen}
                 disabled={isActionDisabled("advance-stage")}
                 my="1"
                 ml="auto"
@@ -270,10 +270,10 @@ function ViewProcess() {
         />
       </Flex>
       {process && (
-        <ConfirmationModal
+        <FinalizationModal
           process={process}
-          isOpen={isConfirmationOpen}
-          onClose={onConfirmationClose}
+          isOpen={isFinalizationOpen}
+          onClose={onFinalizationClose}
           afterSubmition={refetchFlow}
         />
       )}

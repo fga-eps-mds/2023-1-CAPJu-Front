@@ -16,19 +16,19 @@ import { useLoading } from "hooks/useLoading";
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 
-interface ConfirmationModalProps {
+interface FinalizationModalProps {
   process: Process;
   isOpen: boolean;
   onClose: () => void;
   afterSubmition: () => void;
 }
 
-export function ConfirmationModal({
+export function FinalizationModal({
   process,
   isOpen,
   onClose,
   afterSubmition,
-}: ConfirmationModalProps) {
+}: FinalizationModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
   const params = useParams();
@@ -68,7 +68,7 @@ export function ConfirmationModal({
       });
     }
     onClose();
-    handleLoading(true);
+    handleLoading(false);
     refetchProcess();
   };
   return (
