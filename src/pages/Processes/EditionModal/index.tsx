@@ -107,6 +107,7 @@ export function EditionModal({
     handleLoading(true);
 
     const body = {
+      ...selectedProcess,
       record: selectedProcess?.record as string,
       nickname: formData.nickname,
       idFlow: formData.idFlow,

@@ -16,7 +16,7 @@ import { useLoading } from "hooks/useLoading";
 import {
   advanceStage,
   getProcessByRecord,
-  updateProcessStatus,
+  updateProcess,
 } from "services/processes";
 import { getPriorities } from "services/priorities";
 import { labelByProcessStatus } from "utils/constants";
@@ -106,10 +106,7 @@ function ViewProcess() {
           from: processData?.value?.idStage,
           to: nextStageId,
           commentary: "",
-          idFlow:
-            typeof process.idFlow === "number"
-              ? process.idFlow
-              : process.idFlow[0],
+          idFlow: flowData?.value?.idFlow as number,
         })
       : ({
           type: "error",
@@ -144,18 +141,30 @@ function ViewProcess() {
   async function handleStartFlow() {
     handleLoading(true);
 
-    const res = processData?.value
-      ? await updateProcessStatus({
-          record: processData?.value?.record as string,
-          status: "inProgress",
-        })
-      : ({
-          type: "error",
-          error: new Error(
-            "Houve um problema com as informações sobre o processo"
-          ),
-          value: undefined,
-        } as ResultError);
+    if (!processData?.value) {
+      toast({
+        id: "start-process-error",
+        title: "Erro ao iniciar processo no fluxo",
+        description: "Há um erro com as informações do processo",
+        status: "error",
+        isClosable: true,
+      });
+
+      handleLoading(false);
+      refetchProcess();
+      refetchFlow();
+      return;
+    }
+
+    const body = {
+      ...processData?.value,
+      record: processData?.value?.record as string,
+      priority: processData?.value?.idPriority,
+      idFlow: flowData?.value?.idFlow as number,
+      status: "inProgress",
+    };
+
+    const res = await updateProcess(body);
 
     if (res.type === "success") {
       toast({
@@ -200,9 +209,9 @@ function ViewProcess() {
             alignItems="center"
             gap="1"
           >
-            Processo - {process.nickname}
+            Processo - {processData?.value?.nickname}
             <Text as="span" fontSize="md" fontWeight="300">
-              ({process.record})
+              ({processData?.value?.record})
             </Text>
           </Text>
           <Button
@@ -227,7 +236,7 @@ function ViewProcess() {
             Status:{" "}
             <Text as="span" fontWeight="300">
               {/* @ts-ignore */}
-              {labelByProcessStatus[process.status]}
+              {labelByProcessStatus[processData?.value?.status]}
             </Text>
           </Text>
           <Text fontWeight="semibold">
@@ -244,7 +253,7 @@ function ViewProcess() {
               </Text>
             </Text>
           ) : null}
-          {process?.status === "notStarted" ? (
+          {processData?.value?.status === "notStarted" ? (
             <Button
               size="sm"
               colorScheme="green"
@@ -253,7 +262,7 @@ function ViewProcess() {
               my="1"
             >
               <Icon as={FiSkipForward} mr="2" boxSize={4} />
-              Iniciar Fluxo
+              Iniciar Processo
             </Button>
           ) : (
             <Button
@@ -272,7 +281,11 @@ function ViewProcess() {
           sequences={flowData?.value?.sequences || []}
           stages={stages || []}
           minHeight={650}
-          currentStage={processData?.value?.idStage}
+          currentStage={
+            processData?.value?.status !== "inProgress"
+              ? undefined
+              : processData?.value?.idStage
+          }
           effectiveDate={processData?.value?.effectiveDate}
           isFetching={isFlowFetching}
         />
