@@ -13,7 +13,11 @@ import { getStages } from "services/stages";
 import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
-import { updateStage, getProcessByRecord } from "services/processes";
+import {
+  updateStage,
+  getProcessByRecord,
+  updateProcess,
+} from "services/processes";
 import { getPriorities } from "services/priorities";
 import { labelByProcessStatus } from "utils/constants";
 
@@ -113,10 +117,7 @@ function ViewProcess() {
           from: processData?.value?.idStage,
           to: isNextStage ? nextStageId : previousStageId,
           commentary: "",
-          idFlow:
-            typeof process.idFlow === "number"
-              ? process.idFlow
-              : process.idFlow[0],
+          idFlow: flowData?.value?.idFlow as number,
         })
       : ({
           type: "error",
@@ -139,6 +140,56 @@ function ViewProcess() {
       toast({
         id: "update-stage-error",
         title: `Erro ao  ${isNextStage ? "avaçar" : "retroceder"} etapa`,
+        description: res.error?.message,
+        status: "error",
+        isClosable: true,
+      });
+    }
+
+    handleLoading(false);
+    refetchProcess();
+    refetchFlow();
+  }
+
+  async function handleStartFlow() {
+    handleLoading(true);
+
+    if (!processData?.value) {
+      toast({
+        id: "start-process-error",
+        title: "Erro ao iniciar processo no fluxo",
+        description: "Há um erro com as informações do processo",
+        status: "error",
+        isClosable: true,
+      });
+
+      handleLoading(false);
+      refetchProcess();
+      refetchFlow();
+      return;
+    }
+
+    const body = {
+      ...processData?.value,
+      record: processData?.value?.record as string,
+      priority: processData?.value?.idPriority,
+      idFlow: flowData?.value?.idFlow as number,
+      status: "inProgress",
+    };
+
+    const res = await updateProcess(body);
+
+    if (res.type === "success") {
+      toast({
+        id: "start-process-sucess",
+        title: "Sucesso!",
+        description: `Seu processo foi iniciado no fluxo com sucesso.`,
+        status: "success",
+      });
+    } else {
+      toast({
+        id: "start-process-error",
+        title: "Erro ao iniciar processo no fluxo",
         description: res.error?.message,
         status: "error",
         isClosable: true,
@@ -175,9 +226,9 @@ function ViewProcess() {
             alignItems="center"
             gap="1"
           >
-            Processo - {process.nickname}
+            Processo - {processData?.value?.nickname}
             <Text as="span" fontSize="md" fontWeight="300">
-              ({process.record})
+              ({processData?.value?.record})
             </Text>
           </Text>
           <Button
@@ -199,6 +250,13 @@ function ViewProcess() {
           flexWrap="wrap"
         >
           <Text fontWeight="semibold">
+            Status:{" "}
+            <Text as="span" fontWeight="300">
+              {/* @ts-ignore */}
+              {labelByProcessStatus[processData?.value?.status]}
+            </Text>
+          </Text>
+          <Text fontWeight="semibold">
             Fluxo:{" "}
             <Text as="span" fontWeight="300">
               {flowData?.value?.name}
@@ -212,57 +270,67 @@ function ViewProcess() {
               </Text>
             </Text>
           ) : null}
-          <Text fontWeight="semibold">
-            Status:{" "}
-            <Text as="span" fontWeight="300">
-              {/* @ts-ignore */}
-              {labelByProcessStatus[process.status]}
-            </Text>
-          </Text>
-        </Flex>
-        <Flex
-          w="100%"
-          flexDirection="row"
-          justifyContent="space-between"
-          alignItems="center"
-          gap="1"
-          flexWrap="wrap"
-        >
-          {!(
-            flowData?.value?.sequences[0]?.from ===
-              processData?.value?.idStage || !processData?.value?.idStage
-          ) ? (
+          {processData?.value?.status === "notStarted" ? (
             <Button
-              size="xs"
-              colorScheme="red"
-              onClick={() => handleUpdateProcessStage(false)}
+              size="sm"
+              colorScheme="green"
+              onClick={() => handleStartFlow()}
               disabled={isActionDisabled("advance-stage")}
               my="1"
             >
-              <Icon as={FiSkipBack} mr="2" boxSize={4} />
-              Retroceder Etapa
+              <Icon as={FiSkipForward} mr="2" boxSize={4} />
+              Iniciar Processo
             </Button>
-          ) : null}
-          <Button
-            size="xs"
-            colorScheme="green"
-            onClick={() => handleUpdateProcessStage(true)}
-            disabled={isActionDisabled("advance-stage")}
-            my="1"
-            ml="auto"
-          >
-            Avançar de Etapa
-            <Icon as={FiSkipForward} ml="2" boxSize={4} />
-          </Button>
-          <Flow
-            sequences={flowData?.value?.sequences || []}
-            stages={stages || []}
-            minHeight={650}
-            currentStage={processData?.value?.idStage}
-            effectiveDate={processData?.value?.effectiveDate}
-            isFetching={!isProcessFetched || !isFlowFetched}
-          />
+          ) : (
+            <Flex
+              w="100%"
+              flexDirection="row"
+              justifyContent="space-between"
+              alignItems="center"
+              gap="1"
+              flexWrap="wrap"
+            >
+              {!(
+                flowData?.value?.sequences[0]?.from ===
+                  processData?.value?.idStage || !processData?.value?.idStage
+              ) ? (
+                <Button
+                  size="xs"
+                  colorScheme="red"
+                  onClick={() => handleUpdateProcessStage(false)}
+                  disabled={isActionDisabled("advance-stage")}
+                  my="1"
+                >
+                  <Icon as={FiSkipBack} mr="2" boxSize={4} />
+                  Retroceder Etapa
+                </Button>
+              ) : null}
+              <Button
+                size="xs"
+                colorScheme="green"
+                onClick={() => handleUpdateProcessStage(true)}
+                disabled={isActionDisabled("advance-stage")}
+                my="1"
+                ml="auto"
+              >
+                Avançar Etapa
+                <Icon as={FiSkipForward} ml="2" boxSize={4} />
+              </Button>
+            </Flex>
+          )}
         </Flex>
+        <Flow
+          sequences={flowData?.value?.sequences || []}
+          stages={stages || []}
+          minHeight={650}
+          currentStage={
+            processData?.value?.status !== "inProgress"
+              ? undefined
+              : processData?.value?.idStage
+          }
+          effectiveDate={processData?.value?.effectiveDate}
+          isFetching={!isProcessFetched || !isFlowFetched}
+        />
       </Flex>
     </PrivateLayout>
   );
