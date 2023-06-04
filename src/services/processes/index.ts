@@ -50,7 +50,6 @@ export const createProcess = async (data: {
   nickname: string;
   idFlow: number;
   priority: number;
-  effectiveDate: Date;
 }): Promise<Result<Process>> => {
   try {
     const res = await api.processes.post<Process>("/newProcess", data);
@@ -147,13 +146,10 @@ export const advanceStage = async (data: {
 
 export const updateProcessStatus = async (data: {
   record: string;
-  nickname: string;
-  idFlow: number;
-  priority: number;
   status: string;
 }): Promise<Result<Process>> => {
   try {
-    const res = await api.processes.put<Process>("/updateProcess", data);
+    const res = await api.processes.put<Process>("/processUpdateStage", data);
 
     return {
       type: "success",

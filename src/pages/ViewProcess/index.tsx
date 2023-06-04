@@ -147,12 +147,6 @@ function ViewProcess() {
     const res = processData?.value
       ? await updateProcessStatus({
           record: processData?.value?.record as string,
-          nickname: processData?.value?.nickname as string,
-          idFlow:
-            typeof process.idFlow === "number"
-              ? process.idFlow
-              : process.idFlow[0],
-          priority: processData?.value?.idPriority as number,
           status: "inProgress",
         })
       : ({
@@ -180,7 +174,7 @@ function ViewProcess() {
       });
     }
 
-    handleLoading(true);
+    handleLoading(false);
     refetchProcess();
     refetchFlow();
   }
@@ -258,7 +252,7 @@ function ViewProcess() {
               disabled={isActionDisabled("advance-stage")}
               my="1"
             >
-              <Icon as={FiSkipForward} ml="2" boxSize={4} />
+              <Icon as={FiSkipForward} mr="2" boxSize={4} />
               Iniciar Fluxo
             </Button>
           ) : (
