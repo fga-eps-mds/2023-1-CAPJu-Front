@@ -10,37 +10,36 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-interface FinalizationModalProps {
-  process: Process;
+interface ViewModalProps {
+  user: User;
   isOpen: boolean;
   onClose: () => void;
-  handleFinishProcess: () => void;
 }
 
-export function FinalizationModal({
-  process,
-  isOpen,
-  onClose,
-  handleFinishProcess,
-}: FinalizationModalProps) {
+export function ViewModal({ user, isOpen, onClose }: ViewModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Finalizar Processo</ModalHeader>
+        <ModalHeader>Visualizar Usuário</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Text>
-            Tem certeza que deseja finalizar o processo{" "}
-            <strong>{process?.nickname}</strong>?
+            <strong>Nome Completo:</strong> {user.fullName}
+          </Text>
+          <Text>
+            <strong>CPF:</strong> {user.cpf}
+          </Text>
+          <Text>
+            <strong>Email:</strong> {user.email}
+          </Text>
+          <Text>
+            <strong>Perfil:</strong> {user.role}
           </Text>
         </ModalBody>
         <ModalFooter gap="2">
           <Button variant="ghost" onClick={onClose} size="sm">
-            Cancelar
-          </Button>
-          <Button colorScheme="red" onClick={handleFinishProcess} size="sm">
-            Finalizar
+            Fechar
           </Button>
         </ModalFooter>
       </ModalContent>

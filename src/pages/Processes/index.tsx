@@ -96,7 +96,9 @@ function Processes() {
           const currIndexInFlow =
             currFlow?.stages?.indexOf(curr?.idStage) || -1;
           const currentState =
-            currFlow?.stages && currIndexInFlow !== -1
+            currFlow?.stages &&
+            currIndexInFlow !== -1 &&
+            curr.status !== "notStarted"
               ? parseInt(
                   (
                     (currIndexInFlow / currFlow?.stages?.length) *
@@ -164,7 +166,7 @@ function Processes() {
         disabled: isActionDisabled("delete-process"),
       },
     ],
-    [isProcessesFetched, isUserFetched]
+    [isProcessesFetched, isUserFetched, userData]
   );
 
   const filterByPriority = (processes: Process[]) => {
@@ -230,7 +232,15 @@ function Processes() {
         []
       ) as TableRow<Process>[]) || []
     );
-  }, [legalPriority, processesData, filter, isProcessesFetched, flowsData]);
+  }, [
+    legalPriority,
+    processesData,
+    filter,
+    isProcessesFetched,
+    isUserFetched,
+    userData,
+    tableActions,
+  ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [

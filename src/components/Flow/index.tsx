@@ -90,7 +90,7 @@ export function Flow({
       id: `${item.idStage}`,
       position: {
         x: 30 + index * 60,
-        y: 30 + index * (currentStage ? 125 : 75),
+        y: 30 + index * (currentStage ? 125 : 100),
       },
       data: {
         label: deadline ? (

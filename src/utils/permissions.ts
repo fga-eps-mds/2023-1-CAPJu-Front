@@ -35,13 +35,7 @@ export const permissionsArray = [
     ],
   },
   {
-    actions: [
-      "view-stage",
-      "view-flow",
-      "view-process",
-      "view-unit",
-      "edit-account",
-    ],
+    actions: ["view-unit", "edit-account"],
     users: [
       Roles.ESTAGIARIO,
       Roles.DIRETOR,
@@ -49,6 +43,10 @@ export const permissionsArray = [
       Roles.SERVIDOR,
       Roles.ADMINISTRADOR,
     ],
+  },
+  {
+    actions: ["view-stage", "view-flow", "view-process"],
+    users: [Roles.ESTAGIARIO, Roles.DIRETOR, Roles.JUIZ, Roles.SERVIDOR],
   },
   {
     actions: [
@@ -76,13 +74,7 @@ export const permissionsArray = [
   },
   {
     actions: ["view-process-in-flow", "view-statistic-of-process-in-flow"],
-    users: [
-      Roles.ESTAGIARIO,
-      Roles.DIRETOR,
-      Roles.JUIZ,
-      Roles.SERVIDOR,
-      Roles.ADMINISTRADOR,
-    ],
+    users: [Roles.ESTAGIARIO, Roles.DIRETOR, Roles.JUIZ, Roles.SERVIDOR],
   },
 ];
 

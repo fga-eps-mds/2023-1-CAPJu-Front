@@ -72,14 +72,8 @@ function Login() {
   });
 
   return (
-    <Flex
-      flex="1"
-      alignItems="center"
-      justifyContent="center"
-      w="100%"
-      py={["16", 0]}
-    >
-      <Card p={["10", "20"]} w="90%" maxW="454">
+    <Flex flex="1" alignItems="center" justifyContent="center" w="100%">
+      <Card p={["10", "20"]} w="90%" maxW="454" my="16">
         <CardBody
           w="100%"
           p={0}

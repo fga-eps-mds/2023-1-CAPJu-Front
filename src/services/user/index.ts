@@ -121,7 +121,10 @@ export const getAcceptedUsers = async (): Promise<Result<User[]>> => {
   try {
     const res = await api.user.get<User[]>(`/allUser?accepted=true`);
 
-    return { type: "success", value: res.data };
+    return {
+      type: "success",
+      value: res.data?.filter((user) => user.idRole !== 5),
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };

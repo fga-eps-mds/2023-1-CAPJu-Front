@@ -21,6 +21,7 @@ export function PageSkeleton() {
       h="100%"
       w="100%"
       flex="1"
+      my="16"
     >
       <Skeleton w="90%" maxW="460" h="520" />
     </Flex>
