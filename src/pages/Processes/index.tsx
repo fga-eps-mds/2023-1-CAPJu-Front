@@ -96,7 +96,9 @@ function Processes() {
           const currIndexInFlow =
             currFlow?.stages?.indexOf(curr?.idStage) || -1;
           const currentState =
-            currFlow?.stages && currIndexInFlow !== -1
+            currFlow?.stages &&
+            currIndexInFlow !== -1 &&
+            curr.status !== "notStarted"
               ? parseInt(
                   (
                     (currIndexInFlow / currFlow?.stages?.length) *
@@ -110,7 +112,9 @@ function Processes() {
             ...acc,
             {
               ...curr,
-              currentState: `${currentState}%`,
+              currentState: `${
+                curr.status === "finished" ? 100 : currentState
+              }%`,
               flowName: currFlow?.name,
             },
           ];

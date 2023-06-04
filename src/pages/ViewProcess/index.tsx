@@ -1,4 +1,4 @@
-import { Flex, Text, Button, useToast } from "@chakra-ui/react";
+import { Flex, Text, Button, useDisclosure, useToast } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/icons";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
@@ -20,6 +20,7 @@ import {
 } from "services/processes";
 import { getPriorities } from "services/priorities";
 import { labelByProcessStatus } from "utils/constants";
+import { FinalizationModal } from "./FinalizationModal";
 
 function ViewProcess() {
   const params = useParams();
@@ -40,9 +41,17 @@ function ViewProcess() {
       const res = await getProcessByRecord(
         params.record || (process.record as string)
       );
+
+      console.log(res.value);
+
       return res;
     },
   });
+  const {
+    isOpen: isFinalizationOpen,
+    onOpen: onFinalizationOpen,
+    onClose: onFinalizationClose,
+  } = useDisclosure();
   const { data: stagesData } = useQuery({
     queryKey: ["stages"],
     queryFn: getStages,
@@ -107,6 +116,12 @@ function ViewProcess() {
   }, [flowData, processData]);
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
+  const isLastStage = useMemo(() => {
+    return (
+      flowData?.value?.stages[flowData?.value?.stages?.length - 1] ===
+      processData?.value?.idStage
+    );
+  }, [flowData?.value?.stages, processData?.value?.idStage]);
 
   async function handleUpdateProcessStage(isNextStage: boolean) {
     handleLoading(true);
@@ -151,13 +166,13 @@ function ViewProcess() {
     refetchFlow();
   }
 
-  async function handleStartFlow() {
+  async function handleUpdateProcessStatus(status: string) {
     handleLoading(true);
 
     if (!processData?.value) {
       toast({
         id: "start-process-error",
-        title: "Erro ao iniciar processo no fluxo",
+        title: "Erro ao atualizar status do processo no fluxo",
         description: "Há um erro com as informações do processo",
         status: "error",
         isClosable: true,
@@ -174,7 +189,7 @@ function ViewProcess() {
       record: processData?.value?.record as string,
       priority: processData?.value?.idPriority,
       idFlow: flowData?.value?.idFlow as number,
-      status: "inProgress",
+      status,
     };
 
     const res = await updateProcess(body);
@@ -183,13 +198,13 @@ function ViewProcess() {
       toast({
         id: "start-process-sucess",
         title: "Sucesso!",
-        description: `Seu processo foi iniciado no fluxo com sucesso.`,
+        description: `O status do processo foi atualizado no fluxo com sucesso.`,
         status: "success",
       });
     } else {
       toast({
         id: "start-process-error",
-        title: "Erro ao iniciar processo no fluxo",
+        title: "Erro ao atualizar status do processo no fluxo",
         description: res.error?.message,
         status: "error",
         isClosable: true,
@@ -202,8 +217,9 @@ function ViewProcess() {
   }
 
   useEffect(() => {
+    refetchProcess();
     if (!process) navigate(-1);
-  }, []);
+  }, [process]);
 
   useEffect(() => {
     console.log(flowData?.value?.sequences[0]?.from);
@@ -270,11 +286,18 @@ function ViewProcess() {
               </Text>
             </Text>
           ) : null}
+          <Text fontWeight="semibold">
+            Status:{" "}
+            <Text as="span" fontWeight="300">
+              {/* @ts-ignore */}
+              {labelByProcessStatus[processData?.value?.status]}
+            </Text>
+          </Text>
           {processData?.value?.status === "notStarted" ? (
             <Button
               size="sm"
               colorScheme="green"
-              onClick={() => handleStartFlow()}
+              onClick={() => handleUpdateProcessStatus("inProgress")}
               disabled={isActionDisabled("advance-stage")}
               my="1"
             >
@@ -290,32 +313,52 @@ function ViewProcess() {
               gap="1"
               flexWrap="wrap"
             >
-              {!(
-                flowData?.value?.sequences[0]?.from ===
-                  processData?.value?.idStage || !processData?.value?.idStage
-              ) ? (
+              {!isLastStage ? (
+                <>
+                  {!(
+                    flowData?.value?.sequences[0]?.from ===
+                      processData?.value?.idStage ||
+                    !processData?.value?.idStage
+                  ) ? (
+                    <Button
+                      size="xs"
+                      colorScheme="red"
+                      onClick={() => handleUpdateProcessStage(false)}
+                      disabled={isActionDisabled("advance-stage")}
+                      my="1"
+                    >
+                      <Icon as={FiSkipBack} mr="2" boxSize={4} />
+                      Retroceder Etapa
+                    </Button>
+                  ) : null}
+                  {processData?.value?.status === "inProgress" ? (
+                    <Button
+                      size="xs"
+                      colorScheme="green"
+                      onClick={() => handleUpdateProcessStage(true)}
+                      disabled={isActionDisabled("advance-stage")}
+                      my="1"
+                      ml="auto"
+                    >
+                      Avançar Etapa
+                      <Icon as={FiSkipForward} ml="2" boxSize={4} />
+                    </Button>
+                  ) : null}
+                </>
+              ) : (
                 <Button
                   size="xs"
+                  fontSize="sm"
                   colorScheme="red"
-                  onClick={() => handleUpdateProcessStage(false)}
+                  onClick={onFinalizationOpen}
                   disabled={isActionDisabled("advance-stage")}
                   my="1"
+                  ml="auto"
                 >
-                  <Icon as={FiSkipBack} mr="2" boxSize={4} />
-                  Retroceder Etapa
+                  <Icon as={FiSkipForward} mr="2" boxSize={4} />
+                  Finalizar Processo
                 </Button>
-              ) : null}
-              <Button
-                size="xs"
-                colorScheme="green"
-                onClick={() => handleUpdateProcessStage(true)}
-                disabled={isActionDisabled("advance-stage")}
-                my="1"
-                ml="auto"
-              >
-                Avançar Etapa
-                <Icon as={FiSkipForward} ml="2" boxSize={4} />
-              </Button>
+              )}
             </Flex>
           )}
         </Flex>
@@ -332,6 +375,17 @@ function ViewProcess() {
           isFetching={!isProcessFetched || !isFlowFetched}
         />
       </Flex>
+      {processData?.value && (
+        <FinalizationModal
+          process={processData?.value}
+          isOpen={isFinalizationOpen}
+          onClose={onFinalizationClose}
+          handleFinishProcess={() => {
+            handleUpdateProcessStatus("finished");
+            onFinalizationClose();
+          }}
+        />
+      )}
     </PrivateLayout>
   );
 }

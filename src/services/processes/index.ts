@@ -144,3 +144,26 @@ export const updateStage = async (data: {
     };
   }
 };
+
+export const updateProcessStatus = async (data: {
+  record: string;
+  status: string;
+}): Promise<Result<Process>> => {
+  try {
+    const res = await api.processes.put<Process>("/updateProcess", data);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
