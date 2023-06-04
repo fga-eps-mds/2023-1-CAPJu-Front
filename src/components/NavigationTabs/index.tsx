@@ -1,5 +1,5 @@
 import { Tabs, TabList, Tab, Flex } from "@chakra-ui/react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 
@@ -24,13 +24,14 @@ export function NavigationTabs() {
 
     return currentTab ? tabs.indexOf(currentTab) : undefined;
   }, [tabs, location]);
+  const [tabIndex, setTabIndex] = useState<number | undefined>(currentTabIndex);
 
-  function isUserAllowedInTab(tabIndex: number) {
+  function isUserAllowedInTab(tab: number) {
     if (!userData?.value) return false;
 
     return permissionsArray.some(
       (item) =>
-        item.actions.some((action) => action === tabs[tabIndex].action) &&
+        item.actions.some((action) => action === tabs[tab].action) &&
         item.users.some((userRole) => userRole === userData?.value?.idRole)
     );
   }
@@ -55,12 +56,7 @@ export function NavigationTabs() {
         },
       }}
     >
-      <Tabs
-        w="100%"
-        variant="line"
-        colorScheme="green"
-        defaultIndex={currentTabIndex}
-      >
+      <Tabs w="100%" variant="line" colorScheme="green" index={tabIndex}>
         <TabList>
           {tabs.map((tab, index) => {
             const isCurrentTab = currentTabIndex === index;
@@ -68,11 +64,17 @@ export function NavigationTabs() {
 
             if (!isUserAllowedInTab(index)) cursor = "not-allowed";
 
+            const handleClick = () => {
+              if (isUserAllowedInTab(index)) {
+                navigate(tab.path);
+                setTabIndex(index);
+              }
+            };
+
             return (
               <Tab
                 key={tab.label}
-                disabled={!isUserAllowedInTab(index)}
-                onClick={() => navigate(tab.path)}
+                onClick={handleClick}
                 cursor={cursor}
                 minW="fit-content"
                 opacity={isUserAllowedInTab(index) ? 1 : 0.25}

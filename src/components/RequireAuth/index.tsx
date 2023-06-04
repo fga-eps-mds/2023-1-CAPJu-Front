@@ -38,7 +38,7 @@ export function RequireAuth({ children, authorizedRoles }: RequireAuthProps) {
   useEffect(() => validateAuthentication(), []);
 
   // Sem authorizedRoles, todo mundo é autorizado
-  if (!authorizedRoles || user?.idRole === 5) return children;
+  if (!authorizedRoles) return children;
 
   // Para estar logado role precisa ser válida
   if (!roles.some((role) => role.idRole === user?.idRole)) {

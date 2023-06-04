@@ -119,7 +119,7 @@ export const getProcessByRecord = async (
   }
 };
 
-export const advanceStage = async (data: {
+export const updateStage = async (data: {
   record: string;
   from: number;
   to: number;

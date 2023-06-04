@@ -1,19 +1,30 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, Text, useDisclosure } from "@chakra-ui/react";
-import { DeleteIcon, CheckIcon } from "@chakra-ui/icons";
+import { Icon, CheckIcon, ViewIcon } from "@chakra-ui/icons";
+import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
-import { getUsersRequests } from "services/user";
 import { getUnits } from "services/units";
 import { AcceptModal } from "./AcceptModal";
 import { DenyModal } from "./DenyModal";
+import { ViewModal } from "./ViewModal";
 
-export function Requests() {
+interface RequestsProps {
+  requestsData: Result<User[]> | undefined;
+  isRequestsFetched: boolean;
+  refetchRequests: () => void;
+}
+
+export function Requests({
+  requestsData,
+  isRequestsFetched,
+  refetchRequests,
+}: RequestsProps) {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
   const { getUserData } = useAuth();
@@ -32,13 +43,10 @@ export function Requests() {
     queryFn: getUserData,
   });
   const {
-    data: requestsData,
-    isFetched: isRequestsFetched,
-    refetch: refetchRequests,
-  } = useQuery({
-    queryKey: ["requests"],
-    queryFn: getUsersRequests,
-  });
+    isOpen: isViewOpen,
+    onOpen: onViewOpen,
+    onClose: onViewClose,
+  } = useDisclosure();
   const {
     data: unitsData,
     isFetched: isUnitsFetched,
@@ -52,6 +60,15 @@ export function Requests() {
   const tableActions = useMemo(
     () => [
       {
+        label: "Visualizar Usuário",
+        icon: <ViewIcon boxSize={4} />,
+        action: ({ user }: { user: User }) => {
+          selectUser(user);
+          onViewOpen();
+        },
+        disabled: false,
+      },
+      {
         label: "Aceitar Usuário",
         icon: <CheckIcon boxSize={4} />,
         action: ({ user }: { user: User }) => {
@@ -63,7 +80,7 @@ export function Requests() {
       },
       {
         label: "Recusar Usuário",
-        icon: <DeleteIcon boxSize={4} />,
+        icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
           onDenyOpen();
@@ -72,7 +89,7 @@ export function Requests() {
         disabled: isActionDisabled("delete-user"),
       },
     ],
-    []
+    [isUserFetched, userData]
   );
   const requests = useMemo<TableRow<User>[]>(() => {
     if (!isRequestsFetched || !isUnitsFetched) return [];
@@ -88,9 +105,8 @@ export function Requests() {
             {
               ...curr,
               unit:
-                unitsData?.value?.find(
-                  (item) => item.idUnit === userData?.value?.idUnit
-                )?.name || "-",
+                unitsData?.value?.find((item) => item.idUnit === curr?.idUnit)
+                  ?.name || "-",
               tableActions,
               actionsProps: { user: curr },
             },
@@ -99,7 +115,16 @@ export function Requests() {
         []
       ) as TableRow<User>[]) || []
     );
-  }, [requestsData, unitsData, isRequestsFetched, isUnitsFetched, filter]);
+  }, [
+    requestsData,
+    unitsData,
+    isRequestsFetched,
+    isUnitsFetched,
+    filter,
+    isUserFetched,
+    userData,
+    tableActions,
+  ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<User>>();
   const tableColumns = [
@@ -163,7 +188,11 @@ export function Requests() {
       </Flex>
       <DataTable
         data={requests}
-        columns={tableColumns}
+        columns={
+          userData?.value?.idRole !== 5
+            ? tableColumns.filter((_, index) => index !== 1)
+            : tableColumns
+        }
         isDataFetching={!isRequestsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas solicitações no momento."
       />
@@ -181,6 +210,13 @@ export function Requests() {
           onClose={onDenyClose}
           user={selectedUser}
           refetch={() => refetchAll()}
+        />
+      ) : null}
+      {userData?.value && selectedUser && isViewOpen ? (
+        <ViewModal
+          isOpen={isViewOpen}
+          onClose={onViewClose}
+          user={selectedUser}
         />
       ) : null}
     </>

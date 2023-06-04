@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, Text, useDisclosure } from "@chakra-ui/react";
-import { Icon } from "@chakra-ui/icons";
+import { Icon, ViewIcon } from "@chakra-ui/icons";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -9,13 +9,23 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
-import { getAcceptedUsers } from "services/user";
 import { getUnits } from "services/units";
 import { roleNameById } from "utils/roles";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
+import { ViewModal } from "./ViewModal";
 
-export function Profiles() {
+interface ProfilesProps {
+  usersData: Result<User[]> | undefined;
+  isUsersFetched: boolean;
+  refetchUsers: () => void;
+}
+
+export function Profiles({
+  usersData,
+  isUsersFetched,
+  refetchUsers,
+}: ProfilesProps) {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
   const {
@@ -28,18 +38,15 @@ export function Profiles() {
     onOpen: onEditOpen,
     onClose: onEditClose,
   } = useDisclosure();
+  const {
+    isOpen: isViewOpen,
+    onOpen: onViewOpen,
+    onClose: onViewClose,
+  } = useDisclosure();
   const { getUserData } = useAuth();
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
-  });
-  const {
-    data: usersData,
-    isFetched: isUsersFetched,
-    refetch: refetchUsers,
-  } = useQuery({
-    queryKey: ["accepted-users"],
-    queryFn: getAcceptedUsers,
   });
   const { data: unitsData, isFetched: isUnitsFetched } = useQuery({
     queryKey: ["units"],
@@ -49,6 +56,15 @@ export function Profiles() {
     userData?.value ? !hasPermission(userData.value, actionName) : true;
   const tableActions = useMemo(
     () => [
+      {
+        label: "Visualizar Usuário",
+        icon: <ViewIcon boxSize={4} />,
+        action: ({ user }: { user: User }) => {
+          selectUser(user);
+          onViewOpen();
+        },
+        disabled: false,
+      },
       {
         label: "Editar Usuário",
         icon: <Icon as={MdEdit} boxSize={4} />,
@@ -70,18 +86,15 @@ export function Profiles() {
         disabled: isActionDisabled("delete-user"),
       },
     ],
-    []
+    [isUserFetched, userData]
   );
-  const requests = useMemo<TableRow<User>[]>(() => {
+  const users = useMemo<TableRow<User>[]>(() => {
     if (!isUsersFetched || !isUnitsFetched) return [];
 
     return (
       (usersData?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (
-            !curr.fullName.toLowerCase().includes(filter.toLowerCase()) ||
-            curr.cpf === userData?.value?.cpf
-          )
+          if (!curr.fullName.toLowerCase().includes(filter.toLowerCase()))
             return acc;
 
           const role = roleNameById(curr.idRole);
@@ -102,27 +115,36 @@ export function Profiles() {
         []
       ) as TableRow<User>[]) || []
     );
-  }, [usersData, unitsData, isUsersFetched, isUnitsFetched, filter]);
+  }, [
+    usersData,
+    unitsData,
+    isUsersFetched,
+    isUnitsFetched,
+    filter,
+    isUserFetched,
+    userData,
+    tableActions,
+  ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<User>>();
   const tableColumns = [
     tableColumnHelper.accessor("fullName", {
       cell: (info) => info.getValue(),
-      header: "Nomes",
+      header: "Nome",
       meta: {
         isSortable: true,
       },
     }),
     tableColumnHelper.accessor("unit", {
       cell: (info) => info.getValue(),
-      header: "Unidades",
+      header: "Unidade",
       meta: {
         isSortable: true,
       },
     }),
     tableColumnHelper.accessor("role", {
       cell: (info) => info.getValue(),
-      header: "Perfis",
+      header: "Perfil",
       meta: {
         isSortable: true,
       },
@@ -160,8 +182,12 @@ export function Profiles() {
         </Flex>
       </Flex>
       <DataTable
-        data={requests}
-        columns={tableColumns}
+        data={users}
+        columns={
+          userData?.value?.idRole !== 5
+            ? tableColumns.filter((_, index) => index !== 1)
+            : tableColumns
+        }
         isDataFetching={!isUsersFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados usuários no momento."
       />
@@ -179,6 +205,13 @@ export function Profiles() {
           onClose={onEditClose}
           user={selectedUser}
           refetch={refetchUsers}
+        />
+      ) : null}
+      {userData?.value && selectedUser && isViewOpen ? (
+        <ViewModal
+          isOpen={isViewOpen}
+          onClose={onViewClose}
+          user={selectedUser}
         />
       ) : null}
     </>

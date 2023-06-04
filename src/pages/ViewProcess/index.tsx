@@ -2,7 +2,7 @@ import { Flex, Text, Button, useToast } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/icons";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
-import { FiSkipForward } from "react-icons/fi";
+import { FiSkipBack, FiSkipForward } from "react-icons/fi";
 import { useEffect, useMemo } from "react";
 import { useQuery } from "react-query";
 
@@ -14,7 +14,7 @@ import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
 import {
-  advanceStage,
+  updateStage,
   getProcessByRecord,
   updateProcess,
 } from "services/processes";
@@ -30,7 +30,11 @@ function ViewProcess() {
   const { process, flow }: { process: Process; flow: Flow | undefined } =
     location.state;
   const { getUserData } = useAuth();
-  const { data: processData, refetch: refetchProcess } = useQuery({
+  const {
+    data: processData,
+    isFetched: isProcessFetched,
+    refetch: refetchProcess,
+  } = useQuery({
     queryKey: ["process", params.record],
     queryFn: async () => {
       const res = await getProcessByRecord(
@@ -49,7 +53,7 @@ function ViewProcess() {
   });
   const {
     data: flowData,
-    isFetching: isFlowFetching,
+    isFetched: isFlowFetched,
     refetch: refetchFlow,
   } = useQuery({
     queryKey: [
@@ -87,6 +91,13 @@ function ViewProcess() {
       }, []) || []
     );
   }, [flowData]);
+  const previousStageId = useMemo<number>(() => {
+    return (
+      flowData?.value?.sequences?.find(
+        (item) => item.to === processData?.value?.idStage
+      )?.from || -1
+    );
+  }, [flowData, processData]);
   const nextStageId = useMemo<number>(() => {
     return (
       flowData?.value?.sequences?.find(
@@ -97,14 +108,14 @@ function ViewProcess() {
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
 
-  async function handleNextStage() {
+  async function handleUpdateProcessStage(isNextStage: boolean) {
     handleLoading(true);
 
     const res = processData?.value
-      ? await advanceStage({
+      ? await updateStage({
           record: processData?.value?.record as string,
           from: processData?.value?.idStage,
-          to: nextStageId,
+          to: isNextStage ? nextStageId : previousStageId,
           commentary: "",
           idFlow: flowData?.value?.idFlow as number,
         })
@@ -118,15 +129,17 @@ function ViewProcess() {
 
     if (res.type === "success") {
       toast({
-        id: "advance-stage-success",
+        id: "update-stage-success",
         title: "Sucesso!",
-        description: `Seu processo avançou para a próxima etapa.`,
+        description: `Seu processo ${
+          isNextStage ? "avaçou" : "retrocedeu"
+        } de etapa.`,
         status: "success",
       });
     } else {
       toast({
-        id: "advance-stage-error",
-        title: "Erro ao avançar etapa",
+        id: "update-stage-error",
+        title: `Erro ao  ${isNextStage ? "avaçar" : "retroceder"} etapa`,
         description: res.error?.message,
         status: "error",
         isClosable: true,
@@ -191,6 +204,10 @@ function ViewProcess() {
   useEffect(() => {
     if (!process) navigate(-1);
   }, []);
+
+  useEffect(() => {
+    console.log(flowData?.value?.sequences[0]?.from);
+  }, [flowData]);
 
   return (
     <PrivateLayout>
@@ -265,16 +282,41 @@ function ViewProcess() {
               Iniciar Processo
             </Button>
           ) : (
-            <Button
-              size="sm"
-              colorScheme="green"
-              onClick={() => handleNextStage()}
-              disabled={isActionDisabled("advance-stage")}
-              my="1"
+            <Flex
+              w="100%"
+              flexDirection="row"
+              justifyContent="space-between"
+              alignItems="center"
+              gap="1"
+              flexWrap="wrap"
             >
-              Avançar de Etapa
-              <Icon as={FiSkipForward} ml="2" boxSize={4} />
-            </Button>
+              {!(
+                flowData?.value?.sequences[0]?.from ===
+                  processData?.value?.idStage || !processData?.value?.idStage
+              ) ? (
+                <Button
+                  size="xs"
+                  colorScheme="red"
+                  onClick={() => handleUpdateProcessStage(false)}
+                  disabled={isActionDisabled("advance-stage")}
+                  my="1"
+                >
+                  <Icon as={FiSkipBack} mr="2" boxSize={4} />
+                  Retroceder Etapa
+                </Button>
+              ) : null}
+              <Button
+                size="xs"
+                colorScheme="green"
+                onClick={() => handleUpdateProcessStage(true)}
+                disabled={isActionDisabled("advance-stage")}
+                my="1"
+                ml="auto"
+              >
+                Avançar Etapa
+                <Icon as={FiSkipForward} ml="2" boxSize={4} />
+              </Button>
+            </Flex>
           )}
         </Flex>
         <Flow
@@ -287,7 +329,7 @@ function ViewProcess() {
               : processData?.value?.idStage
           }
           effectiveDate={processData?.value?.effectiveDate}
-          isFetching={isFlowFetching}
+          isFetching={!isProcessFetched || !isFlowFetched}
         />
       </Flex>
     </PrivateLayout>

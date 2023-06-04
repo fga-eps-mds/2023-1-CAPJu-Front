@@ -162,7 +162,7 @@ function Processes() {
         disabled: isActionDisabled("delete-process"),
       },
     ],
-    [isProcessesFetched, isUserFetched]
+    [isProcessesFetched, isUserFetched, userData]
   );
 
   const filterByPriority = (processes: Process[]) => {
@@ -228,7 +228,15 @@ function Processes() {
         []
       ) as TableRow<Process>[]) || []
     );
-  }, [legalPriority, processesData, filter, isProcessesFetched]);
+  }, [
+    legalPriority,
+    processesData,
+    filter,
+    isProcessesFetched,
+    isUserFetched,
+    userData,
+    tableActions,
+  ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [
