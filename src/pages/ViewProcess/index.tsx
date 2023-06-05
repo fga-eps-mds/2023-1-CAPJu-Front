@@ -284,13 +284,6 @@ function ViewProcess() {
               </Text>
             </Text>
           ) : null}
-          <Text fontWeight="semibold">
-            Status:{" "}
-            <Text as="span" fontWeight="300">
-              {/* @ts-ignore */}
-              {labelByProcessStatus[processData?.value?.status]}
-            </Text>
-          </Text>
           {processData?.value?.status === "notStarted" ? (
             <Button
               size="sm"
