@@ -2,7 +2,7 @@ import { Flex, Text, Button, useDisclosure, useToast } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/icons";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
-import { FiSkipBack, FiSkipForward } from "react-icons/fi";
+import { FiArchive, FiSkipBack, FiSkipForward } from "react-icons/fi";
 import { useEffect, useMemo } from "react";
 import { useQuery } from "react-query";
 
@@ -41,8 +41,6 @@ function ViewProcess() {
       const res = await getProcessByRecord(
         params.record || (process.record as string)
       );
-
-      console.log(res.value);
 
       return res;
     },
@@ -331,6 +329,28 @@ function ViewProcess() {
                       Retroceder Etapa
                     </Button>
                   ) : null}
+                  {processData?.value?.status !== "finished" ? (
+                    <Button
+                      size="xs"
+                      colorScheme="blue"
+                      onClick={() =>
+                        handleUpdateProcessStatus(
+                          processData?.value?.status === "archived"
+                            ? "inProgress"
+                            : "archived"
+                        )
+                      }
+                      disabled={isActionDisabled("advance-stage")}
+                      my="1"
+                      ml="auto"
+                    >
+                      {processData?.value?.status === "archived"
+                        ? "Desarquivar"
+                        : "Arquivar"}{" "}
+                      Processo
+                      <Icon as={FiArchive} ml="2" boxSize={4} />
+                    </Button>
+                  ) : null}
                   {processData?.value?.status === "inProgress" ? (
                     <Button
                       size="xs"
@@ -338,7 +358,6 @@ function ViewProcess() {
                       onClick={() => handleUpdateProcessStage(true)}
                       disabled={isActionDisabled("advance-stage")}
                       my="1"
-                      ml="auto"
                     >
                       Avançar Etapa
                       <Icon as={FiSkipForward} ml="2" boxSize={4} />
