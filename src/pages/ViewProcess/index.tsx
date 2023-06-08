@@ -21,6 +21,7 @@ import {
 import { getPriorities } from "services/priorities";
 import { labelByProcessStatus } from "utils/constants";
 import { FinalizationModal } from "./FinalizationModal";
+import { ArchivationModal } from "./ArchivationModal";
 
 function ViewProcess() {
   const params = useParams();
@@ -49,6 +50,11 @@ function ViewProcess() {
     isOpen: isFinalizationOpen,
     onOpen: onFinalizationOpen,
     onClose: onFinalizationClose,
+  } = useDisclosure();
+  const {
+    isOpen: isArchivationOpen,
+    onOpen: onArchivationOpen,
+    onClose: onArchivationClose,
   } = useDisclosure();
   const { data: stagesData } = useQuery({
     queryKey: ["stages"],
@@ -309,7 +315,8 @@ function ViewProcess() {
                   {!(
                     flowData?.value?.sequences[0]?.from ===
                       processData?.value?.idStage ||
-                    !processData?.value?.idStage
+                    !processData?.value?.idStage ||
+                    processData?.value?.status !== "inProgress"
                   ) ? (
                     <Button
                       size="xs"
@@ -326,13 +333,7 @@ function ViewProcess() {
                     <Button
                       size="xs"
                       colorScheme="blue"
-                      onClick={() =>
-                        handleUpdateProcessStatus(
-                          processData?.value?.status === "archived"
-                            ? "inProgress"
-                            : "archived"
-                        )
-                      }
+                      onClick={onArchivationOpen}
                       disabled={isActionDisabled("advance-stage")}
                       my="1"
                       ml="auto"
@@ -379,9 +380,9 @@ function ViewProcess() {
           stages={stages || []}
           minHeight={650}
           currentStage={
-            processData?.value?.status !== "inProgress"
-              ? undefined
-              : processData?.value?.idStage
+            processData?.value?.status !== "finished"
+              ? processData?.value?.idStage
+              : undefined
           }
           effectiveDate={processData?.value?.effectiveDate}
           isFetching={!isProcessFetched || !isFlowFetched}
@@ -395,6 +396,21 @@ function ViewProcess() {
           handleFinishProcess={() => {
             handleUpdateProcessStatus("finished");
             onFinalizationClose();
+          }}
+        />
+      )}
+      {processData?.value && (
+        <ArchivationModal
+          process={processData?.value}
+          isOpen={isArchivationOpen}
+          onClose={onArchivationClose}
+          handleUpdateProcessStatus={() => {
+            handleUpdateProcessStatus(
+              processData?.value?.status === "archived"
+                ? "inProgress"
+                : "archived"
+            );
+            onArchivationClose();
           }}
         />
       )}
