@@ -77,6 +77,7 @@ export const updateProcess = async (data: {
   priority: number;
   effectiveDate: Date | string;
   status: string;
+  idStage: number;
 }): Promise<Result<Process>> => {
   try {
     const res = await api.processes.put<Process>("/updateProcess", data);

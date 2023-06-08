@@ -2,7 +2,7 @@ import { Flex, Text, Button, useDisclosure, useToast } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/icons";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
-import { FiSkipBack, FiSkipForward } from "react-icons/fi";
+import { FiArchive, FiSkipBack, FiSkipForward } from "react-icons/fi";
 import { useEffect, useMemo } from "react";
 import { useQuery } from "react-query";
 
@@ -21,6 +21,7 @@ import {
 import { getPriorities } from "services/priorities";
 import { labelByProcessStatus } from "utils/constants";
 import { FinalizationModal } from "./FinalizationModal";
+import { ArchivationModal } from "./ArchivationModal";
 
 function ViewProcess() {
   const params = useParams();
@@ -42,8 +43,6 @@ function ViewProcess() {
         params.record || (process.record as string)
       );
 
-      console.log(res.value);
-
       return res;
     },
   });
@@ -51,6 +50,11 @@ function ViewProcess() {
     isOpen: isFinalizationOpen,
     onOpen: onFinalizationOpen,
     onClose: onFinalizationClose,
+  } = useDisclosure();
+  const {
+    isOpen: isArchivationOpen,
+    onOpen: onArchivationOpen,
+    onClose: onArchivationClose,
   } = useDisclosure();
   const { data: stagesData } = useQuery({
     queryKey: ["stages"],
@@ -286,13 +290,6 @@ function ViewProcess() {
               </Text>
             </Text>
           ) : null}
-          <Text fontWeight="semibold">
-            Status:{" "}
-            <Text as="span" fontWeight="300">
-              {/* @ts-ignore */}
-              {labelByProcessStatus[processData?.value?.status]}
-            </Text>
-          </Text>
           {processData?.value?.status === "notStarted" ? (
             <Button
               size="sm"
@@ -318,7 +315,8 @@ function ViewProcess() {
                   {!(
                     flowData?.value?.sequences[0]?.from ===
                       processData?.value?.idStage ||
-                    !processData?.value?.idStage
+                    !processData?.value?.idStage ||
+                    processData?.value?.status !== "inProgress"
                   ) ? (
                     <Button
                       size="xs"
@@ -331,6 +329,22 @@ function ViewProcess() {
                       Retroceder Etapa
                     </Button>
                   ) : null}
+                  {processData?.value?.status !== "finished" ? (
+                    <Button
+                      size="xs"
+                      colorScheme="blue"
+                      onClick={onArchivationOpen}
+                      disabled={isActionDisabled("advance-stage")}
+                      my="1"
+                      ml="auto"
+                    >
+                      {processData?.value?.status === "archived"
+                        ? "Desarquivar"
+                        : "Arquivar"}{" "}
+                      Processo
+                      <Icon as={FiArchive} ml="2" boxSize={4} />
+                    </Button>
+                  ) : null}
                   {processData?.value?.status === "inProgress" ? (
                     <Button
                       size="xs"
@@ -338,7 +352,6 @@ function ViewProcess() {
                       onClick={() => handleUpdateProcessStage(true)}
                       disabled={isActionDisabled("advance-stage")}
                       my="1"
-                      ml="auto"
                     >
                       Avançar Etapa
                       <Icon as={FiSkipForward} ml="2" boxSize={4} />
@@ -367,9 +380,9 @@ function ViewProcess() {
           stages={stages || []}
           minHeight={650}
           currentStage={
-            processData?.value?.status !== "inProgress"
-              ? undefined
-              : processData?.value?.idStage
+            processData?.value?.status !== "finished"
+              ? processData?.value?.idStage
+              : undefined
           }
           effectiveDate={processData?.value?.effectiveDate}
           isFetching={!isProcessFetched || !isFlowFetched}
@@ -383,6 +396,21 @@ function ViewProcess() {
           handleFinishProcess={() => {
             handleUpdateProcessStatus("finished");
             onFinalizationClose();
+          }}
+        />
+      )}
+      {processData?.value && (
+        <ArchivationModal
+          process={processData?.value}
+          isOpen={isArchivationOpen}
+          onClose={onArchivationClose}
+          handleUpdateProcessStatus={() => {
+            handleUpdateProcessStatus(
+              processData?.value?.status === "archived"
+                ? "inProgress"
+                : "archived"
+            );
+            onArchivationClose();
           }}
         />
       )}
