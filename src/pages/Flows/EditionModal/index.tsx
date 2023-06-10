@@ -121,8 +121,9 @@ export function EditionModal({
 
   function stageToSelectOption(value: Stage[]): SelectOption[] {
     return value?.map((item: Stage) => {
+      
       return {
-        label: item.name,
+        label: `${item.name}, (${item.duration} dia${item.duration > 1 ? "s" : ""})`,
         value: item.idStage,
       };
     });
