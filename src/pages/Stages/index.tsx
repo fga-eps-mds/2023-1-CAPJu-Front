@@ -4,6 +4,7 @@ import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon, Icon } from "@chakra-ui/icons";
 import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
+import ReactPaginate from "react-paginate";
 
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
@@ -123,6 +124,17 @@ function Stages() {
     }),
   ];
 
+  const [itemsPerPage, setItemsPerPage] = useState(2); // Define a quantidade de itens por página
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+
+  const pageCount = Math.ceil(filteredStages.length / itemsPerPage);
+  const offset = currentPage * itemsPerPage;
+  const currentItems = filteredStages.slice(offset, offset + itemsPerPage);
+
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -142,7 +154,7 @@ function Stages() {
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Input
-            placeholder="Pesquisar etapas"
+            placeholder="Pesquisar unidades"
             value={filter}
             onChange={({ target }) => setFilter(target.value)}
             variant="filled"
@@ -152,13 +164,38 @@ function Stages() {
               },
             }}
           />
+          <Flex alignItems="center">
+            <Text mr="2">Itens por página:</Text>
+            {[2, 4, 6].map((option) => (
+              <Button
+                key={option}
+                size="sm"
+                colorScheme={itemsPerPage === option ? "blue" : "gray"}
+                onClick={() => setItemsPerPage(option)}
+                mr="1"
+              >
+                {option}
+              </Button>
+            ))}
+          </Flex>
         </Flex>
       </Flex>
       <DataTable
-        data={filteredStages}
+        data={currentItems}
         columns={tableColumns}
         isDataFetching={!isStagesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas etapas."
+      />
+      <ReactPaginate
+        previousLabel="Anterior"
+        nextLabel="Próxima"
+        pageCount={pageCount}
+        onPageChange={handlePageChange}
+        containerClassName="pagination"
+        previousLinkClassName="pagination__link"
+        nextLinkClassName="pagination__link"
+        disabledClassName="pagination__link--disabled"
+        activeClassName="pagination__link--active"
       />
       <CreationModal
         user={userData?.value!}

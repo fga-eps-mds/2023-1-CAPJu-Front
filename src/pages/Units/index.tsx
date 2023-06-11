@@ -4,6 +4,7 @@ import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon, Icon } from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
+import ReactPaginate from "react-paginate";
 
 import { PrivateLayout } from "layouts/Private";
 import { getUnits } from "services/units";
@@ -131,6 +132,17 @@ function Units() {
     }),
   ];
 
+  const [itemsPerPage, setItemsPerPage] = useState(2); // Define a quantidade de itens por página
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+
+  const pageCount = Math.ceil(filteredUnits.length / itemsPerPage);
+  const offset = currentPage * itemsPerPage;
+  const currentData = filteredUnits.slice(offset, offset + itemsPerPage);
+
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -160,10 +172,24 @@ function Units() {
               },
             }}
           />
+          <Flex alignItems="center">
+            <Text mr="2">Itens por página:</Text>
+            {[2, 4, 6].map((option) => (
+              <Button
+                key={option}
+                size="sm"
+                colorScheme={itemsPerPage === option ? "blue" : "gray"}
+                onClick={() => setItemsPerPage(option)}
+                mr="1"
+              >
+                {option}
+              </Button>
+            ))}
+          </Flex>
         </Flex>
       </Flex>
       <DataTable
-        data={filteredUnits}
+        data={currentData}
         columns={tableColumns}
         isDataFetching={!isUnitsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas unidades."
@@ -189,6 +215,17 @@ function Units() {
           afterSubmission={refetchUnits}
         />
       ) : null}
+      <ReactPaginate
+        previousLabel="Anterior"
+        nextLabel="Próximo"
+        pageCount={pageCount}
+        onPageChange={handlePageChange}
+        containerClassName="pagination"
+        previousLinkClassName="pagination__link"
+        nextLinkClassName="pagination__link"
+        disabledClassName="pagination__link--disabled"
+        activeClassName="pagination__link--active"
+      />
     </PrivateLayout>
   );
 }

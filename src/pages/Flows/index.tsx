@@ -4,6 +4,7 @@ import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
+import ReactPaginate from "react-paginate";
 
 import { PrivateLayout } from "layouts/Private";
 import { getFlows } from "services/flows";
@@ -91,6 +92,7 @@ function Flows() {
     ],
     [isFlowsFetched, isUserFetched, userData]
   );
+
   const filteredFlows = useMemo<TableRow<Flow>[]>(() => {
     if (!isFlowsFetched) return [];
 
@@ -146,6 +148,17 @@ function Flows() {
     }),
   ];
 
+  const [itemsPerPage, setItemsPerPage] = useState(2); // Define a quantidade de itens por página
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+
+  const pageCount = Math.ceil(filteredFlows.length / itemsPerPage);
+  const offset = currentPage * itemsPerPage;
+  const currentItems = filteredFlows.slice(offset, offset + itemsPerPage);
+
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -176,12 +189,37 @@ function Flows() {
             }}
           />
         </Flex>
+        <Flex alignItems="center">
+          <Text mr="2">Itens por página:</Text>
+          {[2, 4, 6].map((option) => (
+            <Button
+              key={option}
+              size="sm"
+              colorScheme={itemsPerPage === option ? "blue" : "gray"}
+              onClick={() => setItemsPerPage(option)}
+              mr="1"
+            >
+              {option}
+            </Button>
+          ))}
+        </Flex>
       </Flex>
       <DataTable
-        data={filteredFlows}
+        data={currentItems}
         columns={tableColumns}
         isDataFetching={!isFlowsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados fluxos."
+      />
+      <ReactPaginate
+        previousLabel="Anterior"
+        nextLabel="Próximo"
+        pageCount={pageCount}
+        onPageChange={handlePageChange}
+        containerClassName="pagination"
+        previousLinkClassName="pagination__link"
+        nextLinkClassName="pagination__link"
+        disabledClassName="pagination__link--disabled"
+        activeClassName="pagination__link--active"
       />
       {selectedFlow && isEditionOpen ? (
         <EditionModal

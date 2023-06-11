@@ -15,6 +15,7 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
+import ReactPaginate from "react-paginate";
 
 import { getProcesses } from "services/processes";
 import { getFlows } from "services/flows";
@@ -241,6 +242,17 @@ function Processes() {
     tableActions,
   ]);
 
+  const [itemsPerPage, setItemsPerPage] = useState(2); // Define a quantidade de itens por página
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+
+  const pageCount = Math.ceil(filteredProcess.length / itemsPerPage);
+  const offset = currentPage * itemsPerPage;
+  const currentData = filteredProcess.slice(offset, offset + itemsPerPage);
+
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [
     tableColumnHelper.accessor("record", {
@@ -360,9 +372,23 @@ function Processes() {
             </Checkbox>
           </Flex>
         </Flex>
+        <Flex alignItems="center">
+          <Text mr="2">Itens por página:</Text>
+          {[2, 4, 6].map((option) => (
+            <Button
+              key={option}
+              size="sm"
+              colorScheme={itemsPerPage === option ? "blue" : "gray"}
+              onClick={() => setItemsPerPage(option)}
+              mr="1"
+            >
+              {option}
+            </Button>
+          ))}
+        </Flex>
       </Flex>
       <DataTable
-        data={filteredProcess}
+        data={currentData}
         columns={tableColumns}
         isDataFetching={!isProcessesFetched || !isUserFetched}
         emptyTableMessage={`Não foram encontrados processos${
@@ -390,6 +416,17 @@ function Processes() {
           refetchStages={refetchProcesses}
         />
       )}
+      <ReactPaginate
+        previousLabel="Anterior"
+        nextLabel="Próximo"
+        pageCount={pageCount}
+        onPageChange={handlePageChange}
+        containerClassName="pagination"
+        previousLinkClassName="pagination__link"
+        nextLinkClassName="pagination__link"
+        disabledClassName="pagination__link--disabled"
+        activeClassName="pagination__link--active"
+      />
     </PrivateLayout>
   );
 }
