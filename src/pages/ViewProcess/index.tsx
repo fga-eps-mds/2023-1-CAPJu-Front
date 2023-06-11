@@ -358,7 +358,8 @@ function ViewProcess() {
                     </Button>
                   ) : null}
                 </>
-              ) : (
+              ) : null}
+              {processData?.value?.status !== "finished" ? (
                 <Button
                   size="xs"
                   fontSize="sm"
@@ -371,7 +372,7 @@ function ViewProcess() {
                   <Icon as={FiSkipForward} mr="2" boxSize={4} />
                   Finalizar Processo
                 </Button>
-              )}
+              ) : null}
             </Flex>
           )}
         </Flex>
