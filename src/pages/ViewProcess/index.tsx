@@ -368,6 +368,19 @@ function ViewProcess() {
                   size="xs"
                   fontSize="sm"
                   colorScheme="red"
+                  onClick={() => handleUpdateProcessStage(false)}
+                  disabled={isActionDisabled("advance-stage")}
+                  my="1"
+                >
+                  <Icon as={FiSkipBack} mr="2" boxSize={4} />
+                  Retroceder Etapa
+                </Button>
+              ) : null}
+              {isLastStage && processData?.value?.status !== "finished" ? (
+                <Button
+                  size="xs"
+                  fontSize="sm"
+                  colorScheme="red"
                   onClick={onFinalizationOpen}
                   disabled={isActionDisabled("advance-stage")}
                   my="1"
