@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, Text, useDisclosure } from "@chakra-ui/react";
+import { Button, Flex, Text, useDisclosure } from "@chakra-ui/react";
 import { Icon, CheckIcon, ViewIcon } from "@chakra-ui/icons";
 import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
+import ReactPaginate from "react-paginate";
 
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
@@ -164,6 +165,17 @@ export function Requests({
     refetchUnits();
   }
 
+  const [itemsPerPage, setItemsPerPage] = useState(2); // Número de itens por página
+  const [currentPage, setCurrentPage] = useState(0);
+  const offset = currentPage * itemsPerPage;
+  const pageCount = Math.ceil(requests.length / itemsPerPage);
+
+  const handlePageChange = (selectedItem: { selected: number }) => {
+    setCurrentPage(selectedItem.selected);
+  };
+
+  const paginatedRequests = requests.slice(offset, offset + itemsPerPage);
+
   return (
     <>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -185,9 +197,23 @@ export function Requests({
             }}
           />
         </Flex>
+        <Flex alignItems="center">
+          <Text mr="2">Itens por página:</Text>
+          {[2, 4, 6].map((option) => (
+            <Button
+              key={option}
+              size="sm"
+              colorScheme={itemsPerPage === option ? "blue" : "gray"}
+              onClick={() => setItemsPerPage(option)}
+              mr="1"
+            >
+              {option}
+            </Button>
+          ))}
+        </Flex>
       </Flex>
       <DataTable
-        data={requests}
+        data={paginatedRequests}
         columns={
           userData?.value?.idRole !== 5
             ? tableColumns.filter((_, index) => index !== 1)
@@ -195,6 +221,17 @@ export function Requests({
         }
         isDataFetching={!isRequestsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas solicitações no momento."
+      />
+      <ReactPaginate
+        previousLabel="Anterior"
+        nextLabel="Próximo"
+        pageCount={pageCount}
+        onPageChange={handlePageChange}
+        containerClassName="pagination"
+        previousLinkClassName="pagination__link"
+        nextLinkClassName="pagination__link"
+        disabledClassName="pagination__link--disabled"
+        activeClassName="pagination__link--active"
       />
       {userData?.value && selectedUser && isAcceptOpen ? (
         <AcceptModal
@@ -222,3 +259,4 @@ export function Requests({
     </>
   );
 }
+

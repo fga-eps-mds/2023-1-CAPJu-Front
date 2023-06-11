@@ -215,7 +215,7 @@ function Units() {
           afterSubmission={refetchUnits}
         />
       ) : null}
-      <ReactPaginate
+      <ReactPaginate 
         previousLabel="Anterior"
         nextLabel="Próximo"
         pageCount={pageCount}
