@@ -292,7 +292,8 @@ function ViewProcess() {
           ) : null}
           {processData?.value?.status === "notStarted" ? (
             <Button
-              size="sm"
+              size="xs"
+              fontSize="sm"
               colorScheme="green"
               onClick={() => handleUpdateProcessStatus("inProgress")}
               disabled={isActionDisabled("advance-stage")}
@@ -320,6 +321,7 @@ function ViewProcess() {
                   ) ? (
                     <Button
                       size="xs"
+                      fontSize="sm"
                       colorScheme="red"
                       onClick={() => handleUpdateProcessStage(false)}
                       disabled={isActionDisabled("advance-stage")}
@@ -332,6 +334,7 @@ function ViewProcess() {
                   {processData?.value?.status !== "finished" ? (
                     <Button
                       size="xs"
+                      fontSize="sm"
                       colorScheme="blue"
                       onClick={onArchivationOpen}
                       disabled={isActionDisabled("advance-stage")}
@@ -348,6 +351,7 @@ function ViewProcess() {
                   {processData?.value?.status === "inProgress" ? (
                     <Button
                       size="xs"
+                      fontSize="sm"
                       colorScheme="green"
                       onClick={() => handleUpdateProcessStage(true)}
                       disabled={isActionDisabled("advance-stage")}
