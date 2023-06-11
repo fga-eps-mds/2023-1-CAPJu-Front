@@ -359,7 +359,7 @@ function ViewProcess() {
                   ) : null}
                 </>
               ) : null}
-              {processData?.value?.status !== "finished" ? (
+              {isLastStage && processData?.value?.status !== "finished" ? (
                 <Button
                   size="xs"
                   fontSize="sm"
