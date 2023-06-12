@@ -292,7 +292,8 @@ function ViewProcess() {
           ) : null}
           {processData?.value?.status === "notStarted" ? (
             <Button
-              size="sm"
+              size="xs"
+              fontSize="sm"
               colorScheme="green"
               onClick={() => handleUpdateProcessStatus("inProgress")}
               disabled={isActionDisabled("advance-stage")}
@@ -320,6 +321,7 @@ function ViewProcess() {
                   ) ? (
                     <Button
                       size="xs"
+                      fontSize="sm"
                       colorScheme="red"
                       onClick={() => handleUpdateProcessStage(false)}
                       disabled={isActionDisabled("advance-stage")}
@@ -332,6 +334,7 @@ function ViewProcess() {
                   {processData?.value?.status !== "finished" ? (
                     <Button
                       size="xs"
+                      fontSize="sm"
                       colorScheme="blue"
                       onClick={onArchivationOpen}
                       disabled={isActionDisabled("advance-stage")}
@@ -348,6 +351,7 @@ function ViewProcess() {
                   {processData?.value?.status === "inProgress" ? (
                     <Button
                       size="xs"
+                      fontSize="sm"
                       colorScheme="green"
                       onClick={() => handleUpdateProcessStage(true)}
                       disabled={isActionDisabled("advance-stage")}
@@ -358,7 +362,21 @@ function ViewProcess() {
                     </Button>
                   ) : null}
                 </>
-              ) : (
+              ) : null}
+              {isLastStage && processData?.value?.status !== "finished" ? (
+                <Button
+                  size="xs"
+                  fontSize="sm"
+                  colorScheme="red"
+                  onClick={() => handleUpdateProcessStage(false)}
+                  disabled={isActionDisabled("advance-stage")}
+                  my="1"
+                >
+                  <Icon as={FiSkipBack} mr="2" boxSize={4} />
+                  Retroceder Etapa
+                </Button>
+              ) : null}
+              {isLastStage && processData?.value?.status !== "finished" ? (
                 <Button
                   size="xs"
                   fontSize="sm"
@@ -371,7 +389,7 @@ function ViewProcess() {
                   <Icon as={FiSkipForward} mr="2" boxSize={4} />
                   Finalizar Processo
                 </Button>
-              )}
+              ) : null}
             </Flex>
           )}
         </Flex>
