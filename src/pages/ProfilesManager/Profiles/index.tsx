@@ -161,16 +161,15 @@ export function Profiles({
   ];
 
   // Pagination
-  const [itemsPerPage] = useState(10); // Número de itens por página
   const [currentPage, setCurrentPage] = useState(0);
-  const offset = currentPage * itemsPerPage;
-  const pageCount = Math.ceil(users.length / itemsPerPage);
+  const offset = currentPage * 5;
+  const pageCount = Math.ceil(users.length / 5);
 
   const handlePageChange = (selectedItem: { selected: number }) => {
     setCurrentPage(selectedItem.selected);
   };
 
-  const paginatedUsers = users.slice(offset, offset + itemsPerPage);
+  const paginatedUsers = users.slice(offset, offset + 5);
 
   return (
     <>

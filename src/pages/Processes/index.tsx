@@ -242,16 +242,15 @@ function Processes() {
     tableActions,
   ]);
 
-  const [itemsPerPage] = useState(2); // Define a quantidade de itens por página
   const [currentPage, setCurrentPage] = useState(0);
 
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
   };
 
-  const pageCount = Math.ceil(filteredProcess.length / itemsPerPage);
-  const offset = currentPage * itemsPerPage;
-  const currentData = filteredProcess.slice(offset, offset + itemsPerPage);
+  const pageCount = Math.ceil(filteredProcess.length / 5);
+  const offset = currentPage * 5;
+  const currentData = filteredProcess.slice(offset, offset + 5);
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [

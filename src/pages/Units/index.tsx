@@ -16,6 +16,8 @@ import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
 
+import "./style.css";
+
 function Units() {
   const toast = useToast();
   const [selectedUnit, selectUnit] = useState<Unit | null>(null);
@@ -132,16 +134,15 @@ function Units() {
     }),
   ];
 
-  const [itemsPerPage] = useState(2); // Define a quantidade de itens por página
   const [currentPage, setCurrentPage] = useState(0);
 
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
   };
 
-  const pageCount = Math.ceil(filteredUnits.length / itemsPerPage);
-  const offset = currentPage * itemsPerPage;
-  const currentData = filteredUnits.slice(offset, offset + itemsPerPage);
+  const pageCount = Math.ceil(filteredUnits.length / 5);
+  const offset = currentPage * 5;
+  const currentData = filteredUnits.slice(offset, offset + 5);
 
   return (
     <PrivateLayout>

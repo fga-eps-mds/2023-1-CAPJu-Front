@@ -165,16 +165,15 @@ export function Requests({
     refetchUnits();
   }
 
-  const [itemsPerPage] = useState(2); // Número de itens por página
   const [currentPage, setCurrentPage] = useState(0);
-  const offset = currentPage * itemsPerPage;
-  const pageCount = Math.ceil(requests.length / itemsPerPage);
+  const offset = currentPage * 5;
+  const pageCount = Math.ceil(requests.length / 5);
 
   const handlePageChange = (selectedItem: { selected: number }) => {
     setCurrentPage(selectedItem.selected);
   };
 
-  const paginatedRequests = requests.slice(offset, offset + itemsPerPage);
+  const paginatedRequests = requests.slice(offset, offset + 5);
 
   return (
     <>

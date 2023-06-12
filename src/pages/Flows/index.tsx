@@ -148,16 +148,15 @@ function Flows() {
     }),
   ];
 
-  const [itemsPerPage] = useState(2); // Define a quantidade de itens por página
   const [currentPage, setCurrentPage] = useState(0);
 
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
   };
 
-  const pageCount = Math.ceil(filteredFlows.length / itemsPerPage);
-  const offset = currentPage * itemsPerPage;
-  const currentItems = filteredFlows.slice(offset, offset + itemsPerPage);
+  const pageCount = Math.ceil(filteredFlows.length / 5);
+  const offset = currentPage * 5;
+  const currentItems = filteredFlows.slice(offset, offset + 5);
 
   return (
     <PrivateLayout>
