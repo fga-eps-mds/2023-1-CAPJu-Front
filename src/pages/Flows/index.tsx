@@ -148,7 +148,7 @@ function Flows() {
     }),
   ];
 
-  const [itemsPerPage, setItemsPerPage] = useState(2); // Define a quantidade de itens por página
+  const [itemsPerPage] = useState(2); // Define a quantidade de itens por página
   const [currentPage, setCurrentPage] = useState(0);
 
   const handlePageChange = (selectedPage: { selected: number }) => {
@@ -188,20 +188,6 @@ function Flows() {
               },
             }}
           />
-        </Flex>
-        <Flex alignItems="center">
-          <Text mr="2">Itens por página:</Text>
-          {[2, 4, 6].map((option) => (
-            <Button
-              key={option}
-              size="sm"
-              colorScheme={itemsPerPage === option ? "blue" : "gray"}
-              onClick={() => setItemsPerPage(option)}
-              mr="1"
-            >
-              {option}
-            </Button>
-          ))}
         </Flex>
       </Flex>
       <DataTable

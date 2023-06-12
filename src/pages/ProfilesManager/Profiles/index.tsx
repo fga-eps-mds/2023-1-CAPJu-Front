@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, Text, useDisclosure, Button } from "@chakra-ui/react";
+import { Flex, Text, useDisclosure } from "@chakra-ui/react";
 import { Icon, ViewIcon } from "@chakra-ui/icons";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -161,7 +161,7 @@ export function Profiles({
   ];
 
   // Pagination
-  const [itemsPerPage, setItemsPerPage] = useState(2); // Número de itens por página
+  const [itemsPerPage] = useState(10); // Número de itens por página
   const [currentPage, setCurrentPage] = useState(0);
   const offset = currentPage * itemsPerPage;
   const pageCount = Math.ceil(users.length / itemsPerPage);
@@ -192,20 +192,6 @@ export function Profiles({
               },
             }}
           />
-          <Flex alignItems="center">
-            <Text mr="2">Itens por página:</Text>
-            {[2, 4, 6].map((option) => (
-              <Button
-                key={option}
-                size="sm"
-                colorScheme={itemsPerPage === option ? "blue" : "gray"}
-                onClick={() => setItemsPerPage(option)}
-                mr="1"
-              >
-                {option}
-              </Button>
-            ))}
-          </Flex>
         </Flex>
       </Flex>
       <DataTable
@@ -230,6 +216,7 @@ export function Profiles({
         disabledClassName="pagination__link--disabled"
         activeClassName="pagination__link--active"
       />
+
       {userData?.value && selectedUser && isEditOpen && (
         <EditionModal
           isOpen={isEditOpen}

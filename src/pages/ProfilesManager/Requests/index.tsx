@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Button, Flex, Text, useDisclosure } from "@chakra-ui/react";
+import { Flex, Text, useDisclosure } from "@chakra-ui/react";
 import { Icon, CheckIcon, ViewIcon } from "@chakra-ui/icons";
 import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -165,7 +165,7 @@ export function Requests({
     refetchUnits();
   }
 
-  const [itemsPerPage, setItemsPerPage] = useState(2); // Número de itens por página
+  const [itemsPerPage] = useState(2); // Número de itens por página
   const [currentPage, setCurrentPage] = useState(0);
   const offset = currentPage * itemsPerPage;
   const pageCount = Math.ceil(requests.length / itemsPerPage);
@@ -196,20 +196,6 @@ export function Requests({
               },
             }}
           />
-        </Flex>
-        <Flex alignItems="center">
-          <Text mr="2">Itens por página:</Text>
-          {[2, 4, 6].map((option) => (
-            <Button
-              key={option}
-              size="sm"
-              colorScheme={itemsPerPage === option ? "blue" : "gray"}
-              onClick={() => setItemsPerPage(option)}
-              mr="1"
-            >
-              {option}
-            </Button>
-          ))}
         </Flex>
       </Flex>
       <DataTable
@@ -259,4 +245,3 @@ export function Requests({
     </>
   );
 }
-
