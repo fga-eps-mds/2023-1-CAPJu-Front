@@ -317,26 +317,26 @@ function ViewProcess() {
               gap="1"
               flexWrap="wrap"
             >
+              {!(
+                flowData?.value?.sequences[0]?.from ===
+                  processData?.value?.idStage ||
+                !processData?.value?.idStage ||
+                processData?.value?.status !== "inProgress"
+              ) ? (
+                <Button
+                  size="xs"
+                  fontSize="sm"
+                  colorScheme="red"
+                  onClick={onReturnOpen}
+                  disabled={isActionDisabled("advance-stage")}
+                  my="1"
+                >
+                  <Icon as={FiSkipBack} mr="2" boxSize={4} />
+                  Retroceder Etapa
+                </Button>
+              ) : null}
               {!isLastStage ? (
                 <>
-                  {!(
-                    flowData?.value?.sequences[0]?.from ===
-                      processData?.value?.idStage ||
-                    !processData?.value?.idStage ||
-                    processData?.value?.status !== "inProgress"
-                  ) ? (
-                    <Button
-                      size="xs"
-                      fontSize="sm"
-                      colorScheme="red"
-                      onClick={onReturnOpen}
-                      disabled={isActionDisabled("advance-stage")}
-                      my="1"
-                    >
-                      <Icon as={FiSkipBack} mr="2" boxSize={4} />
-                      Retroceder Etapa
-                    </Button>
-                  ) : null}
                   {processData?.value?.status !== "finished" ? (
                     <Button
                       size="xs"
@@ -368,19 +368,6 @@ function ViewProcess() {
                     </Button>
                   ) : null}
                 </>
-              ) : null}
-              {isLastStage && processData?.value?.status !== "finished" ? (
-                <Button
-                  size="xs"
-                  fontSize="sm"
-                  colorScheme="red"
-                  onClick={onReturnOpen}
-                  disabled={isActionDisabled("advance-stage")}
-                  my="1"
-                >
-                  <Icon as={FiSkipBack} mr="2" boxSize={4} />
-                  Retroceder Etapa
-                </Button>
               ) : null}
               {isLastStage && processData?.value?.status !== "finished" ? (
                 <Button
