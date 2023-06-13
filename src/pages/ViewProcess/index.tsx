@@ -22,6 +22,7 @@ import { getPriorities } from "services/priorities";
 import { labelByProcessStatus } from "utils/constants";
 import { FinalizationModal } from "./FinalizationModal";
 import { ArchivationModal } from "./ArchivationModal";
+import { ReturnModal } from "./ReturnModal";
 
 function ViewProcess() {
   const params = useParams();
@@ -46,6 +47,11 @@ function ViewProcess() {
       return res;
     },
   });
+  const {
+    isOpen: isReturnOpen,
+    onOpen: onReturnOpen,
+    onClose: onReturnClose,
+  } = useDisclosure();
   const {
     isOpen: isFinalizationOpen,
     onOpen: onFinalizationOpen,
@@ -323,7 +329,7 @@ function ViewProcess() {
                       size="xs"
                       fontSize="sm"
                       colorScheme="red"
-                      onClick={() => handleUpdateProcessStage(false)}
+                      onClick={onReturnOpen}
                       disabled={isActionDisabled("advance-stage")}
                       my="1"
                     >
@@ -368,7 +374,7 @@ function ViewProcess() {
                   size="xs"
                   fontSize="sm"
                   colorScheme="red"
-                  onClick={() => handleUpdateProcessStage(false)}
+                  onClick={onReturnOpen}
                   disabled={isActionDisabled("advance-stage")}
                   my="1"
                 >
@@ -406,6 +412,17 @@ function ViewProcess() {
           isFetching={!isProcessFetched || !isFlowFetched}
         />
       </Flex>
+      {processData?.value && (
+        <ReturnModal
+          process={processData?.value}
+          isOpen={isReturnOpen}
+          onClose={onReturnClose}
+          handleReturnProcess={() => {
+            handleUpdateProcessStage(false);
+            onReturnClose();
+          }}
+        />
+      )}
       {processData?.value && (
         <FinalizationModal
           process={processData?.value}
