@@ -22,6 +22,7 @@ import { getPriorities } from "services/priorities";
 import { labelByProcessStatus } from "utils/constants";
 import { FinalizationModal } from "./FinalizationModal";
 import { ArchivationModal } from "./ArchivationModal";
+import { ReturnModal } from "./ReturnModal";
 
 function ViewProcess() {
   const params = useParams();
@@ -46,6 +47,11 @@ function ViewProcess() {
       return res;
     },
   });
+  const {
+    isOpen: isReturnOpen,
+    onOpen: onReturnOpen,
+    onClose: onReturnClose,
+  } = useDisclosure();
   const {
     isOpen: isFinalizationOpen,
     onOpen: onFinalizationOpen,
@@ -311,26 +317,26 @@ function ViewProcess() {
               gap="1"
               flexWrap="wrap"
             >
+              {!(
+                flowData?.value?.sequences[0]?.from ===
+                  processData?.value?.idStage ||
+                !processData?.value?.idStage ||
+                processData?.value?.status !== "inProgress"
+              ) ? (
+                <Button
+                  size="xs"
+                  fontSize="sm"
+                  colorScheme="red"
+                  onClick={onReturnOpen}
+                  disabled={isActionDisabled("advance-stage")}
+                  my="1"
+                >
+                  <Icon as={FiSkipBack} mr="2" boxSize={4} />
+                  Retroceder Etapa
+                </Button>
+              ) : null}
               {!isLastStage ? (
                 <>
-                  {!(
-                    flowData?.value?.sequences[0]?.from ===
-                      processData?.value?.idStage ||
-                    !processData?.value?.idStage ||
-                    processData?.value?.status !== "inProgress"
-                  ) ? (
-                    <Button
-                      size="xs"
-                      fontSize="sm"
-                      colorScheme="red"
-                      onClick={() => handleUpdateProcessStage(false)}
-                      disabled={isActionDisabled("advance-stage")}
-                      my="1"
-                    >
-                      <Icon as={FiSkipBack} mr="2" boxSize={4} />
-                      Retroceder Etapa
-                    </Button>
-                  ) : null}
                   {processData?.value?.status !== "finished" ? (
                     <Button
                       size="xs"
@@ -368,19 +374,6 @@ function ViewProcess() {
                   size="xs"
                   fontSize="sm"
                   colorScheme="red"
-                  onClick={() => handleUpdateProcessStage(false)}
-                  disabled={isActionDisabled("advance-stage")}
-                  my="1"
-                >
-                  <Icon as={FiSkipBack} mr="2" boxSize={4} />
-                  Retroceder Etapa
-                </Button>
-              ) : null}
-              {isLastStage && processData?.value?.status !== "finished" ? (
-                <Button
-                  size="xs"
-                  fontSize="sm"
-                  colorScheme="red"
                   onClick={onFinalizationOpen}
                   disabled={isActionDisabled("advance-stage")}
                   my="1"
@@ -406,6 +399,17 @@ function ViewProcess() {
           isFetching={!isProcessFetched || !isFlowFetched}
         />
       </Flex>
+      {processData?.value && (
+        <ReturnModal
+          process={processData?.value}
+          isOpen={isReturnOpen}
+          onClose={onReturnClose}
+          handleReturnProcess={() => {
+            handleUpdateProcessStage(false);
+            onReturnClose();
+          }}
+        />
+      )}
       {processData?.value && (
         <FinalizationModal
           process={processData?.value}
