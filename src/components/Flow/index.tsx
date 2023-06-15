@@ -21,6 +21,7 @@ interface FlowProps {
   currentStage?: string | number | undefined;
   effectiveDate?: string | undefined;
   isFetching?: boolean;
+  showStagesDuration?: boolean;
 }
 
 export function Flow({
@@ -32,6 +33,7 @@ export function Flow({
   currentStage = undefined,
   effectiveDate = undefined,
   isFetching = false,
+  showStagesDuration = false,
 }: FlowProps) {
   const startDate = effectiveDate ? new Date(effectiveDate) : null;
   const sortedStages = useMemo(() => {
@@ -85,22 +87,28 @@ export function Flow({
 
   const nodes = sortedStages.map((item, index) => {
     const deadline = getStageDeadline(item, index);
-
+    const stageLabel = `${_.startCase(item.name)}, ${
+      showStagesDuration
+        ? ` (${item.duration} dia${item.duration > 1 ? "s" : ""})`
+        : ""
+    }`;
     return {
       id: `${item.idStage}`,
       position: {
         x: 30 + index * 60,
-        y: 30 + index * (currentStage ? 125 : 75),
+        y: 30 + index * (currentStage ? 125 : 100),
       },
       data: {
-        label: deadline ? (
+        label: (
           <>
-            {_.startCase(item.name)}
-            <br />
-            Vencimento: {deadline}
+            {stageLabel}
+            {deadline ? (
+              <>
+                {" "}
+                <br /> {`Vencimento: ${deadline}`}{" "}
+              </>
+            ) : null}
           </>
-        ) : (
-          _.startCase(item.name)
         ),
       },
       style: {

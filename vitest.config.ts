@@ -8,7 +8,7 @@ export default defineConfig({
     globals: true,
     coverage: { reporter: ["lcov", "html"] },
     environment: "jsdom",
-    reporters: "vitest-sonar-reporter",
+    reporters: process.env.VITEST_REPORTERS,
     outputFile: "coverage/coverage.xml",
   },
 });

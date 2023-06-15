@@ -96,21 +96,20 @@ function Processes() {
           const currIndexInFlow =
             currFlow?.stages?.indexOf(curr?.idStage) || -1;
           const currentState =
-            currFlow?.stages && currIndexInFlow !== -1
-              ? parseInt(
-                  (
-                    (currIndexInFlow / currFlow?.stages?.length) *
-                    100
-                  ).toString(),
-                  10
-                )
-              : 0;
+            (currFlow?.stages && currIndexInFlow !== -1) ||
+            curr.status === "notStarted"
+              ? `${currIndexInFlow + 1}/${currFlow?.stages?.length}`
+              : `${currIndexInFlow + 2}/${currFlow?.stages?.length}`;
 
           return [
             ...acc,
             {
               ...curr,
-              currentState: `${currentState}%`,
+              currentState: `${
+                curr.status === "finished"
+                  ? `${currFlow?.stages?.length}/${currFlow?.stages?.length}`
+                  : currentState
+              }`,
               flowName: currFlow?.name,
             },
           ];

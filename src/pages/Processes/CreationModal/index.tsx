@@ -108,7 +108,6 @@ export function CreationModal({
       nickname: formData.nickname,
       idFlow: formData.idFlow,
       priority: formData.hasLegalPriority ? formData.idPriority : 0,
-      effectiveDate: new Date(),
     };
 
     const res = await createProcess(body);

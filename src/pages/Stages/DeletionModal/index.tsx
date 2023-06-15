@@ -43,7 +43,7 @@ export function DeletionModal({
     } else {
       toast({
         id: "delete-stage-error",
-        title: "Erro na deleção da etaoa.",
+        title: "Erro na deleção da etapa.",
         description: res.error?.message,
         status: "error",
         isClosable: true,
