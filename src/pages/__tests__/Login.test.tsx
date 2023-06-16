@@ -8,6 +8,7 @@ import { act } from "react-dom/test-utils";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
+import { mockedUser } from "utils/mocks";
 import Login from "../Login";
 
 const restHandlers = [
@@ -16,19 +17,8 @@ const restHandlers = [
     async (req, res, ctx) => {
       const { password } = await req.json();
 
-      if (password === "123Teste") {
-        return res(
-          ctx.status(200),
-          ctx.json({
-            cpf: "12345678900",
-            fullName: "User Teste",
-            email: "test@test.com",
-            idUnit: 1,
-            token: "mocked-token",
-            idRole: 1,
-            expiresIn: "2023-06-19T03:26:25.050Z",
-          })
-        );
+      if (password === "senha-certa") {
+        return res(ctx.status(200), ctx.json(mockedUser));
       }
 
       return res(
@@ -84,24 +74,7 @@ describe("Login page", () => {
     expect(await screen.findByText("Preencha sua Senha")).not.toBe(null);
   });
 
-  it("login", async () => {
-    const cpfInput = screen.getByLabelText("CPF");
-    const passwordInput = screen.getByLabelText("Senha");
-    const submitButton = screen.getByText("Entrar");
-
-    await act(async () => {
-      await fireEvent.change(cpfInput, { target: { value: "123.456.789-00" } });
-      await fireEvent.change(passwordInput, {
-        target: { value: "123Teste" },
-      });
-      await fireEvent.click(submitButton);
-    });
-
-    await screen.getByText("Bem vindo!");
-    await screen.getByText("Login efetuado com sucesso!");
-  });
-
-  it("login error", async () => {
+  it("submits form and displays login messages correctly", async () => {
     const cpfInput = screen.getByLabelText("CPF");
     const passwordInput = screen.getByLabelText("Senha");
     const submitButton = screen.getByText("Entrar");
@@ -116,5 +89,15 @@ describe("Login page", () => {
 
     await screen.getByText("Erro no login");
     await screen.getByText("Senha incorreta");
+
+    await act(async () => {
+      await fireEvent.change(passwordInput, {
+        target: { value: "senha-certa" },
+      });
+      await fireEvent.click(submitButton);
+    });
+
+    await screen.getByText("Bem vindo!");
+    await screen.getByText("Login efetuado com sucesso!");
   });
 });
