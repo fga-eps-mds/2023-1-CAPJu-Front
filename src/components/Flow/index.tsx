@@ -22,7 +22,7 @@ interface FlowProps {
   effectiveDate?: string | undefined;
   isFetching?: boolean;
   showStagesDuration?: boolean;
-  process: Process;
+  process?: Process;
 }
 
 export function Flow({
@@ -91,7 +91,7 @@ export function Flow({
     });
   };
 
-  const handleStartDateFormating = (date: string) => {
+  const handleStartDateFormating = (date: Date | string) => {
     const currentDate = new Date(date);
     return currentDate.toLocaleString("pt-BR", {
       year: "numeric",
@@ -101,15 +101,18 @@ export function Flow({
   };
 
   const handleStartDueDateFormating = () => {
-    const initialExpirationDate = new Date(process?.effectiveDate);
-    initialExpirationDate.setDate(
-      initialExpirationDate.getDate() + stages[0].duration
-    );
-    return initialExpirationDate.toLocaleString("pt-BR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    if (process) {
+      const initialExpirationDate = new Date(process?.effectiveDate);
+      initialExpirationDate.setDate(
+        initialExpirationDate.getDate() + stages[0].duration
+      );
+      return initialExpirationDate.toLocaleString("pt-BR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    }
+    return "";
   };
 
   const nodes = sortedStages.map((item, index) => {
@@ -135,9 +138,8 @@ export function Flow({
               {item?.vencimento
                 ? `Entrada: ${item.entrada}`
                 : index === 0 &&
-                  `Entrada: ${handleStartDateFormating(
-                    process?.effectiveDate
-                  )}`}
+                  process?.effectiveDate &&
+                  `Entrada: ${handleStartDateFormating(process.effectiveDate)}`}
               <br />
               {item?.vencimento
                 ? `Vencimento: ${item.vencimento}`

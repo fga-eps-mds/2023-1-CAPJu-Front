@@ -37,6 +37,7 @@ function ViewProcess() {
     data: processData,
     isFetched: isProcessFetched,
     refetch: refetchProcess,
+    isRefetching: isRefetchingProcess,
   } = useQuery({
     queryKey: ["process", params.record],
     queryFn: async () => {
@@ -386,19 +387,21 @@ function ViewProcess() {
             </Flex>
           )}
         </Flex>
-        <Flow
-          sequences={flowData?.value?.sequences || []}
-          stages={stages || []}
-          minHeight={650}
-          currentStage={
-            processData?.value?.status !== "finished"
-              ? processData?.value?.idStage
-              : undefined
-          }
-          effectiveDate={processData?.value?.effectiveDate}
-          isFetching={!isProcessFetched || !isFlowFetched}
-          process={processData?.value}
-        />
+        {!isRefetchingProcess && (
+          <Flow
+            sequences={flowData?.value?.sequences || []}
+            stages={stages || []}
+            minHeight={650}
+            currentStage={
+              processData?.value?.status !== "finished"
+                ? processData?.value?.idStage
+                : undefined
+            }
+            effectiveDate={processData?.value?.effectiveDate}
+            isFetching={!isProcessFetched || !isFlowFetched}
+            process={processData?.value}
+          />
+        )}
       </Flex>
       {processData?.value && (
         <ReturnModal
