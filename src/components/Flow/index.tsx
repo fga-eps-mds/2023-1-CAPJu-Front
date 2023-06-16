@@ -144,11 +144,9 @@ export function Flow({
               {item?.vencimento
                 ? `Vencimento: ${item.vencimento}`
                 : index === 0 && `Vencimento: ${handleStartDueDateFormating()}`}
-              {/* {item?.vencimento
-                ? `Vencimento: ${item.vencimento}`
-                : index === 0
-                ? `Vencimento: ${handleStartDueDateFormating()}`
-                : `Vencimento: ${item.duration} dia(s) após a data de entrada`} */}
+              {!item.vencimento &&
+                index !== 0 &&
+                `Vencimento: ${item.duration} dia(s) após a data de entrada`}
             </>
           </>
         ),
