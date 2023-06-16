@@ -356,7 +356,7 @@ function Processes() {
               checked={legalPriority}
               onChange={() => setLegalPriority(!legalPriority)}
             >
-              Mostrar processos com prioridade legal
+              Mostrar apenas processos com prioridade legal
             </Checkbox>
             <Checkbox
               colorScheme="green"
@@ -364,7 +364,7 @@ function Processes() {
               checked={showFinished}
               onChange={() => setShowFinished(!showFinished)}
             >
-              Mostrar processos arquivados/finalizados
+              Mostrar apenas processos arquivados/finalizados
             </Checkbox>
           </Flex>
         </Flex>
