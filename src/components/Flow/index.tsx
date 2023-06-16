@@ -22,6 +22,7 @@ interface FlowProps {
   effectiveDate?: string | undefined;
   isFetching?: boolean;
   showStagesDuration?: boolean;
+  process: Process;
 }
 
 export function Flow({
@@ -34,6 +35,7 @@ export function Flow({
   effectiveDate = undefined,
   isFetching = false,
   showStagesDuration = false,
+  process,
 }: FlowProps) {
   const startDate = effectiveDate ? new Date(effectiveDate) : null;
   const sortedStages = useMemo(() => {
@@ -43,7 +45,11 @@ export function Flow({
       sequenceMap.set(sequence.from, index);
     });
 
+    let index = 0;
+
     return stages.sort((a, b) => {
+      a.entrada = process?.progress && process?.progress[index]?.entrada;
+      a.vencimento = process?.progress && process?.progress[index]?.vencimento;
       const indexA = sequenceMap.get(a.idStage);
       const indexB = sequenceMap.get(b.idStage);
 
@@ -58,7 +64,7 @@ export function Flow({
       if (indexB === undefined) {
         return -1;
       }
-
+      index += 1;
       return indexA - indexB;
     });
   }, [stages, sequences]);
@@ -85,6 +91,27 @@ export function Flow({
     });
   };
 
+  const handleStartDateFormating = (date: string) => {
+    const currentDate = new Date(date);
+    return currentDate.toLocaleString("pt-BR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const handleStartDueDateFormating = () => {
+    const initialExpirationDate = new Date(process?.effectiveDate);
+    initialExpirationDate.setDate(
+      initialExpirationDate.getDate() + stages[0].duration
+    );
+    return initialExpirationDate.toLocaleString("pt-BR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   const nodes = sortedStages.map((item, index) => {
     const deadline = getStageDeadline(item, index);
     const stageLabel = `${_.startCase(item.name)}, ${
@@ -102,12 +129,25 @@ export function Flow({
         label: (
           <>
             {stageLabel}
-            {deadline ? (
-              <>
-                {" "}
-                <br /> {`Vencimento: ${deadline}`}{" "}
-              </>
-            ) : null}
+            <>
+              {" "}
+              {(item?.entrada || index === 0) && <br />}
+              {item?.vencimento
+                ? `Entrada: ${item.entrada}`
+                : index === 0 &&
+                  `Entrada: ${handleStartDateFormating(
+                    process?.effectiveDate
+                  )}`}
+              <br />
+              {item?.vencimento
+                ? `Vencimento: ${item.vencimento}`
+                : index === 0 && `Vencimento: ${handleStartDueDateFormating()}`}
+              {/* {item?.vencimento
+                ? `Vencimento: ${item.vencimento}`
+                : index === 0
+                ? `Vencimento: ${handleStartDueDateFormating()}`
+                : `Vencimento: ${item.duration} dia(s) após a data de entrada`} */}
+            </>
           </>
         ),
       },

@@ -397,6 +397,7 @@ function ViewProcess() {
           }
           effectiveDate={processData?.value?.effectiveDate}
           isFetching={!isProcessFetched || !isFlowFetched}
+          process={processData?.value}
         />
       </Flex>
       {processData?.value && (
