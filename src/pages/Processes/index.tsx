@@ -40,6 +40,7 @@ function Processes() {
   });
   const [filter, setFilter] = useState<string>("");
   const [legalPriority, setLegalPriority] = useState(false);
+  const [showFinished, setShowFinished] = useState<boolean>(true);
   const {
     isOpen: isCreationOpen,
     onOpen: onCreationOpen,
@@ -164,8 +165,17 @@ function Processes() {
     [isProcessesFetched, isUserFetched, userData]
   );
 
-  const filterByPriority = (processes: Process[]) => {
-    return processes?.filter((process: Process) => process.idPriority);
+  const filterByPriority = (processes: Process[]) =>
+    processes?.filter((process: Process) => process.idPriority);
+
+  const filterByStatus = (processes: Process[]) => {
+    if (!showFinished) {
+      return processes?.filter(
+        (process: Process) =>
+          process.status === "finished" || process.status === "archived"
+      );
+    }
+    return processes;
   };
 
   const filteredProcess = useMemo<TableRow<Process>[]>(() => {
@@ -185,6 +195,7 @@ function Processes() {
         : processesData?.value;
 
     if (legalPriority && value) value = filterByPriority(value);
+    if (!showFinished && value) value = filterByStatus(value);
 
     return (
       (value?.reduce(
@@ -229,6 +240,7 @@ function Processes() {
     );
   }, [
     legalPriority,
+    showFinished,
     processesData,
     filter,
     isProcessesFetched,
@@ -337,14 +349,24 @@ function Processes() {
               },
             }}
           />
-          <Checkbox
-            colorScheme="green"
-            borderColor="gray.600"
-            checked={legalPriority}
-            onChange={() => setLegalPriority(!legalPriority)}
-          >
-            Mostrar processos com prioridade legal
-          </Checkbox>
+          <Flex flexDir="column" gap="1">
+            <Checkbox
+              colorScheme="green"
+              borderColor="gray.600"
+              checked={legalPriority}
+              onChange={() => setLegalPriority(!legalPriority)}
+            >
+              Mostrar processos com prioridade legal
+            </Checkbox>
+            <Checkbox
+              colorScheme="green"
+              borderColor="gray.600"
+              checked={showFinished}
+              onChange={() => setShowFinished(!showFinished)}
+            >
+              Mostrar processos arquivados/finalizados
+            </Checkbox>
+          </Flex>
         </Flex>
       </Flex>
       <DataTable
