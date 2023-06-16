@@ -13,7 +13,7 @@
     "check-format": "prettier --check .",
     "check-lint": "eslint . --ext ts --ext tsx --ext js",
     "format": "prettier --write .",
-    "test": "vitest"
+    "test": "vitest --silent"
   },
   "dependencies": {
     "@chakra-ui/form-control": "^2.0.0",
@@ -29,6 +29,7 @@
     "@emotion/styled": "^11.10.6",
     "@hookform/resolvers": "^3.1.0",
     "@tanstack/react-table": "^8.8.5",
+    "@testing-library/user-event": "^14.4.3",
     "@types/node": "^18.16.0",
     "@types/react-table": "^7.7.14",
     "@vitejs/plugin-react": "^4.0.0",
@@ -36,6 +37,7 @@
     "chakra-react-select": "^4.6.0",
     "framer-motion": "^10.12.4",
     "lodash": "^4.17.21",
+    "msw": "^1.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.43.9",
@@ -47,8 +49,8 @@
     "reactflow": "^11.7.2",
     "vite": "^4.3.0",
     "vite-tsconfig-paths": "^4.2.0",
-    "yup": "^1.1.1",
-    "vitest-sonar-reporter": "^0.4.1"
+    "vitest-sonar-reporter": "^0.4.1",
+    "yup": "^1.1.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
