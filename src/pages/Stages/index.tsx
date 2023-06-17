@@ -4,13 +4,13 @@ import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon, Icon } from "@chakra-ui/icons";
 import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
-import ReactPaginate from "react-paginate";
 
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { hasPermission } from "utils/permissions";
+import { Pagination } from "components/Pagination";
 import { getStages } from "../../services/stages";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
@@ -171,17 +171,7 @@ function Stages() {
         isDataFetching={!isStagesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas etapas."
       />
-      <ReactPaginate
-        previousLabel="Anterior"
-        nextLabel="Próxima"
-        pageCount={pageCount}
-        onPageChange={handlePageChange}
-        containerClassName="pagination"
-        previousLinkClassName="pagination__link"
-        nextLinkClassName="pagination__link"
-        disabledClassName="pagination__link--disabled"
-        activeClassName="pagination__link--active"
-      />
+      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
       <CreationModal
         user={userData?.value!}
         isOpen={isCreationOpen}

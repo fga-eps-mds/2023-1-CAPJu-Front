@@ -4,7 +4,6 @@ import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
-import ReactPaginate from "react-paginate";
 
 import { PrivateLayout } from "layouts/Private";
 import { getFlows } from "services/flows";
@@ -12,6 +11,7 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
+import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
@@ -195,17 +195,6 @@ function Flows() {
         isDataFetching={!isFlowsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados fluxos."
       />
-      <ReactPaginate
-        previousLabel="Anterior"
-        nextLabel="Próximo"
-        pageCount={pageCount}
-        onPageChange={handlePageChange}
-        containerClassName="pagination"
-        previousLinkClassName="pagination__link"
-        nextLinkClassName="pagination__link"
-        disabledClassName="pagination__link--disabled"
-        activeClassName="pagination__link--active"
-      />
       {selectedFlow && isEditionOpen ? (
         <EditionModal
           flow={selectedFlow}
@@ -230,6 +219,7 @@ function Flows() {
           refetchFlows={refetchFlows}
         />
       ) : null}
+      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
     </PrivateLayout>
   );
 }

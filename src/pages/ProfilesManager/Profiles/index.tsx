@@ -4,7 +4,6 @@ import { Flex, Text, useDisclosure } from "@chakra-ui/react";
 import { Icon, ViewIcon } from "@chakra-ui/icons";
 import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
-import ReactPaginate from "react-paginate";
 
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
@@ -12,6 +11,7 @@ import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { getUnits } from "services/units";
 import { roleNameById } from "utils/roles";
+import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
 import { ViewModal } from "./ViewModal";
@@ -204,17 +204,7 @@ export function Profiles({
         emptyTableMessage="Não há usuários cadastrados"
       />
 
-      <ReactPaginate
-        previousLabel="Anterior"
-        nextLabel="Próximo"
-        pageCount={pageCount}
-        onPageChange={handlePageChange}
-        containerClassName="pagination"
-        previousLinkClassName="pagination__link"
-        nextLinkClassName="pagination__link"
-        disabledClassName="pagination__link--disabled"
-        activeClassName="pagination__link--active"
-      />
+      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
 
       {userData?.value && selectedUser && isEditOpen && (
         <EditionModal

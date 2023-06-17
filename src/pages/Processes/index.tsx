@@ -15,7 +15,6 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
-import ReactPaginate from "react-paginate";
 
 import { getProcesses } from "services/processes";
 import { getFlows } from "services/flows";
@@ -24,6 +23,7 @@ import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { labelByProcessStatus } from "utils/constants";
+import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
@@ -401,17 +401,7 @@ function Processes() {
           refetchStages={refetchProcesses}
         />
       )}
-      <ReactPaginate
-        previousLabel="Anterior"
-        nextLabel="Próximo"
-        pageCount={pageCount}
-        onPageChange={handlePageChange}
-        containerClassName="pagination"
-        previousLinkClassName="pagination__link"
-        nextLinkClassName="pagination__link"
-        disabledClassName="pagination__link--disabled"
-        activeClassName="pagination__link--active"
-      />
+      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
     </PrivateLayout>
   );
 }

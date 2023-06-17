@@ -4,7 +4,6 @@ import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon, Icon } from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
-import ReactPaginate from "react-paginate";
 
 import { PrivateLayout } from "layouts/Private";
 import { getUnits } from "services/units";
@@ -12,11 +11,12 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
+import { Pagination } from "components/Pagination";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
 
-import "./style.css";
+import "components/Pagination/style.css";
 
 function Units() {
   const toast = useToast();
@@ -202,17 +202,7 @@ function Units() {
           afterSubmission={refetchUnits}
         />
       ) : null}
-      <ReactPaginate
-        previousLabel="Anterior"
-        nextLabel="Próximo"
-        pageCount={pageCount}
-        onPageChange={handlePageChange}
-        containerClassName="pagination"
-        previousLinkClassName="pagination__link"
-        nextLinkClassName="pagination__link"
-        disabledClassName="pagination__link--disabled"
-        activeClassName="pagination__link--active"
-      />
+      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
     </PrivateLayout>
   );
 }

@@ -4,13 +4,13 @@ import { Flex, Text, useDisclosure } from "@chakra-ui/react";
 import { Icon, CheckIcon, ViewIcon } from "@chakra-ui/icons";
 import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
-import ReactPaginate from "react-paginate";
 
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { getUnits } from "services/units";
+import { Pagination } from "components/Pagination";
 import { AcceptModal } from "./AcceptModal";
 import { DenyModal } from "./DenyModal";
 import { ViewModal } from "./ViewModal";
@@ -207,17 +207,7 @@ export function Requests({
         isDataFetching={!isRequestsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas solicitações no momento."
       />
-      <ReactPaginate
-        previousLabel="Anterior"
-        nextLabel="Próximo"
-        pageCount={pageCount}
-        onPageChange={handlePageChange}
-        containerClassName="pagination"
-        previousLinkClassName="pagination__link"
-        nextLinkClassName="pagination__link"
-        disabledClassName="pagination__link--disabled"
-        activeClassName="pagination__link--active"
-      />
+      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
       {userData?.value && selectedUser && isAcceptOpen ? (
         <AcceptModal
           isOpen={isAcceptOpen}
