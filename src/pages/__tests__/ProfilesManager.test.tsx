@@ -13,19 +13,12 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import ViewModal from "../ProfilesManager";
 
 const restHandlers = [
-  rest.post(
-    `${import.meta.env.VITE_USER_SERVICE_URL}allUser?accepted=true`,
-    async (_req, res, ctx) =>
-      res(
-        ctx.status(200),
-        ctx.json({
-          user: mockedUser,
-          type: "success",
-        })
-      )
+  rest.get(
+    `${import.meta.env.VITE_UNITS_SERVICE_URL}allUser?accepted=true`,
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}allUser?accepted=true`,
+    `${import.meta.env.VITE_UNITS_SERVICE_URL}allUser?accepted=false`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
   ),
 ];
@@ -65,5 +58,6 @@ describe("ViewModal page", () => {
 
   it("shows text content correctly", () => {
     expect(screen.getByText("Solicitações")).not.toBe(null);
+    expect(screen.getByText("Perfil de Acesso")).not.toBe(null);
   });
 });
