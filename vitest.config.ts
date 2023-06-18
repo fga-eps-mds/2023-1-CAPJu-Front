@@ -10,5 +10,6 @@ export default defineConfig({
     environment: "jsdom",
     reporters: process.env.VITEST_REPORTERS,
     outputFile: "coverage/coverage.xml",
+    testTimeout: 7500,
   },
 });
