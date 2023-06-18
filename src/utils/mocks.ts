@@ -5,7 +5,12 @@ export const mockedUser = {
   idUnit: 1,
   token: "mocked-token",
   idRole: 1,
-  expiresIn: "2023-06-19T03:26:25.050Z",
+  expiresIn: "2100-06-19T03:26:25.050Z",
+};
+
+export const mockedAdminUser = {
+  ...mockedUser,
+  idRole: 5,
 };
 
 export const mockedUnits = [
