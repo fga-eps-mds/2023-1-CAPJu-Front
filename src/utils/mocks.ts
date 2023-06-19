@@ -41,12 +41,6 @@ export const mockedUnits = [
   },
 ];
 
-export const mockedProcess = {
-  record: "12345678901234567881",
-  nickname: "teste",
-  status: "notStarted",
-};
-
 export const mockedProcesses = [
   {
     record: "12345678901234567881",
