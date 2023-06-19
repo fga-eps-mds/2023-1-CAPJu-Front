@@ -42,7 +42,7 @@ describe("Signup page", () => {
             <AuthProvider>
               <QueryClientProvider client={queryClient}>
                 <BrowserRouter>
-                  <ProfilesManager/>
+                  <ProfilesManager />
                 </BrowserRouter>
               </QueryClientProvider>
             </AuthProvider>
@@ -64,23 +64,20 @@ describe("Signup page", () => {
     expect(screen.getByText("Solicitações")).not.toBe(null);
     expect(screen.getByText("Perfil de Acesso")).not.toBe(null);
   });
-  
+
   it("shows solicitations and requests text correctly", () => {
-    expect(screen.findAllByAltText("Nome")).not.toBe(null)
+    expect(screen.findAllByAltText("Nome")).not.toBe(null);
     expect(screen.findAllByAltText("User Teste")).not.toBe(null);
     expect(screen.findAllByAltText("Perfil")).not.toBe(null);
     expect(screen.findAllByAltText("Ações")).not.toBe(null);
   });
 
-  /*
   it("shows 'search bar' correctly", async () => {
-    const searchbar = screen.getByPlaceholderText(
-      "Pesquisar usuário por nome"
+    expect(screen.getByPlaceholderText("Pesquisar usuários por nome")).not.toBe(
+      null
     );
-
-    if (searchbar) {
-      expect(searchbar).not.toBe(null);
-    }
+    expect(screen.getByPlaceholderText("Pesquisar usuário pelo nome")).not.toBe(
+      null
+    );
   });
-    */
 });
