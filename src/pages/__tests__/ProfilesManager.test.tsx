@@ -10,15 +10,19 @@ import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
 import { mockedUser } from "utils/mocks";
 import { QueryClient, QueryClientProvider } from "react-query";
-import ViewModal from "../ProfilesManager";
+import ProfilesManager from "../ProfilesManager";
 
 const restHandlers = [
   rest.get(
-    `${import.meta.env.VITE_UNITS_SERVICE_URL}allUser?accepted=true`,
+    `${import.meta.env.VITE_USER_SERVICE_URL}ProfilesManager`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
   ),
   rest.get(
-    `${import.meta.env.VITE_UNITS_SERVICE_URL}allUser?accepted=false`,
+    `${import.meta.env.VITE_USER_SERVICE_URL}allUser?accepted=true`,
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
+  ),
+  rest.get(
+    `${import.meta.env.VITE_USER_SERVICE_URL}allUser?accepted=false`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
   ),
 ];
@@ -27,7 +31,7 @@ const server = setupServer(...restHandlers);
 
 const queryClient = new QueryClient();
 
-describe("ViewModal page", () => {
+describe("Signup page", () => {
   beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 
   beforeEach(async () => {
@@ -38,7 +42,7 @@ describe("ViewModal page", () => {
             <AuthProvider>
               <QueryClientProvider client={queryClient}>
                 <BrowserRouter>
-                  <ViewModal />
+                  <ProfilesManager/>
                 </BrowserRouter>
               </QueryClientProvider>
             </AuthProvider>
@@ -60,4 +64,23 @@ describe("ViewModal page", () => {
     expect(screen.getByText("Solicitações")).not.toBe(null);
     expect(screen.getByText("Perfil de Acesso")).not.toBe(null);
   });
+  
+  it("shows solicitations and requests text correctly", () => {
+    expect(screen.findAllByAltText("Nome")).not.toBe(null)
+    expect(screen.findAllByAltText("User Teste")).not.toBe(null);
+    expect(screen.findAllByAltText("Perfil")).not.toBe(null);
+    expect(screen.findAllByAltText("Ações")).not.toBe(null);
+  });
+
+  /*
+  it("shows 'search bar' correctly", async () => {
+    const searchbar = screen.getByPlaceholderText(
+      "Pesquisar usuário por nome"
+    );
+
+    if (searchbar) {
+      expect(searchbar).not.toBe(null);
+    }
+  });
+    */
 });
