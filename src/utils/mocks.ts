@@ -13,6 +13,11 @@ export const mockedAdminUser = {
   idRole: 5,
 };
 
+export const mockedManagerUser = {
+  ...mockedUser,
+  idRole: 1,
+};
+
 export const mockedUnits = [
   {
     idUnit: 1,
@@ -33,5 +38,37 @@ export const mockedUnits = [
   {
     idUnit: 5,
     name: "Unidade 5",
+  },
+];
+
+export const mockedProcess = {
+  record: "12345678901234567881",
+  nickname: "teste",
+  status: "notStarted",
+};
+
+export const mockedProcesses = [
+  {
+    record: "12345678901234567881",
+    nickname: "teste",
+    status: "notStarted",
+  },
+];
+
+export const mockedFlows = [
+  {
+    idFlow: 1,
+    idUnit: 1,
+    name: "teste",
+  },
+  {
+    idFlow: 2,
+    idUnit: 1,
+    name: "abcd",
+  },
+  {
+    idFlow: 3,
+    idUnit: 1,
+    name: "quadrado",
   },
 ];
