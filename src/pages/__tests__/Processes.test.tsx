@@ -9,13 +9,18 @@ import { act } from "react-dom/test-utils";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
-import { mockedProcesses } from "utils/mocks";
+import { mockedProcesses, mockedManagerUser } from "utils/mocks";
 import Processes from "../Processes";
 
 const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_PROCESSES_SERVICE_URL}processes`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedProcesses))
+  ),
+
+  rest.get(
+    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedManagerUser.cpf}`,
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedManagerUser))
   ),
 ];
 
@@ -59,9 +64,21 @@ describe("Processes page", () => {
     expect(screen.getByText("Fluxo")).not.toBe(null);
     expect(screen.getByText("Status")).not.toBe(null);
     expect(screen.getByText("Ações")).not.toBe(null);
+  });
+
+  it("shows process text content correctly", () => {
     expect(screen.getByText("12345678901234567881")).not.toBe(null);
-    expect(screen.getByText("teste")).not.toBe(null);
+    expect(screen.getByText("testeA")).not.toBe(null);
     expect(screen.getByText("Não iniciado")).not.toBe(null);
+    expect(screen.getByText("12345678901234567882")).not.toBe(null);
+    expect(screen.getByText("testeB")).not.toBe(null);
+    expect(screen.getByText("Em andamento")).not.toBe(null);
+    expect(screen.getByText("12345678901234567883")).not.toBe(null);
+    expect(screen.getByText("testeC")).not.toBe(null);
+    expect(screen.getByText("Arquivado")).not.toBe(null);
+    expect(screen.getByText("12345678901234567884")).not.toBe(null);
+    expect(screen.getByText("testeD")).not.toBe(null);
+    expect(screen.getByText("Finalizado")).not.toBe(null);
   });
 
   it("shows 'create process' correctly", async () => {
@@ -89,4 +106,25 @@ describe("Processes page", () => {
       expect(button).not.toBe(null);
     }
   });
+
+  /*
+  it("opens and closes the creation modal correctly", async () => {
+    const createProcessButton = await screen.getByText("Criar Processo");
+
+    await act(async () => {
+      await fireEvent.click(createProcessButton);
+    });
+
+    expect(await screen.findByText("Criar Processo")).not.toBeNull();
+
+    const closeModalButton = await screen.getByText("Cancelar");
+
+    await act(async () => {
+      await fireEvent.click(closeModalButton);
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText("Criar Processo")).toBeNull();
+    });
+  }); */
 });
