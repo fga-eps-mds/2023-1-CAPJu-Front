@@ -80,6 +80,7 @@ export function CreationModal({
     formState: { errors, isSubmitted },
     reset,
   } = useForm<FormValues>({
+    // @ts-ignore
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });

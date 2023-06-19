@@ -231,10 +231,6 @@ function ViewProcess() {
     if (!process) navigate(-1);
   }, [process]);
 
-  useEffect(() => {
-    console.log(flowData?.value?.sequences[0]?.from);
-  }, [flowData]);
-
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3">

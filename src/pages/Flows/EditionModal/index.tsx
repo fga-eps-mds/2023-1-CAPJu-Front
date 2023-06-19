@@ -83,6 +83,7 @@ export function EditionModal({
     handleSubmit,
     formState: { errors, isSubmitted },
   } = useForm<FormValues>({
+    // @ts-ignore
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });

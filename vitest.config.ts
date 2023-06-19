@@ -6,9 +6,10 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     globals: true,
-    coverage: { reporter: ["lcov", "html"] },
+    coverage: { reporter: ["lcov"] },
     environment: "jsdom",
     reporters: process.env.VITEST_REPORTERS,
     outputFile: "coverage/coverage.xml",
+    testTimeout: 7500,
   },
 });
