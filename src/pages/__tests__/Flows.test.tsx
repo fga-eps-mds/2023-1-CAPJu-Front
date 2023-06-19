@@ -54,13 +54,13 @@ describe("Flows page", () => {
   it("renders correctly", () => {
     expect(screen).toMatchSnapshot();
   });
-  it("shows text content correctly", () => {
-    expect(screen.findAllByText("Fluxos")).not.toBe(null);
-    expect(screen.getByText("Nome")).not.toBe(null);
-    expect(screen.getByText("Ações")).not.toBe(null);
-    expect(screen.findAllByText("teste")).not.toBe(null);
-    expect(screen.findAllByText("abcd")).not.toBe(null);
-    expect(screen.findAllByText("quadrado")).not.toBe(null);
+  it("shows text content correctly", async () => {
+    expect(await screen.findAllByText("Fluxos")).not.toBe(null);
+    expect(await screen.findByText("Nome")).not.toBe(null);
+    expect(await screen.findByText("Ações")).not.toBe(null);
+    expect(await screen.findByText("teste")).not.toBe(null);
+    expect(await screen.findByText("abcd")).not.toBe(null);
+    expect(await screen.findByText("quadrado")).not.toBe(null);
   });
 
   it("shows 'search bar' correctly", async () => {
