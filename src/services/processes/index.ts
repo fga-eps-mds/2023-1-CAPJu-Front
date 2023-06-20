@@ -1,12 +1,17 @@
 import { api } from "services/api";
 
 export const getProcesses = async (
-  flowId: number | undefined
+  flowId: number | undefined,
+  filter: string | undefined
 ): Promise<Result<Process[]>> => {
   try {
-    const res = await api.processes.get<Process[]>(
-      `/processes${flowId ? `/${flowId}` : ""}`
-    );
+    let url = `/processes${flowId ? `/${flowId}` : ""}`;
+
+    if (filter) {
+      url = `/getFilterProcess/${filter}`;
+    }
+
+    const res = await api.processes.get<Process[]>(url);
 
     return { type: "success", value: res.data };
   } catch (error) {

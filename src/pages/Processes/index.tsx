@@ -10,7 +10,13 @@ import {
   useToast,
   Tooltip,
 } from "@chakra-ui/react";
-import { AddIcon, ArrowUpIcon, Icon, ViewIcon } from "@chakra-ui/icons";
+import {
+  AddIcon,
+  ArrowUpIcon,
+  Icon,
+  ViewIcon,
+  SearchIcon,
+} from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -82,7 +88,7 @@ function Processes() {
   } = useQuery({
     queryKey: ["processes"],
     queryFn: async () => {
-      const res = await getProcesses(flow?.idFlow);
+      const res = await getProcesses(flow?.idFlow, filter);
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -171,19 +177,17 @@ function Processes() {
   const filteredProcess = useMemo<TableRow<Process>[]>(() => {
     if (!isProcessesFetched) return [];
 
-    let value =
-      filter !== ""
-        ? processesData?.value?.filter(
-            (process: Process) =>
-              (process.record as string)
-                ?.toLowerCase()
-                .includes(filter.toLocaleLowerCase()) ||
-              process.nickname
-                .toLowerCase()
-                .includes(filter.toLocaleLowerCase())
-          )
-        : processesData?.value;
+    let value = processesData?.value;
 
+    //  if (filter !== "") {
+    //    value = value?.filter(q
+    //      (process: Process) =>
+    //        (process.record as string)
+    //          ?.toLowerCase()
+    //          .includes(filter.toLowerCase()) ||
+    //        process.nickname.toLowerCase().includes(filter.toLowerCase())
+    //    );
+    //  } sudo lsof -i -P -n | grep LISTEN
     if (legalPriority && value) value = filterByPriority(value);
 
     return (
@@ -324,19 +328,29 @@ function Processes() {
           </Flex>
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Input
-            placeholder="Pesquisar processos (por registro ou apelido)"
-            width={["100%", "100%", "60%"]}
-            maxW={["100%", "100%", 365]}
-            value={filter}
-            onChange={({ target }) => setFilter(target.value)}
-            variant="filled"
-            css={{
-              "&, &:hover, &:focus": {
-                background: "white",
-              },
-            }}
-          />
+          <Flex justifyContent="flex-start" w="70%">
+            <Input
+              placeholder="Pesquisar processos (por registro ou apelido)"
+              width={["100%", "100%", "60%"]}
+              maxW={["100%", "100%", 365]}
+              value={filter}
+              onChange={({ target }) => setFilter(target.value)}
+              variant="filled"
+              css={{
+                "&, &:hover, &:focus": {
+                  background: "white",
+                },
+              }}
+            />
+            <Button
+              colorScheme="green"
+              marginLeft="0.5%"
+              justifyContent="center"
+              onClick={() => refetchProcesses()}
+            >
+              <SearchIcon boxSize={4} />
+            </Button>
+          </Flex>
           <Checkbox
             colorScheme="green"
             borderColor="gray.600"
