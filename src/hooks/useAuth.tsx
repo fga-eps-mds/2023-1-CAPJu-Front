@@ -26,7 +26,10 @@ type AuthContextType = {
 const AuthContext = createContext({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const localUser = localStorage.getItem("@CAPJu:user");
+  const [user, setUser] = useState<User | null>(
+    localUser ? JSON.parse(localUser) : null
+  );
 
   const handleLogin = useCallback(
     async (credentials: {
