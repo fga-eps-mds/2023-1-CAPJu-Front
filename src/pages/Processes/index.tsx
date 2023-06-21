@@ -9,6 +9,7 @@ import {
   Checkbox,
   useToast,
   Tooltip,
+  chakra,
 } from "@chakra-ui/react";
 import {
   AddIcon,
@@ -44,7 +45,7 @@ function Processes() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<string | undefined>(undefined);
   const [legalPriority, setLegalPriority] = useState(false);
   const {
     isOpen: isCreationOpen,
@@ -179,15 +180,6 @@ function Processes() {
 
     let value = processesData?.value;
 
-    //  if (filter !== "") {
-    //    value = value?.filter(q
-    //      (process: Process) =>
-    //        (process.record as string)
-    //          ?.toLowerCase()
-    //          .includes(filter.toLowerCase()) ||
-    //        process.nickname.toLowerCase().includes(filter.toLowerCase())
-    //    );
-    //  } sudo lsof -i -P -n | grep LISTEN
     if (legalPriority && value) value = filterByPriority(value);
 
     return (
@@ -329,27 +321,35 @@ function Processes() {
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Flex justifyContent="flex-start" w="70%">
-            <Input
-              placeholder="Pesquisar processos (por registro ou apelido)"
-              width={["100%", "100%", "60%"]}
-              maxW={["100%", "100%", 365]}
-              value={filter}
-              onChange={({ target }) => setFilter(target.value)}
-              variant="filled"
-              css={{
-                "&, &:hover, &:focus": {
-                  background: "white",
-                },
+            <chakra.form
+              onSubmit={(e) => {
+                e.preventDefault();
+                refetchProcesses();
               }}
-            />
-            <Button
-              colorScheme="green"
-              marginLeft="0.5%"
-              justifyContent="center"
-              onClick={() => refetchProcesses()}
+              w="100%"
             >
-              <SearchIcon boxSize={4} />
-            </Button>
+              <Input
+                placeholder="Pesquisar processos (por registro ou apelido)"
+                width={["100%", "100%", "60%"]}
+                maxW={["100%", "100%", 365]}
+                value={filter}
+                onChange={({ target }) => setFilter(target.value)}
+                variant="filled"
+                css={{
+                  "&, &:hover, &:focus": {
+                    background: "white",
+                  },
+                }}
+              />
+              <Button
+                colorScheme="green"
+                marginLeft="2"
+                justifyContent="center"
+                type="submit"
+              >
+                <SearchIcon boxSize={4} />
+              </Button>
+            </chakra.form>
           </Flex>
           <Checkbox
             colorScheme="green"

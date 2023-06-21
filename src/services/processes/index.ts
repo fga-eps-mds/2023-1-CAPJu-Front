@@ -5,14 +5,10 @@ export const getProcesses = async (
   filter: string | undefined
 ): Promise<Result<Process[]>> => {
   try {
-    let url = `/processes${flowId ? `/${flowId}` : ""}`;
-
-    if (filter) {
-      url = `/getFilterProcess/${filter}`;
-    }
-
-    const res = await api.processes.get<Process[]>(url);
-
+    const res = await api.processes.get<Process[]>(
+      `/processes${flowId ? `/${flowId}` : ""}`,
+      { params: { filter } }
+    );
     return { type: "success", value: res.data };
   } catch (error) {
     if (error instanceof Error)
