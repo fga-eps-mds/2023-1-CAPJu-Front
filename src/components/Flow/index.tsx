@@ -115,6 +115,16 @@ export function Flow({
     return "";
   };
 
+  const handleVenciento = (vencimento: Date) => {
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 2);
+    const processDate = new Date(vencimento);
+    if (processDate < currentDate) {
+      return true;
+    }
+    return false;
+  };
+
   const nodes = sortedStages.map((item, index) => {
     const deadline = getStageDeadline(item, index);
     const stageLabel = `${_.startCase(item.name)}, ${
@@ -152,10 +162,13 @@ export function Flow({
         ),
       },
       style: {
-        ...(currentStage === item.idStage
+        ...(currentStage === item.idStage && item?.vencimento
           ? {
               color: "white",
-              background: colors.green["500"],
+              background:
+                item?.vencimento && handleVenciento(item.vencimento)
+                  ? colors.red["500"]
+                  : colors.green["500"],
               fontWeight: "bold",
             }
           : {
