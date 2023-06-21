@@ -27,8 +27,8 @@ declare global {
     name: string;
     duration: number;
     createdAt: string;
-    entrada?: Date;
-    vencimento?: Date;
+    entrada?: Date | undefined;
+    vencimento?: Date | undefined;
   };
 
   type FlowSequence = {
@@ -52,8 +52,8 @@ declare global {
 
   type Progress = {
     idStage: number;
-    entrada: Date;
-    vencimento: Date;
+    entrada?: Date;
+    vencimento?: Date;
   };
 
   type Process = {

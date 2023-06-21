@@ -45,11 +45,14 @@ export function Flow({
       sequenceMap.set(sequence.from, index);
     });
 
-    let index = 0;
+    for (let index = 0; index < stages.length; index += 1) {
+      stages[index].entrada =
+        process?.progress && process?.progress[index]?.entrada;
+      stages[index].vencimento =
+        process?.progress && process?.progress[index]?.vencimento;
+    }
 
     return stages.sort((a, b) => {
-      a.entrada = process?.progress && process?.progress[index]?.entrada;
-      a.vencimento = process?.progress && process?.progress[index]?.vencimento;
       const indexA = sequenceMap.get(a.idStage);
       const indexB = sequenceMap.get(b.idStage);
 
@@ -64,7 +67,6 @@ export function Flow({
       if (indexB === undefined) {
         return -1;
       }
-      index += 1;
       return indexA - indexB;
     });
   }, [stages, sequences]);
@@ -91,7 +93,7 @@ export function Flow({
     });
   };
 
-  const handleStartDateFormating = (date: Date | string) => {
+  const handleDateFormating = (date: Date | string) => {
     const currentDate = new Date(date);
     return currentDate.toLocaleString("pt-BR", {
       year: "numeric",
@@ -100,29 +102,59 @@ export function Flow({
     });
   };
 
-  const handleStartDueDateFormating = () => {
-    if (process) {
-      const initialExpirationDate = new Date(process?.effectiveDate);
-      initialExpirationDate.setDate(
-        initialExpirationDate.getDate() + stages[0].duration
-      );
-      return initialExpirationDate.toLocaleString("pt-BR", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    }
-    return "";
+  const handleExpiration = (vencimento: Date) => {
+    const currentDate = new Date();
+    const processDate = new Date(vencimento);
+    currentDate.setDate(currentDate.getDate() + 2);
+    if (processDate < currentDate) return true;
+    return false;
   };
 
-  const handleVenciento = (vencimento: Date) => {
-    const currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() + 2);
-    const processDate = new Date(vencimento);
-    if (processDate < currentDate) {
-      return true;
+  const handleDate = (item: Stage, index: Number) => {
+    // Processo não inciado
+    if (!process?.idStage) {
+      return (
+        <>{`Vencimento: ${item.duration} Dia${
+          item.duration > 1 ? "s uteís" : " útil"
+        } após a data de entrada nesta etapa.`}</>
+      );
     }
-    return false;
+    // Processo Iniciado
+    if (process?.idStage) {
+      // Processo na etapa Inicial
+      if (index === 0 && process?.idStage) {
+        return (
+          <>
+            {`Entrada: ${item?.entrada && handleDateFormating(item?.entrada)}`}
+            <br />
+            {`Vencimento: ${
+              item?.vencimento && handleDateFormating(item?.vencimento)
+            }`}
+          </>
+        );
+      }
+      // Cards restantes quando o processo tá na etapa inicial
+      if (index !== 0 && process?.idStage !== item.idStage) {
+        return (
+          <>{`Vencimento: ${item.duration} Dia${
+            item.duration > 1 ? "s úteis" : " útil"
+          } após a data de entrada nesta etapa.`}</>
+        );
+      }
+      // Processo fora da etapa inicial
+      if (process?.idStage === item.idStage) {
+        return (
+          <>
+            {`Entrada: ${item?.entrada && handleDateFormating(item?.entrada)}`}
+            <br />
+            {`Vencimento: ${
+              item?.vencimento && handleDateFormating(item?.vencimento)
+            }`}
+          </>
+        );
+      }
+    }
+    return "";
   };
 
   const nodes = sortedStages.map((item, index) => {
@@ -144,29 +176,18 @@ export function Flow({
             {stageLabel}
             <>
               {" "}
-              {(item?.entrada || index === 0) && <br />}
-              {item?.vencimento
-                ? `Entrada: ${item.entrada}`
-                : index === 0 &&
-                  process?.effectiveDate &&
-                  `Entrada: ${handleStartDateFormating(process.effectiveDate)}`}
               <br />
-              {item?.vencimento
-                ? `Vencimento: ${item.vencimento}`
-                : index === 0 && `Vencimento: ${handleStartDueDateFormating()}`}
-              {!item.vencimento &&
-                index !== 0 &&
-                `Vencimento: ${item.duration} dia(s) após a data de entrada`}
+              {handleDate(item, index)}
             </>
           </>
         ),
       },
       style: {
-        ...(currentStage === item.idStage && item?.vencimento
+        ...(currentStage === item.idStage
           ? {
               color: "white",
               background:
-                item?.vencimento && handleVenciento(item.vencimento)
+                item?.vencimento && handleExpiration(item.vencimento)
                   ? colors.red["500"]
                   : colors.green["500"],
               fontWeight: "bold",
