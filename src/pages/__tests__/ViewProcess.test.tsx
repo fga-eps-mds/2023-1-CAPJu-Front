@@ -1,5 +1,11 @@
 import { describe, expect } from "vitest";
-import { act, render, screen } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
@@ -49,7 +55,7 @@ const restHandlers = [
 const server = setupServer(...restHandlers);
 const queryClient = new QueryClient();
 
-describe("ViewProcess page", () => {
+describe("ViewProcess page", async () => {
   beforeAll(async () => {
     global.ResizeObserver = ResizeObserver;
     localStorage.setItem("@CAPJu:user", JSON.stringify(mockedUser));
@@ -87,5 +93,28 @@ describe("ViewProcess page", () => {
 
   it("renders correctly", () => {
     expect(screen).toMatchSnapshot();
+  });
+
+  it("shows staged name and due date correctly", () => {
+    expect(screen.findByText("etapaabcdef")).not.toBe(null);
+    expect(screen.findByText("Vencimento")).not.toBe(null);
+  });
+
+  it("opens and closes the creation modal correctly", async () => {
+    const ReturnStageButton = await screen.getByText("Retroceder Etapa");
+
+    await act(async () => {
+      await fireEvent.click(ReturnStageButton);
+    });
+
+    const closeModalButton = await screen.getByText("Cancelar");
+
+    await act(async () => {
+      await fireEvent.click(closeModalButton);
+    });
+  });
+
+  await waitFor(() => {
+    expect(screen.queryByText("ReturnModal")).toBeNull();
   });
 });

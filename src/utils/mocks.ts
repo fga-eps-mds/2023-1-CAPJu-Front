@@ -39,7 +39,7 @@ export const mockedUnits = [
 export const mockedStages = [
   {
     idStage: 1,
-    name: "a",
+    name: "etapaabcdef",
     duration: 5,
     idUnit: 1,
   },
