@@ -71,8 +71,13 @@ declare global {
   };
 
   type Result<T> = ResultSuccess<T> | ResultError;
-  type ResultSuccess<T> = { type: "success"; value: T };
-  type ResultError = { type: "error"; error: Error; value: undefined };
+  type ResultSuccess<T> = { type: "success"; value: T; totalPages?: number };
+  type ResultError = {
+    type: "error";
+    error: Error;
+    value: undefined;
+    totalPages?: undefined;
+  };
 
   type RouteObject = import("react-router-dom").RouteObject;
 

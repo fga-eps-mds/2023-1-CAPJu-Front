@@ -51,7 +51,10 @@ export function Profiles({
   });
   const { data: unitsData, isFetched: isUnitsFetched } = useQuery({
     queryKey: ["units"],
-    queryFn: getUnits,
+    queryFn: async () => {
+      const res = await getUnits();
+      return res;
+    },
   });
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;

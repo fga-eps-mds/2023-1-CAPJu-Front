@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon, Icon } from "@chakra-ui/icons";
@@ -38,13 +38,20 @@ function Units() {
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
   const {
     data: unitsData,
     isFetched: isUnitsFetched,
     refetch: refetchUnits,
   } = useQuery({
     queryKey: ["units"],
-    queryFn: getUnits,
+    queryFn: async () => {
+      const res = await getUnits({ offset: currentPage * 5, limit: 5 });
+      return res;
+    },
     onError: () => {
       toast({
         id: "units-error",
@@ -133,16 +140,13 @@ function Units() {
       },
     }),
   ];
+  const pageCount = useMemo(() => {
+    return unitsData?.totalPages;
+  }, [unitsData]);
 
-  const [currentPage, setCurrentPage] = useState(0);
-
-  const handlePageChange = (selectedPage: { selected: number }) => {
-    setCurrentPage(selectedPage.selected);
-  };
-
-  const pageCount = Math.ceil(filteredUnits.length / 5);
-  const offset = currentPage * 5;
-  const currentData = filteredUnits.slice(offset, offset + 5);
+  useEffect(() => {
+    refetchUnits();
+  }, [currentPage]);
 
   return (
     <PrivateLayout>
@@ -176,7 +180,7 @@ function Units() {
         </Flex>
       </Flex>
       <DataTable
-        data={currentData}
+        data={filteredUnits}
         columns={tableColumns}
         isDataFetching={!isUnitsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas unidades."
@@ -202,7 +206,9 @@ function Units() {
           afterSubmission={refetchUnits}
         />
       ) : null}
-      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
+      {pageCount !== undefined ? (
+        <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
+      ) : null}
     </PrivateLayout>
   );
 }
