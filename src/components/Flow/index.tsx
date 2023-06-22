@@ -23,7 +23,10 @@ interface FlowProps {
   isFetching?: boolean;
   showStagesDuration?: boolean;
   process?: Process;
+  isNextStage?: Boolean;
 }
+
+const whiteList: number[] = [];
 
 export function Flow({
   stages,
@@ -36,8 +39,10 @@ export function Flow({
   isFetching = false,
   showStagesDuration = false,
   process,
+  isNextStage,
 }: FlowProps) {
   const startDate = effectiveDate ? new Date(effectiveDate) : null;
+
   const sortedStages = useMemo(() => {
     const sequenceMap = new Map<number, number>();
 
@@ -110,19 +115,22 @@ export function Flow({
     return false;
   };
 
-  const handleDate = (item: Stage, index: Number) => {
-    // Processo não inciado
+  const handleDate = (item: Stage) => {
     if (!process?.idStage) {
       return (
         <>{`Vencimento: ${item.duration} Dia${
-          item.duration > 1 ? "s uteís" : " útil"
+          item.duration > 1 ? "s úteis" : " útil"
         } após a data de entrada nesta etapa.`}</>
       );
     }
     // Processo Iniciado
     if (process?.idStage) {
-      // Processo na etapa Inicial
-      if (index === 0 && process?.idStage) {
+      if (process?.idStage === item.idStage) {
+        if (!whiteList.includes(item?.idStage))
+          whiteList.push(process?.idStage);
+
+        if (whiteList.includes(item?.idStage) && !isNextStage) whiteList.pop();
+
         return (
           <>
             {`Entrada: ${item?.entrada && handleDateFormating(item?.entrada)}`}
@@ -133,24 +141,24 @@ export function Flow({
           </>
         );
       }
-      // Cards restantes quando o processo tá na etapa inicial
-      if (index !== 0 && process?.idStage !== item.idStage) {
+      if (process?.idStage !== item.idStage) {
+        if (whiteList.includes(item?.idStage)) {
+          return (
+            <>
+              {`Entrada: ${
+                item?.entrada && handleDateFormating(item?.entrada)
+              }`}
+              <br />
+              {`Vencimento: ${
+                item?.vencimento && handleDateFormating(item?.vencimento)
+              }`}
+            </>
+          );
+        }
         return (
           <>{`Vencimento: ${item.duration} Dia${
             item.duration > 1 ? "s úteis" : " útil"
           } após a data de entrada nesta etapa.`}</>
-        );
-      }
-      // Processo fora da etapa inicial
-      if (process?.idStage === item.idStage) {
-        return (
-          <>
-            {`Entrada: ${item?.entrada && handleDateFormating(item?.entrada)}`}
-            <br />
-            {`Vencimento: ${
-              item?.vencimento && handleDateFormating(item?.vencimento)
-            }`}
-          </>
         );
       }
     }
@@ -177,7 +185,7 @@ export function Flow({
             <>
               {" "}
               <br />
-              {handleDate(item, index)}
+              {handleDate(item)}
             </>
           </>
         ),

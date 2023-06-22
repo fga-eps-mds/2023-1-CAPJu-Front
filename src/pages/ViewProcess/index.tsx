@@ -3,7 +3,7 @@ import { Icon } from "@chakra-ui/icons";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
 import { FiArchive, FiSkipBack, FiSkipForward } from "react-icons/fi";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 
 import { PrivateLayout } from "layouts/Private";
@@ -25,6 +25,7 @@ import { ArchivationModal } from "./ArchivationModal";
 import { ReturnModal } from "./ReturnModal";
 
 function ViewProcess() {
+  const [action, setAction] = useState<Boolean | undefined>();
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -136,6 +137,7 @@ function ViewProcess() {
 
   async function handleUpdateProcessStage(isNextStage: boolean) {
     handleLoading(true);
+    setAction(isNextStage);
 
     const res = processData?.value
       ? await updateStage({
@@ -400,6 +402,7 @@ function ViewProcess() {
             effectiveDate={processData?.value?.effectiveDate}
             isFetching={!isProcessFetched || !isFlowFetched}
             process={processData?.value}
+            isNextStage={action}
           />
         )}
       </Flex>
