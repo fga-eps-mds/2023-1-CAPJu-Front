@@ -68,7 +68,10 @@ export function CreationModal({
   }, [selectedStages]);
   const { data: stagesData } = useQuery({
     queryKey: ["stages"],
-    queryFn: getStages,
+    queryFn: async () => {
+      const res = await getStages();
+      return res;
+    },
   });
   const { data: usersData } = useQuery({
     queryKey: ["accepted-users"],

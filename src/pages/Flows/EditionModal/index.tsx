@@ -49,7 +49,10 @@ export function EditionModal({
   const { handleLoading } = useLoading();
   const { data: stagesData, isFetched: isStagesFetched } = useQuery({
     queryKey: ["stages"],
-    queryFn: getStages,
+    queryFn: async () => {
+      const res = await getStages();
+      return res;
+    },
   });
   const { data: usersData } = useQuery({
     queryKey: ["accepted-users"],

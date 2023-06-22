@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon, Icon } from "@chakra-ui/icons";
@@ -30,17 +30,26 @@ function Stages() {
     onOpen: onDeletionOpen,
     onClose: onDeletionClose,
   } = useDisclosure();
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
+
   const {
     data: stagesData,
     isFetched: isStagesFetched,
     refetch: refetchStages,
   } = useQuery({
     queryKey: ["stages"],
-    queryFn: getStages,
+    queryFn: async () => {
+      const res = await getStages({ offset: currentPage * 5, limit: 5 });
+      return res;
+    },
     onError: () => {
       toast({
         id: "stages-error",
@@ -124,15 +133,13 @@ function Stages() {
     }),
   ];
 
-  const [currentPage, setCurrentPage] = useState(0);
+  const pageCount = useMemo(() => {
+    return stagesData?.totalPages;
+  }, [stagesData]);
 
-  const handlePageChange = (selectedPage: { selected: number }) => {
-    setCurrentPage(selectedPage.selected);
-  };
-
-  const pageCount = Math.ceil(filteredStages.length / 5);
-  const offset = currentPage * 5;
-  const currentItems = filteredStages.slice(offset, offset + 5);
+  useEffect(() => {
+    refetchStages();
+  }, [currentPage]);
 
   return (
     <PrivateLayout>
@@ -166,12 +173,14 @@ function Stages() {
         </Flex>
       </Flex>
       <DataTable
-        data={currentItems}
+        data={filteredStages}
         columns={tableColumns}
         isDataFetching={!isStagesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas etapas."
       />
-      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
+      {pageCount !== undefined ? (
+        <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
+      ) : null}
       <CreationModal
         user={userData?.value!}
         isOpen={isCreationOpen}
