@@ -167,3 +167,23 @@ export const mockedPriorities = [
     description: "Réu Preso",
   },
 ];
+
+export const mockedStage = [
+  {
+    idStage: 1,
+    idUnit: 1,
+    name: "a",
+    duration: 5,
+    createdAt: "2100-06-19T03:26:25.050Z",
+    entrada: new Date(),
+    vencimento: new Date(),
+  },
+];
+
+export const mockedFlowSequence = [
+  {
+    from: 1,
+    to: 2,
+    commentary: "",
+  },
+];
