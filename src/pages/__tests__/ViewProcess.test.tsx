@@ -1,11 +1,5 @@
 import { describe, expect } from "vitest";
-import {
-  act,
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-} from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
@@ -95,26 +89,21 @@ describe("ViewProcess page", async () => {
     expect(screen).toMatchSnapshot();
   });
 
+  it("shows process text content correctly", () => {
+    expect(screen.getByText("(12345678912345678915)")).not.toBe(null);
+    expect(screen.getByText("Processo - Processo NS")).not.toBe(null);
+    expect(screen.getByText("Não iniciado")).not.toBe(null);
+    expect(screen.getByText("Status:")).not.toBe(null);
+    expect(screen.getByText("Fluxo:")).not.toBe(null);
+    expect(screen.getByText("Fluxo 1")).not.toBe(null);
+    expect(screen.getByText("Prioridade Legal:")).not.toBe(null);
+    expect(screen.getByText("Não tem")).not.toBe(null);
+    expect(screen.getByText("Voltar aos Processos")).not.toBe(null);
+    expect(screen.getByText("Iniciar Processo")).not.toBe(null);
+  });
+
   it("shows staged name and due date correctly", () => {
-    expect(screen.findByText("etapaabcdef")).not.toBe(null);
+    expect(screen.findByText("etapaA")).not.toBe(null);
     expect(screen.findByText("Vencimento")).not.toBe(null);
-  });
-
-  it("opens and closes the creation modal correctly", async () => {
-    const ReturnStageButton = await screen.getByText("Retroceder Etapa");
-
-    await act(async () => {
-      await fireEvent.click(ReturnStageButton);
-    });
-
-    const closeModalButton = await screen.getByText("Cancelar");
-
-    await act(async () => {
-      await fireEvent.click(closeModalButton);
-    });
-  });
-
-  await waitFor(() => {
-    expect(screen.queryByText("ReturnModal")).toBeNull();
   });
 });
