@@ -124,9 +124,22 @@ describe("Processes page", () => {
       "Mostrar apenas processos arquivados/finalizados"
     );
 
-    if (button) {
-      expect(button).not.toBe(null);
-    }
+    expect(button).not.toBe(null);
+
+    await mockedProcesses.forEach(async (process) => {
+      expect(await screen.findByText(process.record)).toBeDefined()
+    })
+
+    await act(async () => {
+      await fireEvent.click(button);
+    });
+
+    await mockedProcesses.forEach(async (process) => {
+      if (process.status === "finished" || process.status === "archived")
+        expect(await screen.findByText(process.record)).toBeDefined()
+      else
+        expect(await screen.findByText(process.record)).not.toBeDefined()
+    })
   });
 
   it("shows 'search bar' correctly", async () => {
@@ -137,6 +150,7 @@ describe("Processes page", () => {
     if (button) {
       expect(button).not.toBe(null);
     }
+
   });
 
   it("opens and closes the creation modal correctly", async () => {
