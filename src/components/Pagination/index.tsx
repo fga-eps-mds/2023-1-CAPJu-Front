@@ -25,7 +25,7 @@ export function Pagination({ pageCount, onPageChange }: PaginationProps) {
       previousLinkClassName="pagination__link"
       nextLinkClassName="pagination__link"
       disabledClassName="pagination__link--disabled"
-      activeClassName="pagination__link--active"
+      activeClassName="active"
     />
   );
 }

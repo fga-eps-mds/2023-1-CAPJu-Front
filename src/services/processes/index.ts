@@ -1,14 +1,27 @@
 import { api } from "services/api";
 
+type Pagination = {
+  offset: number;
+  limit: number;
+};
+
 export const getProcesses = async (
-  flowId: number | undefined
+  flowId: number | undefined,
+  pagination?: Pagination
 ): Promise<Result<Process[]>> => {
   try {
-    const res = await api.processes.get<Process[]>(
-      `/processes${flowId ? `/${flowId}` : ""}`
-    );
+    const res = await api.processes.get<{
+      processes: Process[];
+      totalPages: number;
+    }>(`/processes${flowId ? `/${flowId}` : ""}`, {
+      params: { ...pagination },
+    });
 
-    return { type: "success", value: res.data };
+    return {
+      type: "success",
+      value: res.data.processes,
+      totalPages: res.data.totalPages,
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };

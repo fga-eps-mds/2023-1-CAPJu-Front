@@ -57,6 +57,10 @@ function Processes() {
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
   const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
@@ -84,7 +88,10 @@ function Processes() {
   } = useQuery({
     queryKey: ["processes"],
     queryFn: async () => {
-      const res = await getProcesses(flow?.idFlow);
+      const res = await getProcesses(flow?.idFlow, {
+        offset: currentPage * 5,
+        limit: 5,
+      });
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -242,15 +249,13 @@ function Processes() {
     tableActions,
   ]);
 
-  const [currentPage, setCurrentPage] = useState(0);
+  const pageCount = useMemo(() => {
+    return processesData?.totalPages;
+  }, [processesData]);
 
-  const handlePageChange = (selectedPage: { selected: number }) => {
-    setCurrentPage(selectedPage.selected);
-  };
-
-  const pageCount = Math.ceil(filteredProcess.length / 5);
-  const offset = currentPage * 5;
-  const currentData = filteredProcess.slice(offset, offset + 5);
+  useEffect(() => {
+    refetchProcesses();
+  }, [currentPage]);
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [
@@ -373,7 +378,7 @@ function Processes() {
         </Flex>
       </Flex>
       <DataTable
-        data={currentData}
+        data={filteredProcess}
         columns={tableColumns}
         isDataFetching={!isProcessesFetched || !isUserFetched}
         emptyTableMessage={`Não foram encontrados processos${
@@ -401,7 +406,9 @@ function Processes() {
           refetchStages={refetchProcesses}
         />
       )}
-      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
+      {pageCount !== undefined ? (
+        <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
+      ) : null}
     </PrivateLayout>
   );
 }
