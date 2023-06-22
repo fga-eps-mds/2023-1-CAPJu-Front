@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { MdDelete, MdEdit } from "react-icons/md";
@@ -16,6 +16,9 @@ import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
 
+// function refetchFlows() {
+//  throw new Error("Function not implemented.");
+// }
 function Flows() {
   const toast = useToast();
   const [selectedFlow, selectFlow] = useState<Flow | null>(null);
@@ -36,13 +39,22 @@ function Flows() {
     onOpen: onDeleteOpen,
     onClose: onDeleteClose,
   } = useDisclosure();
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+
   const {
     data: flowsData,
     isFetched: isFlowsFetched,
     refetch: refetchFlows,
   } = useQuery({
     queryKey: ["flows"],
-    queryFn: getFlows,
+    queryFn: async () => {
+      const res = await getFlows({ offset: currentPage * 5, limit: 5 });
+      return res;
+    },
     onError: () => {
       toast({
         id: "flows-error",
@@ -148,15 +160,13 @@ function Flows() {
     }),
   ];
 
-  const [currentPage, setCurrentPage] = useState(0);
+  const pageCount = useMemo(() => {
+    return flowsData?.totalPages;
+  }, [flowsData]);
 
-  const handlePageChange = (selectedPage: { selected: number }) => {
-    setCurrentPage(selectedPage.selected);
-  };
-
-  const pageCount = Math.ceil(filteredFlows.length / 5);
-  const offset = currentPage * 5;
-  const currentItems = filteredFlows.slice(offset, offset + 5);
+  useEffect(() => {
+    refetchFlows();
+  }, [currentPage]);
 
   return (
     <PrivateLayout>
@@ -190,7 +200,7 @@ function Flows() {
         </Flex>
       </Flex>
       <DataTable
-        data={currentItems}
+        data={filteredFlows}
         columns={tableColumns}
         isDataFetching={!isFlowsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados fluxos."
@@ -219,7 +229,9 @@ function Flows() {
           refetchFlows={refetchFlows}
         />
       ) : null}
-      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
+      {pageCount !== undefined ? (
+        <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
+      ) : null}
     </PrivateLayout>
   );
 }
