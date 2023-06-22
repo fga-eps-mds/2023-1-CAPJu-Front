@@ -47,6 +47,7 @@ function Processes() {
   });
   const [filter, setFilter] = useState<string | undefined>(undefined);
   const [legalPriority, setLegalPriority] = useState(false);
+  const [showFinished, setShowFinished] = useState<boolean>(true);
   const {
     isOpen: isCreationOpen,
     onOpen: onCreationOpen,
@@ -62,7 +63,7 @@ function Processes() {
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
-  const { data: flowsData } = useQuery({
+  const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
       const res = await getFlows();
@@ -93,35 +94,7 @@ function Processes() {
 
       if (res.type === "error") throw new Error(res.error.message);
 
-      return {
-        ...res,
-        value: res?.value?.reduce((acc: Process[], curr: Process) => {
-          const currFlow = flowsData?.value?.find(
-            (item) =>
-              item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
-          );
-          const currIndexInFlow =
-            currFlow?.stages?.indexOf(curr?.idStage) || -1;
-          const currentState =
-            (currFlow?.stages && currIndexInFlow !== -1) ||
-            curr.status === "notStarted"
-              ? `${currIndexInFlow + 1}/${currFlow?.stages?.length}`
-              : `${currIndexInFlow + 2}/${currFlow?.stages?.length}`;
-
-          return [
-            ...acc,
-            {
-              ...curr,
-              currentState: `${
-                curr.status === "finished"
-                  ? `${currFlow?.stages?.length}/${currFlow?.stages?.length}`
-                  : currentState
-              }`,
-              flowName: currFlow?.name,
-            },
-          ];
-        }, []),
-      };
+      return res;
     },
     onError: () => {
       toast({
@@ -171,60 +144,91 @@ function Processes() {
     [isProcessesFetched, isUserFetched, userData]
   );
 
-  const filterByPriority = (processes: Process[]) => {
-    return processes?.filter((process: Process) => process.idPriority);
+  const filterByPriority = (processes: Process[]) =>
+    processes?.filter((process: Process) => process.idPriority);
+
+  const filterByStatus = (processes: Process[]) => {
+    if (!showFinished) {
+      return processes?.filter(
+        (process: Process) =>
+          process.status === "finished" || process.status === "archived"
+      );
+    }
+    return processes;
   };
 
   const filteredProcess = useMemo<TableRow<Process>[]>(() => {
-    if (!isProcessesFetched) return [];
+    if (!isProcessesFetched || !isFlowsFetched) return [];
 
     let value = processesData?.value;
 
     if (legalPriority && value) value = filterByPriority(value);
+    if (!showFinished && value) value = filterByStatus(value);
 
     return (
       (value?.reduce(
         (
           acc: TableRow<Process>[] | Process[],
           curr: TableRow<Process> | Process
-        ) => [
-          ...acc,
-          {
-            ...curr,
-            tableActions,
-            actionsProps: {
-              process: curr,
-              pathname: `/processos/${curr.record}`,
-              state: {
+        ) => {
+          const currFlow = flowsData?.value?.find(
+            (item) =>
+              item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
+          );
+          const currIndexInFlow =
+            currFlow?.stages?.indexOf(curr?.idStage) || -1;
+          const currentState =
+            (currFlow?.stages && currIndexInFlow !== -1) ||
+            curr.status === "notStarted"
+              ? `${currIndexInFlow + 1}/${currFlow?.stages?.length}`
+              : `${currIndexInFlow + 2}/${currFlow?.stages?.length}`;
+
+          return [
+            ...acc,
+            {
+              ...curr,
+              tableActions,
+              actionsProps: {
                 process: curr,
-                ...(state || {}),
+                pathname: `/processos/${curr.record}`,
+                state: {
+                  process: curr,
+                  ...(state || {}),
+                },
               },
+              // @ts-ignore
+              record: curr.idPriority ? (
+                <Flex flex="1" alignItems="center" gap="1">
+                  {curr.record}
+                  <Tooltip
+                    label="Prioridade legal"
+                    hasArrow
+                    background="blackAlpha.900"
+                    placement="right"
+                  >
+                    <ArrowUpIcon boxSize={3.5} />
+                  </Tooltip>
+                </Flex>
+              ) : (
+                curr.record
+              ),
+              currentState: `${
+                curr.status === "finished"
+                  ? `${currFlow?.stages?.length}/${currFlow?.stages?.length}`
+                  : currentState
+              }`,
+              flowName: currFlow?.name,
+              // @ts-ignore
+              status: labelByProcessStatus[curr.status],
             },
-            // @ts-ignore
-            record: curr.idPriority ? (
-              <Flex flex="1" alignItems="center" gap="1">
-                {curr.record}
-                <Tooltip
-                  label="Prioridade legal"
-                  hasArrow
-                  background="blackAlpha.900"
-                  placement="right"
-                >
-                  <ArrowUpIcon boxSize={3.5} />
-                </Tooltip>
-              </Flex>
-            ) : (
-              curr.record
-            ),
-            // @ts-ignore
-            status: labelByProcessStatus[curr.status],
-          },
-        ],
+          ];
+        },
         []
       ) as TableRow<Process>[]) || []
     );
   }, [
     legalPriority,
+    showFinished,
     processesData,
     filter,
     isProcessesFetched,
@@ -282,7 +286,7 @@ function Processes() {
 
   useEffect(() => {
     refetchProcesses();
-  }, [flowsData]);
+  }, [flowsData, isFlowsFetched]);
 
   return (
     <PrivateLayout>
@@ -320,18 +324,18 @@ function Processes() {
           </Flex>
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Flex justifyContent="flex-start" w="70%">
+          <Flex justifyContent="flex-start" w="100%">
             <chakra.form
               onSubmit={(e) => {
                 e.preventDefault();
                 refetchProcesses();
               }}
               w="100%"
+              display="flex"
+              flexDirection="row"
             >
               <Input
                 placeholder="Pesquisar processos (por registro ou apelido)"
-                width={["100%", "100%", "60%"]}
-                maxW={["100%", "100%", 365]}
                 value={filter}
                 onChange={({ target }) => setFilter(target.value)}
                 variant="filled"
@@ -351,14 +355,24 @@ function Processes() {
               </Button>
             </chakra.form>
           </Flex>
-          <Checkbox
-            colorScheme="green"
-            borderColor="gray.600"
-            checked={legalPriority}
-            onChange={() => setLegalPriority(!legalPriority)}
-          >
-            Mostrar processos com prioridade legal
-          </Checkbox>
+          <Flex flexDir="row" rowGap="1" columnGap="3" flexWrap="wrap">
+            <Checkbox
+              colorScheme="green"
+              borderColor="gray.600"
+              checked={legalPriority}
+              onChange={() => setLegalPriority(!legalPriority)}
+            >
+              Mostrar apenas processos com prioridade legal
+            </Checkbox>
+            <Checkbox
+              colorScheme="green"
+              borderColor="gray.600"
+              checked={showFinished}
+              onChange={() => setShowFinished(!showFinished)}
+            >
+              Mostrar apenas processos arquivados/finalizados
+            </Checkbox>
+          </Flex>
         </Flex>
       </Flex>
       <DataTable

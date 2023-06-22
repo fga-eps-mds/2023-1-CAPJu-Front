@@ -80,6 +80,7 @@ export function CreationModal({
     formState: { errors, isSubmitted },
     reset,
   } = useForm<FormValues>({
+    // @ts-ignore
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });
@@ -159,7 +160,9 @@ export function CreationModal({
                 }
                 options={stagesData?.value?.map((item: Stage) => {
                   return {
-                    label: item.name,
+                    label: `${item.name}, (${item.duration} dia${
+                      item.duration > 1 ? "s" : ""
+                    })`,
                     value: item.idStage,
                   };
                 })}
@@ -194,7 +197,11 @@ export function CreationModal({
                 }}
               />
             ) : null}
-            <Flow stages={selectedStages} sequences={sequences} />
+            <Flow
+              stages={selectedStages}
+              sequences={sequences}
+              showStagesDuration
+            />
           </ModalBody>
           <ModalFooter gap="2">
             <Button variant="ghost" onClick={onClose} size="sm">
