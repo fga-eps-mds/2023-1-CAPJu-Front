@@ -66,7 +66,7 @@ function Processes() {
   const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
-      const res = await getFlows();
+      const res = await getFlows(filter);
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -179,7 +179,7 @@ function Processes() {
             currFlow?.stages?.indexOf(curr?.idStage) || -1;
           const currentState =
             (currFlow?.stages && currIndexInFlow !== -1) ||
-            curr.status === "notStarted"
+              curr.status === "notStarted"
               ? `${currIndexInFlow + 1}/${currFlow?.stages?.length}`
               : `${currIndexInFlow + 2}/${currFlow?.stages?.length}`;
 
@@ -212,11 +212,10 @@ function Processes() {
               ) : (
                 curr.record
               ),
-              currentState: `${
-                curr.status === "finished"
+              currentState: `${curr.status === "finished"
                   ? `${currFlow?.stages?.length}/${currFlow?.stages?.length}`
                   : currentState
-              }`,
+                }`,
               flowName: currFlow?.name,
               // @ts-ignore
               status: labelByProcessStatus[curr.status],
@@ -379,9 +378,8 @@ function Processes() {
         data={filteredProcess}
         columns={tableColumns}
         isDataFetching={!isProcessesFetched || !isUserFetched}
-        emptyTableMessage={`Não foram encontrados processos${
-          flow ? ` no fluxo ${flow.name}` : ""
-        }.`}
+        emptyTableMessage={`Não foram encontrados processos${flow ? ` no fluxo ${flow.name}` : ""
+          }.`}
       />
       <CreationModal
         isOpen={isCreationOpen}
