@@ -1,6 +1,6 @@
 import { describe, expect } from "vitest";
 import { act, render, screen } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -8,7 +8,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
-import { mockedStages, mockedManagerUser } from "utils/mocks";
+import { mockedUser, mockedStages } from "utils/mocks";
 import Stages from "../Stages";
 
 const restHandlers = [
@@ -17,8 +17,8 @@ const restHandlers = [
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedStages))
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedManagerUser.cpf}`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedManagerUser))
+    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
   ),
 ];
 
@@ -26,18 +26,21 @@ const server = setupServer(...restHandlers);
 const queryClient = new QueryClient();
 
 describe("Stages page", () => {
-  beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+  beforeAll(async () => {
+    localStorage.setItem("@CAPJu:user", JSON.stringify(mockedUser));
+    server.listen({ onUnhandledRequest: "error" });
+  });
 
   beforeEach(async () => {
     await act(async () => {
-      render(
+      await render(
         <ChakraProvider>
           <LoadingProvider>
             <QueryClientProvider client={queryClient}>
               <AuthProvider>
-                <BrowserRouter>
+                <MemoryRouter>
                   <Stages />
-                </BrowserRouter>
+                </MemoryRouter>
               </AuthProvider>
             </QueryClientProvider>
           </LoadingProvider>
@@ -58,12 +61,12 @@ describe("Stages page", () => {
     expect(screen.findAllByText("Etapas")).not.toBe(null);
     expect(screen.getByText("Duração (em dias)")).not.toBe(null);
     expect(screen.getByText("Ações")).not.toBe(null);
-    expect(screen.getByText("a")).not.toBe(null);
-    expect(screen.getByText("1")).not.toBe(null);
-    expect(screen.getByText("b")).not.toBe(null);
+    expect(screen.getByText("etapaA")).not.toBe(null);
     expect(screen.getByText("2")).not.toBe(null);
-    expect(screen.getByText("c")).not.toBe(null);
+    expect(screen.getByText("etapaB")).not.toBe(null);
     expect(screen.getByText("3")).not.toBe(null);
+    expect(screen.getByText("etapaC")).not.toBe(null);
+    expect(screen.getByText("5")).not.toBe(null);
   });
 
   it("shows 'create stage' correctly", async () => {
