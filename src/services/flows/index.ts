@@ -1,8 +1,10 @@
 import { api } from "services/api";
 
-export const getFlows = async (): Promise<Result<Flow[]>> => {
+export const getFlows = async (
+  filter: string | undefined
+): Promise<Result<Flow[]>> => {
   try {
-    const res = await api.flows.get<Flow[]>("/flows");
+    const res = await api.flows.get<Flow[]>("/flows", { params: { filter } });
 
     return { type: "success", value: res.data };
   } catch (error) {
