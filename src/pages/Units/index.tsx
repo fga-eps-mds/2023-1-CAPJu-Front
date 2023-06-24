@@ -1,7 +1,11 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
-import { AddIcon, Icon } from "@chakra-ui/icons";
+import { Flex, useToast, Text, Button, useDisclosure, chakra } from "@chakra-ui/react";
+import {
+  AddIcon,
+  Icon,
+  SearchIcon,
+} from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -41,7 +45,13 @@ function Units() {
     refetch: refetchUnits,
   } = useQuery({
     queryKey: ["units"],
-    queryFn: getUnits,
+    queryFn: async () => {
+      const res = await getUnits(filter);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
     onError: () => {
       toast({
         id: "units-error",
@@ -87,12 +97,7 @@ function Units() {
   const filteredUnits = useMemo<TableRow<Unit>[]>(() => {
     if (!isUnitsFetched) return [];
 
-    const value =
-      filter !== ""
-        ? unitsData?.value?.filter((unit) =>
-            unit.name.toLowerCase().includes(filter.toLocaleLowerCase())
-          )
-        : unitsData?.value;
+    const value = unitsData?.value;
 
     return (
       (value?.reduce(
@@ -148,18 +153,36 @@ function Units() {
             <AddIcon mr="2" boxSize={3} /> Criar Unidade
           </Button>
         </Flex>
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Input
-            placeholder="Pesquisar unidades"
-            value={filter}
-            onChange={({ target }) => setFilter(target.value)}
-            variant="filled"
-            css={{
-              "&, &:hover, &:focus": {
-                background: "white",
-              },
+        <Flex justifyContent="flex-start" w="100%">
+          <chakra.form
+            onSubmit={(e) => {
+              e.preventDefault();
+              refetchUnits();
             }}
-          />
+            w="100%"
+            display="flex"
+            flexDirection="row"
+          >
+            <Input
+              placeholder="Pesquisar unidades"
+              value={filter}
+              onChange={({ target }) => setFilter(target.value)}
+              variant="filled"
+              css={{
+                "&, &:hover, &:focus": {
+                  background: "white",
+                },
+              }}
+            />
+            <Button
+              colorScheme="green"
+              marginLeft="2"
+              justifyContent="center"
+              type="submit"
+            >
+              <SearchIcon boxSize={4} />
+            </Button>
+          </chakra.form>
         </Flex>
       </Flex>
       <DataTable
