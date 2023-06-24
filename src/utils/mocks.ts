@@ -143,4 +143,32 @@ export const mockedPriorities = [
     idPriority: 1,
     description: "Art. 1048, II. Do CPC (ECA)",
   },
+  {
+    idPriority: 2,
+    description: "Art. 1048, IV do CPC (Licitação)",
+  },
+  {
+    idPriority: 3,
+    description: "Art. 7, parágrafo 4, da Lei n 12.016/2009",
+  },
+  {
+    idPriority: 4,
+    description: "Idosa(a) maior de 80 anos",
+  },
+  {
+    idPriority: 5,
+    description: "Pessoa com deficiencia",
+  },
+  {
+    idPriority: 6,
+    description: "Pessoa em situação de rua",
+  },
+  {
+    idPriority: 7,
+    description: "Portador(a) de doença grave",
+  },
+  {
+    idPriority: 8,
+    description: "Réu Preso",
+  },
 ];
