@@ -21,7 +21,7 @@ import _ from "lodash";
 import { useLoading } from "hooks/useLoading";
 import { Input } from "components/FormFields";
 import { getUnits } from "services/units";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Select } from "components/FormFields/Select";
 import { roleOptions } from "utils/roles";
 import { signUp } from "services/user";
@@ -68,11 +68,16 @@ const validationSchema = yup.object({
 
 function Signup() {
   const toast = useToast();
+  const [filter] = useState<string>("");
   const navigate = useNavigate();
   const { handleLoading } = useLoading();
   const { data: unitsData } = useQuery({
     queryKey: ["units"],
-    queryFn: getUnits,
+    queryFn: async () => {
+      const res = await getUnits(filter);
+
+      return res;
+    },
     onError: () => {
       toast({
         id: "units-error",

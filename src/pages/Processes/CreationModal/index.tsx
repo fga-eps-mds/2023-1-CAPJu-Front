@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -57,6 +57,7 @@ export function CreationModal({
 }: CreationModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
+  const [filter] = useState<string>("");
   const { data: prioritiesData } = useQuery({
     queryKey: ["priorities"],
     queryFn: async () => {
@@ -76,7 +77,13 @@ export function CreationModal({
   });
   const { data: flowsData } = useQuery({
     queryKey: ["flows"],
-    queryFn: getFlows,
+    queryFn: async () => {
+      const res = await getFlows(filter);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
     onError: () => {
       toast({
         id: "flows-error",
@@ -167,11 +174,11 @@ export function CreationModal({
               options={
                 flowsData?.value
                   ? flowsData?.value?.map((flow) => {
-                      return {
-                        value: flow.idFlow,
-                        label: flow.name,
-                      };
-                    })
+                    return {
+                      value: flow.idFlow,
+                      label: flow.name,
+                    };
+                  })
                   : []
               }
               errors={errors.idFlow}
@@ -193,13 +200,13 @@ export function CreationModal({
                 options={
                   prioritiesData?.value
                     ? (prioritiesData.value as Priority[]).map(
-                        (priority: Priority) => {
-                          return {
-                            value: priority.idPriority,
-                            label: priority.description,
-                          };
-                        }
-                      )
+                      (priority: Priority) => {
+                        return {
+                          value: priority.idPriority,
+                          label: priority.description,
+                        };
+                      }
+                    )
                     : []
                 }
                 errors={errors.idPriority}
