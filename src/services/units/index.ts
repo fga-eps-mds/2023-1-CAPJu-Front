@@ -1,8 +1,10 @@
 import { api } from "services/api";
 
-export const getUnits = async (): Promise<Result<Unit[]>> => {
+export const getUnits = async (
+  filter: string | undefined
+): Promise<Result<Unit[]>> => {
   try {
-    const res = await api.units.get<Unit[]>("/units");
+    const res = await api.units.get<Unit[]>("/units", { params: { filter } });
 
     return { type: "success", value: res.data };
   } catch (error) {
