@@ -19,6 +19,7 @@ import {
   mockedProcesses,
   mockedFlows,
   mockedPriorities,
+  mockedNotStartedProcess,
 } from "utils/mocks";
 import Processes from "../Processes";
 
@@ -104,9 +105,7 @@ describe("Processes page", () => {
   it("shows 'create process' correctly", async () => {
     const button = screen.getByText("Criar Processo");
 
-    if (button) {
-      expect(button).not.toBe(null);
-    }
+    expect(button).not.toBe(null);
   });
 
   it("shows 'legal priority' correctly", async () => {
@@ -119,38 +118,30 @@ describe("Processes page", () => {
     }
   });
 
-  it("shows 'archived/finished' correctly", async () => {
+  it("toggles 'archived/finished processes' checkbox correctly", async () => {
     const button = screen.getByText(
       "Mostrar apenas processos arquivados/finalizados"
     );
 
     expect(button).not.toBe(null);
 
-    await mockedProcesses.forEach(async (process) => {
-      expect(await screen.findByText(process.record)).toBeDefined()
-    })
+    expect(await screen.queryByText(mockedNotStartedProcess.record)).not.toBe(
+      null
+    );
 
     await act(async () => {
       await fireEvent.click(button);
     });
 
-    await mockedProcesses.forEach(async (process) => {
-      if (process.status === "finished" || process.status === "archived")
-        expect(await screen.findByText(process.record)).toBeDefined()
-      else
-        expect(await screen.findByText(process.record)).not.toBeDefined()
-    })
+    expect(await screen.queryByText(mockedNotStartedProcess.record)).toBe(null);
   });
 
-  it("shows 'search bar' correctly", async () => {
-    const button = screen.getByPlaceholderText(
+  it("displays the 'search bar' correctly", async () => {
+    const input = screen.getByPlaceholderText(
       "Pesquisar processos (por registro ou apelido)"
     );
 
-    if (button) {
-      expect(button).not.toBe(null);
-    }
-
+    expect(input).not.toBe(null);
   });
 
   it("opens and closes the creation modal correctly", async () => {
