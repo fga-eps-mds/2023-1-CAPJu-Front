@@ -15,6 +15,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
+
 import { mockedManagerUser, mockedStages } from "utils/mocks";
 import Stages from "../Stages";
 

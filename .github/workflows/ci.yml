@@ -187,7 +187,7 @@ jobs:
         run: npx eslint -f json -o reports/eslint-report.json src || true
 
       - name: 🧪 Testes e cobertura
-        run: VITEST_REPORTERS=vitest-sonar-reporter yarn test
+        run: VITEST_REPORTERS=vitest-sonar-reporter yarn test --coverage
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
