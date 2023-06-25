@@ -102,7 +102,7 @@ export function CreationModal({
     reset,
     watch,
   } = useForm<FormValues>({
-     // @ts-ignore
+    // @ts-ignore
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });
