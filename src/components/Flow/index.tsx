@@ -118,9 +118,7 @@ export function Flow({
   const handleDate = (item: Stage) => {
     if (!process?.idStage) {
       return (
-        <>{`Vencimento: ${item.duration} Dia${
-          item.duration > 1 ? "s úteis" : " útil"
-        } após a data de entrada nesta etapa.`}</>
+        <>{`Vencimento: ${item.duration} Dia${item.duration > 1 ? "s" : ""}`}</>
       );
     }
     // Processo Iniciado
@@ -157,8 +155,8 @@ export function Flow({
         }
         return (
           <>{`Vencimento: ${item.duration} Dia${
-            item.duration > 1 ? "s úteis" : " útil"
-          } após a data de entrada nesta etapa.`}</>
+            item.duration > 1 ? "s" : ""
+          }`}</>
         );
       }
     }
@@ -167,7 +165,7 @@ export function Flow({
 
   const nodes = sortedStages.map((item, index) => {
     const deadline = getStageDeadline(item, index);
-    const stageLabel = `${_.startCase(item.name)}, ${
+    const stageLabel = `${_.startCase(item.name)} ${
       showStagesDuration
         ? ` (${item.duration} dia${item.duration > 1 ? "s" : ""})`
         : ""
