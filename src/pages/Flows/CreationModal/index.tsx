@@ -75,7 +75,10 @@ export function CreationModal({
   });
   const { data: usersData } = useQuery({
     queryKey: ["accepted-users"],
-    queryFn: getAcceptedUsers,
+    queryFn: async () => {
+      const res = await getAcceptedUsers();
+      return res;
+    },
   });
   const {
     register,

@@ -1,10 +1,5 @@
 import { api } from "services/api";
 
-type Pagination = {
-  offset: number;
-  limit: number;
-};
-
 export const getStages = async (
   pagination?: Pagination
 ): Promise<Result<Stage[]>> => {

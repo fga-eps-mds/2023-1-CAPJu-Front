@@ -102,4 +102,9 @@ declare global {
     tableActions: TableAction[];
     actionsProps: any;
   };
+
+  type Pagination = {
+    offset: number;
+    limit: number;
+  };
 }

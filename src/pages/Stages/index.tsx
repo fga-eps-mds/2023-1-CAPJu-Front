@@ -30,7 +30,6 @@ function Stages() {
     onOpen: onDeletionOpen,
     onClose: onDeletionClose,
   } = useDisclosure();
-
   const [currentPage, setCurrentPage] = useState(0);
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
@@ -39,7 +38,6 @@ function Stages() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-
   const {
     data: stagesData,
     isFetched: isStagesFetched,
@@ -78,7 +76,6 @@ function Stages() {
     ],
     [isStagesFetched, isUserFetched, userData]
   );
-
   const filteredStages = useMemo<TableRow<Stage>[]>(() => {
     if (!isStagesFetched) return [];
 
@@ -133,10 +130,6 @@ function Stages() {
     }),
   ];
 
-  const pageCount = useMemo(() => {
-    return stagesData?.totalPages;
-  }, [stagesData]);
-
   useEffect(() => {
     refetchStages();
   }, [currentPage]);
@@ -178,8 +171,11 @@ function Stages() {
         isDataFetching={!isStagesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas etapas."
       />
-      {pageCount !== undefined ? (
-        <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
+      {stagesData?.totalPages !== undefined ? (
+        <Pagination
+          pageCount={stagesData?.totalPages}
+          onPageChange={handlePageChange}
+        />
       ) : null}
       <CreationModal
         user={userData?.value!}

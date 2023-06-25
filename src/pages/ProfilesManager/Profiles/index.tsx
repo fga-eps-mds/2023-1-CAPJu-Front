@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, Text, useDisclosure } from "@chakra-ui/react";
 import { Icon, ViewIcon } from "@chakra-ui/icons";
@@ -11,24 +11,33 @@ import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { getUnits } from "services/units";
 import { roleNameById } from "utils/roles";
+import { getAcceptedUsers } from "services/user";
 import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
 import { ViewModal } from "./ViewModal";
 
-interface ProfilesProps {
-  usersData: Result<User[]> | undefined;
-  isUsersFetched: boolean;
-  refetchUsers: () => void;
-}
-
-export function Profiles({
-  usersData,
-  isUsersFetched,
-  refetchUsers,
-}: ProfilesProps) {
+export function Profiles() {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+  const {
+    data: usersData,
+    isFetched: isUsersFetched,
+    refetch: refetchUsers,
+  } = useQuery({
+    queryKey: ["accepted-users"],
+    queryFn: async () => {
+      const res = await getAcceptedUsers({
+        offset: currentPage * 5,
+        limit: 5,
+      });
+      return res;
+    },
+  });
   const {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
@@ -163,16 +172,9 @@ export function Profiles({
     }),
   ];
 
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(0);
-  const offset = currentPage * 5;
-  const pageCount = Math.ceil(users.length / 5);
-
-  const handlePageChange = (selectedItem: { selected: number }) => {
-    setCurrentPage(selectedItem.selected);
-  };
-
-  const paginatedUsers = users.slice(offset, offset + 5);
+  useEffect(() => {
+    refetchUsers();
+  }, [currentPage]);
 
   return (
     <>
@@ -197,7 +199,7 @@ export function Profiles({
         </Flex>
       </Flex>
       <DataTable
-        data={paginatedUsers}
+        data={users}
         columns={
           userData?.value?.idRole !== 5
             ? tableColumns.filter((_, index) => index !== 1)
@@ -206,9 +208,12 @@ export function Profiles({
         isDataFetching={!isUsersFetched || !isUnitsFetched}
         emptyTableMessage="Não há usuários cadastrados"
       />
-
-      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
-
+      {usersData?.totalPages ? (
+        <Pagination
+          pageCount={usersData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       {userData?.value && selectedUser && isEditOpen && (
         <EditionModal
           isOpen={isEditOpen}
@@ -217,7 +222,6 @@ export function Profiles({
           refetch={refetchUsers}
         />
       )}
-
       {userData?.value && selectedUser && isViewOpen && (
         <ViewModal
           isOpen={isViewOpen}
@@ -225,7 +229,6 @@ export function Profiles({
           user={selectedUser}
         />
       )}
-
       {userData?.value && selectedUser && isDeleteOpen && (
         <DeletionModal
           isOpen={isDeleteOpen}

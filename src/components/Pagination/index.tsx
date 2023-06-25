@@ -1,6 +1,8 @@
 import { useState } from "react";
 import ReactPaginate from "react-paginate";
 
+import "./style.css";
+
 interface PaginationProps {
   pageCount: number;
   // eslint-disable-next-line no-unused-vars

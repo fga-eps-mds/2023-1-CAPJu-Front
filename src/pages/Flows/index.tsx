@@ -16,9 +16,6 @@ import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
 
-// function refetchFlows() {
-//  throw new Error("Function not implemented.");
-// }
 function Flows() {
   const toast = useToast();
   const [selectedFlow, selectFlow] = useState<Flow | null>(null);
@@ -39,12 +36,10 @@ function Flows() {
     onOpen: onDeleteOpen,
     onClose: onDeleteClose,
   } = useDisclosure();
-
   const [currentPage, setCurrentPage] = useState(0);
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
   };
-
   const {
     data: flowsData,
     isFetched: isFlowsFetched,
@@ -160,10 +155,6 @@ function Flows() {
     }),
   ];
 
-  const pageCount = useMemo(() => {
-    return flowsData?.totalPages;
-  }, [flowsData]);
-
   useEffect(() => {
     refetchFlows();
   }, [currentPage]);
@@ -205,6 +196,12 @@ function Flows() {
         isDataFetching={!isFlowsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados fluxos."
       />
+      {flowsData?.totalPages !== undefined ? (
+        <Pagination
+          pageCount={flowsData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       {selectedFlow && isEditionOpen ? (
         <EditionModal
           flow={selectedFlow}
@@ -228,9 +225,6 @@ function Flows() {
           onClose={onDeleteClose}
           refetchFlows={refetchFlows}
         />
-      ) : null}
-      {pageCount !== undefined ? (
-        <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
       ) : null}
     </PrivateLayout>
   );

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "react-query";
 import { Flex, Text, useDisclosure } from "@chakra-ui/react";
 import { Icon, CheckIcon, ViewIcon } from "@chakra-ui/icons";
@@ -11,24 +11,34 @@ import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { getUnits } from "services/units";
 import { Pagination } from "components/Pagination";
+import { getUsersRequests } from "services/user";
 import { AcceptModal } from "./AcceptModal";
 import { DenyModal } from "./DenyModal";
 import { ViewModal } from "./ViewModal";
 
-interface RequestsProps {
-  requestsData: Result<User[]> | undefined;
-  isRequestsFetched: boolean;
-  refetchRequests: () => void;
-}
-
-export function Requests({
-  requestsData,
-  isRequestsFetched,
-  refetchRequests,
-}: RequestsProps) {
+export function Requests() {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
   const { getUserData } = useAuth();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+  const {
+    data: requestsData,
+    isFetched: isRequestsFetched,
+    refetch: refetchRequests,
+  } = useQuery({
+    queryKey: ["requests"],
+    queryFn: async () => {
+      const res = await getUsersRequests({
+        offset: 5 * currentPage,
+        limit: 5,
+      });
+
+      return res;
+    },
+  });
   const {
     isOpen: isAcceptOpen,
     onOpen: onAcceptOpen,
@@ -163,20 +173,10 @@ export function Requests({
     }),
   ];
 
-  function refetchAll() {
+  useEffect(() => {
     refetchRequests();
     refetchUnits();
-  }
-
-  const [currentPage, setCurrentPage] = useState(0);
-  const offset = currentPage * 5;
-  const pageCount = Math.ceil(requests.length / 5);
-
-  const handlePageChange = (selectedItem: { selected: number }) => {
-    setCurrentPage(selectedItem.selected);
-  };
-
-  const paginatedRequests = requests.slice(offset, offset + 5);
+  }, [currentPage]);
 
   return (
     <>
@@ -201,7 +201,7 @@ export function Requests({
         </Flex>
       </Flex>
       <DataTable
-        data={paginatedRequests}
+        data={requests}
         columns={
           userData?.value?.idRole !== 5
             ? tableColumns.filter((_, index) => index !== 1)
@@ -210,13 +210,18 @@ export function Requests({
         isDataFetching={!isRequestsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas solicitações no momento."
       />
-      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
+      {requestsData?.totalPages ? (
+        <Pagination
+          pageCount={requestsData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       {userData?.value && selectedUser && isAcceptOpen ? (
         <AcceptModal
           isOpen={isAcceptOpen}
           onClose={onAcceptClose}
           user={selectedUser}
-          refetch={() => refetchAll()}
+          refetch={() => refetchRequests()}
         />
       ) : null}
       {userData?.value && selectedUser && isDenyOpen ? (
@@ -224,7 +229,7 @@ export function Requests({
           isOpen={isDenyOpen}
           onClose={onDenyClose}
           user={selectedUser}
-          refetch={() => refetchAll()}
+          refetch={() => refetchRequests()}
         />
       ) : null}
       {userData?.value && selectedUser && isViewOpen ? (

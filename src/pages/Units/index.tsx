@@ -16,8 +16,6 @@ import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
 
-import "components/Pagination/style.css";
-
 function Units() {
   const toast = useToast();
   const [selectedUnit, selectUnit] = useState<Unit | null>(null);
@@ -140,9 +138,6 @@ function Units() {
       },
     }),
   ];
-  const pageCount = useMemo(() => {
-    return unitsData?.totalPages;
-  }, [unitsData]);
 
   useEffect(() => {
     refetchUnits();
@@ -185,6 +180,12 @@ function Units() {
         isDataFetching={!isUnitsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas unidades."
       />
+      {unitsData?.totalPages !== undefined ? (
+        <Pagination
+          pageCount={unitsData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       <CreationModal
         isOpen={isCreationOpen}
         onClose={onCreationClose}
@@ -205,9 +206,6 @@ function Units() {
           onClose={onEditionClose}
           afterSubmission={refetchUnits}
         />
-      ) : null}
-      {pageCount !== undefined ? (
-        <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
       ) : null}
     </PrivateLayout>
   );

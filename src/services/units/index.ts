@@ -1,10 +1,5 @@
 import { api } from "services/api";
 
-type Pagination = {
-  offset: number;
-  limit: number;
-};
-
 export const getUnits = async (
   pagination?: Pagination
 ): Promise<Result<Unit[]>> => {
