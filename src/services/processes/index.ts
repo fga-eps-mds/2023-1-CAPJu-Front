@@ -77,10 +77,38 @@ export const updateProcess = async (data: {
   priority: number;
   effectiveDate: Date | string;
   status: string;
-  idStage: number;
+  idStage: number | null;
 }): Promise<Result<Process>> => {
   try {
     const res = await api.processes.put<Process>("/updateProcess", data);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const addCommentToProcess = async (data: {
+  record: string;
+  originStage: number;
+  destinationStage: number;
+  commentary: string | null;
+}): Promise<Result<Process>> => {
+  try {
+    const res = await api.processes.put<Process>(
+      "/processNewObservation",
+      data
+    );
 
     return {
       type: "success",
@@ -147,6 +175,8 @@ export const updateStage = async (data: {
 };
 
 export const updateProcessStatus = async (data: {
+  priority: number;
+  idFlow: number;
   record: string;
   status: string;
 }): Promise<Result<Process>> => {
