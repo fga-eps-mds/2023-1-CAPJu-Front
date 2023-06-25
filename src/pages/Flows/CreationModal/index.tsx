@@ -46,6 +46,7 @@ export function CreationModal({
   afterSubmission,
 }: CreationModalProps) {
   const toast = useToast();
+  const [filter] = useState<string>("");
   const { handleLoading } = useLoading();
   const [selectedStages, setSelectedStages] = useState<Stage[]>([]);
   const [usersToNotify, setUsersToNotify] = useState<(number | string)[]>([]);
@@ -68,7 +69,13 @@ export function CreationModal({
   }, [selectedStages]);
   const { data: stagesData } = useQuery({
     queryKey: ["stages"],
-    queryFn: getStages,
+    queryFn: async () => {
+      const res = await getStages(filter);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
   });
   const { data: usersData } = useQuery({
     queryKey: ["accepted-users"],

@@ -105,6 +105,7 @@ export function EditionModal({
     reset,
     watch,
   } = useForm<FormValues>({
+     // @ts-ignore
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });
@@ -195,11 +196,11 @@ export function EditionModal({
               options={
                 flowsData?.value
                   ? flowsData?.value?.map((flow) => {
-                    return {
-                      value: flow.idFlow,
-                      label: flow.name,
-                    };
-                  })
+                      return {
+                        value: flow.idFlow,
+                        label: flow.name,
+                      };
+                    })
                   : []
               }
               errors={errors.idFlow}
@@ -221,13 +222,13 @@ export function EditionModal({
                 options={
                   prioritiesData?.value
                     ? (prioritiesData.value as Priority[]).map(
-                      (priority: Priority) => {
-                        return {
-                          value: priority.idPriority,
-                          label: priority.description,
-                        };
-                      }
-                    )
+                        (priority: Priority) => {
+                          return {
+                            value: priority.idPriority,
+                            label: priority.description,
+                          };
+                        }
+                      )
                     : []
                 }
                 defaultValue={selectedProcess?.idPriority}

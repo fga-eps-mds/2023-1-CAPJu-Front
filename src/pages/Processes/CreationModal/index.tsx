@@ -102,6 +102,7 @@ export function CreationModal({
     reset,
     watch,
   } = useForm<FormValues>({
+     // @ts-ignore
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });
@@ -174,11 +175,11 @@ export function CreationModal({
               options={
                 flowsData?.value
                   ? flowsData?.value?.map((flow) => {
-                    return {
-                      value: flow.idFlow,
-                      label: flow.name,
-                    };
-                  })
+                      return {
+                        value: flow.idFlow,
+                        label: flow.name,
+                      };
+                    })
                   : []
               }
               errors={errors.idFlow}
@@ -200,13 +201,13 @@ export function CreationModal({
                 options={
                   prioritiesData?.value
                     ? (prioritiesData.value as Priority[]).map(
-                      (priority: Priority) => {
-                        return {
-                          value: priority.idPriority,
-                          label: priority.description,
-                        };
-                      }
-                    )
+                        (priority: Priority) => {
+                          return {
+                            value: priority.idPriority,
+                            label: priority.description,
+                          };
+                        }
+                      )
                     : []
                 }
                 errors={errors.idPriority}

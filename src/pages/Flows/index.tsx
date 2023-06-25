@@ -1,14 +1,15 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, useToast, Text, Button, useDisclosure, chakra } from "@chakra-ui/react";
-import { MdDelete, MdEdit } from "react-icons/md";
 import {
-  AddIcon,
-  ArrowUpIcon,
-  Icon,
-  ViewIcon,
-  SearchIcon,
-} from "@chakra-ui/icons";
+  Flex,
+  useToast,
+  Text,
+  Button,
+  useDisclosure,
+  chakra,
+} from "@chakra-ui/react";
+import { MdDelete, MdEdit } from "react-icons/md";
+import { AddIcon, Icon, ViewIcon, SearchIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { PrivateLayout } from "layouts/Private";

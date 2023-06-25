@@ -53,7 +53,13 @@ export function Requests({
     refetch: refetchUnits,
   } = useQuery({
     queryKey: ["units"],
-    queryFn: getUnits,
+    queryFn: async () => {
+      const res = await getUnits(filter);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
   });
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
