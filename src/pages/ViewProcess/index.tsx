@@ -16,9 +16,10 @@ import { useLoading } from "hooks/useLoading";
 import {
   updateStage,
   getProcessByRecord,
-  updateProcess,
+  updateProcessStatus,
 } from "services/processes";
 import { getPriorities } from "services/priorities";
+import { sortFlowStages } from "utils/sorting";
 import { labelByProcessStatus } from "utils/constants";
 import { FinalizationModal } from "./FinalizationModal";
 import { ArchivationModal } from "./ArchivationModal";
@@ -101,14 +102,17 @@ function ViewProcess() {
     },
   });
   const stages = useMemo<Stage[]>(() => {
-    return (
+    if (!flowData?.value?.sequences) return [];
+
+    const stagesInFlow =
       stagesData?.value?.reduce<Stage[]>((acc: Stage[], curr: Stage) => {
         if (!flowData?.value?.stages?.some((item) => item === curr.idStage))
           return acc;
 
         return [...acc, curr];
-      }, []) || []
-    );
+      }, []) || [];
+
+    return sortFlowStages(stagesInFlow, flowData?.value?.sequences);
   }, [flowData]);
   const previousStageId = useMemo<number>(() => {
     return (
@@ -127,11 +131,8 @@ function ViewProcess() {
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
   const isLastStage = useMemo(() => {
-    return (
-      flowData?.value?.stages[flowData?.value?.stages?.length - 1] ===
-      processData?.value?.idStage
-    );
-  }, [flowData?.value?.stages, processData?.value?.idStage]);
+    return stages[stages?.length - 1]?.idStage === processData?.value?.idStage;
+  }, [stages, processData?.value?.idStage]);
 
   async function handleUpdateProcessStage(isNextStage: boolean) {
     handleLoading(true);
@@ -195,14 +196,13 @@ function ViewProcess() {
     }
 
     const body = {
-      ...processData?.value,
       record: processData?.value?.record as string,
       priority: processData?.value?.idPriority,
       idFlow: flowData?.value?.idFlow as number,
       status,
     };
 
-    const res = await updateProcess(body);
+    const res = await updateProcessStatus(body);
 
     if (res.type === "success") {
       toast({
@@ -313,12 +313,9 @@ function ViewProcess() {
               gap="1"
               flexWrap="wrap"
             >
-              {!(
-                flowData?.value?.sequences[0]?.from ===
-                  processData?.value?.idStage ||
-                !processData?.value?.idStage ||
-                processData?.value?.status !== "inProgress"
-              ) ? (
+              {processData?.value?.status === "inProgress" &&
+              !!processData?.value?.idStage &&
+              processData?.value?.idStage !== stages[0].idStage ? (
                 <Button
                   size="xs"
                   fontSize="sm"
@@ -393,6 +390,12 @@ function ViewProcess() {
           }
           effectiveDate={processData?.value?.effectiveDate}
           isFetching={!isProcessFetched || !isFlowFetched}
+          processRecord={processData?.value?.record as string}
+          refetch={() => {
+            refetchFlow();
+            refetchProcess();
+          }}
+          allowComments={processData?.value?.status === "inProgress"}
         />
       </Flex>
       {processData?.value && (

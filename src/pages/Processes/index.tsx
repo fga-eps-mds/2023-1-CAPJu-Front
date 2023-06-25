@@ -23,6 +23,7 @@ import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { labelByProcessStatus } from "utils/constants";
+import { getSequencesSortedStagesIds } from "utils/sorting";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
@@ -178,14 +179,16 @@ function Processes() {
           const currFlow = flowsData?.value?.find(
             (item) =>
               item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
+          ) as Flow;
+          const sortedStagesIds = getSequencesSortedStagesIds(
+            currFlow?.sequences
           );
-          const currIndexInFlow =
-            currFlow?.stages?.indexOf(curr?.idStage) || -1;
+          const currIndexInFlow = sortedStagesIds?.indexOf(curr?.idStage) || -1;
           const currentState =
             (currFlow?.stages && currIndexInFlow !== -1) ||
             curr.status === "notStarted"
-              ? `${currIndexInFlow + 1}/${currFlow?.stages?.length}`
-              : `${currIndexInFlow + 2}/${currFlow?.stages?.length}`;
+              ? `${currIndexInFlow + 1}/${sortedStagesIds?.length}`
+              : `${currIndexInFlow + 2}/${sortedStagesIds?.length}`;
 
           return [
             ...acc,
