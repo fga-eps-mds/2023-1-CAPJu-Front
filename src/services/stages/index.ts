@@ -1,9 +1,12 @@
 import { api } from "services/api";
 
-export const getStages = async (): Promise<Result<Stage[]>> => {
+export const getStages = async (
+  filter: string | undefined
+): Promise<Result<Stage[]>> => {
   try {
-    const res = await api.stages.get<Stage[]>("/stages");
-
+    const res = await api.stages.get<Stage[]>("/stages", {
+      params: { filter },
+    });
     return { type: "success", value: res.data };
   } catch (error) {
     if (error instanceof Error)
