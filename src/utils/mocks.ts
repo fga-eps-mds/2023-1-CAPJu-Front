@@ -39,7 +39,7 @@ export const mockedUnits = [
 export const mockedStages = [
   {
     idStage: 1,
-    name: "a",
+    name: "A",
     duration: 5,
     idUnit: 1,
     createdAt: "2100-06-19T03:26:25.050Z",
@@ -48,7 +48,7 @@ export const mockedStages = [
   },
   {
     idStage: 2,
-    name: "b",
+    name: "B",
     duration: 3,
     idUnit: 1,
     createdAt: "2100-06-19T03:26:25.050Z",
@@ -57,7 +57,7 @@ export const mockedStages = [
   },
   {
     idStage: 3,
-    name: "c",
+    name: "C",
     duration: 1,
     idUnit: 1,
     createdAt: "2100-06-19T03:26:25.050Z",
@@ -181,11 +181,11 @@ export const mockedStage = [
   {
     idStage: 1,
     idUnit: 1,
-    name: "a",
+    name: "D",
     duration: 5,
     createdAt: "2100-06-19T03:26:25.050Z",
     entrada: new Date(),
-    vencimento: new Date(),
+    vencimento: new Date("2023-06-24"),
   },
 ];
 

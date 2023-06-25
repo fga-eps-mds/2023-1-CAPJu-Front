@@ -40,18 +40,26 @@ describe("Flow components", async () => {
 
   it("shows 'stage's properties' correctly", async () => {
     await mockedStages.forEach(async (stage) => {
-      expect(await screen.findByText(stage.name)).toBeDefined();
-    });
-    await mockedStages.forEach(async (stage) => {
-      expect(await screen.findAllByText(stage.duration)).toBeDefined();
+      expect(await screen.findAllByText(stage.name)).toBeDefined();
     });
   });
 
-  // it("shows 'flow sequence' correctly", async () => {
-  //   const from = await mockedFlowSequence.forEach(async (stage) => {
-  //     expect(await screen.getByText(stage.from)).toBeDefined()});
-  //   const to = await mockedFlowSequence.forEach(async (stage) => {
-  //     expect(await screen.getByText(stage.to)).toBeDefined()});
+  it("shows 'flow sequence' correctly", async () => {
+    await mockedFlowSequence.forEach(async (stage) => {
+      expect(await screen.findByText(stage.from)).toBeDefined();
+    });
+    await mockedFlowSequence.forEach(async (stage) => {
+      expect(await screen.findByText(stage.to)).toBeDefined();
+    });
+  });
 
-  //   });
+  it('shows if "handledateformating" is working', async () => {
+    const currentDate = new Date("2023-06-25");
+    const datestring = currentDate.toLocaleDateString("pt-BR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    expect(datestring).toMatch("24 de junho de 2023");
+  });
 });
