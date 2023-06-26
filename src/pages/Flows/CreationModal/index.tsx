@@ -79,7 +79,13 @@ export function CreationModal({
   });
   const { data: usersData } = useQuery({
     queryKey: ["accepted-users"],
-    queryFn: getAcceptedUsers,
+    queryFn: async () => {
+      const res = await getAcceptedUsers(filter);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
   });
   const {
     register,

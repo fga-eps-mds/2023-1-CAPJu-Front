@@ -60,7 +60,13 @@ export function EditionModal({
   });
   const { data: usersData } = useQuery({
     queryKey: ["accepted-users"],
-    queryFn: getAcceptedUsers,
+    queryFn: async () => {
+      const res = await getAcceptedUsers(filter);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
   });
   const [selectedStages, setSelectedStages] = useState<Stage[]>(
     stagesData?.value?.filter((item) =>
