@@ -7,6 +7,7 @@ import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { DataTable } from "components/DataTable";
+import { getAcceptedUsers } from "services/user";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
@@ -25,10 +26,21 @@ interface ProfilesProps {
 export function Profiles({
   usersData,
   isUsersFetched,
-  refetchUsers,
 }: ProfilesProps) {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
+  const {
+    refetch: refetchUsers,
+  } = useQuery({
+    queryKey: ["accepted-users"],
+    queryFn: async () => {
+      const res = await getAcceptedUsers(filter);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
+  });
   const {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
