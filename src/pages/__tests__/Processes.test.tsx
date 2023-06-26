@@ -26,7 +26,24 @@ import Processes from "../Processes";
 const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_PROCESSES_SERVICE_URL}processes`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedProcesses))
+    async (req, res, ctx) => {
+      const filter = req.url.searchParams.get("filter");
+
+      if (filter && filter !== "") {
+        return res(
+          ctx.status(200),
+          ctx.json(
+            mockedProcesses.filter(
+              (process) =>
+                process.nickname.includes(filter) ||
+                process.record.includes(filter)
+            )
+          )
+        );
+      }
+
+      return res(ctx.status(200), ctx.json(mockedProcesses));
+    }
   ),
   rest.get(
     `${import.meta.env.VITE_PROCESSES_SERVICE_URL}priorities`,
@@ -136,14 +153,6 @@ describe("Processes page", () => {
     expect(await screen.queryByText(mockedNotStartedProcess.record)).toBe(null);
   });
 
-  it("displays the 'search bar' correctly", async () => {
-    const input = screen.getByPlaceholderText(
-      "Pesquisar processos (por registro ou apelido)"
-    );
-
-    expect(input).not.toBe(null);
-  });
-
   it("opens and closes the creation modal correctly", async () => {
     const createProcessButton = await screen.getByText("Criar Processo");
 
@@ -162,5 +171,43 @@ describe("Processes page", () => {
     await waitFor(() => {
       expect(screen.queryByText("CreationModal")).toBeNull();
     });
+  });
+
+  it("filters processes correctly", async () => {
+    const input = screen.getByPlaceholderText(
+      "Pesquisar processos (por registro ou apelido)"
+    );
+
+    expect(input).not.toBe(null);
+
+    await act(async () => {
+      await fireEvent.change(input, {
+        target: { value: "12345678912345678915" },
+      });
+      // Testa pelo submit do input
+      await fireEvent.submit(input);
+    });
+
+    expect(await screen.queryByText("12345678912345678915")).not.toBe(null);
+    expect(await screen.queryByText("12345678912345678916")).toBe(null);
+    expect(await screen.queryByText("12345678912345678917")).toBe(null);
+    expect(await screen.queryByText("12345678912345678918")).toBe(null);
+
+    const button = screen.getByLabelText("botão de busca");
+
+    expect(button).not.toBe(null);
+
+    await act(async () => {
+      await fireEvent.change(input, {
+        target: { value: "12345678912345678916" },
+      });
+      // Testa pelo click no botão
+      await fireEvent.click(button);
+    });
+
+    expect(await screen.queryByText("12345678912345678915")).toBe(null);
+    expect(await screen.queryByText("12345678912345678916")).not.toBe(null);
+    expect(await screen.queryByText("12345678912345678917")).toBe(null);
+    expect(await screen.queryByText("12345678912345678918")).toBe(null);
   });
 });
