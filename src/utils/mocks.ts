@@ -45,13 +45,13 @@ export const mockedStages = [
   {
     idStage: 1,
     name: "etapaA",
-    duration: 5,
+    duration: 2,
     idUnit: 1,
   },
   {
     idStage: 2,
     name: "etapaB",
-    duration: 5,
+    duration: 3,
     idUnit: 1,
   },
   {
@@ -98,12 +98,22 @@ export const mockedProcesses = [
   {
     effectiveDate: null,
     idFlow: 1,
+    idPriority: 0,
+    idStage: null,
+    idUnit: 1,
+    nickname: "Processo não Iniciado",
+    record: "12345678912345678915",
+    status: "notStarted",
+  },
+  {
+    effectiveDate: null,
+    idFlow: 1,
     idPriority: 1,
     idStage: null,
     idUnit: 1,
-    nickname: "Apelido do Processo",
-    record: "12345678912345678915",
-    status: "notStarted",
+    nickname: "Processo Arquivado",
+    record: "12345678912345678916",
+    status: "archived",
   },
   {
     effectiveDate: new Date(),
@@ -112,8 +122,8 @@ export const mockedProcesses = [
     idStage: 1,
     idUnit: 1,
     nickname: "Processo em Andamento",
-    record: "12345678912345678916",
-    status: "notStarted",
+    record: "12345678912345678917",
+    status: "inProgress",
   },
   {
     effectiveDate: new Date(),
@@ -122,7 +132,7 @@ export const mockedProcesses = [
     idStage: null,
     idUnit: 1,
     nickname: "Processo Finalizado",
-    record: "12345678912345678917",
+    record: "12345678912345678918",
     status: "finished",
   },
 ];
