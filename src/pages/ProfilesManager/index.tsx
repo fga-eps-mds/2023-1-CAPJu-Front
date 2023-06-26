@@ -27,7 +27,13 @@ function ProfilesManager() {
     refetch: refetchRequests,
   } = useQuery({
     queryKey: ["requests"],
-    queryFn: getUsersRequests,
+    queryFn: async () => {
+      const res = await getUsersRequests(filter);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
   });
 
   return (

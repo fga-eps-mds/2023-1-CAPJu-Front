@@ -10,6 +10,7 @@ import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { getUnits } from "services/units";
+import { getUsersRequests } from "services/user";
 import { AcceptModal } from "./AcceptModal";
 import { DenyModal } from "./DenyModal";
 import { ViewModal } from "./ViewModal";
@@ -27,6 +28,16 @@ export function Requests({
 }: RequestsProps) {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
+  const { refetch: refetchRequestsUsers } = useQuery({
+    queryKey: ["requests"],
+    queryFn: async () => {
+      const res = await getUsersRequests(filter);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
+  });
   const { getUserData } = useAuth();
   const {
     isOpen: isAcceptOpen,
@@ -179,7 +190,7 @@ export function Requests({
           <chakra.form
             onSubmit={(e) => {
               e.preventDefault();
-              refetchRequests();
+              refetchRequestsUsers();
             }}
             w="100%"
             display="flex"
