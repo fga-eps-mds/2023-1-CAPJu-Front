@@ -13,6 +13,11 @@ export const mockedAdminUser = {
   idRole: 5,
 };
 
+export const mockedManagerUser = {
+  ...mockedUser,
+  idRole: 1,
+};
+
 export const mockedUnits = [
   {
     idUnit: 1,
@@ -39,19 +44,19 @@ export const mockedUnits = [
 export const mockedStages = [
   {
     idStage: 1,
-    name: "a",
-    duration: 5,
+    name: "etapaA",
+    duration: 2,
     idUnit: 1,
   },
   {
     idStage: 2,
-    name: "b",
-    duration: 5,
+    name: "etapaB",
+    duration: 3,
     idUnit: 1,
   },
   {
     idStage: 3,
-    name: "c",
+    name: "etapaC",
     duration: 5,
     idUnit: 1,
   },
@@ -68,48 +73,47 @@ export const mockedFlow = {
 export const mockedFlows = [
   {
     idFlow: 1,
-    name: "Fluxo 1",
+    name: "FirstFlow",
     idUnit: 1,
     stages: [1, 2],
     sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
   },
   {
     idFlow: 2,
-    name: "Fluxo 2",
+    name: "SecondFlow",
     idUnit: 1,
     stages: [1, 2],
     sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
   },
   {
     idFlow: 3,
-    name: "Fluxo 3",
+    name: "ThirdFlow",
     idUnit: 1,
     stages: [1, 2],
     sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
   },
 ];
 
-export const mockedNotStartedProcess = {
-  effectiveDate: null,
-  idFlow: 1,
-  idPriority: 0,
-  idStage: null,
-  idUnit: 1,
-  nickname: "Apelido do Processo",
-  record: "12345678912345678915",
-  status: "notStarted",
-};
-
 export const mockedProcesses = [
+  {
+    effectiveDate: null,
+    idFlow: 1,
+    idPriority: 0,
+    idStage: null,
+    idUnit: 1,
+    nickname: "Processo não Iniciado",
+    record: "12345678912345678915",
+    status: "notStarted",
+  },
   {
     effectiveDate: null,
     idFlow: 1,
     idPriority: 1,
     idStage: null,
     idUnit: 1,
-    nickname: "Apelido do Processo",
-    record: "12345678912345678915",
-    status: "notStarted",
+    nickname: "Processo Arquivado",
+    record: "12345678912345678916",
+    status: "archived",
   },
   {
     effectiveDate: new Date(),
@@ -118,8 +122,8 @@ export const mockedProcesses = [
     idStage: 1,
     idUnit: 1,
     nickname: "Processo em Andamento",
-    record: "12345678912345678916",
-    status: "notStarted",
+    record: "12345678912345678917",
+    status: "inProgress",
   },
   {
     effectiveDate: new Date(),
@@ -128,7 +132,7 @@ export const mockedProcesses = [
     idStage: null,
     idUnit: 1,
     nickname: "Processo Finalizado",
-    record: "12345678912345678917",
+    record: "12345678912345678918",
     status: "finished",
   },
 ];
@@ -167,3 +171,32 @@ export const mockedPriorities = [
     description: "Réu Preso",
   },
 ];
+
+export const mockedNotStartedProcess = {
+  effectiveDate: null,
+  idFlow: 1,
+  idPriority: 0,
+  idStage: null,
+  idUnit: 1,
+  nickname: "Processo NS",
+  record: "12345678912345678915",
+  status: "notStarted",
+};
+
+export const mockedInProgressProcess = {
+  effectiveDate: "2023-06-21T01:00:54.109Z",
+  idFlow: 2,
+  idPriority: 0,
+  idStage: 1,
+  idUnit: 1,
+  nickname: "Processo NS",
+  record: "12345678901234567881",
+  status: "inProgress",
+  progress: [
+    {
+      idStage: 1,
+      entrada: "2023-06-21T01:00:54.110Z",
+      vencimento: "2023-06-22T01:00:54.110Z",
+    },
+  ],
+};
