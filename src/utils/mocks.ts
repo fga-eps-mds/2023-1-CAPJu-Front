@@ -112,6 +112,55 @@ export const mockedFlows = [
     stages: [1, 2],
     sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
   },
+  {
+    idFlow: 4,
+    name: "Fluxo 4",
+    idUnit: 1,
+    stages: [1, 2],
+    sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
+  },
+  {
+    idFlow: 5,
+    name: "Fluxo 5",
+    idUnit: 1,
+    stages: [1, 2],
+    sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
+  },
+  {
+    idFlow: 6,
+    name: "Fluxo 6",
+    idUnit: 1,
+    stages: [1, 2],
+    sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
+  },
+  {
+    idFlow: 7,
+    name: "Fluxo 7",
+    idUnit: 1,
+    stages: [1, 2],
+    sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
+  },
+  {
+    idFlow: 8,
+    name: "Fluxo 8",
+    idUnit: 1,
+    stages: [1, 2],
+    sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
+  },
+  {
+    idFlow: 9,
+    name: "Fluxo 9",
+    idUnit: 1,
+    stages: [1, 2],
+    sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
+  },
+  {
+    idFlow: 10,
+    name: "Fluxo 10",
+    idUnit: 1,
+    stages: [1, 2],
+    sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
+  },
 ];
 
 export const mockedProcesses = [
