@@ -7,7 +7,10 @@ export const getStages = async (
     const res = await api.stages.get<{ stages: Stage[]; totalPages: number }>(
       "/stages",
       {
-        params: { ...pagination },
+        params: {
+          offset: pagination?.offset ?? 0,
+          limit: pagination?.limit ?? 5,
+        },
       }
     );
 

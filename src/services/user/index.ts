@@ -124,7 +124,10 @@ export const getAcceptedUsers = async (
     const res = await api.user.get<{ users: User[]; totalPages: number }>(
       `/allUser?accepted=true`,
       {
-        params: { ...pagination },
+        params: {
+          offset: pagination?.offset ?? 0,
+          limit: pagination?.limit ?? 5,
+        },
       }
     );
 
@@ -152,7 +155,10 @@ export const getUsersRequests = async (
     const res = await api.user.get<{ users: User[]; totalPages: number }>(
       `/allUser?accepted=false`,
       {
-        params: { ...pagination },
+        params: {
+          offset: pagination?.offset ?? 0,
+          limit: pagination?.limit ?? 5,
+        },
       }
     );
     const value = res.data?.users?.map((item: User) => {

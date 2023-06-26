@@ -8,7 +8,10 @@ export const getFlows = async (
       flows: Flow[];
       totalPages: number;
     }>("/flows", {
-      params: { ...pagination },
+      params: {
+        offset: pagination?.offset ?? 0,
+        limit: pagination?.limit ?? 5,
+      },
     });
 
     return {

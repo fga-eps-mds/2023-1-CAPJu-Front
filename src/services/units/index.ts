@@ -7,7 +7,10 @@ export const getUnits = async (
     const res = await api.units.get<{ units: Unit[]; totalPages: number }>(
       "/units",
       {
-        params: { ...pagination },
+        params: {
+          offset: pagination?.offset ?? 0,
+          limit: pagination?.limit ?? 5,
+        },
       }
     );
 

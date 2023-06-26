@@ -9,7 +9,10 @@ export const getProcesses = async (
       processes: Process[];
       totalPages: number;
     }>(`/processes${flowId ? `/${flowId}` : ""}`, {
-      params: { ...pagination },
+      params: {
+        offset: pagination?.offset ?? 0,
+        limit: pagination?.limit ?? 5,
+      },
     });
 
     return {

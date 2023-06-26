@@ -39,6 +39,26 @@ export const mockedUnits = [
     idUnit: 5,
     name: "Unidade 5",
   },
+  {
+    idUnit: 6,
+    name: "Unidade 6",
+  },
+  {
+    idUnit: 7,
+    name: "Unidade 7",
+  },
+  {
+    idUnit: 8,
+    name: "Unidade 8",
+  },
+  {
+    idUnit: 9,
+    name: "Unidade 9",
+  },
+  {
+    idUnit: 10,
+    name: "Unidade 10",
+  },
 ];
 
 export const mockedStages = [
