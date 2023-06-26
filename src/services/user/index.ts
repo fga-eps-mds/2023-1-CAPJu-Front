@@ -117,9 +117,11 @@ export const forgotPassword = async (data: { email: string }) => {
   }
 };
 
-export const getAcceptedUsers = async (): Promise<Result<User[]>> => {
+export const getAcceptedUsers = async (
+  filter: string
+): Promise<Result<User[]>> => {
   try {
-    const res = await api.user.get<User[]>(`/allUser?accepted=true`);
+    const res = await api.user.get<User[]>(`/allUser?accepted=true`, { params: { filter } });
 
     return {
       type: "success",
