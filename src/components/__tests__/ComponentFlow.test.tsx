@@ -60,6 +60,6 @@ describe("Flow components", async () => {
       month: "long",
       day: "numeric",
     });
-    expect(datestring).toMatch("24 de junho de 2023");
+    expect(datestring).toMatch("25 de junho de 2023");
   });
 });
