@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, Text, useDisclosure } from "@chakra-ui/react";
-import { Icon, ViewIcon } from "@chakra-ui/icons";
+import { Flex, Text, Button, useDisclosure, chakra } from "@chakra-ui/react";
+import { Icon, ViewIcon, SearchIcon } from "@chakra-ui/icons";
+
 import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -100,9 +101,6 @@ export function Profiles({
     return (
       (usersData?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (!curr.fullName.toLowerCase().includes(filter.toLowerCase()))
-            return acc;
-
           const role = roleNameById(curr.idRole);
 
           return [
@@ -173,18 +171,36 @@ export function Profiles({
             Perfil de Acesso
           </Text>
         </Flex>
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Input
-            placeholder="Pesquisar usuário pelo nome"
-            value={filter}
-            onChange={({ target }) => setFilter(target.value)}
-            variant="filled"
-            css={{
-              "&, &:hover, &:focus": {
-                background: "white",
-              },
+        <Flex justifyContent="flex-start" w="100%">
+          <chakra.form
+            onSubmit={(e) => {
+              e.preventDefault();
+              refetchUsers();
             }}
-          />
+            w="100%"
+            display="flex"
+            flexDirection="row"
+          >
+            <Input
+              placeholder="Pesquisar usuário pelo nome"
+              value={filter}
+              onChange={({ target }) => setFilter(target.value)}
+              variant="filled"
+              css={{
+                "&, &:hover, &:focus": {
+                  background: "white",
+                },
+              }}
+            />
+            <Button
+              colorScheme="green"
+              marginLeft="2"
+              justifyContent="center"
+              type="submit"
+            >
+              <SearchIcon boxSize={4} />
+            </Button>
+          </chakra.form>
         </Flex>
       </Flex>
       <DataTable
