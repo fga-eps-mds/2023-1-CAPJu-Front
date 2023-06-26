@@ -13,6 +13,11 @@ export const mockedAdminUser = {
   idRole: 5,
 };
 
+export const mockedManagerUser = {
+  ...mockedUser,
+  idRole: 1,
+};
+
 export const mockedUnits = [
   {
     idUnit: 1,
