@@ -1,5 +1,5 @@
 import { describe, expect } from "vitest";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
@@ -15,7 +15,23 @@ import Flows from "../Flows";
 const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_FLOWS_SERVICE_URL}flows`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedFlows))
+    async (req, res, ctx) => {
+      const filter = req.url.searchParams.get("filter");
+
+      if (filter && filter !== "") {
+        return res(
+          ctx.status(200),
+          ctx.json(
+            mockedFlows.filter(
+              (flows) =>
+                flows.name.includes(filter)
+            )
+          )
+        );
+      }
+
+      return res(ctx.status(200), ctx.json(mockedFlows));
+    }
   ),
   rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
@@ -58,4 +74,39 @@ describe("Flows page", () => {
   it("renders correctly", () => {
     expect(screen).toMatchSnapshot();
   });
+
+  it("filters flows correctly", async () => {
+    const input = screen.getByPlaceholderText(
+      "Pesquisar fluxos"
+    );
+
+    expect(input).not.toBe(null);
+
+    await act(async () => {
+      await fireEvent.change(input, {
+        target: { value: "FirstFlow" },
+      });
+      await fireEvent.submit(input);
+    });
+
+    expect(await screen.queryByText("FirstFlow")).not.toBe(null);
+    expect(await screen.queryByText("SecondFlow")).toBe(null);
+    expect(await screen.queryByText("ThirdFlow")).toBe(null);
+
+    const button = screen.getByLabelText("botão de busca");
+
+    expect(button).not.toBe(null);
+
+    await act(async () => {
+      await fireEvent.change(input, {
+        target: { value: "ThirdFlow" },
+      });
+      await fireEvent.click(button);
+    });
+
+    expect(await screen.queryByText("FirstFlow")).toBe(null);
+    expect(await screen.queryByText("SecondFlow")).toBe(null);
+    expect(await screen.queryByText("ThirdFlow")).not.toBe(null);
+  });
+
 });
