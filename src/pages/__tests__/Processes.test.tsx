@@ -21,12 +21,28 @@ import {
   mockedPriorities,
   mockedNotStartedProcess,
 } from "utils/mocks";
+import { getPaginatedArray } from "utils/pagination";
 import Processes from "../Processes";
 
 const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_PROCESSES_SERVICE_URL}processes`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedProcesses))
+    async (req, res, ctx) => {
+      const offset = Number(req.url.searchParams.get("offset"));
+      const limit = Number(req.url.searchParams.get("limit"));
+      const { paginatedArray, totalPages } = getPaginatedArray(
+        mockedProcesses,
+        {
+          offset,
+          limit,
+        }
+      );
+
+      return res(
+        ctx.status(200),
+        ctx.json({ processes: paginatedArray, totalPages })
+      );
+    }
   ),
   rest.get(
     `${import.meta.env.VITE_PROCESSES_SERVICE_URL}priorities`,
@@ -78,6 +94,7 @@ describe("Processes page", () => {
   });
 
   it("shows text content correctly", async () => {
+<<<<<<< HEAD
     expect(await screen.findAllByText("Processos")).not.toBe(null);
     expect(await screen.findByText("Registro")).not.toBe(null);
     expect(await screen.findByText("Apelido")).not.toBe(null);
@@ -162,5 +179,17 @@ describe("Processes page", () => {
     await waitFor(() => {
       expect(screen.queryByText("CreationModal")).toBeNull();
     });
+=======
+    expect(await screen.queryByText("A")).not.toBe(null);
+    expect(await screen.queryByText("B")).not.toBe(null);
+    expect(await screen.queryByText("C")).not.toBe(null);
+    expect(await screen.queryByText("D")).not.toBe(null);
+    expect(await screen.queryByText("E")).not.toBe(null);
+    expect(await screen.queryByText("F")).toBe(null);
+    expect(await screen.queryByText("G")).toBe(null);
+    expect(await screen.queryByText("H")).toBe(null);
+    expect(await screen.queryByText("I")).toBe(null);
+    expect(await screen.queryByText("J")).toBe(null);
+>>>>>>> e3f8220 ((fga-eps-mds/2023-1-CAPJu-Doc#121) - Adiciona teste de paginação na página de processos.)
   });
 });
