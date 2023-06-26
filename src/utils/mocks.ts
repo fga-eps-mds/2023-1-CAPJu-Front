@@ -13,6 +13,11 @@ export const mockedAdminUser = {
   idRole: 5,
 };
 
+export const mockedManagerUser = {
+  ...mockedUser,
+  idRole: 1,
+};
+
 export const mockedUnits = [
   {
     idUnit: 1,
@@ -39,21 +44,21 @@ export const mockedUnits = [
 export const mockedStages = [
   {
     idStage: 1,
-    name: "a",
-    duration: 5,
     idUnit: 1,
+    name: "etapaA",
+    duration: 2,
   },
   {
     idStage: 2,
-    name: "b",
-    duration: 5,
     idUnit: 1,
+    name: "etapaB",
+    duration: 3,
   },
   {
     idStage: 3,
-    name: "c",
-    duration: 5,
     idUnit: 1,
+    name: "etapaC",
+    duration: 5,
   },
 ];
 
