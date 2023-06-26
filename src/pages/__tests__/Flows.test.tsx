@@ -21,12 +21,7 @@ const restHandlers = [
       if (filter && filter !== "") {
         return res(
           ctx.status(200),
-          ctx.json(
-            mockedFlows.filter(
-              (flows) =>
-                flows.name.includes(filter)
-            )
-          )
+          ctx.json(mockedFlows.filter((flows) => flows.name.includes(filter)))
         );
       }
 
@@ -76,9 +71,7 @@ describe("Flows page", () => {
   });
 
   it("filters flows correctly", async () => {
-    const input = screen.getByPlaceholderText(
-      "Pesquisar fluxos"
-    );
+    const input = screen.getByPlaceholderText("Pesquisar fluxos");
 
     expect(input).not.toBe(null);
 
@@ -108,5 +101,4 @@ describe("Flows page", () => {
     expect(await screen.queryByText("SecondFlow")).toBe(null);
     expect(await screen.queryByText("ThirdFlow")).not.toBe(null);
   });
-
 });

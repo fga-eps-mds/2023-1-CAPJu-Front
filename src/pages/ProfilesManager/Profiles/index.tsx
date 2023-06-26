@@ -26,12 +26,11 @@ interface ProfilesProps {
 export function Profiles({
   usersData,
   isUsersFetched,
+  refetchUsers,
 }: ProfilesProps) {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
-  const {
-    refetch: refetchUsers,
-  } = useQuery({
+  const { refetch: refetchAcceptedUsers } = useQuery({
     queryKey: ["accepted-users"],
     queryFn: async () => {
       const res = await getAcceptedUsers(filter);
@@ -187,7 +186,7 @@ export function Profiles({
           <chakra.form
             onSubmit={(e) => {
               e.preventDefault();
-              refetchUsers();
+              refetchAcceptedUsers();
             }}
             w="100%"
             display="flex"

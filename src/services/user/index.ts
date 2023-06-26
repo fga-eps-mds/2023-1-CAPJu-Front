@@ -121,7 +121,9 @@ export const getAcceptedUsers = async (
   filter: string
 ): Promise<Result<User[]>> => {
   try {
-    const res = await api.user.get<User[]>(`/allUser?accepted=true`, { params: { filter } });
+    const res = await api.user.get<User[]>(`/allUser?accepted=true`, {
+      params: { filter },
+    });
 
     return {
       type: "success",
@@ -139,9 +141,13 @@ export const getAcceptedUsers = async (
   }
 };
 
-export const getUsersRequests = async (): Promise<Result<User[]>> => {
+export const getUsersRequests = async (
+  filter: string
+): Promise<Result<User[]>> => {
   try {
-    const res = await api.user.get<User[]>(`/allUser?accepted=false`);
+    const res = await api.user.get<User[]>(`/allUser?accepted=false`, {
+      params: { filter },
+    });
     const value = res.data?.map((item: User) => {
       return { ...item, role: roleNameById(item.idRole) };
     });
