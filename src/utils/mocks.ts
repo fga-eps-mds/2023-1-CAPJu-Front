@@ -64,21 +64,63 @@ export const mockedUnits = [
 export const mockedStages = [
   {
     idStage: 1,
-    name: "etapaA",
+    name: "a",
     duration: 2,
     idUnit: 1,
   },
   {
     idStage: 2,
-    name: "etapaB",
-    duration: 3,
-    idUnit: 1,
+    name: "b",
+    duration: 5,
+    idUnit: 2,
   },
   {
     idStage: 3,
-    name: "etapaC",
+    name: "c",
     duration: 5,
-    idUnit: 1,
+    idUnit: 3,
+  },
+  {
+    idStage: 4,
+    name: "d",
+    duration: 5,
+    idUnit: 4,
+  },
+  {
+    idStage: 5,
+    name: "e",
+    duration: 5,
+    idUnit: 5,
+  },
+  {
+    idStage: 6,
+    name: "f",
+    duration: 5,
+    idUnit: 6,
+  },
+  {
+    idStage: 7,
+    name: "g",
+    duration: 5,
+    idUnit: 7,
+  },
+  {
+    idStage: 8,
+    name: "h",
+    duration: 5,
+    idUnit: 8,
+  },
+  {
+    idStage: 9,
+    name: "i",
+    duration: 5,
+    idUnit: 9,
+  },
+  {
+    idStage: 10,
+    name: "j",
+    duration: 5,
+    idUnit: 10,
   },
 ];
 
