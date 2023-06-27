@@ -18,6 +18,25 @@ export const mockedManagerUser = {
   idRole: 1,
 };
 
+export const mockedAllUser = [
+  {
+    ...mockedUser,
+    idRole: 1,
+  },
+  {
+    ...mockedUser,
+    idRole: 2,
+  },
+  {
+    ...mockedUser,
+    idRole: 2,
+  },
+  {
+    ...mockedUser,
+    idRole: 4,
+  },
+];
+
 export const mockedUnits = [
   {
     idUnit: 1,

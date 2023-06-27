@@ -11,7 +11,12 @@ import ResizeObserver from "resize-observer-polyfill";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
-import { mockedUser, mockedFlows } from "utils/mocks";
+import {
+  mockedUser,
+  mockedAllUser,
+  mockedStages,
+  mockedFlows,
+} from "utils/mocks";
 import Flows from "../Flows";
 
 const restHandlers = [
@@ -20,8 +25,16 @@ const restHandlers = [
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedFlows))
   ),
   rest.get(
+    `${import.meta.env.VITE_STAGES_SERVICE_URL}stages`,
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedStages))
+  ),
+  rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
+  ),
+  rest.get(
+    `${import.meta.env.VITE_USER_SERVICE_URL}allUser`,
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedAllUser))
   ),
 ];
 
@@ -75,10 +88,7 @@ describe("Flows page", () => {
 
   it("shows 'create flow' correctly", async () => {
     const button = screen.getByText("Criar Fluxo");
-
-    if (button) {
-      expect(button).not.toBe(null);
-    }
+    expect(button).not.toBe(null);
   });
 
   it("opens and closes the creation modal correctly", async () => {
@@ -87,6 +97,23 @@ describe("Flows page", () => {
     await act(async () => {
       await fireEvent.click(createFlowButton);
     });
+
+    expect(await screen.findAllByText("Nome")).not.toBe(null);
+    expect(await screen.getByPlaceholderText("Nome do fluxo")).not.toBe(null);
+
+    expect(await screen.findByText("Etapas")).not.toBe(null);
+    expect(
+      await screen.getByPlaceholderText(
+        "Escolha as etapas do fluxo em sequência"
+      )
+    ).not.toBe(null);
+
+    expect(await screen.findByText("Usuários notificados")).not.toBe(null);
+    expect(
+      await screen.getByPlaceholderText(
+        "Escolha os usuários a serem notificados"
+      )
+    ).not.toBe(null);
 
     expect(await screen.findByText("Criar")).not.toBeNull();
 
