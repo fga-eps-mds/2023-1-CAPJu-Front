@@ -1,16 +1,18 @@
 import { describe, expect } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ChakraProvider } from "@chakra-ui/react";
 import { act } from "react-dom/test-utils";
 
+import ResizeObserver from "resize-observer-polyfill";
+
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
-import { mockedFlows, mockedManagerUser } from "utils/mocks";
-import Flows from "pages/Flows";
+import { mockedUser, mockedFlows } from "utils/mocks";
+import Flows from "../Flows";
 
 const restHandlers = [
   rest.get(
@@ -18,8 +20,8 @@ const restHandlers = [
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedFlows))
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedManagerUser.cpf}`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedManagerUser))
+    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
   ),
 ];
 
@@ -28,20 +30,21 @@ const queryClient = new QueryClient();
 
 describe("Flows page", () => {
   beforeAll(async () => {
-    localStorage.setItem("@CAPJu:user", JSON.stringify(mockedManagerUser));
+    global.ResizeObserver = ResizeObserver;
+    localStorage.setItem("@CAPJu:user", JSON.stringify(mockedUser));
     server.listen({ onUnhandledRequest: "error" });
   });
 
   beforeEach(async () => {
     await act(async () => {
-      render(
+      await render(
         <ChakraProvider>
           <LoadingProvider>
             <QueryClientProvider client={queryClient}>
               <AuthProvider>
-                <BrowserRouter>
+                <MemoryRouter>
                   <Flows />
-                </BrowserRouter>
+                </MemoryRouter>
               </AuthProvider>
             </QueryClientProvider>
           </LoadingProvider>
@@ -61,9 +64,9 @@ describe("Flows page", () => {
     expect(await screen.findAllByText("Fluxos")).not.toBe(null);
     expect(await screen.findByText("Nome")).not.toBe(null);
     expect(await screen.findByText("Ações")).not.toBe(null);
-    expect(await screen.findByText("teste")).not.toBe(null);
-    expect(await screen.findByText("abcd")).not.toBe(null);
-    expect(await screen.findByText("quadrado")).not.toBe(null);
+    expect(await screen.findByText("FirstFlow")).not.toBe(null);
+    expect(await screen.findByText("SecondFlow")).not.toBe(null);
+    expect(await screen.findByText("ThirdFlow")).not.toBe(null);
   });
 
   it("shows 'search bar' correctly", async () => {
