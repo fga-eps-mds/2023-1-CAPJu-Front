@@ -20,7 +20,18 @@ import Units from "../Units";
 const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_UNITS_SERVICE_URL}units`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUnits))
+    async (req, res, ctx) => {
+      const filter = req.url.searchParams.get("filter");
+
+      if (filter && filter !== "") {
+        return res(
+          ctx.status(200),
+          ctx.json(mockedUnits.filter((units) => units.name.includes(filter)))
+        );
+      }
+
+      return res(ctx.status(200), ctx.json(mockedUnits));
+    }
   ),
   rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedAdminUser.cpf}`,
@@ -91,5 +102,41 @@ describe("Units page", () => {
     await waitFor(() => {
       expect(screen.queryByText("Criar unidade")).toBeNull();
     });
+  });
+
+  it("filters units correctly", async () => {
+    const input = screen.getByPlaceholderText("Pesquisar unidades");
+
+    expect(input).not.toBe(null);
+
+    await act(async () => {
+      await fireEvent.change(input, {
+        target: { value: "Unidade 5" },
+      });
+      await fireEvent.submit(input);
+    });
+
+    expect(await screen.queryByText("Unidade 1")).toBe(null);
+    expect(await screen.queryByText("Unidade 2")).toBe(null);
+    expect(await screen.queryByText("Unidade 3")).toBe(null);
+    expect(await screen.queryByText("Unidade 4")).toBe(null);
+    expect(await screen.queryByText("Unidade 5")).not.toBe(null);
+
+    const button = screen.getByLabelText("botão de busca");
+
+    expect(button).not.toBe(null);
+
+    await act(async () => {
+      await fireEvent.change(input, {
+        target: { value: "Unidade 3" },
+      });
+      await fireEvent.click(button);
+    });
+
+    expect(await screen.queryByText("Unidade 1")).toBe(null);
+    expect(await screen.queryByText("Unidade 2")).toBe(null);
+    expect(await screen.queryByText("Unidade 3")).not.toBe(null);
+    expect(await screen.queryByText("Unidade 4")).toBe(null);
+    expect(await screen.queryByText("Unidade 5")).toBe(null);
   });
 });
