@@ -169,6 +169,7 @@ function Stages() {
               }}
             />
             <Button
+              aria-label="botão de busca"
               colorScheme="green"
               marginLeft="2"
               justifyContent="center"

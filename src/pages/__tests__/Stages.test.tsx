@@ -22,7 +22,20 @@ import Stages from "../Stages";
 const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_STAGES_SERVICE_URL}stages`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedStages))
+    async (req, res, ctx) => {
+      const filter = req.url.searchParams.get("filter");
+
+      if (filter && filter !== "") {
+        return res(
+          ctx.status(200),
+          ctx.json(
+            mockedStages.filter((stages) => stages.name.includes(filter))
+          )
+        );
+      }
+
+      return res(ctx.status(200), ctx.json(mockedStages));
+    }
   ),
   rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedManagerUser.cpf}`,
@@ -117,5 +130,37 @@ describe("Stages page", () => {
     await waitFor(() => {
       expect(screen.queryByText("CreationModal")).toBeNull();
     });
+  });
+
+  it("filters stages correctly", async () => {
+    const input = screen.getByPlaceholderText("Pesquisar etapas");
+
+    expect(input).not.toBe(null);
+
+    await act(async () => {
+      await fireEvent.change(input, {
+        target: { value: "etapaA" },
+      });
+      await fireEvent.submit(input);
+    });
+
+    expect(await screen.queryByText("etapaA")).not.toBe(null);
+    expect(await screen.queryByText("etapaB")).toBe(null);
+    expect(await screen.queryByText("etapaC")).toBe(null);
+
+    const button = screen.getByLabelText("botão de busca");
+
+    expect(button).not.toBe(null);
+
+    await act(async () => {
+      await fireEvent.change(input, {
+        target: { value: "etapaC" },
+      });
+      await fireEvent.click(button);
+    });
+
+    expect(await screen.queryByText("etapaA")).toBe(null);
+    expect(await screen.queryByText("etapaB")).toBe(null);
+    expect(await screen.queryByText("etapaC")).not.toBe(null);
   });
 });
