@@ -135,21 +135,21 @@ export const mockedFlow = {
 export const mockedFlows = [
   {
     idFlow: 1,
-    name: "FirstFlow",
+    name: "Fluxo 1",
     idUnit: 1,
     stages: [1, 2],
     sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
   },
   {
     idFlow: 2,
-    name: "SecondFlow",
+    name: "Fluxo 2",
     idUnit: 1,
     stages: [1, 2],
     sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
   },
   {
     idFlow: 3,
-    name: "ThirdFlow",
+    name: "Fluxo 3",
     idUnit: 1,
     stages: [1, 2],
     sequences: [{ from: 1, commentary: "Comentário", to: 2 }],
@@ -209,28 +209,12 @@ export const mockedProcesses = [
   {
     effectiveDate: null,
     idFlow: 1,
-    idPriority: 0,
-    idStage: null,
-    idUnit: 1,
-    nickname: "Processo não Iniciado",
-    record: "12345678912345678915",
-    status: "notStarted",
-  },
-  {
-    effectiveDate: null,
-    idFlow: 1,
     idPriority: 1,
     idStage: null,
     idUnit: 1,
-<<<<<<< HEAD
-    nickname: "Processo Arquivado",
-    record: "12345678912345678916",
-    status: "archived",
-=======
     nickname: "A",
     record: "12345678912345678910",
     status: "notStarted",
->>>>>>> e3f8220 ((fga-eps-mds/2023-1-CAPJu-Doc#121) - Adiciona teste de paginação na página de processos.)
   },
   {
     effectiveDate: new Date(),
@@ -238,15 +222,9 @@ export const mockedProcesses = [
     idPriority: 1,
     idStage: 1,
     idUnit: 1,
-<<<<<<< HEAD
-    nickname: "Processo em Andamento",
-    record: "12345678912345678917",
-    status: "inProgress",
-=======
     nickname: "B",
     record: "12345678912345678911",
     status: "notStarted",
->>>>>>> e3f8220 ((fga-eps-mds/2023-1-CAPJu-Doc#121) - Adiciona teste de paginação na página de processos.)
   },
   {
     effectiveDate: new Date(),
@@ -254,10 +232,6 @@ export const mockedProcesses = [
     idPriority: null,
     idStage: null,
     idUnit: 1,
-<<<<<<< HEAD
-    nickname: "Processo Finalizado",
-    record: "12345678912345678918",
-=======
     nickname: "C",
     record: "12345678912345678912",
     status: "finished",
@@ -310,7 +284,6 @@ export const mockedProcesses = [
     idUnit: 1,
     nickname: "H",
     record: "12345678912345678917",
->>>>>>> e3f8220 ((fga-eps-mds/2023-1-CAPJu-Doc#121) - Adiciona teste de paginação na página de processos.)
     status: "finished",
   },
   {

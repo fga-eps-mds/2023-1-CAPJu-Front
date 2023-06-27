@@ -71,6 +71,7 @@ describe("Flows page", () => {
   it("renders correctly", () => {
     expect(screen).toMatchSnapshot();
   });
+
   it("shows pagination content correctly", async () => {
     expect(await screen.queryByText("Fluxo 1")).not.toBe(null);
     expect(await screen.queryByText("Fluxo 2")).not.toBe(null);

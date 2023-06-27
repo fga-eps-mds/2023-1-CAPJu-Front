@@ -81,10 +81,6 @@ function Processes() {
       });
     },
   });
-  const [currentPage, setCurrentPage] = useState(0);
-  const handlePageChange = (selectedPage: { selected: number }) => {
-    setCurrentPage(selectedPage.selected);
-  };
   const {
     data: processesData,
     isFetched: isProcessesFetched,

@@ -19,7 +19,6 @@ import {
   mockedProcesses,
   mockedFlows,
   mockedPriorities,
-  mockedNotStartedProcess,
 } from "utils/mocks";
 import { getPaginatedArray } from "utils/pagination";
 import Processes from "../Processes";
@@ -94,29 +93,21 @@ describe("Processes page", () => {
   });
 
   it("shows text content correctly", async () => {
-<<<<<<< HEAD
     expect(await screen.findAllByText("Processos")).not.toBe(null);
-    expect(await screen.findByText("Registro")).not.toBe(null);
-    expect(await screen.findByText("Apelido")).not.toBe(null);
-    expect(await screen.findByText("Situação atual")).not.toBe(null);
-    expect(await screen.findByText("Fluxo")).not.toBe(null);
-    expect(await screen.findByText("Status")).not.toBe(null);
-    expect(await screen.findByText("Ações")).not.toBe(null);
+    expect(await screen.queryByText("Registro")).not.toBe(null);
+    expect(await screen.queryByText("Apelido")).not.toBe(null);
+    expect(await screen.queryByText("Situação atual")).not.toBe(null);
+    expect(await screen.queryByText("Fluxo")).not.toBe(null);
+    expect(await screen.queryByText("Status")).not.toBe(null);
+    expect(await screen.queryByText("Ações")).not.toBe(null);
   });
 
   it("shows process text content correctly", async () => {
-    expect(await screen.findByText("12345678912345678915")).not.toBe(null);
-    expect(await screen.findByText("Processo não Iniciado")).not.toBe(null);
-    expect(await screen.findByText("Não iniciado")).not.toBe(null);
-    expect(await screen.findByText("12345678912345678916")).not.toBe(null);
-    expect(await screen.findByText("Processo Arquivado")).not.toBe(null);
-    expect(await screen.findByText("Arquivado")).not.toBe(null);
-    expect(await screen.findByText("12345678912345678917")).not.toBe(null);
-    expect(await screen.findByText("Processo em Andamento")).not.toBe(null);
-    expect(await screen.findByText("Em andamento")).not.toBe(null);
-    expect(await screen.findByText("12345678912345678918")).not.toBe(null);
-    expect(await screen.findByText("Processo Finalizado")).not.toBe(null);
-    expect(await screen.findByText("Finalizado")).not.toBe(null);
+    expect(await screen.queryByText("A")).not.toBe(null);
+    expect(await screen.queryByText("B")).not.toBe(null);
+    expect(await screen.queryByText("C")).not.toBe(null);
+    expect(await screen.queryByText("D")).not.toBe(null);
+    expect(await screen.queryByText("E")).not.toBe(null);
   });
 
   it("shows 'create process' correctly", async () => {
@@ -130,9 +121,7 @@ describe("Processes page", () => {
       "Mostrar apenas processos com prioridade legal"
     );
 
-    if (button) {
-      expect(button).not.toBe(null);
-    }
+    expect(button).not.toBe(null);
   });
 
   it("toggles 'archived/finished processes' checkbox correctly", async () => {
@@ -141,6 +130,8 @@ describe("Processes page", () => {
     );
 
     expect(button).not.toBe(null);
+
+    const mockedNotStartedProcess = mockedProcesses[0];
 
     expect(await screen.queryByText(mockedNotStartedProcess.record)).not.toBe(
       null
@@ -179,17 +170,5 @@ describe("Processes page", () => {
     await waitFor(() => {
       expect(screen.queryByText("CreationModal")).toBeNull();
     });
-=======
-    expect(await screen.queryByText("A")).not.toBe(null);
-    expect(await screen.queryByText("B")).not.toBe(null);
-    expect(await screen.queryByText("C")).not.toBe(null);
-    expect(await screen.queryByText("D")).not.toBe(null);
-    expect(await screen.queryByText("E")).not.toBe(null);
-    expect(await screen.queryByText("F")).toBe(null);
-    expect(await screen.queryByText("G")).toBe(null);
-    expect(await screen.queryByText("H")).toBe(null);
-    expect(await screen.queryByText("I")).toBe(null);
-    expect(await screen.queryByText("J")).toBe(null);
->>>>>>> e3f8220 ((fga-eps-mds/2023-1-CAPJu-Doc#121) - Adiciona teste de paginação na página de processos.)
   });
 });
