@@ -1,15 +1,22 @@
 import { describe, expect } from "vitest";
-import { act, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ChakraProvider } from "@chakra-ui/react";
+import { act } from "react-dom/test-utils";
+
 import ResizeObserver from "resize-observer-polyfill";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
-import { mockedUser, mockedFlows } from "utils/mocks";
+import {
+  mockedUser,
+  mockedAllUser,
+  mockedStages,
+  mockedFlows,
+} from "utils/mocks";
 import Flows from "../Flows";
 
 const restHandlers = [
@@ -18,8 +25,16 @@ const restHandlers = [
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedFlows))
   ),
   rest.get(
+    `${import.meta.env.VITE_STAGES_SERVICE_URL}stages`,
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedStages))
+  ),
+  rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
+  ),
+  rest.get(
+    `${import.meta.env.VITE_USER_SERVICE_URL}allUser`,
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedAllUser))
   ),
 ];
 
@@ -57,5 +72,59 @@ describe("Flows page", () => {
 
   it("renders correctly", () => {
     expect(screen).toMatchSnapshot();
+  });
+  it("shows text content correctly", async () => {
+    expect(await screen.findAllByText("Fluxos")).not.toBe(null);
+    expect(await screen.findByText("Nome")).not.toBe(null);
+    expect(await screen.findByText("Ações")).not.toBe(null);
+    expect(await screen.findByText("FirstFlow")).not.toBe(null);
+    expect(await screen.findByText("SecondFlow")).not.toBe(null);
+    expect(await screen.findByText("ThirdFlow")).not.toBe(null);
+  });
+
+  it("shows 'search bar' correctly", async () => {
+    expect(screen.getByPlaceholderText("Pesquisar fluxos")).not.toBe(null);
+  });
+
+  it("shows 'create flow' correctly", async () => {
+    const button = screen.getByText("Criar Fluxo");
+    expect(button).not.toBe(null);
+  });
+
+  it("opens and closes the creation modal correctly", async () => {
+    const createFlowButton = await screen.getByText("Criar Fluxo");
+
+    await act(async () => {
+      await fireEvent.click(createFlowButton);
+    });
+
+    expect(await screen.findAllByText("Nome")).not.toBe(null);
+    expect(await screen.getByPlaceholderText("Nome do fluxo")).not.toBe(null);
+
+    expect(await screen.findByText("Etapas")).not.toBe(null);
+    expect(
+      await screen.getByPlaceholderText(
+        "Escolha as etapas do fluxo em sequência"
+      )
+    ).not.toBe(null);
+
+    expect(await screen.findByText("Usuários notificados")).not.toBe(null);
+    expect(
+      await screen.getByPlaceholderText(
+        "Escolha os usuários a serem notificados"
+      )
+    ).not.toBe(null);
+
+    expect(await screen.findByText("Criar")).not.toBeNull();
+
+    const closeModalButton = await screen.getByText("Cancelar");
+
+    await act(async () => {
+      await fireEvent.click(closeModalButton);
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText("CreationModal")).toBeNull();
+    });
   });
 });

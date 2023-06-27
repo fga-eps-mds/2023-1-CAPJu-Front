@@ -16,7 +16,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
 
-import { mockedManagerUser, mockedStages } from "utils/mocks";
+import { mockedUser, mockedStages } from "utils/mocks";
 import Stages from "../Stages";
 
 const restHandlers = [
@@ -25,8 +25,8 @@ const restHandlers = [
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedStages))
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedManagerUser.cpf}`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedManagerUser))
+    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
   ),
 ];
 
@@ -35,7 +35,7 @@ const queryClient = new QueryClient();
 
 describe("Stages page", () => {
   beforeAll(async () => {
-    localStorage.setItem("@CAPJu:user", JSON.stringify(mockedManagerUser));
+    localStorage.setItem("@CAPJu:user", JSON.stringify(mockedUser));
     server.listen({ onUnhandledRequest: "error" });
   });
 
