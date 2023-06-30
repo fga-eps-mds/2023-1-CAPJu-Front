@@ -1,7 +1,7 @@
 import ResizeObserver from "resize-observer-polyfill";
 import { act, render, screen } from "@testing-library/react";
 import { mockedStages, mockedFlowSequence } from "utils/mocks";
-import handleDateFormating from "utils/dates";
+import { handleDateFormating, handleExpiration } from "utils/dates";
 import { Flow } from "../Flow";
 
 describe("Flow components", async () => {
@@ -58,5 +58,18 @@ describe("Flow components", async () => {
     const currentDate = new Date("2023-06-25");
     const datestring = handleDateFormating(currentDate);
     expect(datestring).toMatch("25 de junho de 2023");
+  });
+
+  it('expects "handleExpiration" true if processDate < currentDate', async () => {
+    const processDate = new Date();
+    processDate.setDate(processDate.getDate() - 1);
+    const result = handleExpiration(processDate);
+    expect(result).toBe(true);
+  });
+
+  it('expects "handleExpiration" false if processDate >= currentDate', async () => {
+    const vencimento = new Date();
+    const result = handleExpiration(vencimento);
+    expect(result).not.toBe(true);
   });
 });

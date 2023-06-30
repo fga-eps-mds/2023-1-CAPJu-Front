@@ -11,7 +11,7 @@ import "reactflow/dist/style.css";
 import _ from "lodash";
 
 import { colors } from "styles/colors";
-import handleDateFormating from "utils/dates";
+import { handleDateFormating, handleExpiration } from "utils/dates";
 
 interface FlowProps {
   stages: Stage[];
@@ -97,23 +97,6 @@ export function Flow({
       month: "long",
       day: "numeric",
     });
-  };
-
-  // const handleDateFormating = (date: Date | string) => {
-  //   const currentDate = new Date(date);
-  //   return currentDate.toLocaleString("pt-BR", {
-  //     year: "numeric",
-  //     month: "long",
-  //     day: "numeric",
-  //   });
-  // };
-
-  const handleExpiration = (vencimento: Date) => {
-    const currentDate = new Date();
-    const processDate = new Date(vencimento);
-    currentDate.setDate(currentDate.getDate());
-    if (processDate < currentDate) return true;
-    return false;
   };
 
   const handleDate = (item: Stage) => {
