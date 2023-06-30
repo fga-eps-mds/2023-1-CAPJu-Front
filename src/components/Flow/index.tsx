@@ -167,7 +167,6 @@ export function Flow({
   const nodes = sortedStages.map((item, index) => {
     const deadline = getStageDeadline(item, index);
     const stageLabel = `${_.startCase(item.name)} ${
-
       showStagesDuration
         ? `, (${item.duration} dia${item.duration > 1 ? "s" : ""})`
         : ""
