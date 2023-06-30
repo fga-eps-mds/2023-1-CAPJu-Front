@@ -1,6 +1,7 @@
 import ResizeObserver from "resize-observer-polyfill";
 import { act, render, screen } from "@testing-library/react";
 import { mockedStages, mockedFlowSequence } from "utils/mocks";
+import handleDateFormating from "utils/dates";
 import { Flow } from "../Flow";
 
 describe("Flow components", async () => {
@@ -55,11 +56,7 @@ describe("Flow components", async () => {
 
   it('shows if "handledateformating" is working', async () => {
     const currentDate = new Date("2023-06-25");
-    const datestring = currentDate.toLocaleDateString("pt-BR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    const datestring = handleDateFormating(currentDate);
     expect(datestring).toMatch("25 de junho de 2023");
   });
 });
