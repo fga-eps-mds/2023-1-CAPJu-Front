@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon, Icon } from "@chakra-ui/icons";
@@ -11,6 +11,7 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
+import { Pagination } from "components/Pagination";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
@@ -35,13 +36,20 @@ function Units() {
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
   const {
     data: unitsData,
     isFetched: isUnitsFetched,
     refetch: refetchUnits,
   } = useQuery({
     queryKey: ["units"],
-    queryFn: getUnits,
+    queryFn: async () => {
+      const res = await getUnits({ offset: currentPage * 5, limit: 5 });
+      return res;
+    },
     onError: () => {
       toast({
         id: "units-error",
@@ -131,6 +139,10 @@ function Units() {
     }),
   ];
 
+  useEffect(() => {
+    refetchUnits();
+  }, [currentPage]);
+
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -168,6 +180,12 @@ function Units() {
         isDataFetching={!isUnitsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas unidades."
       />
+      {unitsData?.totalPages !== undefined ? (
+        <Pagination
+          pageCount={unitsData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       <CreationModal
         isOpen={isCreationOpen}
         onClose={onCreationClose}

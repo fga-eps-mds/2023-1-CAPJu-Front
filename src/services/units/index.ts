@@ -1,10 +1,24 @@
 import { api } from "services/api";
 
-export const getUnits = async (): Promise<Result<Unit[]>> => {
+export const getUnits = async (
+  pagination?: Pagination
+): Promise<Result<Unit[]>> => {
   try {
-    const res = await api.units.get<Unit[]>("/units");
+    const res = await api.units.get<{ units: Unit[]; totalPages: number }>(
+      "/units",
+      {
+        params: {
+          offset: pagination?.offset ?? 0,
+          limit: pagination?.limit ?? 5,
+        },
+      }
+    );
 
-    return { type: "success", value: res.data };
+    return {
+      type: "success",
+      value: res.data.units,
+      totalPages: res.data.totalPages,
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };

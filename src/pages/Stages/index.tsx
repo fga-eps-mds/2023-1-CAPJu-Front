@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { AddIcon, Icon } from "@chakra-ui/icons";
@@ -10,6 +10,7 @@ import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { hasPermission } from "utils/permissions";
+import { Pagination } from "components/Pagination";
 import { getStages } from "../../services/stages";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
@@ -29,6 +30,10 @@ function Stages() {
     onOpen: onDeletionOpen,
     onClose: onDeletionClose,
   } = useDisclosure();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
@@ -39,7 +44,10 @@ function Stages() {
     refetch: refetchStages,
   } = useQuery({
     queryKey: ["stages"],
-    queryFn: getStages,
+    queryFn: async () => {
+      const res = await getStages({ offset: currentPage * 5, limit: 5 });
+      return res;
+    },
     onError: () => {
       toast({
         id: "stages-error",
@@ -68,7 +76,6 @@ function Stages() {
     ],
     [isStagesFetched, isUserFetched, userData]
   );
-
   const filteredStages = useMemo<TableRow<Stage>[]>(() => {
     if (!isStagesFetched) return [];
 
@@ -123,6 +130,10 @@ function Stages() {
     }),
   ];
 
+  useEffect(() => {
+    refetchStages();
+  }, [currentPage]);
+
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -142,7 +153,7 @@ function Stages() {
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Input
-            placeholder="Pesquisar etapas"
+            placeholder="Pesquisar unidades"
             value={filter}
             onChange={({ target }) => setFilter(target.value)}
             variant="filled"
@@ -160,6 +171,12 @@ function Stages() {
         isDataFetching={!isStagesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas etapas."
       />
+      {stagesData?.totalPages !== undefined ? (
+        <Pagination
+          pageCount={stagesData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       <CreationModal
         user={userData?.value!}
         isOpen={isCreationOpen}
