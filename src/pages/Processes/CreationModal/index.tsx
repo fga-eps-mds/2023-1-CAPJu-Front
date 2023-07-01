@@ -76,7 +76,10 @@ export function CreationModal({
   });
   const { data: flowsData } = useQuery({
     queryKey: ["flows"],
-    queryFn: getFlows,
+    queryFn: async () => {
+      const res = await getFlows();
+      return res;
+    },
     onError: () => {
       toast({
         id: "flows-error",

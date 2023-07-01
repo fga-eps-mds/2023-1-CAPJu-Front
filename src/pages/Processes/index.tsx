@@ -23,6 +23,7 @@ import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { labelByProcessStatus } from "utils/constants";
+import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
@@ -56,6 +57,10 @@ function Processes() {
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
   const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
@@ -83,7 +88,10 @@ function Processes() {
   } = useQuery({
     queryKey: ["processes"],
     queryFn: async () => {
-      const res = await getProcesses(flow?.idFlow);
+      const res = await getProcesses(flow?.idFlow, {
+        offset: currentPage * 5,
+        limit: 5,
+      });
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -100,10 +108,8 @@ function Processes() {
       });
     },
   });
-
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
-
   const tableActions = useMemo<TableAction[]>(
     () => [
       {
@@ -136,7 +142,6 @@ function Processes() {
     ],
     [isProcessesFetched, isUserFetched, userData]
   );
-
   const filterByPriority = (processes: Process[]) =>
     processes?.filter((process: Process) => process.idPriority);
 
@@ -149,7 +154,6 @@ function Processes() {
     }
     return processes;
   };
-
   const filteredProcess = useMemo<TableRow<Process>[]>(() => {
     if (!isProcessesFetched || !isFlowsFetched) return [];
 
@@ -290,7 +294,7 @@ function Processes() {
 
   useEffect(() => {
     refetchProcesses();
-  }, [flowsData, isFlowsFetched]);
+  }, [flowsData, isFlowsFetched, currentPage]);
 
   return (
     <PrivateLayout>
@@ -369,6 +373,12 @@ function Processes() {
           flow ? ` no fluxo ${flow.name}` : ""
         }.`}
       />
+      {processesData?.totalPages !== undefined ? (
+        <Pagination
+          pageCount={processesData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       <CreationModal
         isOpen={isCreationOpen}
         onClose={onCreationClose}

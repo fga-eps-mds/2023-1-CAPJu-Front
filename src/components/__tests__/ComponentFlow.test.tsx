@@ -16,7 +16,7 @@ describe("Flow components", async () => {
           stages={mockedStages}
           sequences={mockedFlowSequence}
           process={mockedProcess}
-          effectiveDate="2023-06-26"
+          effectiveDate="2023-06-27"
           currentStage={1}
         />
       );
