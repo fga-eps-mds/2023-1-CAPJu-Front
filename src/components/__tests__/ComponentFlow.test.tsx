@@ -1,6 +1,6 @@
 import ResizeObserver from "resize-observer-polyfill";
 import { act, render, screen } from "@testing-library/react";
-import { mockedStages, mockedFlowSequence } from "utils/mocks";
+import { mockedStages, mockedFlowSequence, mockedProcess } from "utils/mocks";
 import { handleDateFormating, handleExpiration } from "utils/dates";
 import { Flow } from "../Flow";
 
@@ -12,7 +12,13 @@ describe("Flow components", async () => {
   beforeEach(async () => {
     await act(async () => {
       await render(
-        <Flow stages={mockedStages} sequences={mockedFlowSequence} />
+        <Flow
+          stages={mockedStages}
+          sequences={mockedFlowSequence}
+          process={mockedProcess}
+          effectiveDate="2023-06-26"
+          currentStage={1}
+        />
       );
     });
   });

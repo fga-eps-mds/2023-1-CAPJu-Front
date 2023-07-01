@@ -1,3 +1,27 @@
+const mockedProgress1 = {
+  idStage: 1,
+  entrada: new Date("2023-06-25"),
+  vencimento: new Date("2023-06-26"),
+};
+
+const mockedProgress2 = {
+  idStage: 2,
+  entrada: new Date("2023-06-25"),
+  vencimento: new Date("2023-06-29"),
+};
+
+export const mockedProcess = {
+  effectiveDate: "2023-06-26",
+  idFlow: 1,
+  idPriority: 0,
+  idStage: 1,
+  idUnit: 1,
+  nickname: "Processo não Iniciado",
+  record: "12345678912345678915",
+  status: "inProgress",
+  progress: [mockedProgress1, mockedProgress2],
+};
+
 export const mockedUser = {
   cpf: "12345678900",
   fullName: "User Teste",
