@@ -11,6 +11,7 @@ import "reactflow/dist/style.css";
 import _ from "lodash";
 
 import { colors } from "styles/colors";
+import { handleDateFormating, handleExpiration } from "utils/dates";
 
 interface FlowProps {
   stages: Stage[];
@@ -22,7 +23,11 @@ interface FlowProps {
   effectiveDate?: string | undefined;
   isFetching?: boolean;
   showStagesDuration?: boolean;
+  process?: Process;
+  isNextStage?: Boolean;
 }
+
+const whiteList: number[] = [];
 
 export function Flow({
   stages,
@@ -34,14 +39,24 @@ export function Flow({
   effectiveDate = undefined,
   isFetching = false,
   showStagesDuration = false,
+  process,
+  isNextStage,
 }: FlowProps) {
   const startDate = effectiveDate ? new Date(effectiveDate) : null;
+
   const sortedStages = useMemo(() => {
     const sequenceMap = new Map<number, number>();
 
     sequences.forEach((sequence, index) => {
       sequenceMap.set(sequence.from, index);
     });
+
+    for (let index = 0; index < stages.length; index += 1) {
+      stages[index].entrada =
+        process?.progress && process?.progress[index]?.entrada;
+      stages[index].vencimento =
+        process?.progress && process?.progress[index]?.vencimento;
+    }
 
     return stages.sort((a, b) => {
       const indexA = sequenceMap.get(a.idStage);
@@ -58,7 +73,6 @@ export function Flow({
       if (indexB === undefined) {
         return -1;
       }
-
       return indexA - indexB;
     });
   }, [stages, sequences]);
@@ -85,11 +99,59 @@ export function Flow({
     });
   };
 
+  const handleDate = (item: Stage) => {
+    if (!process?.idStage) {
+      return (
+        <>{`Vencimento: ${item.duration} Dia${item.duration > 1 ? "s" : ""}`}</>
+      );
+    }
+    // Processo Iniciado
+    if (process?.idStage) {
+      if (process?.idStage === item.idStage) {
+        if (!whiteList.includes(item?.idStage))
+          whiteList.push(process?.idStage);
+
+        if (whiteList.includes(item?.idStage) && !isNextStage) whiteList.pop();
+
+        return (
+          <>
+            {`Entrada: ${item?.entrada && handleDateFormating(item?.entrada)}`}
+            <br />
+            {`Vencimento: ${
+              item?.vencimento && handleDateFormating(item?.vencimento)
+            }`}
+          </>
+        );
+      }
+      if (process?.idStage !== item.idStage) {
+        if (whiteList.includes(item?.idStage)) {
+          return (
+            <>
+              {`Entrada: ${
+                item?.entrada && handleDateFormating(item?.entrada)
+              }`}
+              <br />
+              {`Vencimento: ${
+                item?.vencimento && handleDateFormating(item?.vencimento)
+              }`}
+            </>
+          );
+        }
+        return (
+          <>{`Vencimento: ${item.duration} Dia${
+            item.duration > 1 ? "s" : ""
+          }`}</>
+        );
+      }
+    }
+    return "";
+  };
+
   const nodes = sortedStages.map((item, index) => {
     const deadline = getStageDeadline(item, index);
-    const stageLabel = `${_.startCase(item.name)}, ${
+    const stageLabel = `${_.startCase(item.name)} ${
       showStagesDuration
-        ? ` (${item.duration} dia${item.duration > 1 ? "s" : ""})`
+        ? `, (${item.duration} dia${item.duration > 1 ? "s" : ""})`
         : ""
     }`;
     return {
@@ -102,12 +164,11 @@ export function Flow({
         label: (
           <>
             {stageLabel}
-            {deadline ? (
-              <>
-                {" "}
-                <br /> {`Vencimento: ${deadline}`}{" "}
-              </>
-            ) : null}
+            <>
+              {" "}
+              <br />
+              {handleDate(item)}
+            </>
           </>
         ),
       },
@@ -115,7 +176,10 @@ export function Flow({
         ...(currentStage === item.idStage
           ? {
               color: "white",
-              background: colors.green["500"],
+              background:
+                item?.vencimento && handleExpiration(item.vencimento)
+                  ? colors.red["500"]
+                  : colors.green["500"],
               fontWeight: "bold",
             }
           : {
