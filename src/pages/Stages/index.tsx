@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import {
   Flex,
@@ -16,6 +16,7 @@ import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { hasPermission } from "utils/permissions";
+import { Pagination } from "components/Pagination";
 import { getStages } from "../../services/stages";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
@@ -35,6 +36,10 @@ function Stages() {
     onOpen: onDeletionOpen,
     onClose: onDeletionClose,
   } = useDisclosure();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
@@ -46,7 +51,10 @@ function Stages() {
   } = useQuery({
     queryKey: ["stages"],
     queryFn: async () => {
-      const res = await getStages(filter);
+      const res = await getStages(
+        { offset: currentPage * 5, limit: 5 },
+        filter
+      );
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -80,7 +88,6 @@ function Stages() {
     ],
     [isStagesFetched, isUserFetched, userData]
   );
-
   const filteredStages = useMemo<TableRow<Stage>[]>(() => {
     if (!isStagesFetched) return [];
 
@@ -129,6 +136,10 @@ function Stages() {
       },
     }),
   ];
+
+  useEffect(() => {
+    refetchStages();
+  }, [currentPage]);
 
   return (
     <PrivateLayout>
@@ -186,6 +197,12 @@ function Stages() {
         isDataFetching={!isStagesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas etapas."
       />
+      {stagesData?.totalPages !== undefined ? (
+        <Pagination
+          pageCount={stagesData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       <CreationModal
         user={userData?.value!}
         isOpen={isCreationOpen}

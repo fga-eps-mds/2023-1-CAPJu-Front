@@ -1,12 +1,26 @@
 import { api } from "services/api";
 
 export const getFlows = async (
-  filter: string | undefined
+  pagination?: Pagination,
+  filter?: string
 ): Promise<Result<Flow[]>> => {
   try {
-    const res = await api.flows.get<Flow[]>("/flows", { params: { filter } });
+    const res = await api.flows.get<{
+      flows: Flow[];
+      totalPages: number;
+    }>("/flows", {
+      params: {
+        offset: pagination?.offset ?? 0,
+        limit: pagination?.limit ?? 5,
+        filter,
+      },
+    });
 
-    return { type: "success", value: res.data };
+    return {
+      type: "success",
+      value: res.data.flows,
+      totalPages: res.data.totalPages,
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };

@@ -2,14 +2,26 @@ import { api } from "services/api";
 
 export const getProcesses = async (
   flowId: number | undefined,
-  filter: string | undefined
+  pagination?: Pagination,
+  filter?: string
 ): Promise<Result<Process[]>> => {
   try {
-    const res = await api.processes.get<Process[]>(
-      `/processes${flowId ? `/${flowId}` : ""}`,
-      { params: { filter } }
-    );
-    return { type: "success", value: res.data };
+    const res = await api.processes.get<{
+      processes: Process[];
+      totalPages: number;
+    }>(`/processes${flowId ? `/${flowId}` : ""}`, {
+      params: {
+        offset: pagination?.offset ?? 0,
+        limit: pagination?.limit ?? 5,
+        filter,
+      },
+    });
+
+    return {
+      type: "success",
+      value: res.data.processes,
+      totalPages: res.data.totalPages,
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };

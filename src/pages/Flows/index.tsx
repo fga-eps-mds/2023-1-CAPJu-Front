@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import {
   Flex,
@@ -18,6 +18,7 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
+import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
@@ -42,6 +43,10 @@ function Flows() {
     onOpen: onDeleteOpen,
     onClose: onDeleteClose,
   } = useDisclosure();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
   const {
     data: flowsData,
     isFetched: isFlowsFetched,
@@ -49,7 +54,7 @@ function Flows() {
   } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
-      const res = await getFlows(filter);
+      const res = await getFlows({ offset: currentPage * 5, limit: 5 }, filter);
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -104,6 +109,7 @@ function Flows() {
     ],
     [isFlowsFetched, isUserFetched, userData]
   );
+
   const filteredFlows = useMemo<TableRow<Flow>[]>(() => {
     if (!isFlowsFetched) return [];
 
@@ -153,6 +159,10 @@ function Flows() {
       },
     }),
   ];
+
+  useEffect(() => {
+    refetchFlows();
+  }, [currentPage]);
 
   return (
     <PrivateLayout>
@@ -210,6 +220,12 @@ function Flows() {
         isDataFetching={!isFlowsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados fluxos."
       />
+      {flowsData?.totalPages !== undefined ? (
+        <Pagination
+          pageCount={flowsData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       {selectedFlow && isEditionOpen ? (
         <EditionModal
           flow={selectedFlow}

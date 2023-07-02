@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, Text, Button, useDisclosure, chakra } from "@chakra-ui/react";
 import { Icon, ViewIcon, SearchIcon } from "@chakra-ui/icons";
@@ -13,27 +13,32 @@ import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { getUnits } from "services/units";
 import { roleNameById } from "utils/roles";
+import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
 import { ViewModal } from "./ViewModal";
 
-interface ProfilesProps {
-  usersData: Result<User[]> | undefined;
-  isUsersFetched: boolean;
-  refetchUsers: () => void;
-}
-
-export function Profiles({
-  usersData,
-  isUsersFetched,
-  refetchUsers,
-}: ProfilesProps) {
+export function Profiles() {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
-  const { refetch: refetchAcceptedUsers } = useQuery({
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+  const {
+    data: usersData,
+    isFetched: isUsersFetched,
+    refetch: refetchUsers,
+  } = useQuery({
     queryKey: ["accepted-users"],
     queryFn: async () => {
-      const res = await getAcceptedUsers(filter);
+      const res = await getAcceptedUsers(
+        {
+          offset: currentPage * 5,
+          limit: 5,
+        },
+        filter
+      );
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -63,7 +68,7 @@ export function Profiles({
   const { data: unitsData, isFetched: isUnitsFetched } = useQuery({
     queryKey: ["units"],
     queryFn: async () => {
-      const res = await getUnits(filter);
+      const res = await getUnits();
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -174,6 +179,10 @@ export function Profiles({
     }),
   ];
 
+  useEffect(() => {
+    refetchUsers();
+  }, [currentPage]);
+
   return (
     <>
       <Flex mt="4" w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -186,7 +195,7 @@ export function Profiles({
           <chakra.form
             onSubmit={(e) => {
               e.preventDefault();
-              refetchAcceptedUsers();
+              refetchUsers();
             }}
             w="100%"
             display="flex"
@@ -221,32 +230,38 @@ export function Profiles({
             ? tableColumns.filter((_, index) => index !== 1)
             : tableColumns
         }
-        isDataFetching={!isUsersFetched || !isUserFetched}
-        emptyTableMessage="Não foram encontrados usuários no momento."
+        isDataFetching={!isUsersFetched || !isUnitsFetched}
+        emptyTableMessage="Não há usuários cadastrados"
       />
-      {userData?.value && selectedUser && isDeleteOpen ? (
-        <DeletionModal
-          isOpen={isDeleteOpen}
-          onClose={onDeleteClose}
-          user={selectedUser}
-          refetch={refetchUsers}
+      {usersData?.totalPages ? (
+        <Pagination
+          pageCount={usersData?.totalPages}
+          onPageChange={handlePageChange}
         />
       ) : null}
-      {userData?.value && selectedUser && isEditOpen ? (
+      {userData?.value && selectedUser && isEditOpen && (
         <EditionModal
           isOpen={isEditOpen}
           onClose={onEditClose}
           user={selectedUser}
           refetch={refetchUsers}
         />
-      ) : null}
-      {userData?.value && selectedUser && isViewOpen ? (
+      )}
+      {userData?.value && selectedUser && isViewOpen && (
         <ViewModal
           isOpen={isViewOpen}
           onClose={onViewClose}
           user={selectedUser}
         />
-      ) : null}
+      )}
+      {userData?.value && selectedUser && isDeleteOpen && (
+        <DeletionModal
+          isOpen={isDeleteOpen}
+          onClose={onDeleteClose}
+          user={selectedUser}
+          refetch={refetchUsers}
+        />
+      )}
     </>
   );
 }

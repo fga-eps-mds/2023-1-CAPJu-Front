@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import {
   Flex,
@@ -18,6 +18,7 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
+import { Pagination } from "components/Pagination";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
@@ -42,6 +43,10 @@ function Units() {
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
   const {
     data: unitsData,
     isFetched: isUnitsFetched,
@@ -49,7 +54,7 @@ function Units() {
   } = useQuery({
     queryKey: ["units"],
     queryFn: async () => {
-      const res = await getUnits(filter);
+      const res = await getUnits({ offset: currentPage * 5, limit: 5 }, filter);
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -139,6 +144,10 @@ function Units() {
     }),
   ];
 
+  useEffect(() => {
+    refetchUnits();
+  }, [currentPage]);
+
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -195,6 +204,12 @@ function Units() {
         isDataFetching={!isUnitsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas unidades."
       />
+      {unitsData?.totalPages !== undefined ? (
+        <Pagination
+          pageCount={unitsData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       <CreationModal
         isOpen={isCreationOpen}
         onClose={onCreationClose}

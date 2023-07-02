@@ -118,16 +118,25 @@ export const forgotPassword = async (data: { email: string }) => {
 };
 
 export const getAcceptedUsers = async (
-  filter: string
+  pagination?: Pagination,
+  filter?: string
 ): Promise<Result<User[]>> => {
   try {
-    const res = await api.user.get<User[]>(`/allUser?accepted=true`, {
-      params: { filter },
-    });
+    const res = await api.user.get<{ users: User[]; totalPages: number }>(
+      `/allUser?accepted=true`,
+      {
+        params: {
+          offset: pagination?.offset ?? 0,
+          limit: pagination?.limit ?? 5,
+          filter,
+        },
+      }
+    );
 
     return {
       type: "success",
-      value: res.data?.filter((user) => user.idRole !== 5),
+      value: res.data?.users?.filter((user) => user.idRole !== 5),
+      totalPages: res?.data?.totalPages,
     };
   } catch (error) {
     if (error instanceof Error)
@@ -142,17 +151,25 @@ export const getAcceptedUsers = async (
 };
 
 export const getUsersRequests = async (
-  filter: string
+  pagination?: Pagination,
+  filter?: string
 ): Promise<Result<User[]>> => {
   try {
-    const res = await api.user.get<User[]>(`/allUser?accepted=false`, {
-      params: { filter },
-    });
-    const value = res.data?.map((item: User) => {
+    const res = await api.user.get<{ users: User[]; totalPages: number }>(
+      `/allUser?accepted=false`,
+      {
+        params: {
+          offset: pagination?.offset ?? 0,
+          limit: pagination?.limit ?? 5,
+          filter,
+        },
+      }
+    );
+    const value = res.data?.users?.map((item: User) => {
       return { ...item, role: roleNameById(item.idRole) };
     });
 
-    return { type: "success", value };
+    return { type: "success", value, totalPages: res?.data?.totalPages };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };

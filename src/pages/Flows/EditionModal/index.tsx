@@ -46,25 +46,18 @@ export function EditionModal({
   afterSubmission,
 }: EditionModalProps) {
   const toast = useToast();
-  const [filter] = useState<string>("");
   const { handleLoading } = useLoading();
   const { data: stagesData, isFetched: isStagesFetched } = useQuery({
     queryKey: ["stages"],
     queryFn: async () => {
-      const res = await getStages(filter);
-
-      if (res.type === "error") throw new Error(res.error.message);
-
+      const res = await getStages();
       return res;
     },
   });
   const { data: usersData } = useQuery({
     queryKey: ["accepted-users"],
     queryFn: async () => {
-      const res = await getAcceptedUsers(filter);
-
-      if (res.type === "error") throw new Error(res.error.message);
-
+      const res = await getAcceptedUsers();
       return res;
     },
   });

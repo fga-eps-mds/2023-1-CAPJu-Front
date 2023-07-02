@@ -10,22 +10,30 @@ import ResizeObserver from "resize-observer-polyfill";
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
 import { mockedUser, mockedFlows } from "utils/mocks";
+import { getPaginatedArray } from "utils/pagination";
 import Flows from "../Flows";
 
 const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_FLOWS_SERVICE_URL}flows`,
     async (req, res, ctx) => {
+      const offset = Number(req.url.searchParams.get("offset"));
+      const limit = Number(req.url.searchParams.get("limit"));
       const filter = req.url.searchParams.get("filter");
+      const { paginatedArray, totalPages } = getPaginatedArray(
+        filter && filter !== ""
+          ? mockedFlows.filter((flows) => flows.name.includes(filter))
+          : mockedFlows,
+        {
+          offset,
+          limit,
+        }
+      );
 
-      if (filter && filter !== "") {
-        return res(
-          ctx.status(200),
-          ctx.json(mockedFlows.filter((flows) => flows.name.includes(filter)))
-        );
-      }
-
-      return res(ctx.status(200), ctx.json(mockedFlows));
+      return res(
+        ctx.status(200),
+        ctx.json({ flows: paginatedArray, totalPages })
+      );
     }
   ),
   rest.get(
@@ -77,14 +85,16 @@ describe("Flows page", () => {
 
     await act(async () => {
       await fireEvent.change(input, {
-        target: { value: "FirstFlow" },
+        target: { value: "Fluxo 1" },
       });
       await fireEvent.submit(input);
     });
 
-    expect(await screen.queryByText("FirstFlow")).not.toBe(null);
-    expect(await screen.queryByText("SecondFlow")).toBe(null);
-    expect(await screen.queryByText("ThirdFlow")).toBe(null);
+    expect(await screen.queryByText("Fluxo 1")).not.toBe(null);
+    expect(await screen.queryByText("Fluxo 2")).toBe(null);
+    expect(await screen.queryByText("Fluxo 3")).toBe(null);
+    expect(await screen.queryByText("Fluxo 4")).toBe(null);
+    expect(await screen.queryByText("Fluxo 5")).toBe(null);
 
     const button = screen.getByLabelText("botão de busca");
 
@@ -92,13 +102,28 @@ describe("Flows page", () => {
 
     await act(async () => {
       await fireEvent.change(input, {
-        target: { value: "ThirdFlow" },
+        target: { value: "Fluxo 2" },
       });
       await fireEvent.click(button);
     });
 
-    expect(await screen.queryByText("FirstFlow")).toBe(null);
-    expect(await screen.queryByText("SecondFlow")).toBe(null);
-    expect(await screen.queryByText("ThirdFlow")).not.toBe(null);
+    expect(await screen.queryByText("Fluxo 1")).toBe(null);
+    expect(await screen.queryByText("Fluxo 2")).not.toBe(null);
+    expect(await screen.queryByText("Fluxo 3")).toBe(null);
+    expect(await screen.queryByText("Fluxo 4")).toBe(null);
+    expect(await screen.queryByText("Fluxo 5")).toBe(null);
+  });
+
+  it("shows paginated content correctly", async () => {
+    expect(await screen.queryByText("Fluxo 1")).not.toBe(null);
+    expect(await screen.queryByText("Fluxo 2")).not.toBe(null);
+    expect(await screen.queryByText("Fluxo 3")).not.toBe(null);
+    expect(await screen.queryByText("Fluxo 4")).not.toBe(null);
+    expect(await screen.queryByText("Fluxo 5")).not.toBe(null);
+    expect(await screen.queryByText("Fluxo 6")).toBe(null);
+    expect(await screen.queryByText("Fluxo 7")).toBe(null);
+    expect(await screen.queryByText("Fluxo 8")).toBe(null);
+    expect(await screen.queryByText("Fluxo 9")).toBe(null);
+    expect(await screen.queryByText("Fluxo 10")).toBe(null);
   });
 });

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -60,7 +60,6 @@ export function EditionModal({
 }: EditionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
-  const [filter] = useState<string>("");
   const { data: prioritiesData } = useQuery({
     queryKey: ["priorities"],
     queryFn: async () => {
@@ -81,7 +80,7 @@ export function EditionModal({
   const { data: flowsData } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
-      const res = await getFlows(filter);
+      const res = await getFlows();
 
       if (res.type === "error") throw new Error(res.error.message);
 

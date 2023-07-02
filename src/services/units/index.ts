@@ -1,12 +1,26 @@
 import { api } from "services/api";
 
 export const getUnits = async (
-  filter: string | undefined
+  pagination?: Pagination,
+  filter?: string
 ): Promise<Result<Unit[]>> => {
   try {
-    const res = await api.units.get<Unit[]>("/units", { params: { filter } });
+    const res = await api.units.get<{ units: Unit[]; totalPages: number }>(
+      "/units",
+      {
+        params: {
+          offset: pagination?.offset ?? 0,
+          limit: pagination?.limit ?? 5,
+          filter,
+        },
+      }
+    );
 
-    return { type: "success", value: res.data };
+    return {
+      type: "success",
+      value: res.data.units,
+      totalPages: res.data.totalPages,
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };

@@ -15,6 +15,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
 import { mockedUnits, mockedAdminUser } from "utils/mocks";
+import { getPaginatedArray } from "utils/pagination";
 import Units from "../Units";
 
 const restHandlers = [
@@ -22,15 +23,22 @@ const restHandlers = [
     `${import.meta.env.VITE_UNITS_SERVICE_URL}units`,
     async (req, res, ctx) => {
       const filter = req.url.searchParams.get("filter");
+      const offset = Number(req.url.searchParams.get("offset"));
+      const limit = Number(req.url.searchParams.get("limit"));
+      const { paginatedArray, totalPages } = getPaginatedArray(
+        filter && filter !== ""
+          ? mockedUnits.filter((units) => units.name.includes(filter))
+          : mockedUnits,
+        {
+          offset,
+          limit,
+        }
+      );
 
-      if (filter && filter !== "") {
-        return res(
-          ctx.status(200),
-          ctx.json(mockedUnits.filter((units) => units.name.includes(filter)))
-        );
-      }
-
-      return res(ctx.status(200), ctx.json(mockedUnits));
+      return res(
+        ctx.status(200),
+        ctx.json({ units: paginatedArray, totalPages })
+      );
     }
   ),
   rest.get(
@@ -75,13 +83,18 @@ describe("Units page", () => {
   });
 
   it("shows text content correctly", async () => {
-    expect(await screen.findAllByText("Unidades")).not.toBe(null);
-    expect(await screen.findByText("Criar Unidade")).not.toBe(null);
-    expect(await screen.findByText("Unidade 1")).not.toBe(null);
-    expect(await screen.findByText("Unidade 2")).not.toBe(null);
-    expect(await screen.findByText("Unidade 3")).not.toBe(null);
-    expect(await screen.findByText("Unidade 4")).not.toBe(null);
-    expect(await screen.findByText("Unidade 5")).not.toBe(null);
+    expect(await screen.queryAllByText("Unidades")).not.toBe(null);
+    expect(await screen.queryByText("Criar Unidade")).not.toBe(null);
+    expect(await screen.queryByText("Unidade 1")).not.toBe(null);
+    expect(await screen.queryByText("Unidade 2")).not.toBe(null);
+    expect(await screen.queryByText("Unidade 3")).not.toBe(null);
+    expect(await screen.queryByText("Unidade 4")).not.toBe(null);
+    expect(await screen.queryByText("Unidade 5")).not.toBe(null);
+    expect(await screen.queryByText("Unidade 6")).toBe(null);
+    expect(await screen.queryByText("Unidade 7")).toBe(null);
+    expect(await screen.queryByText("Unidade 8")).toBe(null);
+    expect(await screen.queryByText("Unidade 8")).toBe(null);
+    expect(await screen.queryByText("Unidade 10")).toBe(null);
   });
 
   it("opens and closes the creation modal correctly", async () => {

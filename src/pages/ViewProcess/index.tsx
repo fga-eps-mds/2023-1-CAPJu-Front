@@ -3,7 +3,7 @@ import { Icon } from "@chakra-ui/icons";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
 import { FiArchive, FiSkipBack, FiSkipForward } from "react-icons/fi";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useQuery } from "react-query";
 
 import { PrivateLayout } from "layouts/Private";
@@ -26,7 +26,6 @@ import { ReturnModal } from "./ReturnModal";
 
 function ViewProcess() {
   const params = useParams();
-  const [filter] = useState<string>("");
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
@@ -66,7 +65,7 @@ function ViewProcess() {
   const { data: stagesData } = useQuery({
     queryKey: ["stages"],
     queryFn: async () => {
-      const res = await getStages(filter);
+      const res = await getStages();
 
       if (res.type === "error") throw new Error(res.error.message);
 
