@@ -27,7 +27,7 @@ export function getSequencesSortedStagesIds(
 ): number[] {
   const sortedSequences = sortFlowSequences(sequences);
 
-  // @ts-ignoreƒ
+  // @ts-ignore
   return sortedSequences.reduce((acc, curr, index) => {
     if (index === sortedSequences?.length - 1)
       return [...acc, curr.from, curr.to];

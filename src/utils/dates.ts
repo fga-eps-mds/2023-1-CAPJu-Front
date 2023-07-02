@@ -1,6 +1,9 @@
 export const handleDateFormating = (date: Date | string) => {
   const currentDate = new Date(date);
-  return currentDate.toLocaleString("pt-BR", {
+  const adjustedDate = new Date(
+    currentDate.getTime() + currentDate.getTimezoneOffset() * 60 * 1000
+  );
+  return adjustedDate.toLocaleString("pt-BR", {
     year: "numeric",
     month: "long",
     day: "numeric",
