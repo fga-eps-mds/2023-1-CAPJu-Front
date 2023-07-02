@@ -12,14 +12,12 @@ import {
   Tooltip,
   Flex,
   useDisclosure,
-  useToast,
 } from "@chakra-ui/react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { ViewIcon } from "@chakra-ui/icons";
 
-import { useLoading } from "hooks/useLoading";
-import { addCommentToProcess } from "services/processes";
 import { AddModal } from "./AddModal";
+import { DeletionModal } from "./DeletionModal";
 
 export function CommentEdge({
   id,
@@ -38,8 +36,11 @@ export function CommentEdge({
     onOpen: onAddOpen,
     onClose: onAddClose,
   } = useDisclosure();
-  const toast = useToast();
-  const { handleLoading } = useLoading();
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
   const { from, to, processRecord, commentary, refetch } = data;
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -49,46 +50,6 @@ export function CommentEdge({
     targetY,
     targetPosition,
   });
-
-  async function handleClick(comment: string | null) {
-    handleLoading(true);
-
-    try {
-      const res = await addCommentToProcess({
-        record: processRecord,
-        originStage: from,
-        destinationStage: to,
-        commentary: comment,
-      });
-
-      handleLoading(false);
-
-      if (refetch) refetch();
-
-      if (res.type === "success") {
-        toast({
-          id: `comment-${comment ? "add" : "add"}-sucess`,
-          title: "Sucesso!",
-          description: `Seu comentário foi ${
-            comment ? "adicionado" : "adicionado"
-          }`,
-          status: "success",
-        });
-        return;
-      }
-
-      throw new Error(res.error.message);
-    } catch (err: any) {
-      handleLoading(false);
-      toast({
-        id: `comment-${comment ? "add" : "add"}-error`,
-        title: `Erro ao ${comment ? "adicionar" : "adicionar"} comentário`,
-        description: err.message,
-        status: "error",
-        isClosable: true,
-      });
-    }
-  }
 
   return (
     <>
@@ -125,7 +86,7 @@ export function CommentEdge({
               flexDir="column"
               alignItems="start"
             >
-              <Text noOfLines={2} fontSize="10">
+              <Text noOfLines={1} fontSize="10">
                 {commentary}
               </Text>
               <Flex flexDir="row" gap="1" ml="auto">
@@ -142,7 +103,7 @@ export function CommentEdge({
                     <ViewIcon boxSize={2} />
                   </Button>
                 </Tooltip>
-                <Tooltip label="Editar observação" fontSize="xs">
+                <Tooltip label="Excluir observação" fontSize="xs">
                   <Button
                     variant="solid"
                     colorScheme="blue"
@@ -151,20 +112,7 @@ export function CommentEdge({
                     minW="4"
                     p="0"
                     borderRadius="3"
-                  >
-                    <Icon as={MdEdit} boxSize={2} />
-                  </Button>
-                </Tooltip>
-                <Tooltip label="Remover observação" fontSize="xs">
-                  <Button
-                    variant="solid"
-                    colorScheme="blue"
-                    height="4"
-                    minH="4"
-                    minW="4"
-                    p="0"
-                    borderRadius="3"
-                    onClick={() => handleClick(null)}
+                    onClick={() => onDeleteOpen()}
                   >
                     <Icon as={MdDelete} boxSize={2} />
                   </Button>
@@ -182,6 +130,7 @@ export function CommentEdge({
             to={to}
             processRecord={processRecord}
           />
+          <DeletionModal isOpen={isDeleteOpen} onClose={onDeleteClose} />
         </div>
       </EdgeLabelRenderer>
     </>
