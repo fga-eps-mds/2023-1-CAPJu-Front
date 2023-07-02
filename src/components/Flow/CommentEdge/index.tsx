@@ -21,6 +21,7 @@ import { addCommentToProcess } from "services/processes";
 import { useLoading } from "hooks/useLoading";
 import { AddModal } from "./AddModal";
 import { DeletionModal } from "./DeletionModal";
+import { ViewModal } from "./ViewModal";
 
 export function CommentEdge({
   id,
@@ -45,6 +46,11 @@ export function CommentEdge({
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
     onClose: onDeleteClose,
+  } = useDisclosure();
+  const {
+    isOpen: isViewOpen,
+    onOpen: onViewOpen,
+    onClose: onViewClose,
   } = useDisclosure();
   const { from, to, processRecord, commentary, refetch } = data;
   const [edgePath, labelX, labelY] = getBezierPath({
@@ -143,6 +149,7 @@ export function CommentEdge({
                     minW="4"
                     p="0"
                     borderRadius="3"
+                    onClick={() => onViewOpen()}
                   >
                     <ViewIcon boxSize={2} />
                   </Button>
@@ -173,6 +180,11 @@ export function CommentEdge({
             isOpen={isDeleteOpen}
             onClose={onDeleteClose}
             handleComment={() => handleComment(null)}
+          />
+          <ViewModal
+            isOpen={isViewOpen}
+            onClose={onViewClose}
+            comment={commentary}
           />
         </div>
       </EdgeLabelRenderer>
