@@ -23,7 +23,6 @@ interface FlowProps {
   currentStage?: string | number | undefined;
   effectiveDate?: string | undefined;
   isFetching?: boolean;
-  processRecord?: string;
   refetch?: () => void;
   allowComments?: boolean;
   process?: Process;
@@ -41,7 +40,6 @@ export function Flow({
   currentStage = undefined,
   effectiveDate = undefined,
   isFetching = false,
-  processRecord = undefined,
   refetch = () => {},
   allowComments = false,
   process,
@@ -206,7 +204,7 @@ export function Flow({
         },
       } as Node;
     });
-  }, [stages, sequences, currentStage, processRecord]);
+  }, [stages, sequences, currentStage, process]);
 
   const edges = useMemo(() => {
     return sequences.map((sequence: FlowSequence) => {
@@ -234,12 +232,12 @@ export function Flow({
             : null,
         data: {
           ...sequence,
-          processRecord,
+          processRecord: process?.record,
           refetch,
         },
       } as Edge;
     });
-  }, [stages, sequences, currentStage, processRecord]);
+  }, [stages, sequences, currentStage, process]);
 
   const edgeTypes = {
     commentable: CommentEdge,

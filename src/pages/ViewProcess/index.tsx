@@ -322,7 +322,7 @@ function ViewProcess() {
             >
               {processData?.value?.status === "inProgress" &&
               !!processData?.value?.idStage &&
-              processData?.value?.idStage !== stages[0].idStage ? (
+              processData?.value?.idStage !== stages[0]?.idStage ? (
                 <Button
                   size="xs"
                   fontSize="sm"

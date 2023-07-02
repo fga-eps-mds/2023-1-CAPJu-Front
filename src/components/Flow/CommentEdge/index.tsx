@@ -12,10 +12,13 @@ import {
   Tooltip,
   Flex,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { ViewIcon } from "@chakra-ui/icons";
 
+import { useLoading } from "hooks/useLoading";
+import { addCommentToProcess } from "services/processes";
 import { AddModal } from "./AddModal";
 
 export function CommentEdge({
@@ -35,6 +38,8 @@ export function CommentEdge({
     onOpen: onAddOpen,
     onClose: onAddClose,
   } = useDisclosure();
+  const toast = useToast();
+  const { handleLoading } = useLoading();
   const { from, to, processRecord, commentary, refetch } = data;
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -46,7 +51,43 @@ export function CommentEdge({
   });
 
   async function handleClick(comment: string | null) {
-    console.log(comment);
+    handleLoading(true);
+
+    try {
+      const res = await addCommentToProcess({
+        record: processRecord,
+        originStage: from,
+        destinationStage: to,
+        commentary: comment,
+      });
+
+      handleLoading(false);
+
+      if (refetch) refetch();
+
+      if (res.type === "success") {
+        toast({
+          id: `comment-${comment ? "add" : "add"}-sucess`,
+          title: "Sucesso!",
+          description: `Seu comentário foi ${
+            comment ? "adicionado" : "adicionado"
+          }`,
+          status: "success",
+        });
+        return;
+      }
+
+      throw new Error(res.error.message);
+    } catch (err: any) {
+      handleLoading(false);
+      toast({
+        id: `comment-${comment ? "add" : "add"}-error`,
+        title: `Erro ao ${comment ? "adicionar" : "adicionar"} comentário`,
+        description: err.message,
+        status: "error",
+        isClosable: true,
+      });
+    }
   }
 
   return (

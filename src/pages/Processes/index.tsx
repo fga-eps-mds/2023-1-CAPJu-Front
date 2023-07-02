@@ -155,7 +155,7 @@ function Processes() {
     }
     return processes;
   };
-  const filteredProcess = useMemo<TableRow<Process>[]>(() => {
+  const filteredProcesses = useMemo<TableRow<Process>[]>(() => {
     if (!isProcessesFetched || !isFlowsFetched) return [];
 
     let value =
@@ -246,6 +246,8 @@ function Processes() {
     isUserFetched,
     userData,
     tableActions,
+    isFlowsFetched,
+    isProcessesFetched,
   ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
@@ -369,7 +371,7 @@ function Processes() {
         </Flex>
       </Flex>
       <DataTable
-        data={filteredProcess}
+        data={filteredProcesses}
         columns={tableColumns}
         isDataFetching={!isProcessesFetched || !isUserFetched}
         emptyTableMessage={`Não foram encontrados processos${

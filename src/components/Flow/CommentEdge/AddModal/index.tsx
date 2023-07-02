@@ -58,7 +58,7 @@ export function AddModal({
 
   const onSubmit = handleSubmit(async ({ comment }) => {
     handleLoading(true);
-    console.log(processRecord);
+
     try {
       const res = await addCommentToProcess({
         record: processRecord,
@@ -66,16 +66,15 @@ export function AddModal({
         destinationStage: to,
         commentary: comment,
       });
+      handleLoading(false);
 
       afterSubmission();
 
       if (res.type === "success") {
         toast({
-          id: `Comment-${comment ? "add" : "add"}-sucess`,
+          id: `comment-${comment ? "add" : "add"}-sucess`,
           title: "Sucesso!",
-          description: `Seu comentário foi ${
-            comment ? "adicionado" : "adicionado"
-          }`,
+          description: `Seu comentário foi adicionado`,
           status: "success",
         });
         return;
@@ -83,16 +82,17 @@ export function AddModal({
 
       throw new Error(res.error.message);
     } catch (err: any) {
+      handleLoading(false);
       toast({
-        id: `Comment-${comment ? "add" : "add"}-error`,
-        title: `Erro ao ${comment ? "adicionar" : "adicionar"} comentário`,
+        id: `comment-${comment ? "add" : "add"}-error`,
+        title: `Erro ao adicionar comentário`,
         description: err.message,
         status: "error",
         isClosable: true,
       });
     }
+
     onClose();
-    handleLoading(false);
     afterSubmission();
   });
 
@@ -106,7 +106,12 @@ export function AddModal({
       <ModalContent>
         <ModalHeader>Adicionar Comentário</ModalHeader>
         <ModalCloseButton />
-        <chakra.form onSubmit={onSubmit}>
+        <chakra.form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit(e);
+          }}
+        >
           <ModalBody
             display="flex"
             flexDirection="column"
