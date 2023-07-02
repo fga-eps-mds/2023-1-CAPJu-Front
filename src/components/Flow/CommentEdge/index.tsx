@@ -8,15 +8,15 @@ import {
   Alert,
   Text,
   Button,
-  useToast,
   Icon,
   Tooltip,
   Flex,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { MdDelete, MdEdit } from "react-icons/md";
-
-import { addCommentToProcess } from "services/processes";
 import { ViewIcon } from "@chakra-ui/icons";
+
+import { AddModal } from "./AddModal";
 
 export function CommentEdge({
   id,
@@ -30,7 +30,11 @@ export function CommentEdge({
   markerEnd,
   data,
 }: EdgeProps) {
-  const toast = useToast();
+  const {
+    isOpen: isAddOpen,
+    onOpen: onAddOpen,
+    onClose: onAddClose,
+  } = useDisclosure();
   const { from, to, processRecord, commentary, refetch } = data;
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -42,38 +46,7 @@ export function CommentEdge({
   });
 
   async function handleClick(comment: string | null) {
-    try {
-      const res = await addCommentToProcess({
-        record: processRecord,
-        originStage: from,
-        destinationStage: to,
-        commentary: comment,
-      });
-
-      if (refetch) refetch();
-
-      if (res.type === "success") {
-        toast({
-          id: `comment-${comment ? "creation" : "removal"}-sucess`,
-          title: "Sucesso!",
-          description: `Seu comentário foi ${
-            comment ? "adicionado" : "removido"
-          }`,
-          status: "success",
-        });
-        return;
-      }
-
-      throw new Error(res.error.message);
-    } catch (err: any) {
-      toast({
-        id: `comment-${comment ? "creation" : "removal"}-error`,
-        title: `Erro ao ${comment ? "adicionar" : "remover"} comentário`,
-        description: err.message,
-        status: "error",
-        isClosable: true,
-      });
-    }
+    console.log(comment);
   }
 
   return (
@@ -95,7 +68,7 @@ export function CommentEdge({
               colorScheme="blue"
               size="xs"
               fontSize="10"
-              onClick={() => handleClick("Comentário a ser adicionado")}
+              onClick={() => onAddOpen()}
             >
               <Icon as={MdEdit} boxSize={3} mr={1} />
               Adicionar observação
@@ -158,6 +131,16 @@ export function CommentEdge({
               </Flex>
             </Alert>
           )}
+          <AddModal
+            isOpen={isAddOpen}
+            onClose={onAddClose}
+            afterSubmission={() => {
+              if (refetch) refetch();
+            }}
+            from={from}
+            to={to}
+            processRecord={processRecord}
+          />
         </div>
       </EdgeLabelRenderer>
     </>

@@ -111,8 +111,8 @@ export const updateProcess = async (data: {
 
 export const addCommentToProcess = async (data: {
   record: string;
-  originStage: number;
-  destinationStage: number;
+  originStage: string;
+  destinationStage: string;
   commentary: string | null;
 }): Promise<Result<Process>> => {
   try {

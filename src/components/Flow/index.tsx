@@ -206,7 +206,7 @@ export function Flow({
         },
       } as Node;
     });
-  }, [stages, sequences, currentStage]);
+  }, [stages, sequences, currentStage, processRecord]);
 
   const edges = useMemo(() => {
     return sequences.map((sequence: FlowSequence) => {
@@ -239,7 +239,7 @@ export function Flow({
         },
       } as Edge;
     });
-  }, [stages, sequences, currentStage]);
+  }, [stages, sequences, currentStage, processRecord]);
 
   const edgeTypes = {
     commentable: CommentEdge,
