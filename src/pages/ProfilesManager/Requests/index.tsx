@@ -93,7 +93,7 @@ export function Requests() {
         disabled: isActionDisabled("accept-user"),
       },
       {
-        label: "Recusar Usuário",
+        label: "Excluir Solicitação",
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);

@@ -89,7 +89,7 @@ export function Profiles() {
         disabled: isActionDisabled("accept-user"),
       },
       {
-        label: "Remover Usuário",
+        label: "Excluir Usuário",
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
