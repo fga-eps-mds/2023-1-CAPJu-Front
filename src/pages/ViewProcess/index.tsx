@@ -3,7 +3,7 @@ import { Icon } from "@chakra-ui/icons";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
 import { FiArchive, FiSkipBack, FiSkipForward } from "react-icons/fi";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 
 import { PrivateLayout } from "layouts/Private";
@@ -25,6 +25,7 @@ import { ArchivationModal } from "./ArchivationModal";
 import { ReturnModal } from "./ReturnModal";
 
 function ViewProcess() {
+  const [action, setAction] = useState<Boolean | undefined>();
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,6 +38,7 @@ function ViewProcess() {
     data: processData,
     isFetched: isProcessFetched,
     refetch: refetchProcess,
+    isRefetching: isRefetchingProcess,
   } = useQuery({
     queryKey: ["process", params.record],
     queryFn: async () => {
@@ -138,6 +140,7 @@ function ViewProcess() {
 
   async function handleUpdateProcessStage(isNextStage: boolean) {
     handleLoading(true);
+    setAction(isNextStage);
 
     const res = processData?.value
       ? await updateStage({
@@ -146,6 +149,7 @@ function ViewProcess() {
           to: isNextStage ? nextStageId : previousStageId,
           commentary: "",
           idFlow: flowData?.value?.idFlow as number,
+          isNextStage,
         })
       : ({
           type: "error",
@@ -385,18 +389,22 @@ function ViewProcess() {
             </Flex>
           )}
         </Flex>
-        <Flow
-          sequences={flowData?.value?.sequences || []}
-          stages={stages || []}
-          minHeight={650}
-          currentStage={
-            processData?.value?.status !== "finished"
-              ? processData?.value?.idStage
-              : undefined
-          }
-          effectiveDate={processData?.value?.effectiveDate}
-          isFetching={!isProcessFetched || !isFlowFetched}
-        />
+        {!isRefetchingProcess && (
+          <Flow
+            sequences={flowData?.value?.sequences || []}
+            stages={stages || []}
+            minHeight={650}
+            currentStage={
+              processData?.value?.status !== "finished"
+                ? processData?.value?.idStage
+                : undefined
+            }
+            effectiveDate={processData?.value?.effectiveDate}
+            isFetching={!isProcessFetched || !isFlowFetched}
+            process={processData?.value}
+            isNextStage={action}
+          />
+        )}
       </Flex>
       {processData?.value && (
         <ReturnModal

@@ -27,6 +27,8 @@ declare global {
     name: string;
     duration: number;
     createdAt: string;
+    entrada?: Date | undefined;
+    vencimento?: Date | undefined;
   };
 
   type FlowSequence = {
@@ -48,6 +50,12 @@ declare global {
     description: string;
   };
 
+  type Progress = {
+    idStage: number;
+    entrada?: Date;
+    vencimento?: Date;
+  };
+
   type Process = {
     record: string | ReactNode;
     nickname: string;
@@ -57,6 +65,8 @@ declare global {
     idUnit: number;
     effectiveDate: string;
     status: string;
+    progress?: Progress[];
+    isNextSage?: boolean;
   };
 
   type SelectOption = {
