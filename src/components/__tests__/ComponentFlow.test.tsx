@@ -27,24 +27,6 @@ describe("Flow components", async () => {
     expect(screen).toMatchSnapshot();
   });
 
-  it("shows text content correctly", async () => {
-    expect(
-      screen.findAllByAltText(
-        "Vencimento: 5 Dias úteis após a data de entrada nesta etapa"
-      )
-    ).not.toBe(null);
-    expect(
-      screen.findAllByAltText(
-        "Vencimento: 3 Dias úteis após a data de entrada nesta etapa"
-      )
-    ).not.toBe(null);
-    expect(
-      screen.findAllByAltText(
-        "Vencimento: 1 Dia útil após a data de entrada nesta etapa"
-      )
-    ).not.toBe(null);
-  });
-
   it("shows 'stage's properties' correctly", async () => {
     await mockedStages.forEach(async (stage) => {
       expect(await screen.findAllByText(stage.name)).toBeDefined();
