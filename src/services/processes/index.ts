@@ -1,14 +1,25 @@
 import { api } from "services/api";
 
 export const getProcesses = async (
-  flowId: number | undefined
+  flowId: number | undefined,
+  pagination?: Pagination
 ): Promise<Result<Process[]>> => {
   try {
-    const res = await api.processes.get<Process[]>(
-      `/processes${flowId ? `/${flowId}` : ""}`
-    );
+    const res = await api.processes.get<{
+      processes: Process[];
+      totalPages: number;
+    }>(`/processes${flowId ? `/${flowId}` : ""}`, {
+      params: {
+        offset: pagination?.offset ?? 0,
+        limit: pagination?.limit ?? 5,
+      },
+    });
 
-    return { type: "success", value: res.data };
+    return {
+      type: "success",
+      value: res.data.processes,
+      totalPages: res.data.totalPages,
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
@@ -126,6 +137,7 @@ export const updateStage = async (data: {
   to: number;
   commentary: string;
   idFlow: number;
+  isNextStage: boolean;
 }): Promise<Result<Process>> => {
   try {
     const res = await api.processes.put<Process>("/processUpdateStage", data);

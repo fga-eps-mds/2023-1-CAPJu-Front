@@ -32,15 +32,15 @@ export function DenyModal({ user, isOpen, onClose, refetch }: DenyModalProps) {
       await denyRequest(user.cpf);
       toast({
         id: "deny-request-success",
-        title: "Usuário recusado",
-        description: `A solicitação do usuário foi recusada com sucesso.`,
+        title: "Solicitação excluída",
+        description: `A solicitação do usuário foi excluída com sucesso.`,
         status: "success",
         isClosable: true,
       });
     } catch {
       toast({
         id: "deny-request-error",
-        title: `Erro ao remover ${user.fullName}`,
+        title: `Erro ao excluir a solicitação de ${user.fullName}`,
         description: "Favor tentar novamente.",
         status: "error",
         isClosable: true,
@@ -55,11 +55,11 @@ export function DenyModal({ user, isOpen, onClose, refetch }: DenyModalProps) {
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Recusar Solicitação</ModalHeader>
+        <ModalHeader>Excluir Solicitação</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Text>
-            Tem certeza que deseja recusar a solicitação do usuário{" "}
+            Tem certeza que deseja excluir a solicitação do usuário{" "}
             <strong>{user.fullName}</strong> como <strong>{user.role}</strong>?
           </Text>
         </ModalBody>
@@ -68,7 +68,7 @@ export function DenyModal({ user, isOpen, onClose, refetch }: DenyModalProps) {
             Cancelar
           </Button>
           <Button colorScheme="red" onClick={() => handleDenyUser()} size="sm">
-            Recusar
+            Excluir
           </Button>
         </ModalFooter>
       </ModalContent>

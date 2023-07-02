@@ -72,7 +72,10 @@ function Signup() {
   const { handleLoading } = useLoading();
   const { data: unitsData } = useQuery({
     queryKey: ["units"],
-    queryFn: getUnits,
+    queryFn: async () => {
+      const res = await getUnits();
+      return res;
+    },
     onError: () => {
       toast({
         id: "units-error",

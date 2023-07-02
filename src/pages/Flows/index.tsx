@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
 import { MdDelete, MdEdit } from "react-icons/md";
@@ -11,6 +11,7 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
+import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
@@ -35,13 +36,20 @@ function Flows() {
     onOpen: onDeleteOpen,
     onClose: onDeleteClose,
   } = useDisclosure();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
   const {
     data: flowsData,
     isFetched: isFlowsFetched,
     refetch: refetchFlows,
   } = useQuery({
     queryKey: ["flows"],
-    queryFn: getFlows,
+    queryFn: async () => {
+      const res = await getFlows({ offset: currentPage * 5, limit: 5 });
+      return res;
+    },
     onError: () => {
       toast({
         id: "flows-error",
@@ -79,7 +87,7 @@ function Flows() {
         disabled: isActionDisabled("edit-flow"),
       },
       {
-        label: "Deletar Fluxo",
+        label: "Excluir Fluxo",
         actionName: "delete-flow",
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ flow }: { flow: Flow }) => {
@@ -91,6 +99,7 @@ function Flows() {
     ],
     [isFlowsFetched, isUserFetched, userData]
   );
+
   const filteredFlows = useMemo<TableRow<Flow>[]>(() => {
     if (!isFlowsFetched) return [];
 
@@ -146,6 +155,10 @@ function Flows() {
     }),
   ];
 
+  useEffect(() => {
+    refetchFlows();
+  }, [currentPage]);
+
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -183,6 +196,12 @@ function Flows() {
         isDataFetching={!isFlowsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontrados fluxos."
       />
+      {flowsData?.totalPages !== undefined ? (
+        <Pagination
+          pageCount={flowsData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       {selectedFlow && isEditionOpen ? (
         <EditionModal
           flow={selectedFlow}

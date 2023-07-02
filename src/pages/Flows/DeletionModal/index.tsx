@@ -39,13 +39,13 @@ export function DeletionModal({
       toast({
         id: "delete-flow-success",
         title: "Sucesso!",
-        description: "Fluxo deletado com sucesso!",
+        description: "Fluxo excluído com sucesso!",
         status: "success",
       });
     } else {
       toast({
         id: "delete-flow-error",
-        title: "Erro na deleção da fluxo.",
+        title: "Erro na exclusão do fluxo.",
         description: res.error?.message,
         status: "error",
         isClosable: true,

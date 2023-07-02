@@ -34,7 +34,10 @@ export function AddAdminModal({ unit, isOpen, onClose }: AddAdminModalProps) {
   const { handleLoading } = useLoading();
   const { data, isFetched, refetch } = useQuery({
     queryKey: ["accepted-users", unit.idUnit],
-    queryFn: getAcceptedUsers,
+    queryFn: async () => {
+      const res = await getAcceptedUsers();
+      return res;
+    },
   });
   const tableActions: TableAction[] = [
     {
