@@ -12,10 +12,13 @@ import {
   Tooltip,
   Flex,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { ViewIcon } from "@chakra-ui/icons";
 
+import { addCommentToProcess } from "services/processes";
+import { useLoading } from "hooks/useLoading";
 import { AddModal } from "./AddModal";
 import { DeletionModal } from "./DeletionModal";
 
@@ -31,6 +34,8 @@ export function CommentEdge({
   markerEnd,
   data,
 }: EdgeProps) {
+  const toast = useToast();
+  const { handleLoading } = useLoading();
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
@@ -50,6 +55,45 @@ export function CommentEdge({
     targetY,
     targetPosition,
   });
+
+  async function handleComment(comment: null | string) {
+    handleLoading(true);
+
+    try {
+      const res = await addCommentToProcess({
+        record: processRecord,
+        originStage: from,
+        destinationStage: to,
+        commentary: comment,
+      });
+      handleLoading(false);
+
+      if (refetch) refetch();
+
+      if (res.type === "success") {
+        toast({
+          id: `comment-${comment ? "add" : "remove"}-sucess`,
+          title: "Sucesso!",
+          description: `Sua observação foi ${
+            comment ? "adicionado" : "excluído"
+          }.`,
+          status: "success",
+        });
+        return;
+      }
+
+      throw new Error(res.error.message);
+    } catch (err: any) {
+      handleLoading(false);
+      toast({
+        id: `comment-${comment ? "add" : "remove"}-error`,
+        title: `Erro ao adicionar observação`,
+        description: err.message,
+        status: "error",
+        isClosable: true,
+      });
+    }
+  }
 
   return (
     <>
@@ -123,14 +167,13 @@ export function CommentEdge({
           <AddModal
             isOpen={isAddOpen}
             onClose={onAddClose}
-            afterSubmission={() => {
-              if (refetch) refetch();
-            }}
-            from={from}
-            to={to}
-            processRecord={processRecord}
+            handleComment={(comment: string | null) => handleComment(comment)}
           />
-          <DeletionModal isOpen={isDeleteOpen} onClose={onDeleteClose} />
+          <DeletionModal
+            isOpen={isDeleteOpen}
+            onClose={onDeleteClose}
+            handleComment={() => handleComment(null)}
+          />
         </div>
       </EdgeLabelRenderer>
     </>
