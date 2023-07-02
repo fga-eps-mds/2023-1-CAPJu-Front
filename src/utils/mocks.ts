@@ -1,3 +1,27 @@
+const mockedProgress1 = {
+  idStage: 1,
+  entrada: new Date("2023-06-25"),
+  vencimento: new Date("2023-06-27"),
+};
+
+const mockedProgress2 = {
+  idStage: 2,
+  entrada: new Date("2023-06-25"),
+  vencimento: new Date("2023-06-30"),
+};
+
+export const mockedProcess = {
+  effectiveDate: "2023-06-27",
+  idFlow: 1,
+  idPriority: 0,
+  idStage: 1,
+  idUnit: 1,
+  nickname: "Processo não Iniciado",
+  record: "12345678912345678915",
+  status: "inProgress",
+  progress: [mockedProgress1, mockedProgress2],
+};
+
 export const mockedUser = {
   cpf: "12345678900",
   fullName: "User Teste",
@@ -67,60 +91,90 @@ export const mockedStages = [
     name: "a",
     duration: 2,
     idUnit: 1,
+    createdAt: "2100-06-19T03:26:25.050Z",
+    entrada: new Date(),
+    vencimento: new Date(),
   },
   {
     idStage: 2,
     name: "b",
     duration: 5,
     idUnit: 2,
+    createdAt: "2100-06-19T03:26:25.050Z",
+    entrada: new Date(),
+    vencimento: new Date(),
   },
   {
     idStage: 3,
     name: "c",
     duration: 5,
     idUnit: 3,
+    createdAt: "2100-06-19T03:26:25.050Z",
+    entrada: new Date(),
+    vencimento: new Date(),
   },
   {
     idStage: 4,
     name: "d",
     duration: 5,
     idUnit: 4,
+    createdAt: "2100-06-19T03:26:25.050Z",
+    entrada: new Date(),
+    vencimento: new Date(),
   },
   {
     idStage: 5,
     name: "e",
     duration: 5,
     idUnit: 5,
+    createdAt: "2100-06-19T03:26:25.050Z",
+    entrada: new Date(),
+    vencimento: new Date(),
   },
   {
     idStage: 6,
     name: "f",
     duration: 5,
     idUnit: 6,
+    createdAt: "2100-06-19T03:26:25.050Z",
+    entrada: new Date(),
+    vencimento: new Date(),
   },
   {
     idStage: 7,
     name: "g",
     duration: 5,
     idUnit: 7,
+    createdAt: "2100-06-19T03:26:25.050Z",
+    entrada: new Date(),
+    vencimento: new Date(),
   },
   {
     idStage: 8,
     name: "h",
     duration: 5,
     idUnit: 8,
+    createdAt: "2100-06-19T03:26:25.050Z",
+    entrada: new Date(),
+    vencimento: new Date(),
   },
   {
     idStage: 9,
     name: "i",
     duration: 5,
     idUnit: 9,
+    createdAt: "2100-06-19T03:26:25.050Z",
+    entrada: new Date(),
+    vencimento: new Date(),
   },
   {
     idStage: 10,
     name: "j",
     duration: 5,
     idUnit: 10,
+    createdAt: "2100-06-19T03:26:25.050Z",
+    entrada: new Date(),
+    vencimento: new Date(),
   },
 ];
 
@@ -371,3 +425,11 @@ export const mockedInProgressProcess = {
     },
   ],
 };
+
+export const mockedFlowSequence = [
+  {
+    from: 1,
+    to: 2,
+    commentary: "",
+  },
+];

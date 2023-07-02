@@ -139,6 +139,7 @@ export const updateStage = async (data: {
   to: number;
   commentary: string;
   idFlow: number;
+  isNextStage: boolean;
 }): Promise<Result<Process>> => {
   try {
     const res = await api.processes.put<Process>("/processUpdateStage", data);
