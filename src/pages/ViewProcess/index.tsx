@@ -149,6 +149,7 @@ function ViewProcess() {
           to: isNextStage ? nextStageId : previousStageId,
           commentary: "",
           idFlow: flowData?.value?.idFlow as number,
+          isNextStage,
         })
       : ({
           type: "error",

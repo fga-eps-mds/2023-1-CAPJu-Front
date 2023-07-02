@@ -66,6 +66,7 @@ declare global {
     effectiveDate: string;
     status: string;
     progress?: Progress[];
+    isNextSage?: boolean;
   };
 
   type SelectOption = {
