@@ -28,6 +28,7 @@ export function Tutorial() {
       justifyContent="end"
     >
       <MdHelp
+        title="Tutorial"
         color={colors.blue["500"]}
         onClick={onOpen}
         size={50}
