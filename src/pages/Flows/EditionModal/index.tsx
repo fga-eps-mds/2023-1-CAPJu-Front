@@ -49,11 +49,17 @@ export function EditionModal({
   const { handleLoading } = useLoading();
   const { data: stagesData, isFetched: isStagesFetched } = useQuery({
     queryKey: ["stages"],
-    queryFn: getStages,
+    queryFn: async () => {
+      const res = await getStages();
+      return res;
+    },
   });
   const { data: usersData } = useQuery({
     queryKey: ["accepted-users"],
-    queryFn: getAcceptedUsers,
+    queryFn: async () => {
+      const res = await getAcceptedUsers();
+      return res;
+    },
   });
   const [selectedStages, setSelectedStages] = useState<Stage[]>(
     stagesData?.value?.filter((item) =>
@@ -200,11 +206,7 @@ export function EditionModal({
                 }}
               />
             ) : null}
-            <Flow
-              stages={selectedStages}
-              sequences={sequences}
-              showStagesDuration
-            />
+            <Flow stages={selectedStages} sequences={sequences} />
           </ModalBody>
           <ModalFooter gap="2">
             <Button variant="ghost" onClick={onClose} size="sm">

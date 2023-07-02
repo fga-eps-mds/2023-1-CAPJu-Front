@@ -11,6 +11,7 @@ import "reactflow/dist/style.css";
 import _ from "lodash";
 
 import { colors } from "styles/colors";
+import { handleDateFormating, handleExpiration } from "utils/dates";
 import { CommentEdge } from "./CommentEdge";
 
 interface FlowProps {
@@ -22,11 +23,14 @@ interface FlowProps {
   currentStage?: string | number | undefined;
   effectiveDate?: string | undefined;
   isFetching?: boolean;
-  showStagesDuration?: boolean;
   processRecord?: string;
   refetch?: () => void;
   allowComments?: boolean;
+  process?: Process;
+  isNextStage?: Boolean;
 }
+
+let whiteList: number[] = [];
 
 export function Flow({
   stages,
@@ -37,21 +41,47 @@ export function Flow({
   currentStage = undefined,
   effectiveDate = undefined,
   isFetching = false,
-  showStagesDuration = false,
   processRecord = undefined,
   refetch = () => {},
   allowComments = false,
+  process,
+  isNextStage,
 }: FlowProps) {
   const startDate = effectiveDate ? new Date(effectiveDate) : null;
+
+  const formattedStages = useMemo(() => {
+    const value = stages;
+    const curr = stages.find((item) => item.idStage === process?.idStage);
+    const currIndex = curr ? stages.indexOf(curr) : -1;
+
+    value.forEach((stage, index) => {
+      const stageProgress = process?.progress?.find(
+        (item) => item.idStage === stage.idStage
+      );
+
+      if (stageProgress && process?.progress) {
+        stage.entrada = process?.progress[index]?.entrada;
+        stage.vencimento = process?.progress[index]?.vencimento;
+      }
+
+      if (index < currIndex) whiteList.push(stage.idStage);
+      else whiteList = whiteList.filter((item) => item !== stage.idStage);
+    });
+
+    return value;
+  }, [stages, process, sequences, isNextStage]);
 
   const getStageDeadline = (item: Stage, index: number): string | null => {
     if (!startDate || !effectiveDate) return null;
 
-    const previousDuration = stages.reduce((acc, curr, reduceIndex) => {
-      if (index <= reduceIndex) return acc;
+    const previousDuration = formattedStages.reduce(
+      (acc, curr, reduceIndex) => {
+        if (index <= reduceIndex) return acc;
 
-      return acc + curr.duration + 1;
-    }, 0);
+        return acc + curr.duration + 1;
+      },
+      0
+    );
 
     const stageStartDate = new Date(startDate);
     stageStartDate.setDate(startDate.getDate() + previousDuration);
@@ -66,14 +96,80 @@ export function Flow({
     });
   };
 
+  const handleDate = (item: Stage) => {
+    if (!process?.idStage) {
+      return (
+        <>{`Vencimento: ${item.duration} Dia${item.duration > 1 ? "s" : ""}`}</>
+      );
+    }
+    // Processo Iniciado
+    if (process?.idStage) {
+      if (process?.idStage === item.idStage) {
+        if (!whiteList.includes(item?.idStage))
+          whiteList.push(process?.idStage);
+
+        if (whiteList.includes(item?.idStage) && !isNextStage) whiteList.pop();
+
+        return (
+          <>
+            {item?.entrada ? (
+              <>
+                {`Entrada: ${
+                  item?.entrada && handleDateFormating(item?.entrada)
+                }`}
+                <br />
+              </>
+            ) : null}
+
+            {item?.vencimento
+              ? `Vencimento: ${
+                  item?.vencimento && handleDateFormating(item?.vencimento)
+                }`
+              : `Vencimento: ${item.duration} Dia${
+                  item.duration > 1 ? "s" : ""
+                }`}
+          </>
+        );
+      }
+
+      if (process?.idStage !== item.idStage) {
+        if (whiteList.includes(item?.idStage)) {
+          return (
+            <>
+              {item?.entrada ? (
+                <>
+                  {`Entrada: ${
+                    item?.entrada && handleDateFormating(item?.entrada)
+                  }`}
+                  <br />
+                </>
+              ) : null}
+
+              {item?.vencimento
+                ? `Vencimento: ${
+                    item?.vencimento && handleDateFormating(item?.vencimento)
+                  }`
+                : `Vencimento: ${item.duration} Dia${
+                    item.duration > 1 ? "s" : ""
+                  }`}
+            </>
+          );
+        }
+
+        return (
+          <>{`Vencimento: ${item.duration} Dia${
+            item.duration > 1 ? "s" : ""
+          }`}</>
+        );
+      }
+    }
+    return "";
+  };
+
   const nodes = useMemo(() => {
-    return stages.map((item, index) => {
+    return formattedStages.map((item, index) => {
       const deadline = getStageDeadline(item, index);
-      const stageLabel = `${_.startCase(item.name)}, ${
-        showStagesDuration
-          ? ` (${item.duration} dia${item.duration > 1 ? "s" : ""})`
-          : ""
-      }`;
+
       return {
         id: `${item.idStage}`,
         position: {
@@ -83,13 +179,8 @@ export function Flow({
         data: {
           label: (
             <>
-              {stageLabel}
-              {deadline ? (
-                <>
-                  {" "}
-                  <br /> {`Vencimento: ${deadline}`}{" "}
-                </>
-              ) : null}
+              {_.startCase(item.name)} <br />
+              {handleDate(item)}
             </>
           ),
         },
@@ -97,7 +188,10 @@ export function Flow({
           ...(currentStage === item.idStage
             ? {
                 color: "white",
-                background: colors.green["500"],
+                background:
+                  item?.vencimento && handleExpiration(item.vencimento)
+                    ? colors.red["500"]
+                    : colors.green["500"],
                 fontWeight: "bold",
               }
             : {
@@ -116,8 +210,10 @@ export function Flow({
 
   const edges = useMemo(() => {
     return sequences.map((sequence: FlowSequence) => {
-      const to = stages.find((item) => item.idStage === sequence.to);
-      const current = stages.find((item) => item.idStage === currentStage);
+      const to = formattedStages.find((item) => item.idStage === sequence.to);
+      const current = formattedStages.find(
+        (item) => item.idStage === currentStage
+      );
 
       return {
         id: `edge-${sequence.from}-${sequence.to}`,
@@ -133,7 +229,7 @@ export function Flow({
           allowComments &&
           to &&
           current &&
-          stages.indexOf(to) <= stages.indexOf(current) + 1
+          formattedStages.indexOf(to) <= formattedStages.indexOf(current) + 1
             ? "commentable"
             : null,
         data: {

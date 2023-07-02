@@ -1,10 +1,24 @@
 import { api } from "services/api";
 
-export const getStages = async (): Promise<Result<Stage[]>> => {
+export const getStages = async (
+  pagination?: Pagination
+): Promise<Result<Stage[]>> => {
   try {
-    const res = await api.stages.get<Stage[]>("/stages");
+    const res = await api.stages.get<{ stages: Stage[]; totalPages: number }>(
+      "/stages",
+      {
+        params: {
+          offset: pagination?.offset ?? 0,
+          limit: pagination?.limit ?? 5,
+        },
+      }
+    );
 
-    return { type: "success", value: res.data };
+    return {
+      type: "success",
+      value: res.data.stages,
+      totalPages: res.data.totalPages,
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };

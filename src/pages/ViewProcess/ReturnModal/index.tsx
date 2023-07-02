@@ -32,7 +32,9 @@ export function ReturnModal({
         <ModalBody>
           <Text>
             Tem certeza que deseja retroceder o processo{" "}
-            <strong>{process?.nickname}</strong>?
+            <strong>{process?.nickname}</strong>? Retroceder o processo vai
+            afetar permanentemente a <strong>data de vencimento</strong> da
+            etapa.
           </Text>
         </ModalBody>
         <ModalFooter gap="2">
