@@ -10,8 +10,19 @@ import {
   TabPanels,
   Tab,
   TabPanel,
+  Badge,
 } from "@chakra-ui/react";
-import { aboutYears } from "utils/aboutText";
+import {
+  epsName,
+  mdsName,
+  aboutYears,
+  epsStudents20231,
+  mdsStudents20231,
+  epsStudents20222,
+  mdsStudents20222,
+  epsStudents20221,
+  mdsStudents20221,
+} from "utils/aboutText";
 
 function AboutAccordion() {
   return (
@@ -20,7 +31,7 @@ function AboutAccordion() {
         <h2>
           <AccordionButton>
             <Box as="span" flex="1" textAlign="left">
-              Engenharia de Produto de Software - EPS
+              {epsName}
             </Box>
             <AccordionIcon />
           </AccordionButton>
@@ -35,13 +46,19 @@ function AboutAccordion() {
 
             <TabPanels>
               <TabPanel>
-                <p>one!</p>
+                {epsStudents20231.map((name) => {
+                  return <Badge mr={1}>{name}</Badge>;
+                })}
               </TabPanel>
               <TabPanel>
-                <p>two!</p>
+                {epsStudents20222.map((name) => {
+                  return <Badge mr={1}>{name}</Badge>;
+                })}
               </TabPanel>
               <TabPanel>
-                <p>three!</p>
+                {epsStudents20221.map((name) => {
+                  return <Badge mr={1}>{name}</Badge>;
+                })}
               </TabPanel>
             </TabPanels>
           </Tabs>
@@ -52,7 +69,7 @@ function AboutAccordion() {
         <h2>
           <AccordionButton>
             <Box as="span" flex="1" textAlign="left">
-              Métodos de Desenvolvimento de Software - MDS
+              {mdsName}
             </Box>
             <AccordionIcon />
           </AccordionButton>
@@ -67,13 +84,19 @@ function AboutAccordion() {
 
             <TabPanels>
               <TabPanel>
-                <p>one!</p>
+                {mdsStudents20231.map((name) => {
+                  return <Badge mr={1}>{name}</Badge>;
+                })}
               </TabPanel>
               <TabPanel>
-                <p>two!</p>
+                {mdsStudents20222.map((name) => {
+                  return <Badge mr={1}>{name}</Badge>;
+                })}
               </TabPanel>
               <TabPanel>
-                <p>three!</p>
+                {mdsStudents20221.map((name) => {
+                  return <Badge mr={1}>{name}</Badge>;
+                })}
               </TabPanel>
             </TabPanels>
           </Tabs>
