@@ -97,7 +97,7 @@ function Flows() {
         disabled: isActionDisabled("edit-flow"),
       },
       {
-        label: "Deletar Fluxo",
+        label: "Excluir Fluxo",
         actionName: "delete-flow",
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ flow }: { flow: Flow }) => {

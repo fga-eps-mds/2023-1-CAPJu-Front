@@ -37,15 +37,15 @@ export function DeletionModal({
       await deleteUser(user.cpf);
       toast({
         id: "delete-user-success",
-        title: "Usuário removido",
-        description: `O usuário ${user.fullName} foi deletado com sucesso.`,
+        title: "Usuário excluído",
+        description: `O usuário ${user.fullName} foi excluído com sucesso.`,
         status: "success",
         isClosable: true,
       });
     } catch {
       toast({
         id: "delete-user-error",
-        title: `Erro ao remover ${user.fullName}`,
+        title: `Erro ao excluir ${user.fullName}`,
         description: "Favor tentar novamente.",
         status: "error",
         isClosable: true,
@@ -60,11 +60,11 @@ export function DeletionModal({
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Deletar Usuário</ModalHeader>
+        <ModalHeader>Excluir Usuário</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Text>
-            Tem certeza que deseja deletar o usuário{" "}
+            Tem certeza que deseja excluir o usuário{" "}
             <strong>{user.fullName}</strong>, do perfil{" "}
             <strong>{user.role}</strong>?
           </Text>
@@ -78,7 +78,7 @@ export function DeletionModal({
             onClick={() => handleDeleteUser()}
             size="sm"
           >
-            Deletar
+            Excluir
           </Button>
         </ModalFooter>
       </ModalContent>
