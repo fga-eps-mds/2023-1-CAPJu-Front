@@ -1,4 +1,5 @@
 import { Flex, Box, Text, Image, Button } from "@chakra-ui/react";
+
 import {
   aboutCapju,
   creatorsEmail,
@@ -7,13 +8,13 @@ import {
   techinicalManagerName,
 } from "utils/aboutText";
 import { colors } from "styles/colors";
+import logoJusticaFederal from "images/justica_federal.png";
+import logoUnB from "images/UnB.png";
 import AboutAccordion from "./Accordion";
-import logoJusticaFederal from "../../images/justica_federal.png";
-import logoUnB from "../../images/UnB.png";
 
 function About() {
   return (
-    <Flex flex="1" w="100%" p={["10", "20"]}>
+    <Flex flex="1" w="100%" p={["10", "10"]} maxW={1200}>
       <Flex
         w="100%"
         borderRadius={20}
@@ -22,7 +23,7 @@ function About() {
         justifyContent="center"
         p={["5", "5"]}
       >
-        <Box width="40%" borderLeftRadius={20} pr={5}>
+        <Box width="40%" borderLeftRadius={20} pr={3}>
           <Text fontSize={["lg", "xl"]} fontWeight="semibold">
             O que é o CAPJu?
           </Text>
@@ -52,7 +53,7 @@ function About() {
             <Image src={logoUnB} alt="Logo UnB" width="100px" />
           </Box>
         </Box>
-        <Box width="60%" borderRightRadius={20} pl={5}>
+        <Box width="60%" borderRightRadius={20} pl={3}>
           <Text fontSize={["lg", "xl"]} fontWeight="semibold">
             Contribuidores
           </Text>
