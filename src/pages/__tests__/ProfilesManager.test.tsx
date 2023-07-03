@@ -10,16 +10,41 @@ import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
 import { mockedUsers } from "utils/mocks";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { getPaginatedArray } from "utils/pagination";
 import ProfilesManager from "../ProfilesManager";
 
 const restHandlers = [
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}allUser?accepted=true`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUsers))
+    `${import.meta.env.VITE_USER_SERVICE_URL}/allUser?accepted=true`,
+    async (req, res, ctx) => {
+      const offset = Number(req.url.searchParams.get("offset"));
+      const limit = Number(req.url.searchParams.get("limit"));
+      const { paginatedArray, totalPages } = getPaginatedArray(mockedUsers, {
+        offset,
+        limit,
+      });
+
+      return res(
+        ctx.status(200),
+        ctx.json({ user: paginatedArray, totalPages })
+      );
+    }
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}allUser?accepted=false`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUsers))
+    `${import.meta.env.VITE_USER_SERVICE_URL}/allUser?accepted=false`,
+    async (req, res, ctx) => {
+      const offset = Number(req.url.searchParams.get("offset"));
+      const limit = Number(req.url.searchParams.get("limit"));
+      const { paginatedArray, totalPages } = getPaginatedArray(mockedUsers, {
+        offset,
+        limit,
+      });
+
+      return res(
+        ctx.status(200),
+        ctx.json({ user: paginatedArray, totalPages })
+      );
+    }
   ),
 ];
 
