@@ -32,6 +32,36 @@ export const mockedUser = {
   expiresIn: "2100-06-19T03:26:25.050Z",
 };
 
+export const mockedUsers = [
+  {
+    cpf: "12345678901",
+    fullName: "User Teste 1",
+    email: "test1@test.com",
+    idUnit: 1,
+    token: "mocked-token",
+    idRole: 1,
+    expiresIn: "2100-06-19T03:26:25.050Z",
+  },
+  {
+    cpf: "12345678902",
+    fullName: "User Teste 2",
+    email: "test2@test.com",
+    idUnit: 2,
+    token: "mocked-token",
+    idRole: 1,
+    expiresIn: "2100-06-19T03:26:25.050Z",
+  },
+  {
+    cpf: "12345678903",
+    fullName: "User Teste 3",
+    email: "test3@test.com",
+    idUnit: 3,
+    token: "mocked-token",
+    idRole: 1,
+    expiresIn: "2100-06-19T03:26:25.050Z",
+  },
+];
+
 export const mockedAdminUser = {
   ...mockedUser,
   idRole: 5,
