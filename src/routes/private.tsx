@@ -12,6 +12,7 @@ const Stages = lazy(() => import("pages/Stages"));
 const Flows = lazy(() => import("pages/Flows"));
 const Processes = lazy(() => import("pages/Processes"));
 const ViewProcess = lazy(() => import("pages/ViewProcess"));
+const About = lazy(() => import("pages/About"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
@@ -86,6 +87,11 @@ export const PrivateRoutes: MenuItem[] = [
     authorizedRoles: permissionsArray.find((item) =>
       item.actions.includes("edit-account")
     )?.users,
+  },
+  {
+    path: "/contribuidores",
+    name: "About",
+    element: <About />,
   },
   {
     path: "*",
