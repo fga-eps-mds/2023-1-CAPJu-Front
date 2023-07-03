@@ -8,22 +8,18 @@ import { act } from "react-dom/test-utils";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
-import { mockedUser } from "utils/mocks";
+import { mockedUsers } from "utils/mocks";
 import { QueryClient, QueryClientProvider } from "react-query";
 import ProfilesManager from "../ProfilesManager";
 
 const restHandlers = [
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}ProfilesManager`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
-  ),
-  rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}allUser?accepted=true`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUsers))
   ),
   rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}allUser?accepted=false`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUsers))
   ),
 ];
 
@@ -31,7 +27,7 @@ const server = setupServer(...restHandlers);
 
 const queryClient = new QueryClient();
 
-describe("Signup page", () => {
+describe("Profiles page", () => {
   beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
 
   beforeEach(async () => {
@@ -65,11 +61,13 @@ describe("Signup page", () => {
     expect(screen.getByText("Perfil de Acesso")).not.toBe(null);
   });
 
-  it("shows solicitations and requests text correctly", () => {
-    expect(screen.findAllByAltText("Nome")).not.toBe(null);
-    expect(screen.findAllByAltText("User Teste")).not.toBe(null);
-    expect(screen.findAllByAltText("Perfil")).not.toBe(null);
-    expect(screen.findAllByAltText("Ações")).not.toBe(null);
+  it("shows requests and profiles text correctly", async () => {
+    const userElements = await screen.queryAllByText("Nome");
+    expect(userElements).toHaveLength(2);
+    const userElements2 = await screen.queryAllByText("Perfil");
+    expect(userElements2).toHaveLength(2);
+    const userElements3 = await screen.queryAllByText("Ações");
+    expect(userElements3).toHaveLength(2);
   });
 
   it("shows 'search bar' correctly", async () => {
