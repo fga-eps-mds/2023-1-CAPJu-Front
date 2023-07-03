@@ -1,7 +1,8 @@
 import { api } from "services/api";
 
 export const getUnits = async (
-  pagination?: Pagination
+  pagination?: Pagination,
+  filter?: string
 ): Promise<Result<Unit[]>> => {
   try {
     const res = await api.units.get<{ units: Unit[]; totalPages: number }>(
@@ -10,6 +11,7 @@ export const getUnits = async (
         params: {
           offset: pagination?.offset ?? 0,
           limit: pagination?.limit ?? 5,
+          filter,
         },
       }
     );

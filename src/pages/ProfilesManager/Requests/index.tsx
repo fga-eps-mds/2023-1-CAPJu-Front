@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "react-query";
-import { Flex, Text, useDisclosure } from "@chakra-ui/react";
-import { Icon, CheckIcon, ViewIcon } from "@chakra-ui/icons";
+import { Flex, Text, Button, useDisclosure, chakra } from "@chakra-ui/react";
+import { Icon, CheckIcon, ViewIcon, SearchIcon } from "@chakra-ui/icons";
 import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -31,10 +31,15 @@ export function Requests() {
   } = useQuery({
     queryKey: ["requests"],
     queryFn: async () => {
-      const res = await getUsersRequests({
-        offset: 5 * currentPage,
-        limit: 5,
-      });
+      const res = await getUsersRequests(
+        {
+          offset: 5 * currentPage,
+          limit: 5,
+        },
+        filter
+      );
+
+      if (res.type === "error") throw new Error(res.error.message);
 
       return res;
     },
@@ -66,6 +71,9 @@ export function Requests() {
     queryKey: ["units"],
     queryFn: async () => {
       const res = await getUnits();
+
+      if (res.type === "error") throw new Error(res.error.message);
+
       return res;
     },
   });
@@ -111,9 +119,6 @@ export function Requests() {
     return (
       (requestsData?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (!curr.fullName.toLowerCase().includes(filter.toLowerCase()))
-            return acc;
-
           return [
             ...acc,
             {
@@ -186,18 +191,36 @@ export function Requests() {
             Solicitações
           </Text>
         </Flex>
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Input
-            placeholder="Pesquisar usuários por nome"
-            value={filter}
-            onChange={({ target }) => setFilter(target.value)}
-            variant="filled"
-            css={{
-              "&, &:hover, &:focus": {
-                background: "white",
-              },
+        <Flex justifyContent="flex-start" w="100%">
+          <chakra.form
+            onSubmit={(e) => {
+              e.preventDefault();
+              refetchRequests();
             }}
-          />
+            w="100%"
+            display="flex"
+            flexDirection="row"
+          >
+            <Input
+              placeholder="Pesquisar usuários por nome"
+              value={filter}
+              onChange={({ target }) => setFilter(target.value)}
+              variant="filled"
+              css={{
+                "&, &:hover, &:focus": {
+                  background: "white",
+                },
+              }}
+            />
+            <Button
+              colorScheme="green"
+              marginLeft="2"
+              justifyContent="center"
+              type="submit"
+            >
+              <SearchIcon boxSize={4} />
+            </Button>
+          </chakra.form>
         </Flex>
       </Flex>
       <DataTable

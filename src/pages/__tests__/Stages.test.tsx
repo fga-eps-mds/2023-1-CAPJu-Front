@@ -1,5 +1,5 @@
 import { describe, expect } from "vitest";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 
 import { BrowserRouter } from "react-router-dom";
 import { rest } from "msw";
@@ -17,12 +17,18 @@ const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_STAGES_SERVICE_URL}stages`,
     async (req, res, ctx) => {
+      const filter = req.url.searchParams.get("filter");
       const offset = Number(req.url.searchParams.get("offset"));
       const limit = Number(req.url.searchParams.get("limit"));
-      const { paginatedArray, totalPages } = getPaginatedArray(mockedStages, {
-        offset,
-        limit,
-      });
+      const { paginatedArray, totalPages } = getPaginatedArray(
+        filter && filter !== ""
+          ? mockedStages.filter((stages) => stages.name.includes(filter))
+          : mockedStages,
+        {
+          offset,
+          limit,
+        }
+      );
       return res(
         ctx.status(200),
         ctx.json({ stages: paginatedArray, totalPages })
@@ -87,5 +93,37 @@ describe("Stages page", () => {
     expect(await screen.queryByText("h")).toBe(null);
     expect(await screen.queryByText("i")).toBe(null);
     expect(await screen.queryByText("j")).toBe(null);
+  });
+
+  it("filters stages correctly", async () => {
+    const input = screen.getByPlaceholderText("Pesquisar etapas");
+
+    expect(input).not.toBe(null);
+
+    await act(async () => {
+      await fireEvent.change(input, {
+        target: { value: "a" },
+      });
+      await fireEvent.submit(input);
+    });
+
+    expect(await screen.queryByText("a")).not.toBe(null);
+    expect(await screen.queryByText("b")).toBe(null);
+    expect(await screen.queryByText("c")).toBe(null);
+
+    const button = screen.getByLabelText("botão de busca");
+
+    expect(button).not.toBe(null);
+
+    await act(async () => {
+      await fireEvent.change(input, {
+        target: { value: "c" },
+      });
+      await fireEvent.click(button);
+    });
+
+    expect(await screen.queryByText("a")).toBe(null);
+    expect(await screen.queryByText("b")).toBe(null);
+    expect(await screen.queryByText("c")).not.toBe(null);
   });
 });
