@@ -19,6 +19,8 @@ describe("Flow components", async () => {
       await fireEvent.click(tutorialButton);
     });
 
+    expect(await screen.getByText("FAQ - Capju"));
+
     const unitContent = screen.getByText("Unidades");
 
     await act(async () => {
@@ -90,5 +92,7 @@ describe("Flow components", async () => {
     await act(async () => {
       await fireEvent.click(closeTutorialButton);
     });
+    
+    expect(await screen.queryByText("FAQ")).toBe(null);
   });
 });
