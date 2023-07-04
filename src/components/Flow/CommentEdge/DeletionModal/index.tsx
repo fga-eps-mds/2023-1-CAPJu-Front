@@ -13,13 +13,14 @@ import {
 interface DeletionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  handleComment: () => void;
 }
 
-export function DeletionModal({ isOpen, onClose }: DeletionModalProps) {
-  const handleDeleteComment = async () => {
-    console.log("Excluir Comentário");
-  };
-
+export function DeletionModal({
+  isOpen,
+  onClose,
+  handleComment,
+}: DeletionModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
@@ -35,7 +36,10 @@ export function DeletionModal({ isOpen, onClose }: DeletionModalProps) {
           </Button>
           <Button
             colorScheme="red"
-            onClick={() => handleDeleteComment()}
+            onClick={async () => {
+              await handleComment();
+              onClose();
+            }}
             size="sm"
           >
             Excluir

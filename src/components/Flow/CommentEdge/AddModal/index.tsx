@@ -9,42 +9,28 @@ import {
   ModalFooter,
   chakra,
   Button,
-  useToast,
 } from "@chakra-ui/react";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "components/FormFields";
-import { useLoading } from "hooks/useLoading";
-import { addCommentToProcess } from "services/processes";
 
 type FormValues = {
   comment: string;
 };
 
 const validationSchema = yup.object({
-  comment: yup.string().required("Escreva um comentário"),
+  comment: yup.string().required("Escreva uma observação"),
 });
 
 interface AddModalProps {
   isOpen: boolean;
   onClose: () => void;
-  afterSubmission: () => void;
-  from: string;
-  to: string;
-  processRecord: string;
+  // eslint-disable-next-line no-unused-vars
+  handleComment: (comment: string | null) => void;
 }
 
-export function AddModal({
-  isOpen,
-  onClose,
-  afterSubmission,
-  from,
-  to,
-  processRecord,
-}: AddModalProps) {
-  const toast = useToast();
-  const { handleLoading } = useLoading();
+export function AddModal({ isOpen, onClose, handleComment }: AddModalProps) {
   const {
     register,
     handleSubmit,
@@ -57,43 +43,8 @@ export function AddModal({
   });
 
   const onSubmit = handleSubmit(async ({ comment }) => {
-    handleLoading(true);
-
-    try {
-      const res = await addCommentToProcess({
-        record: processRecord,
-        originStage: from,
-        destinationStage: to,
-        commentary: comment,
-      });
-      handleLoading(false);
-
-      afterSubmission();
-
-      if (res.type === "success") {
-        toast({
-          id: `comment-${comment ? "add" : "add"}-sucess`,
-          title: "Sucesso!",
-          description: `Seu comentário foi adicionado`,
-          status: "success",
-        });
-        return;
-      }
-
-      throw new Error(res.error.message);
-    } catch (err: any) {
-      handleLoading(false);
-      toast({
-        id: `comment-${comment ? "add" : "add"}-error`,
-        title: `Erro ao adicionar comentário`,
-        description: err.message,
-        status: "error",
-        isClosable: true,
-      });
-    }
-
+    await handleComment(comment);
     onClose();
-    afterSubmission();
   });
 
   useEffect(() => {
@@ -104,7 +55,7 @@ export function AddModal({
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "md"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Adicionar Comentário</ModalHeader>
+        <ModalHeader>Adicionar Observação</ModalHeader>
         <ModalCloseButton />
         <chakra.form
           onSubmit={(e) => {
@@ -122,8 +73,8 @@ export function AddModal({
           >
             <Input
               type="text"
-              label="Comentário"
-              placeholder="Escreva um comentário"
+              label="Observação"
+              placeholder="Escreva sua observação"
               errors={errors.comment}
               {...register("comment")}
             />
@@ -133,7 +84,7 @@ export function AddModal({
               Cancelar
             </Button>
             <Button colorScheme="blue" type="submit" size="sm">
-              Comentar
+              Salvar
             </Button>
           </ModalFooter>
         </chakra.form>
