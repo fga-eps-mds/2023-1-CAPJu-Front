@@ -1,6 +1,12 @@
 import { Flex, Box, Text, Image, Button } from "@chakra-ui/react";
 
-import { aboutCapju, creatorsEmail, creatorsName } from "utils/aboutText";
+import {
+  aboutCapju,
+  creatorsEmail,
+  creatorsName,
+  professorName,
+  techinicalManagerName,
+} from "utils/aboutText";
 import { colors } from "styles/colors";
 import logoJusticaFederal from "images/justica_federal.png";
 import logoUnB from "images/UnB.png";
@@ -8,7 +14,7 @@ import AboutAccordion from "./Accordion";
 
 function About() {
   return (
-    <Flex flex="1" w="100%" p={["10", "10"]} maxW={1200}>
+    <Flex flex="2" w="90%" py="38" maxW={1140}>
       <Flex
         w="100%"
         borderRadius={20}
@@ -63,14 +69,14 @@ function About() {
               <Text fontSize={["md", "md"]} fontWeight="semibold">
                 Responsável Técnico
               </Text>
-              <Text>Nome: Núcleo de Tecnologia da Informação da SJDF </Text>
+              <Text>Nome: {techinicalManagerName} </Text>
               <Text>Email:</Text>
             </Box>
             <Box mt={1}>
               <Text fontSize={["md", "md"]} fontWeight="semibold">
                 Professor Responsável
               </Text>
-              <Text>Nome: Hilmer Rodrigues Neri </Text>
+              <Text>Nome: {professorName} </Text>
             </Box>
             <Box mt={10}>
               <AboutAccordion />

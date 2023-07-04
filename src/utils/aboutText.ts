@@ -5,8 +5,9 @@ export const aboutYears = ["2023.1", "2022.2", "2022.1"];
 export const creatorsName = "Wellington José Barbosa Carlos";
 export const creatorsEmail = "wellington.carlos@trf1.jus.br";
 
-export const techinicalManagerName = "Hilmer Rodrigues Neri";
-export const techinicalManagerEmail = "hilmer@unb.br";
+export const professorName = "Hilmer Rodrigues Neri";
+export const techinicalManagerName =
+  "Núcleo de Tecnologia da Informação da SJDF";
 
 export const epsName = "Engenharia de Produto de Software - EPS";
 export const mdsName = "Métodos de Desenvolvimento de Software - MDS";

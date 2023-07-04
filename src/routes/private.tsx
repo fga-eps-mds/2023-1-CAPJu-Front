@@ -1,3 +1,4 @@
+import { PrivateLayout } from "layouts/Private";
 import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 
@@ -91,7 +92,11 @@ export const PrivateRoutes: MenuItem[] = [
   {
     path: "/contribuidores",
     name: "About",
-    element: <About />,
+    element: (
+      <PrivateLayout>
+        <About />
+      </PrivateLayout>
+    ),
   },
   {
     path: "*",
