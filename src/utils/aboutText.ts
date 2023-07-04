@@ -28,10 +28,10 @@ export const mdsStudents20231 = [
   "Guilherme de Sá Gonçalves",
   "Gustavo França Boa Sorte",
   "Harryson Campos Martins",
-  "Juan Pablo",
-  "Leandro de Almeida",
-  "Oscar de Brito	",
-  "Yan Werlley",
+  "Juan Pablo Ricarte de Barros",
+  "Leandro de Almeida Oliveira",
+  "Oscar Correia de Brito Neto",
+  "Yan Werlley de Freitas Paulo",
 ];
 
 export const epsStudents20222 = [

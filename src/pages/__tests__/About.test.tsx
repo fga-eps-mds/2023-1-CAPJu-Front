@@ -39,8 +39,12 @@ describe("About page", () => {
       null
     );
     expect(screen.getByText("Responsável Técnico")).not.toBe(null);
+    expect(
+      screen.getByText("Nome: Núcleo de Tecnologia da Informação da SJDF")
+    ).not.toBe(null);
+    expect(screen.getByText("Email:")).not.toBe(null);
+    expect(screen.getByText("Professor Responsável")).not.toBe(null);
     expect(screen.getByText("Nome: Hilmer Rodrigues Neri")).not.toBe(null);
-    expect(screen.getByText("Email: hilmer@unb.br")).not.toBe(null);
   });
 
   it("shows button correctly", () => {
