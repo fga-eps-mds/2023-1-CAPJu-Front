@@ -20,6 +20,7 @@ describe("Flow components", async () => {
           process={mockedProcess}
           effectiveDate="2023-06-27"
           currentStage={1}
+          allowComments
         />
       );
     });
@@ -63,5 +64,12 @@ describe("Flow components", async () => {
     const vencimento = new Date();
     const result = handleExpiration(vencimento);
     expect(result).not.toBe(true);
+  });
+
+  it("shows process notes correctly", async () => {
+    await mockedFlowSequence.forEach(async (sequence) => {
+      if (sequence.commentary)
+        expect(await screen.findByText(sequence.commentary)).toBeDefined();
+    });
   });
 });
