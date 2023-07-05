@@ -9,8 +9,15 @@ import {
   Checkbox,
   useToast,
   Tooltip,
+  chakra,
 } from "@chakra-ui/react";
-import { AddIcon, ArrowUpIcon, Icon, ViewIcon } from "@chakra-ui/icons";
+import {
+  AddIcon,
+  ArrowUpIcon,
+  Icon,
+  ViewIcon,
+  SearchIcon,
+} from "@chakra-ui/icons";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -23,6 +30,7 @@ import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { labelByProcessStatus } from "utils/constants";
+import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
@@ -38,7 +46,7 @@ function Processes() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<string | undefined>(undefined);
   const [legalPriority, setLegalPriority] = useState(false);
   const [showFinished, setShowFinished] = useState<boolean>(true);
   const {
@@ -56,10 +64,14 @@ function Processes() {
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
   const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
-      const res = await getFlows();
+      const res = await getFlows(undefined, filter);
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -83,7 +95,14 @@ function Processes() {
   } = useQuery({
     queryKey: ["processes"],
     queryFn: async () => {
-      const res = await getProcesses(flow?.idFlow);
+      const res = await getProcesses(
+        flow?.idFlow,
+        {
+          offset: currentPage * 5,
+          limit: 5,
+        },
+        filter
+      );
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -100,10 +119,8 @@ function Processes() {
       });
     },
   });
-
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
-
   const tableActions = useMemo<TableAction[]>(
     () => [
       {
@@ -136,7 +153,6 @@ function Processes() {
     ],
     [isProcessesFetched, isUserFetched, userData]
   );
-
   const filterByPriority = (processes: Process[]) =>
     processes?.filter((process: Process) => process.idPriority);
 
@@ -149,22 +165,10 @@ function Processes() {
     }
     return processes;
   };
-
   const filteredProcess = useMemo<TableRow<Process>[]>(() => {
     if (!isProcessesFetched || !isFlowsFetched) return [];
 
-    let value =
-      filter !== ""
-        ? processesData?.value?.filter(
-            (process: Process) =>
-              (process.record as string)
-                ?.toLowerCase()
-                .includes(filter.toLocaleLowerCase()) ||
-              process.nickname
-                .toLowerCase()
-                .includes(filter.toLocaleLowerCase())
-          )
-        : processesData?.value;
+    let value = processesData?.value;
 
     if (legalPriority && value) value = filterByPriority(value);
     if (!showFinished && value) value = filterByStatus(value);
@@ -290,7 +294,7 @@ function Processes() {
 
   useEffect(() => {
     refetchProcesses();
-  }, [flowsData, isFlowsFetched]);
+  }, [flowsData, isFlowsFetched, currentPage]);
 
   return (
     <PrivateLayout>
@@ -328,20 +332,39 @@ function Processes() {
           </Flex>
         </Flex>
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Input
-            placeholder="Pesquisar processos (por registro ou apelido)"
-            width={["100%", "100%", "60%"]}
-            maxW={["100%", "100%", 365]}
-            value={filter}
-            onChange={({ target }) => setFilter(target.value)}
-            variant="filled"
-            css={{
-              "&, &:hover, &:focus": {
-                background: "white",
-              },
-            }}
-          />
-          <Flex flexDir="column" gap="1">
+          <Flex justifyContent="flex-start" w="100%">
+            <chakra.form
+              onSubmit={(e) => {
+                e.preventDefault();
+                refetchProcesses();
+              }}
+              w="100%"
+              display="flex"
+              flexDirection="row"
+            >
+              <Input
+                placeholder="Pesquisar processos (por registro ou apelido)"
+                value={filter}
+                onChange={({ target }) => setFilter(target.value)}
+                variant="filled"
+                css={{
+                  "&, &:hover, &:focus": {
+                    background: "white",
+                  },
+                }}
+              />
+              <Button
+                aria-label="botão de busca"
+                colorScheme="green"
+                marginLeft="2"
+                justifyContent="center"
+                type="submit"
+              >
+                <SearchIcon boxSize={4} />
+              </Button>
+            </chakra.form>
+          </Flex>
+          <Flex flexDir="row" rowGap="1" columnGap="3" flexWrap="wrap">
             <Checkbox
               colorScheme="green"
               borderColor="gray.600"
@@ -369,6 +392,12 @@ function Processes() {
           flow ? ` no fluxo ${flow.name}` : ""
         }.`}
       />
+      {processesData?.totalPages !== undefined ? (
+        <Pagination
+          pageCount={processesData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       <CreationModal
         isOpen={isCreationOpen}
         onClose={onCreationClose}

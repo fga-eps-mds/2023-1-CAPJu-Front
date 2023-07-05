@@ -1,0 +1,18 @@
+ul.pagination {
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.pagination__link--disabled {
+  pointer-events: none;
+  opacity: 0.6;
+  color: gray;
+}
+
+.active {
+  color: #1b9454;
+  font-weight: 700;
+}

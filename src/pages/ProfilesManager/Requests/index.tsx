@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "react-query";
-import { Flex, Text, useDisclosure } from "@chakra-ui/react";
-import { Icon, CheckIcon, ViewIcon } from "@chakra-ui/icons";
+import { Flex, Text, Button, useDisclosure, chakra } from "@chakra-ui/react";
+import { Icon, CheckIcon, ViewIcon, SearchIcon } from "@chakra-ui/icons";
 import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
@@ -10,24 +10,40 @@ import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { getUnits } from "services/units";
+import { Pagination } from "components/Pagination";
+import { getUsersRequests } from "services/user";
 import { AcceptModal } from "./AcceptModal";
 import { DenyModal } from "./DenyModal";
 import { ViewModal } from "./ViewModal";
 
-interface RequestsProps {
-  requestsData: Result<User[]> | undefined;
-  isRequestsFetched: boolean;
-  refetchRequests: () => void;
-}
-
-export function Requests({
-  requestsData,
-  isRequestsFetched,
-  refetchRequests,
-}: RequestsProps) {
+export function Requests() {
   const [filter, setFilter] = useState<string>("");
   const [selectedUser, selectUser] = useState<User | null>(null);
   const { getUserData } = useAuth();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+  const {
+    data: requestsData,
+    isFetched: isRequestsFetched,
+    refetch: refetchRequests,
+  } = useQuery({
+    queryKey: ["requests"],
+    queryFn: async () => {
+      const res = await getUsersRequests(
+        {
+          offset: 5 * currentPage,
+          limit: 5,
+        },
+        filter
+      );
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
+  });
   const {
     isOpen: isAcceptOpen,
     onOpen: onAcceptOpen,
@@ -53,7 +69,13 @@ export function Requests({
     refetch: refetchUnits,
   } = useQuery({
     queryKey: ["units"],
-    queryFn: getUnits,
+    queryFn: async () => {
+      const res = await getUnits();
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
   });
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
@@ -79,7 +101,7 @@ export function Requests({
         disabled: isActionDisabled("accept-user"),
       },
       {
-        label: "Recusar Usuário",
+        label: "Excluir Solicitação",
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
@@ -97,9 +119,6 @@ export function Requests({
     return (
       (requestsData?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (!curr.fullName.toLowerCase().includes(filter.toLowerCase()))
-            return acc;
-
           return [
             ...acc,
             {
@@ -159,10 +178,10 @@ export function Requests({
     }),
   ];
 
-  function refetchAll() {
+  useEffect(() => {
     refetchRequests();
     refetchUnits();
-  }
+  }, [currentPage]);
 
   return (
     <>
@@ -172,18 +191,36 @@ export function Requests({
             Solicitações
           </Text>
         </Flex>
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Input
-            placeholder="Pesquisar usuários por nome"
-            value={filter}
-            onChange={({ target }) => setFilter(target.value)}
-            variant="filled"
-            css={{
-              "&, &:hover, &:focus": {
-                background: "white",
-              },
+        <Flex justifyContent="flex-start" w="100%">
+          <chakra.form
+            onSubmit={(e) => {
+              e.preventDefault();
+              refetchRequests();
             }}
-          />
+            w="100%"
+            display="flex"
+            flexDirection="row"
+          >
+            <Input
+              placeholder="Pesquisar usuários por nome"
+              value={filter}
+              onChange={({ target }) => setFilter(target.value)}
+              variant="filled"
+              css={{
+                "&, &:hover, &:focus": {
+                  background: "white",
+                },
+              }}
+            />
+            <Button
+              colorScheme="green"
+              marginLeft="2"
+              justifyContent="center"
+              type="submit"
+            >
+              <SearchIcon boxSize={4} />
+            </Button>
+          </chakra.form>
         </Flex>
       </Flex>
       <DataTable
@@ -196,12 +233,18 @@ export function Requests({
         isDataFetching={!isRequestsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas solicitações no momento."
       />
+      {requestsData?.totalPages ? (
+        <Pagination
+          pageCount={requestsData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       {userData?.value && selectedUser && isAcceptOpen ? (
         <AcceptModal
           isOpen={isAcceptOpen}
           onClose={onAcceptClose}
           user={selectedUser}
-          refetch={() => refetchAll()}
+          refetch={() => refetchRequests()}
         />
       ) : null}
       {userData?.value && selectedUser && isDenyOpen ? (
@@ -209,7 +252,7 @@ export function Requests({
           isOpen={isDenyOpen}
           onClose={onDenyClose}
           user={selectedUser}
-          refetch={() => refetchAll()}
+          refetch={() => refetchRequests()}
         />
       ) : null}
       {userData?.value && selectedUser && isViewOpen ? (

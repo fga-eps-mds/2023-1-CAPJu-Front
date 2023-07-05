@@ -49,7 +49,7 @@ const restHandlers = [
 const server = setupServer(...restHandlers);
 const queryClient = new QueryClient();
 
-describe("ViewProcess page", () => {
+describe("ViewProcess page", async () => {
   beforeAll(async () => {
     global.ResizeObserver = ResizeObserver;
     localStorage.setItem("@CAPJu:user", JSON.stringify(mockedUser));
@@ -87,5 +87,23 @@ describe("ViewProcess page", () => {
 
   it("renders correctly", () => {
     expect(screen).toMatchSnapshot();
+  });
+
+  it("shows process text content correctly", () => {
+    expect(screen.getByText("(12345678912345678915)")).not.toBe(null);
+    expect(screen.getByText("Processo - Processo NS")).not.toBe(null);
+    expect(screen.getByText("Não iniciado")).not.toBe(null);
+    expect(screen.getByText("Status:")).not.toBe(null);
+    expect(screen.getByText("Fluxo:")).not.toBe(null);
+    expect(screen.getByText("Fluxo 1")).not.toBe(null);
+    expect(screen.getByText("Prioridade Legal:")).not.toBe(null);
+    expect(screen.getByText("Não tem")).not.toBe(null);
+    expect(screen.getByText("Voltar aos Processos")).not.toBe(null);
+    expect(screen.getByText("Iniciar Processo")).not.toBe(null);
+  });
+
+  it("shows staged name and due date correctly", () => {
+    expect(screen.findByText("etapaA")).not.toBe(null);
+    expect(screen.findByText("Vencimento")).not.toBe(null);
   });
 });

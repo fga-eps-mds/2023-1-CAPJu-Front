@@ -76,7 +76,13 @@ export function CreationModal({
   });
   const { data: flowsData } = useQuery({
     queryKey: ["flows"],
-    queryFn: getFlows,
+    queryFn: async () => {
+      const res = await getFlows();
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
     onError: () => {
       toast({
         id: "flows-error",
@@ -95,6 +101,7 @@ export function CreationModal({
     reset,
     watch,
   } = useForm<FormValues>({
+    // @ts-ignore
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });

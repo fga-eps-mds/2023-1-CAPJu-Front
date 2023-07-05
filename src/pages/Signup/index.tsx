@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from "react";
 import {
   Flex,
   Card,
@@ -21,7 +22,6 @@ import _ from "lodash";
 import { useLoading } from "hooks/useLoading";
 import { Input } from "components/FormFields";
 import { getUnits } from "services/units";
-import { useEffect, useMemo } from "react";
 import { Select } from "components/FormFields/Select";
 import { roleOptions } from "utils/roles";
 import { signUp } from "services/user";
@@ -72,7 +72,10 @@ function Signup() {
   const { handleLoading } = useLoading();
   const { data: unitsData } = useQuery({
     queryKey: ["units"],
-    queryFn: getUnits,
+    queryFn: async () => {
+      const res = await getUnits();
+      return res;
+    },
     onError: () => {
       toast({
         id: "units-error",

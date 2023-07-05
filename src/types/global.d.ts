@@ -27,6 +27,8 @@ declare global {
     name: string;
     duration: number;
     createdAt: string;
+    entrada?: Date | undefined;
+    vencimento?: Date | undefined;
   };
 
   type FlowSequence = {
@@ -48,6 +50,12 @@ declare global {
     description: string;
   };
 
+  type Progress = {
+    idStage: number;
+    entrada?: Date;
+    vencimento?: Date;
+  };
+
   type Process = {
     record: string | ReactNode;
     nickname: string;
@@ -57,6 +65,8 @@ declare global {
     idUnit: number;
     effectiveDate: string;
     status: string;
+    progress?: Progress[];
+    isNextSage?: boolean;
   };
 
   type SelectOption = {
@@ -71,8 +81,13 @@ declare global {
   };
 
   type Result<T> = ResultSuccess<T> | ResultError;
-  type ResultSuccess<T> = { type: "success"; value: T };
-  type ResultError = { type: "error"; error: Error; value: undefined };
+  type ResultSuccess<T> = { type: "success"; value: T; totalPages?: number };
+  type ResultError = {
+    type: "error";
+    error: Error;
+    value: undefined;
+    totalPages?: undefined;
+  };
 
   type RouteObject = import("react-router-dom").RouteObject;
 
@@ -96,5 +111,10 @@ declare global {
   type TableRow<T> = T & {
     tableActions: TableAction[];
     actionsProps: any;
+  };
+
+  type Pagination = {
+    offset: number;
+    limit: number;
   };
 }

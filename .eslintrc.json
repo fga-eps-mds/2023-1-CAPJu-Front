@@ -30,6 +30,7 @@
     "import/no-extraneous-dependencies": "off",
     "react/require-default-props": "off",
     "no-console": "off",
+    "no-param-reassign": 0,
     "react/jsx-filename-extension": [
       1,
       { "extensions": [".js", ".jsx", ".tsx", ".ts", ".d.ts"] }
