@@ -78,6 +78,9 @@ export function CreationModal({
     queryKey: ["flows"],
     queryFn: async () => {
       const res = await getFlows();
+
+      if (res.type === "error") throw new Error(res.error.message);
+
       return res;
     },
     onError: () => {
@@ -98,6 +101,7 @@ export function CreationModal({
     reset,
     watch,
   } = useForm<FormValues>({
+    // @ts-ignore
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });

@@ -118,7 +118,8 @@ export const forgotPassword = async (data: { email: string }) => {
 };
 
 export const getAcceptedUsers = async (
-  pagination?: Pagination
+  pagination?: Pagination,
+  filter?: string
 ): Promise<Result<User[]>> => {
   try {
     const res = await api.user.get<{ users: User[]; totalPages: number }>(
@@ -127,6 +128,7 @@ export const getAcceptedUsers = async (
         params: {
           offset: pagination?.offset ?? 0,
           limit: pagination?.limit ?? 5,
+          filter,
         },
       }
     );
@@ -149,7 +151,8 @@ export const getAcceptedUsers = async (
 };
 
 export const getUsersRequests = async (
-  pagination?: Pagination
+  pagination?: Pagination,
+  filter?: string
 ): Promise<Result<User[]>> => {
   try {
     const res = await api.user.get<{ users: User[]; totalPages: number }>(
@@ -158,6 +161,7 @@ export const getUsersRequests = async (
         params: {
           offset: pagination?.offset ?? 0,
           limit: pagination?.limit ?? 5,
+          filter,
         },
       }
     );
