@@ -35,7 +35,7 @@ type FormValues = {
 const validationSchema = yup.object({
   record: yup.string().required("Digite o registro do processo."),
   nickname: yup.string().required("Dê um apelido para o processo."),
-  idFlow: yup.number().required("Selecione um fluxo para o processo."),
+  idFlow: yup.number().typeError("Selecione um fluxo para o processo."),
   hasLegalPriority: yup.bool(),
   idPriority: yup.number().when("hasLegalPriority", (hasLegalPriority) => {
     return hasLegalPriority[0]
