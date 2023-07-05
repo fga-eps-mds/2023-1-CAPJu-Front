@@ -2,7 +2,8 @@ import { api } from "services/api";
 
 export const getProcesses = async (
   flowId: number | undefined,
-  pagination?: Pagination
+  pagination?: Pagination,
+  filter?: string
 ): Promise<Result<Process[]>> => {
   try {
     const res = await api.processes.get<{
@@ -12,6 +13,7 @@ export const getProcesses = async (
       params: {
         offset: pagination?.offset ?? 0,
         limit: pagination?.limit ?? 5,
+        filter,
       },
     });
 

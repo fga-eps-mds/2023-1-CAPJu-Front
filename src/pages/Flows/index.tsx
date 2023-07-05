@@ -1,8 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
+import {
+  Flex,
+  useToast,
+  Text,
+  Button,
+  useDisclosure,
+  chakra,
+} from "@chakra-ui/react";
 import { MdDelete, MdEdit } from "react-icons/md";
-import { AddIcon, Icon, ViewIcon } from "@chakra-ui/icons";
+import { AddIcon, Icon, ViewIcon, SearchIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { PrivateLayout } from "layouts/Private";
@@ -47,7 +54,10 @@ function Flows() {
   } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
-      const res = await getFlows({ offset: currentPage * 5, limit: 5 });
+      const res = await getFlows({ offset: currentPage * 5, limit: 5 }, filter);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
       return res;
     },
     onError: () => {
@@ -103,12 +113,7 @@ function Flows() {
   const filteredFlows = useMemo<TableRow<Flow>[]>(() => {
     if (!isFlowsFetched) return [];
 
-    const value =
-      filter !== ""
-        ? flowsData?.value?.filter((unit) =>
-            unit.name.toLowerCase().includes(filter.toLocaleLowerCase())
-          )
-        : flowsData?.value;
+    const value = flowsData?.value;
 
     return (
       (value?.reduce(
@@ -176,18 +181,37 @@ function Flows() {
             <AddIcon mr="2" boxSize={3} /> Criar Fluxo
           </Button>
         </Flex>
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Input
-            placeholder="Pesquisar fluxos"
-            value={filter}
-            onChange={({ target }) => setFilter(target.value)}
-            variant="filled"
-            css={{
-              "&, &:hover, &:focus": {
-                background: "white",
-              },
+        <Flex justifyContent="flex-start" w="100%">
+          <chakra.form
+            onSubmit={(e) => {
+              e.preventDefault();
+              refetchFlows();
             }}
-          />
+            w="100%"
+            display="flex"
+            flexDirection="row"
+          >
+            <Input
+              placeholder="Pesquisar fluxos"
+              value={filter}
+              onChange={({ target }) => setFilter(target.value)}
+              variant="filled"
+              css={{
+                "&, &:hover, &:focus": {
+                  background: "white",
+                },
+              }}
+            />
+            <Button
+              aria-label="botão de busca"
+              colorScheme="green"
+              marginLeft="2"
+              justifyContent="center"
+              type="submit"
+            >
+              <SearchIcon boxSize={4} />
+            </Button>
+          </chakra.form>
         </Flex>
       </Flex>
       <DataTable
