@@ -26,7 +26,7 @@ export function Header() {
       >
         <Image w="20%" maxW="24" src="/assets/logo.png" />
         {isAuthenticated ? (
-          <Flex ml="auto" gap="5">
+          <Flex alignItems="center" ml="auto" gap="5">
             <HeaderLink href="/contribuidores">Sobre</HeaderLink>
             <Button
               size={["xs", "sm"]}

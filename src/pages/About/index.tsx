@@ -10,20 +10,29 @@ import {
 import { colors } from "styles/colors";
 import logoJusticaFederal from "images/justica_federal.png";
 import logoUnB from "images/UnB.png";
+import { useAuth } from "hooks/useAuth";
 import AboutAccordion from "./Accordion";
 
 function About() {
+  const { isAuthenticated } = useAuth();
+
   return (
-    <Flex flex="2" w="90%" py="38" maxW={1140}>
+    <Flex flex="2" w="90%" py={isAuthenticated ? "1" : "10"} maxW={1120}>
       <Flex
         w="100%"
         borderRadius={20}
         backgroundColor="white"
         boxShadow="base"
         justifyContent="center"
-        p={["5", "5"]}
+        p="10"
+        flexWrap="wrap"
+        height="fit-content"
       >
-        <Box width="40%" borderLeftRadius={20} pr={3}>
+        <Box
+          borderLeftRadius={20}
+          pr={3}
+          width={["100%", "100%", "100%", "50%"]}
+        >
           <Text fontSize={["lg", "xl"]} fontWeight="semibold">
             O que é o CAPJu?
           </Text>
@@ -53,7 +62,11 @@ function About() {
             <Image src={logoUnB} alt="Logo UnB" width="100px" />
           </Box>
         </Box>
-        <Box width="60%" borderRightRadius={20} pl={3}>
+        <Box
+          borderRightRadius={20}
+          pl={3}
+          width={["100%", "100%", "100%", "50%"]}
+        >
           <Text fontSize={["lg", "xl"]} fontWeight="semibold">
             Contribuidores
           </Text>

@@ -1,5 +1,5 @@
 import { Tabs, TabList, Tab, Flex } from "@chakra-ui/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 
@@ -35,6 +35,10 @@ export function NavigationTabs() {
         item.users.some((userRole) => userRole === userData?.value?.idRole)
     );
   }
+
+  useEffect(() => {
+    if (currentTabIndex === undefined) setTabIndex(-1);
+  }, [currentTabIndex]);
 
   return (
     <Flex
