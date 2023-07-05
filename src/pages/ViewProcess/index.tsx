@@ -69,6 +69,9 @@ function ViewProcess() {
     queryKey: ["stages"],
     queryFn: async () => {
       const res = await getStages();
+
+      if (res.type === "error") throw new Error(res.error.message);
+
       return res;
     },
   });

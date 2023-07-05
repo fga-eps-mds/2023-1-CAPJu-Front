@@ -37,13 +37,13 @@ export function DeletionModal({
       toast({
         id: "delete-unit-success",
         title: "Sucesso!",
-        description: "Unidade deletada com sucesso!",
+        description: "Unidade excluída com sucesso!",
         status: "success",
       });
     } else {
       toast({
         id: "delete-unit-error",
-        title: "Erro na deleção da unidade.",
+        title: "Erro na exclusão da unidade.",
         description: res.error?.message,
         status: "error",
         isClosable: true,

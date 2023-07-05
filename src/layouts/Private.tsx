@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Flex } from "@chakra-ui/react";
 import { NavigationTabs } from "components/NavigationTabs";
+import { Tutorial } from "components/Tutorial";
 
 interface BaseLayoutProps {
   children?: ReactNode;
@@ -18,6 +19,7 @@ export function PrivateLayout({ children }: BaseLayoutProps) {
     >
       <NavigationTabs />
       {children}
+      <Tutorial />
     </Flex>
   );
 }
