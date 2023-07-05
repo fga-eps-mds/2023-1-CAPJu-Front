@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from "react";
 import {
   Flex,
   Card,
@@ -21,7 +22,6 @@ import _ from "lodash";
 import { useLoading } from "hooks/useLoading";
 import { Input } from "components/FormFields";
 import { getUnits } from "services/units";
-import { useEffect, useMemo } from "react";
 import { Select } from "components/FormFields/Select";
 import { roleOptions } from "utils/roles";
 import { signUp } from "services/user";
@@ -208,7 +208,10 @@ function Signup() {
               infoText={
                 <Stack spacing="0">
                   <Text>Deve conter ao menos um dígito;</Text>
-                  <Text>Deve conter ao menos uma letra maiúscula;</Text>
+                  <Text>
+                    Deve conter ao menos uma letra maiúscula e uma letra
+                    minuscula;
+                  </Text>
                   <Text>Deve conter ao menos 6 caracteres;</Text>
                 </Stack>
               }

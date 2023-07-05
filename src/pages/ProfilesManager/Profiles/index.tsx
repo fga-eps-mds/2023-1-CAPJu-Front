@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, Text, useDisclosure } from "@chakra-ui/react";
-import { Icon, ViewIcon } from "@chakra-ui/icons";
+import { Flex, Text, Button, useDisclosure, chakra } from "@chakra-ui/react";
+import { Icon, ViewIcon, SearchIcon } from "@chakra-ui/icons";
+
 import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { DataTable } from "components/DataTable";
+import { getAcceptedUsers } from "services/user";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { getUnits } from "services/units";
 import { roleNameById } from "utils/roles";
-import { getAcceptedUsers } from "services/user";
 import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
@@ -31,10 +32,16 @@ export function Profiles() {
   } = useQuery({
     queryKey: ["accepted-users"],
     queryFn: async () => {
-      const res = await getAcceptedUsers({
-        offset: currentPage * 5,
-        limit: 5,
-      });
+      const res = await getAcceptedUsers(
+        {
+          offset: currentPage * 5,
+          limit: 5,
+        },
+        filter
+      );
+
+      if (res.type === "error") throw new Error(res.error.message);
+
       return res;
     },
   });
@@ -62,6 +69,9 @@ export function Profiles() {
     queryKey: ["units"],
     queryFn: async () => {
       const res = await getUnits();
+
+      if (res.type === "error") throw new Error(res.error.message);
+
       return res;
     },
   });
@@ -89,7 +99,7 @@ export function Profiles() {
         disabled: isActionDisabled("accept-user"),
       },
       {
-        label: "Remover Usuário",
+        label: "Excluir Usuário",
         icon: <Icon as={MdDelete} boxSize={4} />,
         action: ({ user }: { user: User }) => {
           selectUser(user);
@@ -107,9 +117,6 @@ export function Profiles() {
     return (
       (usersData?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          if (!curr.fullName.toLowerCase().includes(filter.toLowerCase()))
-            return acc;
-
           const role = roleNameById(curr.idRole);
 
           return [
@@ -184,18 +191,36 @@ export function Profiles() {
             Perfil de Acesso
           </Text>
         </Flex>
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Input
-            placeholder="Pesquisar usuário pelo nome"
-            value={filter}
-            onChange={({ target }) => setFilter(target.value)}
-            variant="filled"
-            css={{
-              "&, &:hover, &:focus": {
-                background: "white",
-              },
+        <Flex justifyContent="flex-start" w="100%">
+          <chakra.form
+            onSubmit={(e) => {
+              e.preventDefault();
+              refetchUsers();
             }}
-          />
+            w="100%"
+            display="flex"
+            flexDirection="row"
+          >
+            <Input
+              placeholder="Pesquisar usuário pelo nome"
+              value={filter}
+              onChange={({ target }) => setFilter(target.value)}
+              variant="filled"
+              css={{
+                "&, &:hover, &:focus": {
+                  background: "white",
+                },
+              }}
+            />
+            <Button
+              colorScheme="green"
+              marginLeft="2"
+              justifyContent="center"
+              type="submit"
+            >
+              <SearchIcon boxSize={4} />
+            </Button>
+          </chakra.form>
         </Flex>
       </Flex>
       <DataTable
