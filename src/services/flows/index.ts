@@ -1,7 +1,8 @@
 import { api } from "services/api";
 
 export const getFlows = async (
-  pagination?: Pagination
+  pagination?: Pagination,
+  filter?: string
 ): Promise<Result<Flow[]>> => {
   try {
     const res = await api.flows.get<{
@@ -11,6 +12,7 @@ export const getFlows = async (
       params: {
         offset: pagination?.offset ?? 0,
         limit: pagination?.limit ?? 5,
+        filter,
       },
     });
 

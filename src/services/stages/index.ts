@@ -1,7 +1,8 @@
 import { api } from "services/api";
 
 export const getStages = async (
-  pagination?: Pagination
+  pagination?: Pagination,
+  filter?: string
 ): Promise<Result<Stage[]>> => {
   try {
     const res = await api.stages.get<{ stages: Stage[]; totalPages: number }>(
@@ -10,6 +11,7 @@ export const getStages = async (
         params: {
           offset: pagination?.offset ?? 0,
           limit: pagination?.limit ?? 5,
+          filter,
         },
       }
     );

@@ -1,10 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
-import { AddIcon, Icon } from "@chakra-ui/icons";
+import {
+  Flex,
+  useToast,
+  Text,
+  Button,
+  useDisclosure,
+  chakra,
+} from "@chakra-ui/react";
+import { AddIcon, Icon, SearchIcon } from "@chakra-ui/icons";
 import { MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
-
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
@@ -45,7 +51,13 @@ function Stages() {
   } = useQuery({
     queryKey: ["stages"],
     queryFn: async () => {
-      const res = await getStages({ offset: currentPage * 5, limit: 5 });
+      const res = await getStages(
+        { offset: currentPage * 5, limit: 5 },
+        filter
+      );
+
+      if (res.type === "error") throw new Error(res.error.message);
+
       return res;
     },
     onError: () => {
@@ -79,12 +91,7 @@ function Stages() {
   const filteredStages = useMemo<TableRow<Stage>[]>(() => {
     if (!isStagesFetched) return [];
 
-    const value =
-      filter !== ""
-        ? stagesData?.value?.filter((stage) =>
-            stage.name.toLowerCase().includes(filter.toLocaleLowerCase())
-          )
-        : stagesData?.value;
+    const value = stagesData?.value;
 
     return (
       (value?.reduce(
@@ -151,18 +158,37 @@ function Stages() {
             <AddIcon mr="2" boxSize={3} /> Criar Etapa
           </Button>
         </Flex>
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Input
-            placeholder="Pesquisar unidades"
-            value={filter}
-            onChange={({ target }) => setFilter(target.value)}
-            variant="filled"
-            css={{
-              "&, &:hover, &:focus": {
-                background: "white",
-              },
+        <Flex justifyContent="flex-start" w="100%">
+          <chakra.form
+            onSubmit={(e) => {
+              e.preventDefault();
+              refetchStages();
             }}
-          />
+            w="100%"
+            display="flex"
+            flexDirection="row"
+          >
+            <Input
+              placeholder="Pesquisar etapas"
+              value={filter}
+              onChange={({ target }) => setFilter(target.value)}
+              variant="filled"
+              css={{
+                "&, &:hover, &:focus": {
+                  background: "white",
+                },
+              }}
+            />
+            <Button
+              aria-label="botão de busca"
+              colorScheme="green"
+              marginLeft="2"
+              justifyContent="center"
+              type="submit"
+            >
+              <SearchIcon boxSize={4} />
+            </Button>
+          </chakra.form>
         </Flex>
       </Flex>
       <DataTable
