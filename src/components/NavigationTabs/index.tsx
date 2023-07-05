@@ -1,5 +1,5 @@
 import { Tabs, TabList, Tab, Flex } from "@chakra-ui/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 
@@ -36,6 +36,10 @@ export function NavigationTabs() {
     );
   }
 
+  useEffect(() => {
+    if (currentTabIndex === undefined) setTabIndex(-1);
+  }, [currentTabIndex]);
+
   return (
     <Flex
       w="100%"
@@ -59,6 +63,7 @@ export function NavigationTabs() {
       <Tabs w="100%" variant="line" colorScheme="green" index={tabIndex}>
         <TabList>
           {tabs.map((tab, index) => {
+            console.log(currentTabIndex, index);
             const isCurrentTab = currentTabIndex === index;
             let cursor = isCurrentTab ? "default" : "pointer";
 

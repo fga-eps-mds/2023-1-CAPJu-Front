@@ -26,7 +26,7 @@ type FormValues = {
 
 const validationSchema = yup.object({
   name: yup.string().required("Dê um nome à etapa"),
-  duration: yup.number().typeError("Dê uma duração para esta etapa"),
+  duration: yup.number().required().typeError("Dê uma duração para esta etapa"),
 });
 
 interface CreationModalProps {

@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 const Login = lazy(() => import("pages/Login"));
 const Signup = lazy(() => import("pages/Signup"));
 const ForgotPassword = lazy(() => import("pages/ForgotPassword"));
+const About = lazy(() => import("pages/About"));
 
 export const PublicRoutes: MenuItem[] = [
   {
@@ -20,6 +21,11 @@ export const PublicRoutes: MenuItem[] = [
     path: "/recuperar-senha",
     name: "ForgotPassword",
     element: <ForgotPassword />,
+  },
+  {
+    path: "/contribuidores",
+    name: "About",
+    element: <About />,
   },
   {
     path: "*",
