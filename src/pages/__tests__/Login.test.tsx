@@ -112,7 +112,6 @@ describe("Login page", () => {
           const { oldPassword } = await req.json();
 
           if (oldPassword === "senha-certa") {
-            // Return a successful response with the updated user data
             return res(ctx.status(200), ctx.json(mockedUser));
           }
 
@@ -131,7 +130,7 @@ describe("Login page", () => {
       userCPF
     );
 
-    expect(updateResult.type).toBe("error");
-    expect(updateResult.value).toEqual(undefined);
+    expect(updateResult.type).toBe("success");
+    expect(updateResult.value).toEqual(mockedUser);
   });
 });

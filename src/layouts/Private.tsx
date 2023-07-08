@@ -6,7 +6,6 @@ import DataUpdateModal from "components/DataUpdateModal";
 import { handleVerifyInDefaultEmail } from "utils/defaultEmails";
 import { Tutorial } from "components/Tutorial";
 
-
 interface BaseLayoutProps {
   children?: ReactNode;
 }
