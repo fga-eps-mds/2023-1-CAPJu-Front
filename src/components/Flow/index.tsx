@@ -27,6 +27,7 @@ interface FlowProps {
   allowComments?: boolean;
   process?: Process;
   isNextStage?: Boolean;
+  notes?: Note[];
 }
 
 let whiteList: number[] = [];
@@ -44,6 +45,7 @@ export function Flow({
   allowComments = false,
   process,
   isNextStage,
+  notes = [],
 }: FlowProps) {
   const startDate = effectiveDate ? new Date(effectiveDate) : null;
 
@@ -208,6 +210,13 @@ export function Flow({
 
   const edges = useMemo(() => {
     return sequences.map((sequence: FlowSequence) => {
+      const note =
+        notes.find(
+          (item) =>
+            item.idStageA === sequence.from &&
+            item.idStageB === sequence.to &&
+            !!item.commentary
+        ) || null;
       const to = formattedStages.find((item) => item.idStage === sequence.to);
       const current = formattedStages.find(
         (item) => item.idStage === currentStage
@@ -234,10 +243,12 @@ export function Flow({
           ...sequence,
           processRecord: process?.record,
           refetch,
+          commentary: note?.commentary,
+          idNote: note?.idNote,
         },
       } as Edge;
     });
-  }, [stages, sequences, currentStage, process]);
+  }, [stages, sequences, currentStage, process, notes]);
 
   const edgeTypes = {
     commentable: CommentEdge,

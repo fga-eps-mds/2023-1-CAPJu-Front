@@ -12,7 +12,7 @@ export const getProcesses = async (
     }>(`/processes${flowId ? `/${flowId}` : ""}`, {
       params: {
         offset: pagination?.offset ?? 0,
-        limit: pagination?.limit ?? 5,
+        limit: pagination?.limit,
         filter,
       },
     });
@@ -111,34 +111,6 @@ export const updateProcess = async (data: {
   }
 };
 
-export const addCommentToProcess = async (data: {
-  record: string;
-  originStage: string;
-  destinationStage: string;
-  commentary: string | null;
-}): Promise<Result<Process>> => {
-  try {
-    const res = await api.processes.put<Process>(
-      "/processNewObservation",
-      data
-    );
-
-    return {
-      type: "success",
-      value: res.data,
-    };
-  } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
-  }
-};
-
 export const getProcessByRecord = async (
   record: string
 ): Promise<Result<Process>> => {
@@ -196,6 +168,75 @@ export const updateProcessStatus = async (data: {
 }): Promise<Result<Process>> => {
   try {
     const res = await api.processes.put<Process>("/updateProcess", data);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const getNotesByProcessRecord = async (
+  record: string
+): Promise<Result<Note[]>> => {
+  try {
+    const res = await api.processes.get<Note[]>(`/notes/${record}`);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const addNoteToProcess = async (data: {
+  record: string;
+  idStageA: string;
+  idStageB: string;
+  commentary: string;
+}): Promise<Result<Note>> => {
+  try {
+    const res = await api.processes.post<Note>("/newNote", data);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const deleteProcessNote = async (
+  idNote: number
+): Promise<Result<Note>> => {
+  try {
+    const res = await api.processes.delete<Note>(`/deleteNote/${idNote}`);
 
     return {
       type: "success",

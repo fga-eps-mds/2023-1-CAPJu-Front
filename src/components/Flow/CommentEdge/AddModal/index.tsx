@@ -9,11 +9,12 @@ import {
   ModalFooter,
   chakra,
   Button,
+  Text,
 } from "@chakra-ui/react";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Input } from "components/FormFields";
+import { Textarea } from "components/FormFields";
 
 type FormValues = {
   comment: string;
@@ -27,7 +28,7 @@ interface AddModalProps {
   isOpen: boolean;
   onClose: () => void;
   // eslint-disable-next-line no-unused-vars
-  handleComment: (comment: string | null) => void;
+  handleComment: (comment: string) => void;
 }
 
 export function AddModal({ isOpen, onClose, handleComment }: AddModalProps) {
@@ -36,11 +37,13 @@ export function AddModal({ isOpen, onClose, handleComment }: AddModalProps) {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<FormValues>({
     // @ts-ignore
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });
+  const { comment: commentValue } = watch();
 
   const onSubmit = handleSubmit(async ({ comment }) => {
     await handleComment(comment);
@@ -52,7 +55,7 @@ export function AddModal({ isOpen, onClose, handleComment }: AddModalProps) {
   }, [isOpen]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={["full", "md"]}>
+    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Adicionar Observação</ModalHeader>
@@ -66,18 +69,22 @@ export function AddModal({ isOpen, onClose, handleComment }: AddModalProps) {
           <ModalBody
             display="flex"
             flexDirection="column"
-            alignItems="center"
+            alignItems="start"
             justifyContent="center"
-            gap="3"
-            mt="3"
+            gap="2"
+            mt="2"
           >
-            <Input
-              type="text"
-              label="Observação"
+            <Textarea
+              label=""
               placeholder="Escreva sua observação"
               errors={errors.comment}
+              minH={150}
+              maxLength={500}
               {...register("comment")}
             />
+            <Text fontSize="xs">
+              Caracteres restantes: {500 - commentValue?.length}
+            </Text>
           </ModalBody>
           <ModalFooter gap="2">
             <Button variant="ghost" onClick={onClose} size="sm">

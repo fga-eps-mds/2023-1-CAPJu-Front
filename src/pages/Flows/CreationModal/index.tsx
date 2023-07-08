@@ -166,7 +166,7 @@ export function CreationModal({
                 }
                 options={stagesData?.value?.map((item: Stage) => {
                   return {
-                    label: `${item.name}, (${item.duration} dia${
+                    label: `${item.name} (${item.duration} dia${
                       item.duration > 1 ? "s" : ""
                     })`,
                     value: item.idStage,

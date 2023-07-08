@@ -17,6 +17,7 @@ import {
   updateStage,
   getProcessByRecord,
   updateProcessStatus,
+  getNotesByProcessRecord,
 } from "services/processes";
 import { getPriorities } from "services/priorities";
 import { sortFlowStages } from "utils/sorting";
@@ -69,6 +70,22 @@ function ViewProcess() {
     queryKey: ["stages"],
     queryFn: async () => {
       const res = await getStages();
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
+  });
+  const {
+    data: notesData,
+    refetch: refetchNotes,
+    isFetched: isNotesFetched,
+  } = useQuery({
+    queryKey: ["notes", processData?.value?.record],
+    queryFn: async () => {
+      const res = await getNotesByProcessRecord(
+        processData?.value?.record as string
+      );
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -241,9 +258,13 @@ function ViewProcess() {
     if (!process) navigate(-1);
   }, [process]);
 
+  useEffect(() => {
+    refetchNotes();
+  }, [process, processData]);
+
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3">
+      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="5">
         <Flex
           w="100%"
           justifyContent="space-between"
@@ -400,14 +421,16 @@ function ViewProcess() {
                 : undefined
             }
             effectiveDate={processData?.value?.effectiveDate}
-            isFetching={!isProcessFetched || !isFlowFetched}
+            isFetching={!isProcessFetched || !isFlowFetched || !isNotesFetched}
             process={processData?.value}
             isNextStage={action}
             refetch={() => {
               refetchFlow();
               refetchProcess();
+              refetchNotes();
             }}
             allowComments={processData?.value?.status === "inProgress"}
+            notes={notesData?.value}
           />
         )}
       </Flex>

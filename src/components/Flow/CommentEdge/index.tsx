@@ -17,7 +17,7 @@ import {
 import { MdDelete, MdEdit } from "react-icons/md";
 import { ViewIcon } from "@chakra-ui/icons";
 
-import { addCommentToProcess } from "services/processes";
+import { addNoteToProcess, deleteProcessNote } from "services/processes";
 import { useLoading } from "hooks/useLoading";
 import { AddModal } from "./AddModal";
 import { DeletionModal } from "./DeletionModal";
@@ -52,7 +52,7 @@ export function CommentEdge({
     onOpen: onViewOpen,
     onClose: onViewClose,
   } = useDisclosure();
-  const { from, to, processRecord, commentary, refetch } = data;
+  const { from, to, processRecord, commentary, refetch, idNote } = data;
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -62,14 +62,14 @@ export function CommentEdge({
     targetPosition,
   });
 
-  async function handleComment(comment: null | string) {
+  async function handleComment(comment: string) {
     handleLoading(true);
 
     try {
-      const res = await addCommentToProcess({
+      const res = await addNoteToProcess({
         record: processRecord,
-        originStage: from,
-        destinationStage: to,
+        idStageA: from,
+        idStageB: to,
         commentary: comment,
       });
       handleLoading(false);
@@ -78,11 +78,9 @@ export function CommentEdge({
 
       if (res.type === "success") {
         toast({
-          id: `comment-${comment ? "add" : "remove"}-sucess`,
+          id: `comment-add-success`,
           title: "Sucesso!",
-          description: `Sua observação foi ${
-            comment ? "adicionado" : "excluído"
-          }.`,
+          description: `Sua observação foi adicionada.`,
           status: "success",
         });
         return;
@@ -92,8 +90,40 @@ export function CommentEdge({
     } catch (err: any) {
       handleLoading(false);
       toast({
-        id: `comment-${comment ? "add" : "remove"}-error`,
+        id: `comment-add-error`,
         title: `Erro ao adicionar observação`,
+        description: err.message,
+        status: "error",
+        isClosable: true,
+      });
+    }
+  }
+
+  async function handleDeleteComment() {
+    handleLoading(true);
+
+    try {
+      const res = await deleteProcessNote(idNote);
+      handleLoading(false);
+
+      if (refetch) refetch();
+
+      if (res.type === "success") {
+        toast({
+          id: `comment-remove-sucess`,
+          title: "Sucesso!",
+          description: `Sua observação foi excluída.`,
+          status: "success",
+        });
+        return;
+      }
+
+      throw new Error(res.error.message);
+    } catch (err: any) {
+      handleLoading(false);
+      toast({
+        id: `comment-remove-error`,
+        title: `Erro ao excluir observação`,
         description: err.message,
         status: "error",
         isClosable: true,
@@ -174,12 +204,12 @@ export function CommentEdge({
           <AddModal
             isOpen={isAddOpen}
             onClose={onAddClose}
-            handleComment={(comment: string | null) => handleComment(comment)}
+            handleComment={(comment: string) => handleComment(comment)}
           />
           <DeletionModal
             isOpen={isDeleteOpen}
             onClose={onDeleteClose}
-            handleComment={() => handleComment(null)}
+            handleComment={() => handleDeleteComment()}
           />
           <ViewModal
             isOpen={isViewOpen}
