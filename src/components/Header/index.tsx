@@ -26,13 +26,21 @@ export function Header() {
       >
         <Image w="20%" maxW="24" src="/assets/logo.png" />
         {isAuthenticated ? (
-          <Button size={["xs", "sm"]} colorScheme="red" onClick={handleLogout}>
-            Sair
-          </Button>
+          <Flex alignItems="center" ml="auto" gap="5">
+            <HeaderLink href="/contribuidores">Sobre</HeaderLink>
+            <Button
+              size={["xs", "sm"]}
+              colorScheme="red"
+              onClick={handleLogout}
+            >
+              Sair
+            </Button>
+          </Flex>
         ) : (
           <Flex gap={["3", "4"]} alignItems="center" justifyContent="end">
             <HeaderLink href="/">Login</HeaderLink>
             <HeaderLink href="/cadastro">Cadastro</HeaderLink>
+            <HeaderLink href="/contribuidores">Sobre</HeaderLink>
           </Flex>
         )}
       </Flex>

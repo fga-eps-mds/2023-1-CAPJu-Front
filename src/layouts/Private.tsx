@@ -4,6 +4,8 @@ import { NavigationTabs } from "components/NavigationTabs";
 import { useAuth } from "hooks/useAuth";
 import DataUpdateModal from "components/DataUpdateModal";
 import { handleVerifyInDefaultEmail } from "utils/defaultEmails";
+import { Tutorial } from "components/Tutorial";
+
 
 interface BaseLayoutProps {
   children?: ReactNode;
@@ -28,6 +30,7 @@ export function PrivateLayout({ children }: BaseLayoutProps) {
         handleVerifyInDefaultEmail(user.email) && (
           <DataUpdateModal user={user} />
         )}
+      <Tutorial />
     </Flex>
   );
 }
