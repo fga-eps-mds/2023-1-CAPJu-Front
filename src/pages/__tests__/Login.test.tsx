@@ -165,30 +165,41 @@ describe("Login page", () => {
       )
     );
 
-    const updateResult = await updateUserEmailAndPassword(userData, userCPF);
+    const updateSuccessResult = await updateUserEmailAndPassword(
+      userData,
+      userCPF
+    );
 
-    expect(updateResult.type).toBe("success");
-    expect(updateResult.value).toEqual(mockedUser);
-  });
+    expect(updateSuccessResult.type).toBe("success");
+    expect(updateSuccessResult.value).toEqual(mockedUser);
 
-  it("returns an error object for server errors", async () => {
-    const data = {
-      email: "newemail@example.com",
-      password: "newpassword",
-    };
-    const cpf = "123.456.789-00";
+    // Test the error scenario
+    server.use(
+      rest.put(
+        `${
+          import.meta.env.VITE_USER_SERVICE_URL
+        }updateUserEmailAndPassword/${userCPF}`,
+        async (_req, res, ctx) => {
+          return res(
+            ctx.status(400),
+            ctx.json({
+              error: "Internal server error",
+            })
+          );
+        }
+      )
+    );
 
-    const result = await updateUserEmailAndPassword(data, cpf);
+    const updateErrorResult = await updateUserEmailAndPassword(
+      userData,
+      userCPF
+    );
 
-    expect(result.type).toBe("error");
-    expect(result.error).toBeDefined();
-
-    if (result.error) {
-      expect(result.error).toBeInstanceOf(Error);
-      expect(result.error.message).toBe("Internal server error");
-    }
-
-    expect(result.value).toBeUndefined();
+    expect(updateErrorResult.type).toBe("error");
+    expect((updateErrorResult.error as Error).message).toBe(
+      "Internal server error"
+    );
+    expect(updateErrorResult.value).toBe(undefined);
   });
 
   it("returns an error object for unknown errors", async () => {
@@ -235,38 +246,6 @@ describe("Update Modal", () => {
 
   it("renders correctly", () => {
     expect(screen).toMatchSnapshot();
-  });
-
-  it("returns an error object for updateUserEmailAndPassword", async () => {
-    const userCPF = "123.456.789-00";
-    const userData = {
-      email: "newemail@example.com",
-      password: "new-password",
-    };
-
-    server.use(
-      rest.put(
-        `${
-          import.meta.env.VITE_USER_SERVICE_URL
-        }updateUserEmailAndPassword/${userCPF}`,
-        async (_req, res, ctx) => {
-          return res(
-            ctx.status(500),
-            ctx.json({
-              error: "Internal server error",
-            })
-          );
-        }
-      )
-    );
-
-    const updateResult = await updateUserEmailAndPassword(userData, userCPF);
-
-    expect(updateResult.type).toBe("error");
-    expect(updateResult.error).toBeDefined();
-    expect(updateResult.error!).toBeInstanceOf(Error);
-    expect(updateResult.error!.message).toBe("Internal server error");
-    expect(updateResult.value).toBeUndefined();
   });
 });
 
