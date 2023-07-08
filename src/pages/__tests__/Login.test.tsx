@@ -168,4 +168,24 @@ describe("Login page", () => {
     expect(updateResult.type).toBe("success");
     expect(updateResult.value).toEqual(mockedUser);
   });
+
+  it("returns an error object for server errors", async () => {
+    const data = {
+      email: "newemail@example.com",
+      password: "newpassword",
+    };
+    const cpf = "123.456.789-00";
+
+    const result = await updateUserEmailAndPassword(data, cpf);
+
+    expect(result.type).toBe("error");
+    expect(result.error).toBeDefined();
+
+    if (result.error) {
+      expect(result.error).toBeInstanceOf(Error);
+      expect(result.error.message).toBe("Internal server error");
+    }
+
+    expect(result.value).toBeUndefined();
+  });
 });
