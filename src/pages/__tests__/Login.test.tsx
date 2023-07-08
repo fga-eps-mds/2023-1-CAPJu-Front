@@ -9,6 +9,7 @@ import { act } from "react-dom/test-utils";
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
 import { mockedUser } from "utils/mocks";
+import { updateUserPassword } from "services/user";
 import Login from "../Login";
 
 const restHandlers = [
@@ -99,5 +100,38 @@ describe("Login page", () => {
 
     await screen.getByText("Bem vindo!");
     await screen.getByText("Login efetuado com sucesso!");
+  });
+
+  it("updates user password correctly", async () => {
+    const userCPF = "123.456.789-00";
+
+    server.use(
+      rest.post(
+        `${import.meta.env.VITE_USER_SERVICE_URL}updateUserPassword/${userCPF}`,
+        async (req, res, ctx) => {
+          const { oldPassword } = await req.json();
+
+          if (oldPassword === "senha-certa") {
+            // Return a successful response with the updated user data
+            return res(ctx.status(200), ctx.json(mockedUser));
+          }
+
+          return res(
+            ctx.status(400),
+            ctx.json({
+              error: "Senha incorreta",
+            })
+          );
+        }
+      )
+    );
+
+    const updateResult = await updateUserPassword(
+      { oldPassword: "senha-certa", newPassword: "nova-senha" },
+      userCPF
+    );
+
+    expect(updateResult.type).toBe("error");
+    expect(updateResult.value).toEqual(undefined);
   });
 });
