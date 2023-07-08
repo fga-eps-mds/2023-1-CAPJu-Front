@@ -9,6 +9,7 @@ import { act } from "react-dom/test-utils";
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
 import { mockedUser, mockedUserDateUpdate } from "utils/mocks";
+import { handleVerifyInDefaultEmail } from "utils/defaultEmails";
 import { updateUserEmailAndPassword, updateUserPassword } from "services/user";
 import DataUpdateModal from "components/DataUpdateModal";
 import Login from "../Login";
@@ -234,5 +235,17 @@ describe("Update Modal", () => {
 
   it("renders correctly", () => {
     expect(screen).toMatchSnapshot();
+  });
+});
+
+describe("handleVerifyInDefaultEmail", () => {
+  it("should return true for default emails", () => {
+    expect(handleVerifyInDefaultEmail("email@emaill.com")).toBe(true);
+    expect(handleVerifyInDefaultEmail("email@email.com")).toBe(true);
+  });
+
+  it("should return false for non-default emails", () => {
+    expect(handleVerifyInDefaultEmail("test@example.com")).toBe(false);
+    expect(handleVerifyInDefaultEmail("another@email.com")).toBe(false);
   });
 });
