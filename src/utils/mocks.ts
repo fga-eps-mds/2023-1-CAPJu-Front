@@ -32,6 +32,16 @@ export const mockedUser = {
   expiresIn: "2100-06-19T03:26:25.050Z",
 };
 
+export const mockedUserDateUpdate = {
+  cpf: "12345678900",
+  fullName: "User Teste",
+  email: "test@test.com",
+  idUnit: 1,
+  token: "mocked-token",
+  idRole: 1,
+  expiresIn: new Date("2100-06-19T03:26:25.050Z"),
+};
+
 export const mockedAdminUser = {
   ...mockedUser,
   idRole: 5,
