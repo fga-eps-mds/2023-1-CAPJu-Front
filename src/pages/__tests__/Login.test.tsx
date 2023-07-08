@@ -236,6 +236,38 @@ describe("Update Modal", () => {
   it("renders correctly", () => {
     expect(screen).toMatchSnapshot();
   });
+
+  it("returns an error object for updateUserEmailAndPassword", async () => {
+    const userCPF = "123.456.789-00";
+    const userData = {
+      email: "newemail@example.com",
+      password: "new-password",
+    };
+
+    server.use(
+      rest.put(
+        `${
+          import.meta.env.VITE_USER_SERVICE_URL
+        }updateUserEmailAndPassword/${userCPF}`,
+        async (_req, res, ctx) => {
+          return res(
+            ctx.status(500),
+            ctx.json({
+              error: "Internal server error",
+            })
+          );
+        }
+      )
+    );
+
+    const updateResult = await updateUserEmailAndPassword(userData, userCPF);
+
+    expect(updateResult.type).toBe("error");
+    expect(updateResult.error).toBeDefined();
+    expect(updateResult.error!).toBeInstanceOf(Error);
+    expect(updateResult.error!.message).toBe("Internal server error");
+    expect(updateResult.value).toBeUndefined();
+  });
 });
 
 describe("handleVerifyInDefaultEmail", () => {
