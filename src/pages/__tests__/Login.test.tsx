@@ -8,8 +8,9 @@ import { act } from "react-dom/test-utils";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
-import { mockedUser } from "utils/mocks";
+import { mockedUser, mockedUserDateUpdate } from "utils/mocks";
 import { updateUserEmailAndPassword, updateUserPassword } from "services/user";
+import DataUpdateModal from "components/DataUpdateModal";
 import Login from "../Login";
 
 const restHandlers = [
@@ -207,5 +208,31 @@ describe("Login page", () => {
     }
 
     expect(result.value).toBeUndefined();
+  });
+});
+
+describe("Update Modal", () => {
+  beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
+
+  beforeEach(async () => {
+    await render(
+      <ChakraProvider>
+        <LoadingProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <DataUpdateModal user={mockedUserDateUpdate} />
+            </BrowserRouter>
+          </AuthProvider>
+        </LoadingProvider>
+      </ChakraProvider>
+    );
+  });
+
+  afterAll(() => server.close());
+
+  afterEach(() => server.resetHandlers());
+
+  it("renders correctly", () => {
+    expect(screen).toMatchSnapshot();
   });
 });
