@@ -227,16 +227,16 @@ describe("Processes page", () => {
     }
 
     const validStatusValues = Object.values(labelByProcessStatus);
-    let foundStatus = false;
 
-    for (const statusValue of validStatusValues) {
-      const matchingElements = await screen.queryAllByText(statusValue);
-
-      if (matchingElements.length > 0) {
-        foundStatus = true;
-        break;
+    const matchingElementsPromises = validStatusValues.map(
+      async (statusValue) => {
+        const matchingElements = await screen.queryAllByText(statusValue);
+        return matchingElements.length > 0;
       }
-    }
+    );
+
+    const matchingElementsResults = await Promise.all(matchingElementsPromises);
+    const foundStatus = matchingElementsResults.some((result) => result);
 
     expect(foundStatus).toBe(true);
   });
