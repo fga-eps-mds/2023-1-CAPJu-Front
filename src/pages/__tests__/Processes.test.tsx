@@ -22,6 +22,7 @@ import {
 } from "utils/mocks";
 import { getPaginatedArray } from "utils/pagination";
 import Processes from "../Processes";
+import { labelByProcessStatus } from "utils/constants";
 
 const restHandlers = [
   rest.get(
@@ -207,5 +208,14 @@ describe("Processes page", () => {
     expect(await screen.queryByText("12345678912345678916")).not.toBe(null);
     expect(await screen.queryByText("12345678912345678917")).toBe(null);
     expect(await screen.queryByText("12345678912345678918")).toBe(null);
+  });
+
+  it("status processes correctly", async () => {
+    const validStatus = new Set(Object.values(labelByProcessStatus));
+    const status = await mockedProcesses[0].status;
+    const teste =
+      labelByProcessStatus[status as keyof typeof labelByProcessStatus];
+
+    expect(validStatus.has(teste)).toBe(true);
   });
 });
