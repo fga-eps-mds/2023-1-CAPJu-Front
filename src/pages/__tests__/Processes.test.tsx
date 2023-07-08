@@ -20,9 +20,9 @@ import {
   mockedFlows,
   mockedPriorities,
 } from "utils/mocks";
+import { labelByProcessStatus } from "utils/constants";
 import { getPaginatedArray } from "utils/pagination";
 import Processes from "../Processes";
-import { labelByProcessStatus } from "utils/constants";
 
 const restHandlers = [
   rest.get(
@@ -217,5 +217,27 @@ describe("Processes page", () => {
       labelByProcessStatus[status as keyof typeof labelByProcessStatus];
 
     expect(validStatus.has(teste)).toBe(true);
+  });
+
+  it("checks if processes have status displayed on the screen", async () => {
+    if (mockedProcesses.length === 0) {
+      // Isso serve para passar o teste caso não tenha processos
+      expect(true).toBe(true);
+      return;
+    }
+
+    const validStatusValues = Object.values(labelByProcessStatus);
+    let foundStatus = false;
+
+    for (const statusValue of validStatusValues) {
+      const matchingElements = await screen.queryAllByText(statusValue);
+
+      if (matchingElements.length > 0) {
+        foundStatus = true;
+        break;
+      }
+    }
+
+    expect(foundStatus).toBe(true);
   });
 });
