@@ -9,7 +9,7 @@ import { act } from "react-dom/test-utils";
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
 import { mockedUser } from "utils/mocks";
-import { updateUserPassword } from "services/user";
+import { updateUserEmailAndPassword, updateUserPassword } from "services/user";
 import Login from "../Login";
 
 const restHandlers = [
@@ -129,6 +129,41 @@ describe("Login page", () => {
       { oldPassword: "senha-certa", newPassword: "nova-senha" },
       userCPF
     );
+
+    expect(updateResult.type).toBe("success");
+    expect(updateResult.value).toEqual(mockedUser);
+  });
+
+  it("updates user email and password correctly", async () => {
+    const userCPF = "123.456.789-00";
+    const userData = {
+      email: "newemail@example.com",
+      password: "new-password",
+    };
+
+    server.use(
+      rest.put(
+        `${
+          import.meta.env.VITE_USER_SERVICE_URL
+        }updateUserEmailAndPassword/${userCPF}`,
+        async (req, res, ctx) => {
+          const { email, password } = await req.json();
+
+          if (email === userData.email && password === userData.password) {
+            return res(ctx.status(200), ctx.json(mockedUser));
+          }
+
+          return res(
+            ctx.status(400),
+            ctx.json({
+              error: "Error updating email and password",
+            })
+          );
+        }
+      )
+    );
+
+    const updateResult = await updateUserEmailAndPassword(userData, userCPF);
 
     expect(updateResult.type).toBe("success");
     expect(updateResult.value).toEqual(mockedUser);
