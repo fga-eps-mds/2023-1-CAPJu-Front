@@ -97,3 +97,110 @@ export function getAllowedTabPath(userRoleId: number) {
     )?.path || "/"
   );
 }
+
+export const actionsForm = [
+  {
+    label: "Criar Unidades",
+    value: "create-unit",
+  },
+  {
+    label: "Visualizar Unidades",
+    value: "see-unit",
+  },
+  {
+    label: "Editar Unidades",
+    value: "edit-unit",
+  },
+  {
+    label: "Excluir Unidades",
+    value: "delete-unit",
+  },
+  {
+    label: "Criar Etapas",
+    value: "create-stage",
+  },
+  {
+    label: "Visualizar Etapas",
+    value: "see-stage",
+  },
+  {
+    label: "Editar Etapas",
+    value: "edit-stage",
+  },
+  {
+    label: "Excluir Etapas",
+    value: "delete-stage",
+  },
+  {
+    label: "Avançar Etapas",
+    value: "forward-stage",
+  },
+  {
+    label: "Retroceder Etapas",
+    value: "backward-stage",
+  },
+  {
+    label: "Criar Fluxos",
+    value: "create-flow",
+  },
+  {
+    label: "Editar Fluxos",
+    value: "edit-flow",
+  },
+  {
+    label: "Visualizar Fluxos",
+    value: "see-flow",
+  },
+  {
+    label: "Excluir Fluxos",
+    value: "delete-flow",
+  },
+  {
+    label: "Criar Processos",
+    value: "create-process",
+  },
+  {
+    label: "Editar Processos",
+    value: "edit-process",
+  },
+  {
+    label: "Visualizar Processos",
+    value: "see-process",
+  },
+  {
+    label: "Excluir Processos",
+    value: "delete-process",
+  },
+  {
+    label: "Arquivar Processos",
+    value: "archive-process",
+  },
+  {
+    label: "Finalizar Processos",
+    value: "end-process",
+  },
+  {
+    label: "Visualizar Solicitações",
+    value: "see-request",
+  },
+  {
+    label: "Aceitar Solicitações",
+    value: "accept-request",
+  },
+  {
+    label: "Recusar Solicitações",
+    value: "delete-request",
+  },
+  {
+    label: "Visualizar Perfis",
+    value: "see-profile",
+  },
+  {
+    label: "Editar Perfis",
+    value: "edit-profile",
+  },
+  {
+    label: "Excluir Perfis",
+    value: "delete-profile",
+  },
+];
