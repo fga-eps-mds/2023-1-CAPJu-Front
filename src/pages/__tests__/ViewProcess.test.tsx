@@ -15,6 +15,7 @@ import {
   mockedStages,
   mockedPriorities,
   mockedFlow,
+  mockedRoles,
 } from "utils/mocks";
 import ViewProcess from "../ViewProcess";
 
@@ -43,6 +44,14 @@ const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
+  ),
+  rest.get(
+    `${import.meta.env.VITE_USER_SERVICE_URL}roleAdmins/${mockedUser.idRole}`,
+    async (_req, res, ctx) =>
+      res(
+        ctx.status(200),
+        ctx.json(mockedRoles?.find((i) => i.idRole === mockedUser.idRole))
+      )
   ),
 ];
 

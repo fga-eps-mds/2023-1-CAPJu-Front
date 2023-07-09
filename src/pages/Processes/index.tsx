@@ -25,7 +25,7 @@ import { IoReturnDownBackOutline } from "react-icons/io5";
 
 import { getProcesses } from "services/processes";
 import { getFlows } from "services/flows";
-import { hasPermission } from "utils/permissions";
+import { isActionAllowedToUser } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
@@ -120,16 +120,17 @@ function Processes() {
       });
     },
   });
-  const isActionDisabled = (actionName: string) =>
-    userData?.value ? !hasPermission(userData.value, actionName) : true;
   const tableActions = useMemo<TableAction[]>(
     () => [
       {
         label: "Visualizar Processo",
         icon: <ViewIcon boxSize={4} />,
         isNavigate: true,
-        actionName: "view-process",
-        disabled: isActionDisabled("view-process"),
+        actionName: "see-process",
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "see-process"
+        ),
       },
       {
         label: "Editar Processo",
@@ -139,7 +140,10 @@ function Processes() {
           onEditionOpen();
         },
         actionName: "edit-process",
-        disabled: isActionDisabled("edit-process"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "edit-process"
+        ),
       },
       {
         label: "Excluir Processo",
@@ -149,7 +153,10 @@ function Processes() {
           onDeletionOpen();
         },
         actionName: "delete-process",
-        disabled: isActionDisabled("delete-process"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "delete-process"
+        ),
       },
     ],
     [isProcessesFetched, isUserFetched, userData]
@@ -329,7 +336,12 @@ function Processes() {
               size="xs"
               fontSize="sm"
               colorScheme="green"
-              isDisabled={isActionDisabled("create-process")}
+              isDisabled={
+                !isActionAllowedToUser(
+                  userData?.value?.allowedActions || [],
+                  "create-process"
+                )
+              }
               onClick={onCreationOpen}
             >
               <AddIcon mr="2" boxSize={3} /> Criar Processo

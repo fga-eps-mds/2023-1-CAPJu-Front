@@ -17,7 +17,7 @@ import { getFlows } from "services/flows";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
-import { hasPermission } from "utils/permissions";
+import { isActionAllowedToUser } from "utils/permissions";
 import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
@@ -75,16 +75,18 @@ function Flows() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const isActionDisabled = (actionName: string) =>
-    userData?.value ? !hasPermission(userData.value, actionName) : true;
+
   const tableActions = useMemo<TableAction[]>(
     () => [
       {
         label: "Visualizar Processos do Fluxo",
         icon: <ViewIcon boxSize={4} />,
         isNavigate: true,
-        actionName: "view-flow",
-        disabled: isActionDisabled("view-flow"),
+        actionName: "see-flow",
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "see-flow"
+        ),
       },
       {
         label: "Editar Fluxo",
@@ -94,7 +96,10 @@ function Flows() {
           onEditionOpen();
         },
         actionName: "edit-flow",
-        disabled: isActionDisabled("edit-flow"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "edit-flow"
+        ),
       },
       {
         label: "Excluir Fluxo",
@@ -104,7 +109,10 @@ function Flows() {
           selectFlow(flow);
           onDeleteOpen();
         },
-        disabled: isActionDisabled("delete-flow"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "delete-flow"
+        ),
       },
     ],
     [isFlowsFetched, isUserFetched, userData]
@@ -175,7 +183,12 @@ function Flows() {
             size="xs"
             fontSize="sm"
             colorScheme="green"
-            isDisabled={isActionDisabled("create-flow")}
+            isDisabled={
+              !isActionAllowedToUser(
+                userData?.value?.allowedActions || [],
+                "create-flow"
+              )
+            }
             onClick={onCreationOpen}
           >
             <AddIcon mr="2" boxSize={3} /> Criar Fluxo

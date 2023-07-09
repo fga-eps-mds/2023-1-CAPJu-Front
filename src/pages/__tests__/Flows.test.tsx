@@ -9,7 +9,7 @@ import ResizeObserver from "resize-observer-polyfill";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
-import { mockedUser, mockedFlows } from "utils/mocks";
+import { mockedUser, mockedFlows, mockedRoles } from "utils/mocks";
 import { getPaginatedArray } from "utils/pagination";
 import Flows from "../Flows";
 
@@ -39,6 +39,14 @@ const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
+  ),
+  rest.get(
+    `${import.meta.env.VITE_USER_SERVICE_URL}roleAdmins/${mockedUser.idRole}`,
+    async (_req, res, ctx) =>
+      res(
+        ctx.status(200),
+        ctx.json(mockedRoles?.find((i) => i.idRole === mockedUser.idRole))
+      )
   ),
 ];
 

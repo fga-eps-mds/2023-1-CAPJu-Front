@@ -17,6 +17,12 @@ declare global {
     firstLogin?: boolean;
   };
 
+  type Role = {
+    idRole: number;
+    name: string;
+    allowedActions: string[];
+  };
+
   type Unit = {
     idUnit: number;
     name: string;
@@ -102,10 +108,10 @@ declare global {
 
   type MenuItem = RouteObject & {
     name: string;
-    authorizedRoles?: number[];
     icon?: string;
     element?: JSX.Element;
-    children?: MenuItem[];
+    children?: (MenuItem | (MenuItem & { authorizedRoles: number[] }))[];
+    actionName?: string;
   };
 
   type TableAction = {

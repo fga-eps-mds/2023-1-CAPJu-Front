@@ -7,12 +7,11 @@ import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { DataTable } from "components/DataTable";
-import { getAcceptedUsers } from "services/user";
+import { getAcceptedUsers, getAllRoles } from "services/user";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
-import { hasPermission } from "utils/permissions";
+import { isActionAllowedToUser } from "utils/permissions";
 import { getUnits } from "services/units";
-import { roleNameById } from "utils/roles";
 import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
@@ -75,8 +74,10 @@ export function Profiles() {
       return res;
     },
   });
-  const isActionDisabled = (actionName: string) =>
-    userData?.value ? !hasPermission(userData.value, actionName) : true;
+  const { data: rolesData, isFetched: isRolesFetched } = useQuery({
+    queryKey: ["roles"],
+    queryFn: getAllRoles,
+  });
   const tableActions = useMemo(
     () => [
       {
@@ -86,7 +87,10 @@ export function Profiles() {
           selectUser(user);
           onViewOpen();
         },
-        disabled: false,
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "see-profile"
+        ),
       },
       {
         label: "Editar Usuário",
@@ -96,7 +100,10 @@ export function Profiles() {
           onEditOpen();
         },
         actionName: "edit-user",
-        disabled: isActionDisabled("accept-user"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "edit-profile"
+        ),
       },
       {
         label: "Excluir Usuário",
@@ -106,18 +113,23 @@ export function Profiles() {
           onDeleteOpen();
         },
         actionName: "delete-user",
-        disabled: isActionDisabled("delete-user"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "delete-profile"
+        ),
       },
     ],
     [isUserFetched, userData]
   );
   const users = useMemo<TableRow<User>[]>(() => {
-    if (!isUsersFetched || !isUnitsFetched) return [];
+    if (!isUsersFetched || !isUnitsFetched || !isRolesFetched) return [];
 
     return (
       (usersData?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          const role = roleNameById(curr.idRole);
+          const role =
+            rolesData?.value?.find((i) => i.idRole === curr.idRole)?.name ||
+            "-";
 
           return [
             ...acc,
@@ -140,6 +152,7 @@ export function Profiles() {
     unitsData,
     isUsersFetched,
     isUnitsFetched,
+    isRolesFetched,
     filter,
     isUserFetched,
     userData,
@@ -230,7 +243,7 @@ export function Profiles() {
             ? tableColumns.filter((_, index) => index !== 1)
             : tableColumns
         }
-        isDataFetching={!isUsersFetched || !isUnitsFetched}
+        isDataFetching={!isUsersFetched || !isUnitsFetched || !isRolesFetched}
         emptyTableMessage="Não há usuários cadastrados"
       />
       {usersData?.totalPages ? (

@@ -1,5 +1,4 @@
 import { api } from "services/api";
-import { roleNameById } from "utils/roles";
 
 export const signIn = async (credentials: {
   cpf: string;
@@ -46,11 +45,17 @@ export const signUp = async (credentials: {
   }
 };
 
-export const getUserById = async (userId: string): Promise<Result<User>> => {
+export const getUserById = async (
+  userId: string
+): Promise<Result<User & { allowedActions: string[] }>> => {
   try {
     const res = await api.user.get<User>(`/user/${userId}`);
+    const { value: role } = await getRoleById(res.data?.idRole);
 
-    return { type: "success", value: res.data };
+    return {
+      type: "success",
+      value: { ...res.data, allowedActions: role?.allowedActions || [] },
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
@@ -185,8 +190,12 @@ export const getUsersRequests = async (
         },
       }
     );
+    const { value: roles } = await getAllRoles();
     const value = res.data?.users?.map((item: User) => {
-      return { ...item, role: roleNameById(item.idRole) };
+      return {
+        ...item,
+        role: roles?.find((i) => i.idRole === item.idRole)?.name || "-",
+      };
     });
 
     return { type: "success", value, totalPages: res?.data?.totalPages };
@@ -264,6 +273,85 @@ export const updateUserRole = async (
     });
 
     return { type: "success", value: null };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const getAllRoles = async (): Promise<Result<Role[]>> => {
+  try {
+    const res = await api.user.get<Role[]>("/role");
+
+    const orderedRolesNames = [
+      "Estagiário",
+      "Servidor",
+      "Diretor",
+      "Juiz",
+      "Administrador",
+    ];
+
+    const orderedData = res.data?.sort(
+      (a, b) =>
+        orderedRolesNames.indexOf(a.name) - orderedRolesNames.indexOf(b.name)
+    );
+
+    return {
+      type: "success",
+      value: orderedData,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const getRoleById = async (idRole: number): Promise<Result<Role>> => {
+  try {
+    const { data } = await api.user.get<Role>(`/roleAdmins/${idRole}`);
+
+    return {
+      type: "success",
+      value: data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const updateRoleAllowedActions = async ({
+  idRole,
+  allowedActions,
+}: {
+  idRole: number;
+  allowedActions: string[];
+}): Promise<Result<Role>> => {
+  try {
+    const res = await api.user.put<Role>(
+      `/updateRoleAllowedActions/${idRole}`,
+      { allowedActions }
+    );
+
+    return { type: "success", value: res.data };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
