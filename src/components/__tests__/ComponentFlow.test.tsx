@@ -1,5 +1,7 @@
 import ResizeObserver from "resize-observer-polyfill";
 import { act, render, screen } from "@testing-library/react";
+import _ from "lodash";
+
 import { mockedStages, mockedFlowSequence, mockedProcess } from "utils/mocks";
 import { handleDateFormating, handleExpiration } from "utils/dates";
 import { Flow } from "../Flow";
@@ -29,7 +31,14 @@ describe("Flow components", async () => {
 
   it("shows 'stage's properties' correctly", async () => {
     await mockedStages.forEach(async (stage) => {
-      expect(await screen.findAllByText(stage.name)).toBeDefined();
+      if (
+        mockedFlowSequence.some(
+          (i) => i.from === stage.idStage || i.to === stage.idStage
+        )
+      )
+        expect(
+          await screen.findAllByText(_.startCase(stage.name))
+        ).toBeDefined();
     });
   });
 

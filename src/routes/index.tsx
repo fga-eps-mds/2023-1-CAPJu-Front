@@ -19,7 +19,9 @@ const getRoutesWithAuthorizedRoles = (
       (accRoles: number[], currRole: Role) => {
         if (
           currRole.allowedActions.some((i) => i === currRoute.actionName) ||
-          !currRoute.actionName
+          !currRoute.actionName ||
+          (currRoute.actionName === "manage-profiles" &&
+            currRole.name === "Administradors")
         )
           return [...accRoles, currRole.idRole];
 

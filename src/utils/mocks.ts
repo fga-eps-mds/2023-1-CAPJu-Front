@@ -1,3 +1,77 @@
+export const mockedAllowedActions = [
+  "forward-stage",
+  "backward-stage",
+  "edit-account",
+  "edit-stage",
+  "delete-stage",
+  "create-flow",
+  "edit-flow",
+  "delete-flow",
+  "create-stage",
+  "archive-process",
+  "end-process",
+  "accept-request",
+  "delete-request",
+  "delete-unit",
+  "edit-unit",
+  "create-unit",
+  "create-process",
+  "see-unit",
+  "see-stage",
+  "see-flow",
+  "edit-process",
+  "see-process",
+  "delete-process",
+  "see-request",
+  "see-profile",
+  "edit-profile",
+  "delete-profile",
+  "manage-profiles",
+];
+
+export const mockedRoleEstagiario = {
+  idRole: 1,
+  name: "Estagiário",
+  accessLevel: 4,
+  allowedActions: mockedAllowedActions,
+};
+
+export const mockedRoleAdministrador = {
+  idRole: 5,
+  name: "Administrador",
+  accessLevel: 5,
+  allowedActions: mockedAllowedActions,
+};
+
+export const mockedRoleServidor = {
+  idRole: 2,
+  name: "Servidor",
+  accessLevel: 3,
+  allowedActions: mockedAllowedActions,
+};
+
+export const mockedRoleDiretor = {
+  idRole: 4,
+  name: "Diretor",
+  accessLevel: 1,
+  allowedActions: mockedAllowedActions,
+};
+
+export const mockedRoleJuiz = {
+  idRole: 3,
+  name: "Juiz",
+  accessLevel: 2,
+  allowedActions: mockedAllowedActions,
+};
+
+export const mockedRoles = [
+  mockedRoleEstagiario,
+  mockedRoleAdministrador,
+  mockedRoleServidor,
+  mockedRoleDiretor,
+  mockedRoleJuiz,
+];
+
 const mockedProgress1 = {
   idStage: 1,
   entrada: new Date("2023-06-25"),
@@ -54,12 +128,12 @@ export const mockedUserDateUpdateandpassword = {
 
 export const mockedAdminUser = {
   ...mockedUser,
-  idRole: 5,
+  idRole: mockedRoles?.find((i) => i.name === "Administrador")?.idRole || 5,
 };
 
 export const mockedManagerUser = {
   ...mockedUser,
-  idRole: 1,
+  idRole: mockedRoles?.find((i) => i.name === "Diretor")?.idRole || 4,
 };
 
 export const mockedUnits = [
