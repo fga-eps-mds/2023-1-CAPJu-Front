@@ -10,39 +10,39 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-interface ReturnModalProps {
-  process: Process;
+interface DeletionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  handleReturnProcess: () => void;
+  handleComment: () => void;
 }
 
-export function ReturnModal({
-  process,
+export function DeletionModal({
   isOpen,
   onClose,
-  handleReturnProcess,
-}: ReturnModalProps) {
+  handleComment,
+}: DeletionModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Retroceder Processo</ModalHeader>
+        <ModalHeader>Excluir Observação</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text>
-            Tem certeza que deseja retroceder o processo{" "}
-            <strong>{process?.nickname}</strong>? Retroceder o processo vai
-            afetar permanentemente a <strong>data de vencimento</strong> da
-            etapa.
-          </Text>
+          <Text>Tem certeza que deseja excluir a observação?</Text>
         </ModalBody>
         <ModalFooter gap="2">
           <Button variant="ghost" onClick={onClose} size="sm">
             Cancelar
           </Button>
-          <Button colorScheme="red" onClick={handleReturnProcess} size="sm">
-            Retroceder
+          <Button
+            colorScheme="red"
+            onClick={async () => {
+              await handleComment();
+              onClose();
+            }}
+            size="sm"
+          >
+            Excluir
           </Button>
         </ModalFooter>
       </ModalContent>

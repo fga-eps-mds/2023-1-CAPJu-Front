@@ -152,7 +152,7 @@ export const getAcceptedUsers = async (
       {
         params: {
           offset: pagination?.offset ?? 0,
-          limit: pagination?.limit ?? 5,
+          limit: pagination?.limit,
           filter,
         },
       }
@@ -185,7 +185,7 @@ export const getUsersRequests = async (
       {
         params: {
           offset: pagination?.offset ?? 0,
-          limit: pagination?.limit ?? 5,
+          limit: pagination?.limit,
           filter,
         },
       }

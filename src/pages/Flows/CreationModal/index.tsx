@@ -166,7 +166,7 @@ export function CreationModal({
                 }
                 options={stagesData?.value?.map((item: Stage) => {
                   return {
-                    label: `${item.name}, (${item.duration} dia${
+                    label: `${item.name} (${item.duration} dia${
                       item.duration > 1 ? "s" : ""
                     })`,
                     value: item.idStage,
@@ -203,11 +203,7 @@ export function CreationModal({
                 }}
               />
             ) : null}
-            <Flow
-              stages={selectedStages}
-              sequences={sequences}
-              showStagesDuration
-            />
+            <Flow stages={selectedStages} sequences={sequences} />
           </ModalBody>
           <ModalFooter gap="2">
             <Button variant="ghost" onClick={onClose} size="sm">

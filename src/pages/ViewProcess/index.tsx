@@ -15,10 +15,12 @@ import { useLoading } from "hooks/useLoading";
 import {
   updateStage,
   getProcessByRecord,
-  updateProcess,
+  updateProcessStatus,
+  getNotesByProcessRecord,
 } from "services/processes";
 import { getPriorities } from "services/priorities";
 import { isActionAllowedToUser } from "utils/permissions";
+import { sortFlowStages } from "utils/sorting";
 import { labelByProcessStatus } from "utils/constants";
 import { FinalizationModal } from "./FinalizationModal";
 import { ArchivationModal } from "./ArchivationModal";
@@ -74,6 +76,22 @@ function ViewProcess() {
       return res;
     },
   });
+  const {
+    data: notesData,
+    refetch: refetchNotes,
+    isFetched: isNotesFetched,
+  } = useQuery({
+    queryKey: ["notes", processData?.value?.record],
+    queryFn: async () => {
+      const res = await getNotesByProcessRecord(
+        processData?.value?.record as string
+      );
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
+  });
   const { data: userData } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
@@ -109,14 +127,17 @@ function ViewProcess() {
     },
   });
   const stages = useMemo<Stage[]>(() => {
-    return (
+    if (!flowData?.value?.sequences) return [];
+
+    const stagesInFlow =
       stagesData?.value?.reduce<Stage[]>((acc: Stage[], curr: Stage) => {
         if (!flowData?.value?.stages?.some((item) => item === curr.idStage))
           return acc;
 
         return [...acc, curr];
-      }, []) || []
-    );
+      }, []) || [];
+
+    return sortFlowStages(stagesInFlow, flowData?.value?.sequences);
   }, [flowData]);
   const previousStageId = useMemo<number>(() => {
     return (
@@ -133,11 +154,8 @@ function ViewProcess() {
     );
   }, [flowData, processData]);
   const isLastStage = useMemo(() => {
-    return (
-      flowData?.value?.stages[flowData?.value?.stages?.length - 1] ===
-      processData?.value?.idStage
-    );
-  }, [flowData?.value?.stages, processData?.value?.idStage]);
+    return stages[stages?.length - 1]?.idStage === processData?.value?.idStage;
+  }, [stages, processData?.value?.idStage]);
 
   async function handleUpdateProcessStage(isNextStage: boolean) {
     handleLoading(true);
@@ -203,14 +221,13 @@ function ViewProcess() {
     }
 
     const body = {
-      ...processData?.value,
       record: processData?.value?.record as string,
       priority: processData?.value?.idPriority,
       idFlow: flowData?.value?.idFlow as number,
       status,
     };
 
-    const res = await updateProcess(body);
+    const res = await updateProcessStatus(body);
 
     if (res.type === "success") {
       toast({
@@ -239,9 +256,13 @@ function ViewProcess() {
     if (!process) navigate(-1);
   }, [process]);
 
+  useEffect(() => {
+    refetchNotes();
+  }, [process, processData]);
+
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3">
+      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="5">
         <Flex
           w="100%"
           justifyContent="space-between"
@@ -326,12 +347,9 @@ function ViewProcess() {
               gap="1"
               flexWrap="wrap"
             >
-              {!(
-                flowData?.value?.sequences[0]?.from ===
-                  processData?.value?.idStage ||
-                !processData?.value?.idStage ||
-                processData?.value?.status !== "inProgress"
-              ) ? (
+              {processData?.value?.status === "inProgress" &&
+              !!processData?.value?.idStage &&
+              processData?.value?.idStage !== stages[0]?.idStage ? (
                 <Button
                   size="xs"
                   fontSize="sm"
@@ -426,9 +444,16 @@ function ViewProcess() {
                 : undefined
             }
             effectiveDate={processData?.value?.effectiveDate}
-            isFetching={!isProcessFetched || !isFlowFetched}
+            isFetching={!isProcessFetched || !isFlowFetched || !isNotesFetched}
             process={processData?.value}
             isNextStage={action}
+            refetch={() => {
+              refetchFlow();
+              refetchProcess();
+              refetchNotes();
+            }}
+            allowComments={processData?.value?.status === "inProgress"}
+            notes={notesData?.value}
           />
         )}
       </Flex>

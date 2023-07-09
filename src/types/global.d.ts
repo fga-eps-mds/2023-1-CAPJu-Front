@@ -76,6 +76,14 @@ declare global {
     isNextSage?: boolean;
   };
 
+  type Note = {
+    idNote?: number;
+    commentary: string;
+    record: string;
+    idStageA: number;
+    idStageB: number;
+  };
+
   type SelectOption = {
     label: string;
     value: number | string;
