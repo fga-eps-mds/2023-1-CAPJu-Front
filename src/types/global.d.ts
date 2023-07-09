@@ -14,6 +14,7 @@ declare global {
     role?: string;
     idUnit: number;
     unit?: string;
+    firstLogin?: boolean;
   };
 
   type Unit = {
