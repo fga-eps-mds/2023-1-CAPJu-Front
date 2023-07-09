@@ -10,7 +10,7 @@ import { DataTable } from "components/DataTable";
 import { getAcceptedUsers, getAllRoles } from "services/user";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
-import { hasPermission } from "utils/permissions";
+import { isActionAllowedToUser } from "utils/permissions";
 import { getUnits } from "services/units";
 import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
@@ -78,8 +78,6 @@ export function Profiles() {
     queryKey: ["roles"],
     queryFn: getAllRoles,
   });
-  const isActionDisabled = (actionName: string) =>
-    userData?.value ? !hasPermission(userData.value, actionName) : true;
   const tableActions = useMemo(
     () => [
       {
@@ -89,7 +87,10 @@ export function Profiles() {
           selectUser(user);
           onViewOpen();
         },
-        disabled: false,
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "see-profile"
+        ),
       },
       {
         label: "Editar Usuário",
@@ -99,7 +100,10 @@ export function Profiles() {
           onEditOpen();
         },
         actionName: "edit-user",
-        disabled: isActionDisabled("accept-user"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "edit-profile"
+        ),
       },
       {
         label: "Excluir Usuário",
@@ -109,7 +113,10 @@ export function Profiles() {
           onDeleteOpen();
         },
         actionName: "delete-user",
-        disabled: isActionDisabled("delete-user"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "delete-profile"
+        ),
       },
     ],
     [isUserFetched, userData]
