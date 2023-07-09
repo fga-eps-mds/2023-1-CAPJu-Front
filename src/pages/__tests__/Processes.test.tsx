@@ -21,6 +21,7 @@ import {
   mockedPriorities,
   mockedRoles,
 } from "utils/mocks";
+import { labelByProcessStatus } from "utils/constants";
 import { getPaginatedArray } from "utils/pagination";
 import Processes from "../Processes";
 
@@ -217,5 +218,36 @@ describe("Processes page", () => {
     expect(await screen.queryByText("12345678912345678916")).not.toBe(null);
     expect(await screen.queryByText("12345678912345678917")).toBe(null);
     expect(await screen.queryByText("12345678912345678918")).toBe(null);
+  });
+
+  it("status processes correctly", async () => {
+    const validStatus = new Set(Object.values(labelByProcessStatus));
+    const status = await mockedProcesses[0].status;
+    const teste =
+      labelByProcessStatus[status as keyof typeof labelByProcessStatus];
+
+    expect(validStatus.has(teste)).toBe(true);
+  });
+
+  it("checks if processes have status displayed on the screen", async () => {
+    if (mockedProcesses.length === 0) {
+      // Isso serve para passar o teste caso não tenha processos
+      expect(true).toBe(true);
+      return;
+    }
+
+    const validStatusValues = Object.values(labelByProcessStatus);
+
+    const matchingElementsPromises = validStatusValues.map(
+      async (statusValue) => {
+        const matchingElements = await screen.queryAllByText(statusValue);
+        return matchingElements.length > 0;
+      }
+    );
+
+    const matchingElementsResults = await Promise.all(matchingElementsPromises);
+    const foundStatus = matchingElementsResults.some((result) => result);
+
+    expect(foundStatus).toBe(true);
   });
 });
