@@ -7,12 +7,11 @@ import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { DataTable } from "components/DataTable";
-import { getAcceptedUsers } from "services/user";
+import { getAcceptedUsers, getAllRoles } from "services/user";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { hasPermission } from "utils/permissions";
 import { getUnits } from "services/units";
-import { roleNameById } from "utils/roles";
 import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";
@@ -75,6 +74,10 @@ export function Profiles() {
       return res;
     },
   });
+  const { data: rolesData, isFetched: isRolesFetched } = useQuery({
+    queryKey: ["roles"],
+    queryFn: getAllRoles,
+  });
   const isActionDisabled = (actionName: string) =>
     userData?.value ? !hasPermission(userData.value, actionName) : true;
   const tableActions = useMemo(
@@ -112,12 +115,14 @@ export function Profiles() {
     [isUserFetched, userData]
   );
   const users = useMemo<TableRow<User>[]>(() => {
-    if (!isUsersFetched || !isUnitsFetched) return [];
+    if (!isUsersFetched || !isUnitsFetched || !isRolesFetched) return [];
 
     return (
       (usersData?.value?.reduce(
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
-          const role = roleNameById(curr.idRole);
+          const role =
+            rolesData?.value?.find((i) => i.idRole === curr.idRole)?.name ||
+            "-";
 
           return [
             ...acc,
@@ -140,6 +145,7 @@ export function Profiles() {
     unitsData,
     isUsersFetched,
     isUnitsFetched,
+    isRolesFetched,
     filter,
     isUserFetched,
     userData,
@@ -230,7 +236,7 @@ export function Profiles() {
             ? tableColumns.filter((_, index) => index !== 1)
             : tableColumns
         }
-        isDataFetching={!isUsersFetched || !isUnitsFetched}
+        isDataFetching={!isUsersFetched || !isUnitsFetched || !isRolesFetched}
         emptyTableMessage="Não há usuários cadastrados"
       />
       {usersData?.totalPages ? (

@@ -2,9 +2,9 @@ import { useEffect, useMemo } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "hooks/useAuth";
-import { roles } from "utils/roles";
 import { getAllowedTabPath } from "utils/permissions";
 import { useQuery } from "react-query";
+import { getAllRoles } from "services/user";
 
 interface RequireAuthProps {
   children: JSX.Element;
@@ -36,6 +36,10 @@ export function RequireAuth({ children, authorizedRoles }: RequireAuthProps) {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
+  const { data: rolesData } = useQuery({
+    queryKey: ["roles"],
+    queryFn: getAllRoles,
+  });
   const location = useLocation();
 
   const saveFrom = useMemo(() => ({ from: location }), [location]);
@@ -46,7 +50,7 @@ export function RequireAuth({ children, authorizedRoles }: RequireAuthProps) {
   if (!authorizedRoles) return children;
 
   // Para estar logado role precisa ser válida
-  if (!roles.some((role) => role.idRole === user?.idRole)) {
+  if (!rolesData?.value?.some((role) => role.idRole === user?.idRole)) {
     window.location.reload();
     handleLogout();
     return children;

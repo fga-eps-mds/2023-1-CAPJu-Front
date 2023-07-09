@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -11,14 +12,14 @@ import {
   chakra,
   Text,
 } from "@chakra-ui/react";
+import { useQuery } from "react-query";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import { updateUserRole } from "services/user";
+import { getAllRoles, updateUserRole } from "services/user";
 import { Select } from "components/FormFields/Select";
 import { useLoading } from "hooks/useLoading";
-import { roleOptions } from "utils/roles";
 
 type FormValues = {
   idRole: string;
@@ -51,6 +52,26 @@ export function EditionModal({
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });
+  const { data: rolesData } = useQuery({
+    queryKey: ["roles"],
+    queryFn: getAllRoles,
+    onError: () => {
+      toast({
+        id: "roles-error",
+        title: "Erro ao carregar perfis",
+        description: "Houve um erro ao carregar perfis, tentando novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    },
+  });
+  const roles = useMemo(() => {
+    return (
+      rolesData?.value?.map((role) => {
+        return { label: role.name, value: role.idRole };
+      }) || []
+    );
+  }, [rolesData]);
 
   const onSubmit = handleSubmit(async (formData) => {
     handleLoading(true);
@@ -98,7 +119,7 @@ export function EditionModal({
             <Select
               placeholder="Novo perfil de usuário"
               errors={errors.idRole}
-              options={roleOptions(false)}
+              options={roles}
               defaultValue={user.idRole}
               {...register("idRole")}
             />

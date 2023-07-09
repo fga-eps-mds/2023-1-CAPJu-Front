@@ -1,5 +1,4 @@
 import { api } from "services/api";
-import { roleNameById } from "utils/roles";
 
 export const signIn = async (credentials: {
   cpf: string;
@@ -51,13 +50,11 @@ export const getUserById = async (
 ): Promise<Result<User & { allowedActions: string[] }>> => {
   try {
     const res = await api.user.get<User>(`/user/${userId}`);
-    const { value: allowedActions } = await getRoleAllowedActions(
-      res.data?.idRole
-    );
+    const { value: role } = await getRoleById(res.data?.idRole);
 
     return {
       type: "success",
-      value: { ...res.data, allowedActions: allowedActions || [] },
+      value: { ...res.data, allowedActions: role?.allowedActions || [] },
     };
   } catch (error) {
     if (error instanceof Error)
@@ -193,8 +190,12 @@ export const getUsersRequests = async (
         },
       }
     );
+    const { value: roles } = await getAllRoles();
     const value = res.data?.users?.map((item: User) => {
-      return { ...item, role: roleNameById(item.idRole) };
+      return {
+        ...item,
+        role: roles?.find((i) => i.idRole === item.idRole)?.name || "-",
+      };
     });
 
     return { type: "success", value, totalPages: res?.data?.totalPages };
@@ -317,15 +318,13 @@ export const getAllRoles = async (): Promise<Result<Role[]>> => {
   }
 };
 
-export const getRoleAllowedActions = async (
-  idRole: number
-): Promise<Result<string[]>> => {
+export const getRoleById = async (idRole: number): Promise<Result<Role>> => {
   try {
     const { data } = await api.user.get<Role>(`/roleAdmins/${idRole}`);
 
     return {
       type: "success",
-      value: data.allowedActions,
+      value: data,
     };
   } catch (error) {
     if (error instanceof Error)
