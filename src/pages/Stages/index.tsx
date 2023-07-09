@@ -15,7 +15,7 @@ import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
-import { hasPermission } from "utils/permissions";
+import { isActionAllowedToUser } from "utils/permissions";
 import { Pagination } from "components/Pagination";
 import { getStages } from "../../services/stages";
 import { CreationModal } from "./CreationModal";
@@ -71,8 +71,7 @@ function Stages() {
       });
     },
   });
-  const isActionDisabled = (actionName: string) =>
-    userData?.value ? !hasPermission(userData.value, actionName) : true;
+
   const tableActions = useMemo(
     () => [
       {
@@ -82,8 +81,11 @@ function Stages() {
           selectStage(stage);
           onDeletionOpen();
         },
-        actionName: "view-stages",
-        disabled: isActionDisabled("view-stage"),
+        actionName: "delete-stage",
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "delete-stage"
+        ),
       },
     ],
     [isStagesFetched, isUserFetched, userData]
@@ -152,7 +154,12 @@ function Stages() {
             size="xs"
             fontSize="sm"
             colorScheme="green"
-            isDisabled={isActionDisabled("create-stage")}
+            isDisabled={
+              !isActionAllowedToUser(
+                userData?.value?.allowedActions || [],
+                "create-stage"
+              )
+            }
             onClick={onCreationOpen}
           >
             <AddIcon mr="2" boxSize={3} /> Criar Etapa

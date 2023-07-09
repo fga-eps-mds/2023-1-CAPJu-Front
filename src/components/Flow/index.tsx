@@ -12,6 +12,7 @@ import _ from "lodash";
 
 import { colors } from "styles/colors";
 import { handleDateFormating, handleExpiration } from "utils/dates";
+import { CommentEdge } from "./CommentEdge";
 
 interface FlowProps {
   stages: Stage[];
@@ -22,12 +23,14 @@ interface FlowProps {
   currentStage?: string | number | undefined;
   effectiveDate?: string | undefined;
   isFetching?: boolean;
-  showStagesDuration?: boolean;
+  refetch?: () => void;
+  allowComments?: boolean;
   process?: Process;
   isNextStage?: Boolean;
+  notes?: Note[];
 }
 
-const whiteList: number[] = [];
+let whiteList: number[] = [];
 
 export function Flow({
   stages,
@@ -38,53 +41,47 @@ export function Flow({
   currentStage = undefined,
   effectiveDate = undefined,
   isFetching = false,
-  showStagesDuration = false,
+  refetch = () => {},
+  allowComments = false,
   process,
   isNextStage,
+  notes = [],
 }: FlowProps) {
   const startDate = effectiveDate ? new Date(effectiveDate) : null;
 
-  const sortedStages = useMemo(() => {
-    const sequenceMap = new Map<number, number>();
+  const formattedStages = useMemo(() => {
+    const value = stages;
+    const curr = stages.find((item) => item.idStage === process?.idStage);
+    const currIndex = curr ? stages.indexOf(curr) : -1;
 
-    sequences.forEach((sequence, index) => {
-      sequenceMap.set(sequence.from, index);
+    value.forEach((stage, index) => {
+      const stageProgress = process?.progress?.find(
+        (item) => item.idStage === stage.idStage
+      );
+
+      if (stageProgress && process?.progress) {
+        stage.entrada = process?.progress[index]?.entrada;
+        stage.vencimento = process?.progress[index]?.vencimento;
+      }
+
+      if (index < currIndex) whiteList.push(stage.idStage);
+      else whiteList = whiteList.filter((item) => item !== stage.idStage);
     });
 
-    for (let index = 0; index < stages.length; index += 1) {
-      stages[index].entrada =
-        process?.progress && process?.progress[index]?.entrada;
-      stages[index].vencimento =
-        process?.progress && process?.progress[index]?.vencimento;
-    }
-
-    return stages.sort((a, b) => {
-      const indexA = sequenceMap.get(a.idStage);
-      const indexB = sequenceMap.get(b.idStage);
-
-      if (indexA === undefined && indexB === undefined) {
-        return 0;
-      }
-
-      if (indexA === undefined) {
-        return 1;
-      }
-
-      if (indexB === undefined) {
-        return -1;
-      }
-      return indexA - indexB;
-    });
-  }, [stages, sequences]);
+    return value;
+  }, [stages, process, sequences, isNextStage]);
 
   const getStageDeadline = (item: Stage, index: number): string | null => {
     if (!startDate || !effectiveDate) return null;
 
-    const previousDuration = stages.reduce((acc, curr, reduceIndex) => {
-      if (index <= reduceIndex) return acc;
+    const previousDuration = formattedStages.reduce(
+      (acc, curr, reduceIndex) => {
+        if (index <= reduceIndex) return acc;
 
-      return acc + curr.duration + 1;
-    }, 0);
+        return acc + curr.duration + 1;
+      },
+      0
+    );
 
     const stageStartDate = new Date(startDate);
     stageStartDate.setDate(startDate.getDate() + previousDuration);
@@ -115,28 +112,50 @@ export function Flow({
 
         return (
           <>
-            {`Entrada: ${item?.entrada && handleDateFormating(item?.entrada)}`}
-            <br />
-            {`Vencimento: ${
-              item?.vencimento && handleDateFormating(item?.vencimento)
-            }`}
+            {item?.entrada ? (
+              <>
+                {`Entrada: ${
+                  item?.entrada && handleDateFormating(item?.entrada)
+                }`}
+                <br />
+              </>
+            ) : null}
+
+            {item?.vencimento
+              ? `Vencimento: ${
+                  item?.vencimento && handleDateFormating(item?.vencimento)
+                }`
+              : `Vencimento: ${item.duration} Dia${
+                  item.duration > 1 ? "s" : ""
+                }`}
           </>
         );
       }
+
       if (process?.idStage !== item.idStage) {
         if (whiteList.includes(item?.idStage)) {
           return (
             <>
-              {`Entrada: ${
-                item?.entrada && handleDateFormating(item?.entrada)
-              }`}
-              <br />
-              {`Vencimento: ${
-                item?.vencimento && handleDateFormating(item?.vencimento)
-              }`}
+              {item?.entrada ? (
+                <>
+                  {`Entrada: ${
+                    item?.entrada && handleDateFormating(item?.entrada)
+                  }`}
+                  <br />
+                </>
+              ) : null}
+
+              {item?.vencimento
+                ? `Vencimento: ${
+                    item?.vencimento && handleDateFormating(item?.vencimento)
+                  }`
+                : `Vencimento: ${item.duration} Dia${
+                    item.duration > 1 ? "s" : ""
+                  }`}
             </>
           );
         }
+
         return (
           <>{`Vencimento: ${item.duration} Dia${
             item.duration > 1 ? "s" : ""
@@ -147,61 +166,93 @@ export function Flow({
     return "";
   };
 
-  const nodes = sortedStages.map((item, index) => {
-    const deadline = getStageDeadline(item, index);
-    const stageLabel = `${_.startCase(item.name)} ${
-      showStagesDuration
-        ? `, (${item.duration} dia${item.duration > 1 ? "s" : ""})`
-        : ""
-    }`;
-    return {
-      id: `${item.idStage}`,
-      position: {
-        x: 30 + index * 60,
-        y: 30 + index * (currentStage ? 125 : 100),
-      },
-      data: {
-        label: (
-          <>
-            {stageLabel}
+  const nodes = useMemo(() => {
+    return formattedStages.map((item, index) => {
+      const deadline = getStageDeadline(item, index);
+
+      return {
+        id: `${item.idStage}`,
+        position: {
+          x: 30 + index * 60,
+          y: 30 + index * (currentStage ? 225 : 150),
+        },
+        data: {
+          label: (
             <>
-              {" "}
-              <br />
+              {_.startCase(item.name)} <br />
               {handleDate(item)}
             </>
-          </>
-        ),
-      },
-      style: {
-        ...(currentStage === item.idStage
-          ? {
-              color: "white",
-              background:
-                item?.vencimento && handleExpiration(item.vencimento)
-                  ? colors.red["500"]
-                  : colors.green["500"],
-              fontWeight: "bold",
-            }
-          : {
-              background: colors.gray["200"],
-            }),
-        width: deadline ? 240 : 180,
-      },
-    } as Node;
-  });
+          ),
+        },
+        style: {
+          ...(currentStage === item.idStage
+            ? {
+                color: "white",
+                background:
+                  item?.vencimento && handleExpiration(item.vencimento)
+                    ? colors.red["500"]
+                    : colors.green["500"],
+                fontWeight: "bold",
+              }
+            : {
+                background: colors.gray["200"],
+              }),
+          width: deadline ? 280 : 200,
+          minHeight: currentStage ? 80 : 60,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontSize: 13,
+        },
+      } as Node;
+    });
+  }, [stages, sequences, currentStage, process]);
 
-  const edges = sequences.map((item) => {
-    return {
-      id: `edge-${item.from}-${item.to}`,
-      source: `${item.from}`,
-      target: `${item.to}`,
-      animated: currentStage === item.from,
-      style: {
-        stroke: currentStage === item.from ? "#1b9454" : colors.gray["200"],
-      },
-      markerEnd: { type: MarkerType.ArrowClosed, color: "black" },
-    } as Edge;
-  });
+  const edges = useMemo(() => {
+    return sequences.map((sequence: FlowSequence) => {
+      const note =
+        notes.find(
+          (item) =>
+            item.idStageA === sequence.from &&
+            item.idStageB === sequence.to &&
+            !!item.commentary
+        ) || null;
+      const to = formattedStages.find((item) => item.idStage === sequence.to);
+      const current = formattedStages.find(
+        (item) => item.idStage === currentStage
+      );
+
+      return {
+        id: `edge-${sequence.from}-${sequence.to}`,
+        source: `${sequence.from}`,
+        target: `${sequence.to}`,
+        animated: currentStage === sequence.from,
+        style: {
+          stroke:
+            currentStage === sequence.from ? "#1b9454" : colors.gray["200"],
+        },
+        markerEnd: { type: MarkerType.ArrowClosed, color: "black" },
+        type:
+          allowComments &&
+          to &&
+          current &&
+          formattedStages.indexOf(to) <= formattedStages.indexOf(current) + 1
+            ? "commentable"
+            : null,
+        data: {
+          ...sequence,
+          processRecord: process?.record,
+          refetch,
+          commentary: note?.commentary,
+          idNote: note?.idNote,
+        },
+      } as Edge;
+    });
+  }, [stages, sequences, currentStage, process, notes]);
+
+  const edgeTypes = {
+    commentable: CommentEdge,
+  };
 
   return isFetching ? (
     <Skeleton w={width} maxW={maxWidth} h={minHeight} />
@@ -215,7 +266,7 @@ export function Flow({
           minH={minHeight}
           css={{ "> *": { flex: 1 } }}
         >
-          <ReactFlow nodes={nodes} edges={edges} fitView>
+          <ReactFlow nodes={nodes} edges={edges} edgeTypes={edgeTypes} fitView>
             <Controls />
             <Background />
           </ReactFlow>

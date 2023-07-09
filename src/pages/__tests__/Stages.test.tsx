@@ -9,7 +9,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
-import { mockedManagerUser, mockedStages } from "utils/mocks";
+import { mockedManagerUser, mockedRoles, mockedStages } from "utils/mocks";
 import { getPaginatedArray } from "utils/pagination";
 import Stages from "../Stages";
 
@@ -38,6 +38,18 @@ const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedManagerUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedManagerUser))
+  ),
+  rest.get(
+    `${import.meta.env.VITE_USER_SERVICE_URL}roleAdmins/${
+      mockedManagerUser.idRole
+    }`,
+    async (_req, res, ctx) =>
+      res(
+        ctx.status(200),
+        ctx.json(
+          mockedRoles?.find((i) => i.idRole === mockedManagerUser.idRole)
+        )
+      )
   ),
 ];
 

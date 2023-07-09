@@ -206,11 +206,7 @@ export function EditionModal({
                 }}
               />
             ) : null}
-            <Flow
-              stages={selectedStages}
-              sequences={sequences}
-              showStagesDuration
-            />
+            <Flow stages={selectedStages} sequences={sequences} />
           </ModalBody>
           <ModalFooter gap="2">
             <Button variant="ghost" onClick={onClose} size="sm">

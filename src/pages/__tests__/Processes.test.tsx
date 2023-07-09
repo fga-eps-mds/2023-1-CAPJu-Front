@@ -19,6 +19,7 @@ import {
   mockedProcesses,
   mockedFlows,
   mockedPriorities,
+  mockedRoles,
 } from "utils/mocks";
 import { labelByProcessStatus } from "utils/constants";
 import { getPaginatedArray } from "utils/pagination";
@@ -57,11 +58,20 @@ const restHandlers = [
   ),
   rest.get(
     `${import.meta.env.VITE_FLOWS_SERVICE_URL}flows`,
-    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedFlows))
+    async (_req, res, ctx) =>
+      res(ctx.status(200), ctx.json({ flows: mockedFlows }))
   ),
   rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
+  ),
+  rest.get(
+    `${import.meta.env.VITE_USER_SERVICE_URL}roleAdmins/${mockedUser.idRole}`,
+    async (_req, res, ctx) =>
+      res(
+        ctx.status(200),
+        ctx.json(mockedRoles?.find((i) => i.idRole === mockedUser.idRole))
+      )
   ),
 ];
 

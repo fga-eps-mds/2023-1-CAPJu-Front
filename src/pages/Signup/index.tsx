@@ -23,8 +23,7 @@ import { useLoading } from "hooks/useLoading";
 import { Input } from "components/FormFields";
 import { getUnits } from "services/units";
 import { Select } from "components/FormFields/Select";
-import { roleOptions } from "utils/roles";
-import { signUp } from "services/user";
+import { getAllRoles, signUp } from "services/user";
 import { validateCPF } from "utils/validators";
 
 type FormValues = {
@@ -82,7 +81,19 @@ function Signup() {
         title: "Erro ao carregar unidade",
         description: "Houve um erro ao carregar unidades, tentando novamente.",
         status: "error",
-
+        isClosable: true,
+      });
+    },
+  });
+  const { data: rolesData } = useQuery({
+    queryKey: ["roles"],
+    queryFn: getAllRoles,
+    onError: () => {
+      toast({
+        id: "roles-error",
+        title: "Erro ao carregar perfis",
+        description: "Houve um erro ao carregar perfis, tentando novamente.",
+        status: "error",
         isClosable: true,
       });
     },
@@ -94,6 +105,13 @@ function Signup() {
       }) || []
     );
   }, [unitsData]);
+  const roles = useMemo(() => {
+    return (
+      rolesData?.value?.map((role) => {
+        return { label: role.name, value: role.idRole };
+      }) || []
+    );
+  }, [rolesData]);
   const {
     register,
     handleSubmit,
@@ -236,7 +254,7 @@ function Signup() {
               label="Perfil"
               placeholder="Selecione seu perfil"
               errors={errors.idRole}
-              options={roleOptions(false)}
+              options={roles}
               {...register("idRole")}
             />
             <Button

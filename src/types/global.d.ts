@@ -14,6 +14,13 @@ declare global {
     role?: string;
     idUnit: number;
     unit?: string;
+    firstLogin?: boolean;
+  };
+
+  type Role = {
+    idRole: number;
+    name: string;
+    allowedActions: string[];
   };
 
   type Unit = {
@@ -69,6 +76,14 @@ declare global {
     isNextSage?: boolean;
   };
 
+  type Note = {
+    idNote?: number;
+    commentary: string;
+    record: string;
+    idStageA: number;
+    idStageB: number;
+  };
+
   type SelectOption = {
     label: string;
     value: number | string;
@@ -93,10 +108,10 @@ declare global {
 
   type MenuItem = RouteObject & {
     name: string;
-    authorizedRoles?: number[];
     icon?: string;
     element?: JSX.Element;
-    children?: MenuItem[];
+    children?: (MenuItem | (MenuItem & { authorizedRoles: number[] }))[];
+    actionName?: string;
   };
 
   type TableAction = {

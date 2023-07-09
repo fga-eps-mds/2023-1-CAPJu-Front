@@ -25,11 +25,12 @@ import { IoReturnDownBackOutline } from "react-icons/io5";
 
 import { getProcesses } from "services/processes";
 import { getFlows } from "services/flows";
-import { hasPermission } from "utils/permissions";
+import { isActionAllowedToUser } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
 import { DataTable } from "components/DataTable";
 import { labelByProcessStatus } from "utils/constants";
+import { getSequencesSortedStagesIds } from "utils/sorting";
 import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
@@ -119,16 +120,17 @@ function Processes() {
       });
     },
   });
-  const isActionDisabled = (actionName: string) =>
-    userData?.value ? !hasPermission(userData.value, actionName) : true;
   const tableActions = useMemo<TableAction[]>(
     () => [
       {
         label: "Visualizar Processo",
         icon: <ViewIcon boxSize={4} />,
         isNavigate: true,
-        actionName: "view-process",
-        disabled: isActionDisabled("view-process"),
+        actionName: "see-process",
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "see-process"
+        ),
       },
       {
         label: "Editar Processo",
@@ -138,7 +140,10 @@ function Processes() {
           onEditionOpen();
         },
         actionName: "edit-process",
-        disabled: isActionDisabled("edit-process"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "edit-process"
+        ),
       },
       {
         label: "Excluir Processo",
@@ -148,7 +153,10 @@ function Processes() {
           onDeletionOpen();
         },
         actionName: "delete-process",
-        disabled: isActionDisabled("delete-process"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "delete-process"
+        ),
       },
     ],
     [isProcessesFetched, isUserFetched, userData]
@@ -165,7 +173,7 @@ function Processes() {
     }
     return processes;
   };
-  const filteredProcess = useMemo<TableRow<Process>[]>(() => {
+  const filteredProcesses = useMemo<TableRow<Process>[]>(() => {
     if (!isProcessesFetched || !isFlowsFetched) return [];
 
     let value = processesData?.value;
@@ -182,14 +190,16 @@ function Processes() {
           const currFlow = flowsData?.value?.find(
             (item) =>
               item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
+          ) as Flow;
+          const sortedStagesIds = getSequencesSortedStagesIds(
+            currFlow?.sequences
           );
-          const currIndexInFlow =
-            currFlow?.stages?.indexOf(curr?.idStage) || -1;
+          const currIndexInFlow = sortedStagesIds?.indexOf(curr?.idStage) || -1;
           const currentState =
             (currFlow?.stages && currIndexInFlow !== -1) ||
             curr.status === "notStarted"
-              ? `${currIndexInFlow + 1}/${currFlow?.stages?.length}`
-              : `${currIndexInFlow + 2}/${currFlow?.stages?.length}`;
+              ? `${currIndexInFlow + 1}/${sortedStagesIds?.length}`
+              : `${currIndexInFlow + 2}/${sortedStagesIds?.length}`;
 
           return [
             ...acc,
@@ -243,6 +253,8 @@ function Processes() {
     isUserFetched,
     userData,
     tableActions,
+    isFlowsFetched,
+    isProcessesFetched,
   ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
@@ -324,7 +336,12 @@ function Processes() {
               size="xs"
               fontSize="sm"
               colorScheme="green"
-              isDisabled={isActionDisabled("create-process")}
+              isDisabled={
+                !isActionAllowedToUser(
+                  userData?.value?.allowedActions || [],
+                  "create-process"
+                )
+              }
               onClick={onCreationOpen}
             >
               <AddIcon mr="2" boxSize={3} /> Criar Processo
@@ -385,7 +402,7 @@ function Processes() {
         </Flex>
       </Flex>
       <DataTable
-        data={filteredProcess}
+        data={filteredProcesses}
         columns={tableColumns}
         isDataFetching={!isProcessesFetched || !isUserFetched}
         emptyTableMessage={`Não foram encontrados processos${
