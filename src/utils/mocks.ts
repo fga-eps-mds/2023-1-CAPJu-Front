@@ -450,6 +450,6 @@ export const mockedFlowSequence = [
   {
     from: 1,
     to: 2,
-    commentary: "",
+    commentary: "Comentário de teste para aparecer no componente",
   },
 ];
