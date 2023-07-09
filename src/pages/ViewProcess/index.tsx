@@ -10,7 +10,6 @@ import { PrivateLayout } from "layouts/Private";
 import { getFlowById } from "services/flows";
 import { Flow } from "components/Flow";
 import { getStages } from "services/stages";
-import { hasPermission } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
 import {
@@ -19,6 +18,7 @@ import {
   updateProcess,
 } from "services/processes";
 import { getPriorities } from "services/priorities";
+import { isActionAllowedToUser } from "utils/permissions";
 import { labelByProcessStatus } from "utils/constants";
 import { FinalizationModal } from "./FinalizationModal";
 import { ArchivationModal } from "./ArchivationModal";
@@ -132,8 +132,6 @@ function ViewProcess() {
       )?.to || -1
     );
   }, [flowData, processData]);
-  const isActionDisabled = (actionName: string) =>
-    userData?.value ? !hasPermission(userData.value, actionName) : true;
   const isLastStage = useMemo(() => {
     return (
       flowData?.value?.stages[flowData?.value?.stages?.length - 1] ===
@@ -308,7 +306,12 @@ function ViewProcess() {
               fontSize="sm"
               colorScheme="green"
               onClick={() => handleUpdateProcessStatus("inProgress")}
-              disabled={isActionDisabled("advance-stage")}
+              isDisabled={
+                !isActionAllowedToUser(
+                  userData?.value?.allowedActions || [],
+                  "forward-stage"
+                )
+              }
               my="1"
             >
               <Icon as={FiSkipForward} mr="2" boxSize={4} />
@@ -334,7 +337,12 @@ function ViewProcess() {
                   fontSize="sm"
                   colorScheme="red"
                   onClick={onReturnOpen}
-                  disabled={isActionDisabled("advance-stage")}
+                  isDisabled={
+                    !isActionAllowedToUser(
+                      userData?.value?.allowedActions || [],
+                      "backward-stage"
+                    )
+                  }
                   my="1"
                 >
                   <Icon as={FiSkipBack} mr="2" boxSize={4} />
@@ -349,7 +357,12 @@ function ViewProcess() {
                       fontSize="sm"
                       colorScheme="blue"
                       onClick={onArchivationOpen}
-                      disabled={isActionDisabled("advance-stage")}
+                      isDisabled={
+                        !isActionAllowedToUser(
+                          userData?.value?.allowedActions || [],
+                          "archive-process"
+                        )
+                      }
                       my="1"
                       ml="auto"
                     >
@@ -366,7 +379,12 @@ function ViewProcess() {
                       fontSize="sm"
                       colorScheme="green"
                       onClick={() => handleUpdateProcessStage(true)}
-                      disabled={isActionDisabled("advance-stage")}
+                      isDisabled={
+                        !isActionAllowedToUser(
+                          userData?.value?.allowedActions || [],
+                          "forward-stage"
+                        )
+                      }
                       my="1"
                     >
                       Avançar Etapa
@@ -381,7 +399,12 @@ function ViewProcess() {
                   fontSize="sm"
                   colorScheme="red"
                   onClick={onFinalizationOpen}
-                  disabled={isActionDisabled("advance-stage")}
+                  isDisabled={
+                    !isActionAllowedToUser(
+                      userData?.value?.allowedActions || [],
+                      "end-process"
+                    )
+                  }
                   my="1"
                   ml="auto"
                 >

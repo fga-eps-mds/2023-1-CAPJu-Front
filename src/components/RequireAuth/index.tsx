@@ -4,7 +4,6 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "hooks/useAuth";
 import { getAllowedTabPath } from "utils/permissions";
 import { useQuery } from "react-query";
-import { getAllRoles } from "services/user";
 
 interface RequireAuthProps {
   children: JSX.Element;
@@ -31,14 +30,10 @@ interface RequireAuthProps {
  */
 
 export function RequireAuth({ children, authorizedRoles }: RequireAuthProps) {
-  const { user, validateAuthentication, handleLogout, getUserData } = useAuth();
+  const { validateAuthentication, getUserData } = useAuth();
   const { data: userData } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
-  });
-  const { data: rolesData } = useQuery({
-    queryKey: ["roles"],
-    queryFn: getAllRoles,
   });
   const location = useLocation();
 
@@ -49,15 +44,11 @@ export function RequireAuth({ children, authorizedRoles }: RequireAuthProps) {
   // Sem authorizedRoles, todo mundo é autorizado
   if (!authorizedRoles) return children;
 
-  // Para estar logado role precisa ser válida
-  if (!rolesData?.value?.some((role) => role.idRole === user?.idRole)) {
-    window.location.reload();
-    handleLogout();
-    return children;
-  }
-
   // Se não é autorizado, é redirecionado para um aba em que seja
-  if (user?.idRole && !authorizedRoles.includes(user?.idRole)) {
+  if (
+    userData?.value?.idRole &&
+    !authorizedRoles.includes(userData?.value?.idRole)
+  ) {
     const userAllowedTabPath = getAllowedTabPath(
       userData?.value?.allowedActions || []
     );

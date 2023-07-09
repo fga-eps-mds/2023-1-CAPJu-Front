@@ -139,7 +139,7 @@ function ProfilesActionsManager() {
               </Td>
               {rolesData?.value.map((role) => {
                 return (
-                  <Td>
+                  <Td key={role.name}>
                     <Text fontSize="sm">{role.name}</Text>
                   </Td>
                 );
@@ -149,7 +149,7 @@ function ProfilesActionsManager() {
           <Tbody>
             {actionsForm.map((action) => {
               return (
-                <Tr>
+                <Tr key={action.label}>
                   <Td>
                     <Text fontSize="xs">{action.label}</Text>
                   </Td>
@@ -157,7 +157,7 @@ function ProfilesActionsManager() {
                     const roleFormValues = formValues[role.idRole] || [];
 
                     return (
-                      <Td>
+                      <Td key={`${action.label}-${role.name}`}>
                         <Checkbox
                           size="sm"
                           colorScheme="green"
