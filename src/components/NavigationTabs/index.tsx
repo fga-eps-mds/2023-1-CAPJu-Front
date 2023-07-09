@@ -63,7 +63,6 @@ export function NavigationTabs() {
       <Tabs w="100%" variant="line" colorScheme="green" index={tabIndex}>
         <TabList>
           {tabs.map((tab, index) => {
-            console.log(currentTabIndex, index);
             const isCurrentTab = currentTabIndex === index;
             let cursor = isCurrentTab ? "default" : "pointer";
 

@@ -30,6 +30,12 @@ export const tabs = [
     action: "view-user",
   },
   {
+    label: "Perfis e Permissões",
+    pathIndex: "/perfis",
+    path: "/perfis",
+    action: "manage-profiles-actions",
+  },
+  {
     label: "Editar Conta",
     pathIndex: "/editar-conta",
     path: "/editar-conta",

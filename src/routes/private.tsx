@@ -14,6 +14,7 @@ const Flows = lazy(() => import("pages/Flows"));
 const Processes = lazy(() => import("pages/Processes"));
 const ViewProcess = lazy(() => import("pages/ViewProcess"));
 const About = lazy(() => import("pages/About"));
+const ActionsManager = lazy(() => import("pages/ProfilesActionsManager"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
@@ -56,7 +57,12 @@ export const PrivateRoutes: MenuItem[] = [
       item.actions.includes("view-process")
     )?.users,
   },
-
+  {
+    path: "perfis",
+    name: "ActionsManager",
+    element: <ActionsManager />,
+    authorizedRoles: [5],
+  },
   {
     path: "acessos",
     name: "ProfilesManager",
