@@ -8,7 +8,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
-import { hasPermission } from "utils/permissions";
+import { isActionAllowedToUser } from "utils/permissions";
 import { getUnits } from "services/units";
 import { Pagination } from "components/Pagination";
 import { getUsersRequests } from "services/user";
@@ -77,8 +77,7 @@ export function Requests() {
       return res;
     },
   });
-  const isActionDisabled = (actionName: string) =>
-    userData?.value ? !hasPermission(userData.value, actionName) : true;
+
   const tableActions = useMemo(
     () => [
       {
@@ -88,7 +87,10 @@ export function Requests() {
           selectUser(user);
           onViewOpen();
         },
-        disabled: false,
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "see-request"
+        ),
       },
       {
         label: "Aceitar Usuário",
@@ -97,8 +99,11 @@ export function Requests() {
           selectUser(user);
           onAcceptOpen();
         },
-        actionName: "accept-user",
-        disabled: isActionDisabled("accept-user"),
+        actionName: "accept-request",
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "accept-request"
+        ),
       },
       {
         label: "Excluir Solicitação",
@@ -107,8 +112,11 @@ export function Requests() {
           selectUser(user);
           onDenyOpen();
         },
-        actionName: "delete-user",
-        disabled: isActionDisabled("delete-user"),
+        actionName: "delete-request",
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "delete-request"
+        ),
       },
     ],
     [isUserFetched, userData]
