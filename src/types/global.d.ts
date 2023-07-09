@@ -17,6 +17,12 @@ declare global {
     firstLogin?: boolean;
   };
 
+  type Role = {
+    idRole: number;
+    name: string;
+    allowedActions: string[];
+  };
+
   type Unit = {
     idUnit: number;
     name: string;
