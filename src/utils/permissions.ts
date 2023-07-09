@@ -10,6 +10,10 @@ const Roles = {
 
 export const permissionsArray = [
   {
+    actions: ["manage-profiles-actions"],
+    users: [Roles.ADMINISTRADOR],
+  },
+  {
     actions: [
       "create-stage",
       "edit-stage",
@@ -84,6 +88,13 @@ export function hasPermission(user: User, permissionName: string) {
   return permissionsArray
     .find((p) => p.actions.includes(permissionName))
     ?.users.includes(user.idRole);
+}
+
+export function isActionAllowedToUser(
+  allowedActions: string[],
+  actionName: string
+): boolean {
+  return allowedActions.some((item) => item === actionName);
 }
 
 export function getAllowedTabPath(userRoleId: number) {

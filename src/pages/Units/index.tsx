@@ -17,7 +17,7 @@ import { getUnits } from "services/units";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
-import { hasPermission } from "utils/permissions";
+import { isActionAllowedToUser } from "utils/permissions";
 import { Pagination } from "components/Pagination";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
@@ -75,8 +75,6 @@ function Units() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const isActionDisabled = (actionName: string) =>
-    userData?.value ? !hasPermission(userData.value, actionName) : true;
   const tableActions = useMemo(
     () => [
       {
@@ -87,7 +85,10 @@ function Units() {
           onEditionOpen();
         },
         actionName: "edit-unit",
-        disabled: isActionDisabled("edit-unit"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "edit-unit"
+        ),
       },
       {
         label: "Excluir Unidade",
@@ -97,7 +98,10 @@ function Units() {
           onDeletionOpen();
         },
         actionName: "delete-unit",
-        disabled: isActionDisabled("delete-unit"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "edit-unit"
+        ),
       },
     ],
     [isUnitsFetched, isUserFetched, userData]
@@ -159,7 +163,12 @@ function Units() {
             size="xs"
             fontSize="sm"
             colorScheme="green"
-            isDisabled={isActionDisabled("create-unit")}
+            isDisabled={
+              !isActionAllowedToUser(
+                userData?.value?.allowedActions || [],
+                "create-unit"
+              )
+            }
             onClick={onCreationOpen}
           >
             <AddIcon mr="2" boxSize={3} /> Criar Unidade

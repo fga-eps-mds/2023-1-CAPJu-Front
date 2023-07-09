@@ -19,7 +19,7 @@ type AuthContextType = {
     password: string;
   }) => Promise<Result<User>>;
   handleLogout: () => void;
-  getUserData: () => Promise<Result<User>>;
+  getUserData: () => Promise<Result<User & { allowedActions: string[] }>>;
   validateAuthentication: () => void;
 };
 
@@ -63,7 +63,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   }
 
-  const getUserData = async (): Promise<Result<User>> => {
+  const getUserData = async (): Promise<
+    Result<User & { allowedActions: string[] }>
+  > => {
     if (!user?.cpf) {
       handleLogout();
       return {
