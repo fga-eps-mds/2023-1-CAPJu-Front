@@ -100,10 +100,10 @@ declare global {
 
   type MenuItem = RouteObject & {
     name: string;
-    authorizedRoles?: number[];
     icon?: string;
     element?: JSX.Element;
-    children?: MenuItem[];
+    children?: (MenuItem | (MenuItem & { authorizedRoles: number[] }))[];
+    actionName?: string;
   };
 
   type TableAction = {

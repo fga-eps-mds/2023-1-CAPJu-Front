@@ -97,15 +97,10 @@ export function isActionAllowedToUser(
   return allowedActions.some((item) => item === actionName);
 }
 
-export function getAllowedTabPath(userRoleId: number) {
+export function getAllowedTabPath(allowedActions: string[]) {
   return (
-    tabs.find((tab) =>
-      permissionsArray.some(
-        (item) =>
-          item.users.some((permissionUser) => permissionUser === userRoleId) &&
-          item.actions.some((action) => action === tab.action)
-      )
-    )?.path || "/"
+    tabs.find((tab) => allowedActions.some((i) => i === tab.action))?.path ||
+    "/"
   );
 }
 
@@ -213,5 +208,13 @@ export const actionsForm = [
   {
     label: "Excluir Perfis",
     value: "delete-profile",
+  },
+  {
+    label: "Editar Conta",
+    value: "edit-account",
+  },
+  {
+    label: "Gerenciar Perfis",
+    value: "manage-profiles",
   },
 ];

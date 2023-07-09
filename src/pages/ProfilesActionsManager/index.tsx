@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import {
   Table,
   Tr,
@@ -21,6 +21,7 @@ import { useLoading } from "hooks/useLoading";
 function ProfilesActionsManager() {
   const { handleLoading } = useLoading();
   const toast = useToast();
+  const queryClient = useQueryClient();
   const {
     data: rolesData,
     isFetched: isRolesFetched,
@@ -110,19 +111,26 @@ function ProfilesActionsManager() {
     refetchRoles();
   }
 
+  const SaveButton = (
+    <Button
+      isDisabled={formValues === currentAllowedActions}
+      onClick={() => {
+        handleUpdateRolesAllowedActions();
+        queryClient.invalidateQueries({ queryKey: "user-data" });
+      }}
+      colorScheme="green"
+      size="xs"
+      fontSize="sm"
+      ml="auto"
+    >
+      Salvar
+    </Button>
+  );
+
   return (
     <PrivateLayout>
       <Flex flexDir="column" gap="5" width="90%" maxWidth={1120} mb="10">
-        <Button
-          isDisabled={formValues === currentAllowedActions}
-          onClick={() => handleUpdateRolesAllowedActions()}
-          colorScheme="green"
-          size="xs"
-          fontSize="sm"
-          ml="auto"
-        >
-          Salvar
-        </Button>
+        {SaveButton}
         <Table bgColor="white" w="100%" borderRadius="4">
           <Thead>
             <Tr>
@@ -183,16 +191,7 @@ function ProfilesActionsManager() {
             })}
           </Tbody>
         </Table>
-        <Button
-          isDisabled={formValues === currentAllowedActions}
-          onClick={() => handleUpdateRolesAllowedActions()}
-          colorScheme="green"
-          size="xs"
-          fontSize="sm"
-          ml="auto"
-        >
-          Salvar
-        </Button>
+        {SaveButton}
       </Flex>
     </PrivateLayout>
   );

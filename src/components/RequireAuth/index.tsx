@@ -4,6 +4,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "hooks/useAuth";
 import { roles } from "utils/roles";
 import { getAllowedTabPath } from "utils/permissions";
+import { useQuery } from "react-query";
 
 interface RequireAuthProps {
   children: JSX.Element;
@@ -30,7 +31,11 @@ interface RequireAuthProps {
  */
 
 export function RequireAuth({ children, authorizedRoles }: RequireAuthProps) {
-  const { user, validateAuthentication, handleLogout } = useAuth();
+  const { user, validateAuthentication, handleLogout, getUserData } = useAuth();
+  const { data: userData } = useQuery({
+    queryKey: ["user-data"],
+    queryFn: getUserData,
+  });
   const location = useLocation();
 
   const saveFrom = useMemo(() => ({ from: location }), [location]);
@@ -49,7 +54,9 @@ export function RequireAuth({ children, authorizedRoles }: RequireAuthProps) {
 
   // Se não é autorizado, é redirecionado para um aba em que seja
   if (user?.idRole && !authorizedRoles.includes(user?.idRole)) {
-    const userAllowedTabPath = getAllowedTabPath(user.idRole);
+    const userAllowedTabPath = getAllowedTabPath(
+      userData?.value?.allowedActions || []
+    );
 
     return <Navigate to={userAllowedTabPath} state={saveFrom} replace />;
   }
