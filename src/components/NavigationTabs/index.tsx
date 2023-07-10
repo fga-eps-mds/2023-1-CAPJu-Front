@@ -27,7 +27,8 @@ export function NavigationTabs() {
   const [tabIndex, setTabIndex] = useState<number | undefined>(currentTabIndex);
 
   const isUserAllowedInTab = useCallback(
-    (tabAction: string) => {
+    (tabAction: string | undefined) => {
+      if (!tabAction) return true;
       if (!userData?.value) return false;
       if (tabAction === "manage-profiles" && userData?.value?.idRole === 5)
         return true;

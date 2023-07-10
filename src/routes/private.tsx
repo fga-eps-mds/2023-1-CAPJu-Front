@@ -61,19 +61,16 @@ export const PrivateRoutes: MenuItem[] = [
     path: "editar-conta",
     name: "AccountEdition",
     element: <AccountEdition />,
-    actionName: "edit-account",
   },
   {
     path: "editar-conta/email",
     name: "EmailEdition",
     element: <EmailEdition />,
-    actionName: "edit-account",
   },
   {
     path: "editar-conta/senha",
     name: "PasswordEdition",
     element: <PasswordEdition />,
-    actionName: "edit-account",
   },
   {
     path: "/contribuidores",

@@ -120,10 +120,6 @@ export const actionsForm = [
     value: "delete-profile",
   },
   {
-    label: "Editar Conta",
-    value: "edit-account",
-  },
-  {
     label: "Gerenciar Permissões dos Perfis",
     value: "manage-profiles",
   },

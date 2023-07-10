@@ -39,6 +39,5 @@ export const tabs = [
     label: "Editar Conta",
     pathIndex: "/editar-conta",
     path: "/editar-conta",
-    action: "edit-account",
   },
 ];

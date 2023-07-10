@@ -1,7 +1,6 @@
 export const mockedAllowedActions = [
   "forward-stage",
   "backward-stage",
-  "edit-account",
   "edit-stage",
   "delete-stage",
   "create-flow",
