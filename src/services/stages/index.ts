@@ -57,6 +57,29 @@ export const createStage = async (data: {
   }
 };
 
+export const updateStage = async (data: {
+  idStage: number;
+  name: string;
+}): Promise<Result<Stage>> => {
+  try {
+    const res = await api.stages.put<Stage>("/updateStage", data);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
 export const deleteStage = async (idStage: number): Promise<Result<Stage>> => {
   try {
     const res = await api.stages.delete<Stage>(`/deleteStage/${idStage}`);
