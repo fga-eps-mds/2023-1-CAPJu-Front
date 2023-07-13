@@ -14,7 +14,11 @@ import { ChakraProvider } from "@chakra-ui/react";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
-import { mockedUnits, mockedAdminUser } from "utils/mocks";
+import {
+  mockedUnits,
+  mockedAdminUser,
+  mockedRoleAdministrador,
+} from "utils/mocks";
 import { getPaginatedArray } from "utils/pagination";
 import Units from "../Units";
 
@@ -44,6 +48,13 @@ const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedAdminUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedAdminUser))
+  ),
+  rest.get(
+    `${import.meta.env.VITE_USER_SERVICE_URL}roleAdmins/${
+      mockedAdminUser.idRole
+    }`,
+    async (_req, res, ctx) =>
+      res(ctx.status(200), ctx.json(mockedRoleAdministrador))
   ),
 ];
 

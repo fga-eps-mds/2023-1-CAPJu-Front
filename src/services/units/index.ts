@@ -10,7 +10,7 @@ export const getUnits = async (
       {
         params: {
           offset: pagination?.offset ?? 0,
-          limit: pagination?.limit ?? 5,
+          limit: pagination?.limit,
           filter,
         },
       }

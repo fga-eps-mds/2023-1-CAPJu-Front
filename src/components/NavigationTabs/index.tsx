@@ -1,9 +1,9 @@
 import { Tabs, TabList, Tab, Flex } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 
-import { permissionsArray } from "utils/permissions";
+import { isActionAllowedToUser } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { tabs } from "utils/tabs";
 
@@ -26,15 +26,17 @@ export function NavigationTabs() {
   }, [tabs, location]);
   const [tabIndex, setTabIndex] = useState<number | undefined>(currentTabIndex);
 
-  function isUserAllowedInTab(tab: number) {
-    if (!userData?.value) return false;
+  const isUserAllowedInTab = useCallback(
+    (tabAction: string | undefined) => {
+      if (!tabAction) return true;
+      if (!userData?.value) return false;
+      if (tabAction === "manage-profiles" && userData?.value?.idRole === 5)
+        return true;
 
-    return permissionsArray.some(
-      (item) =>
-        item.actions.some((action) => action === tabs[tab].action) &&
-        item.users.some((userRole) => userRole === userData?.value?.idRole)
-    );
-  }
+      return isActionAllowedToUser(userData?.value?.allowedActions, tabAction);
+    },
+    [userData]
+  );
 
   useEffect(() => {
     if (currentTabIndex === undefined) setTabIndex(-1);
@@ -63,14 +65,13 @@ export function NavigationTabs() {
       <Tabs w="100%" variant="line" colorScheme="green" index={tabIndex}>
         <TabList>
           {tabs.map((tab, index) => {
-            console.log(currentTabIndex, index);
             const isCurrentTab = currentTabIndex === index;
             let cursor = isCurrentTab ? "default" : "pointer";
 
-            if (!isUserAllowedInTab(index)) cursor = "not-allowed";
+            if (!isUserAllowedInTab(tab.action)) cursor = "not-allowed";
 
             const handleClick = () => {
-              if (isUserAllowedInTab(index)) {
+              if (isUserAllowedInTab(tab.action)) {
                 navigate(tab.path);
                 setTabIndex(index);
               }
@@ -82,7 +83,7 @@ export function NavigationTabs() {
                 onClick={handleClick}
                 cursor={cursor}
                 minW="fit-content"
-                opacity={isUserAllowedInTab(index) ? 1 : 0.25}
+                opacity={isUserAllowedInTab(tab.action) ? 1 : 0.25}
               >
                 {tab.label}
               </Tab>

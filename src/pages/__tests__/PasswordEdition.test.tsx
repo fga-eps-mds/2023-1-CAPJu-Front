@@ -8,13 +8,21 @@ import { ChakraProvider } from "@chakra-ui/react";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
-import { mockedUser } from "utils/mocks";
+import { mockedRoles, mockedUser } from "utils/mocks";
 import PasswordEdition from "../PasswordEdition";
 
 const restHandlers = [
   rest.get(
     `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
+  ),
+  rest.get(
+    `${import.meta.env.VITE_USER_SERVICE_URL}roleAdmins/${mockedUser.idRole}`,
+    async (_req, res, ctx) =>
+      res(
+        ctx.status(200),
+        ctx.json(mockedRoles?.find((i) => i.idRole === mockedUser.idRole))
+      )
   ),
 ];
 
