@@ -9,7 +9,7 @@ import {
   chakra,
 } from "@chakra-ui/react";
 import { AddIcon, Icon, SearchIcon } from "@chakra-ui/icons";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
@@ -20,6 +20,7 @@ import { Pagination } from "components/Pagination";
 import { getStages } from "../../services/stages";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
+import { EditionModal } from "./EditionModal";
 
 function Stages() {
   const toast = useToast();
@@ -35,6 +36,11 @@ function Stages() {
     isOpen: isDeletionOpen,
     onOpen: onDeletionOpen,
     onClose: onDeletionClose,
+  } = useDisclosure();
+  const {
+    isOpen: isEditionOpen,
+    onOpen: onEditionOpen,
+    onClose: onEditionClose,
   } = useDisclosure();
   const [currentPage, setCurrentPage] = useState(0);
   const handlePageChange = (selectedPage: { selected: number }) => {
@@ -74,6 +80,19 @@ function Stages() {
 
   const tableActions = useMemo(
     () => [
+      {
+        label: "Editar Etapa",
+        icon: <Icon as={MdEdit} boxSize={4} />,
+        action: ({ stage }: { stage: Stage }) => {
+          selectStage(stage);
+          onEditionOpen();
+        },
+        actionName: "edit-stage",
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "edit-stage"
+        ),
+      },
       {
         label: "Excluir Etapa",
         icon: <Icon as={MdDelete} boxSize={4} />,
@@ -224,6 +243,14 @@ function Stages() {
           refetchStages={refetchStages}
         />
       )}
+      {selectedStage ? (
+        <EditionModal
+          stage={selectedStage}
+          isOpen={isEditionOpen}
+          onClose={onEditionClose}
+          afterSubmission={refetchStages}
+        />
+      ) : null}
     </PrivateLayout>
   );
 }

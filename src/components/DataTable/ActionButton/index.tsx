@@ -24,6 +24,7 @@ export function ActionButton({
         color="gray.600"
         onClick={action}
         isDisabled={disabled}
+        aria-label={label}
       >
         {icon}
       </Button>
