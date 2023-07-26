@@ -5,10 +5,10 @@ export const getFlows = async (
   filter?: string
 ): Promise<Result<Flow[]>> => {
   try {
-    const res = await api.flows.get<{
+    const res = await api.processManagement.get<{
       flows: Flow[];
       totalPages: number;
-    }>("/flows", {
+    }>("/flow", {
       params: {
         offset: pagination?.offset ?? 0,
         limit: pagination?.limit,
@@ -37,7 +37,7 @@ export const getFlowById = async (
   id: string | number
 ): Promise<Result<Flow>> => {
   try {
-    const res = await api.flows.get<Flow>(`/flow/${id}`);
+    const res = await api.processManagement.get<Flow>(`/flow/${id}`);
 
     return { type: "success", value: res.data };
   } catch (error) {
@@ -59,7 +59,7 @@ export const createFlow = async (data: {
   idUnit: number;
 }) => {
   try {
-    const res = await api.flows.post<Flow>(`/newFlow/`, data);
+    const res = await api.processManagement.post<Flow>(`/flow/newFlow/`, data);
 
     return { type: "success", value: res.data };
   } catch (error) {
@@ -81,7 +81,7 @@ export const updateFlow = async (data: {
   idFlow: number;
 }) => {
   try {
-    const res = await api.flows.put<Flow>(`/flow/`, data);
+    const res = await api.processManagement.put<Flow>(`/flow/`, data);
 
     return { type: "success", value: res.data };
   } catch (error) {
@@ -98,7 +98,7 @@ export const updateFlow = async (data: {
 
 export const deleteFlow = async (id: number) => {
   try {
-    const res = await api.flows.delete<Flow[]>(`/flow/${id}`);
+    const res = await api.processManagement.delete<Flow[]>(`/flow/${id}`);
 
     return { type: "success", value: res.data };
   } catch (error) {

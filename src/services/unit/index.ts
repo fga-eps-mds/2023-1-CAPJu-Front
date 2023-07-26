@@ -5,16 +5,13 @@ export const getUnits = async (
   filter?: string
 ): Promise<Result<Unit[]>> => {
   try {
-    const res = await api.units.get<{ units: Unit[]; totalPages: number }>(
-      "/units",
-      {
-        params: {
-          offset: pagination?.offset ?? 0,
-          limit: pagination?.limit,
-          filter,
-        },
-      }
-    );
+    const res = await api.unit.get<{ units: Unit[]; totalPages: number }>("/", {
+      params: {
+        offset: pagination?.offset ?? 0,
+        limit: pagination?.limit,
+        filter,
+      },
+    });
 
     return {
       type: "success",
@@ -37,7 +34,7 @@ export const createUnit = async (data: {
   name: string;
 }): Promise<Result<Unit>> => {
   try {
-    const res = await api.units.post<Unit>("/newUnit", data);
+    const res = await api.unit.post<Unit>("/newUnit", data);
 
     return {
       type: "success",
@@ -60,7 +57,7 @@ export const updateUnit = async (data: {
   name: string;
 }): Promise<Result<Unit>> => {
   try {
-    const res = await api.units.put<Unit>("/updateUnit", data);
+    const res = await api.unit.put<Unit>("/updateUnit", data);
 
     return {
       type: "success",
@@ -80,7 +77,7 @@ export const updateUnit = async (data: {
 
 export const deleteUnit = async (idUnit: number): Promise<Result<any>> => {
   try {
-    const res = await api.units.delete<Unit>("/deleteUnit", {
+    const res = await api.unit.delete<Unit>("/deleteUnit", {
       data: { idUnit },
     });
 
@@ -104,7 +101,7 @@ export const getUnitAdmins = async (
   unitId: number
 ): Promise<Result<User[]>> => {
   try {
-    const res = await api.units.get<User[]>(`/unitAdmins/${unitId}`);
+    const res = await api.unit.get<User[]>(`/unitAdmins/${unitId}`);
 
     return { type: "success", value: res.data };
   } catch (error) {
@@ -124,7 +121,7 @@ export const addUnitAdmin = async (data: {
   cpf: string;
 }): Promise<Result<null>> => {
   try {
-    await api.units.put("/setUnitAdmin/", { ...data });
+    await api.unit.put("/setUnitAdmin/", { ...data });
 
     return { type: "success", value: null };
   } catch (error) {
@@ -144,7 +141,7 @@ export const removeUnitAdmin = async (data: {
   cpf: string;
 }): Promise<Result<null>> => {
   try {
-    await api.units.put("/removeUnitAdmin/", { ...data });
+    await api.unit.put("/removeUnitAdmin/", { ...data });
 
     return { type: "success", value: null };
   } catch (error) {

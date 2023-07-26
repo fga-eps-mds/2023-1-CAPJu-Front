@@ -14,7 +14,7 @@ Object.entries(Services).forEach(([serviceName, { baseURL }]) => {
   if (!baseURL)
     console.warn(
       `Falha ao carregar a baseURL do serviço ${serviceName}. Verificar '.env'.`,
-      `A baseURL do ${serviceName}  é '${baseURL}'.`
+      `A baseURL do ${serviceName} é '${baseURL}'.`
     );
 
   api[serviceName as ServiceName] = axios.create({

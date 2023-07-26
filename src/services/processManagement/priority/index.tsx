@@ -4,7 +4,7 @@ export const getPriorities = async (
   id?: number
 ): Promise<Result<Priority[] | Priority>> => {
   try {
-    const res = await api.processes.get<Priority[]>("/priorities");
+    const res = await api.processManagement.get<Priority[]>("/priority");
     const priorityById = id
       ? res.data?.find((item) => item.idPriority === id)
       : null;

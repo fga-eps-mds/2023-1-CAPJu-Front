@@ -1,4 +1,5 @@
 import { api } from "services/api";
+import { getRoleById, getAllRoles } from "services/role";
 
 export const signIn = async (credentials: {
   cpf: string;
@@ -49,7 +50,7 @@ export const getUserById = async (
   userId: string
 ): Promise<Result<User & { allowedActions: string[] }>> => {
   try {
-    const res = await api.user.get<User>(`/user/${userId}`);
+    const res = await api.user.get<User>(`/cpf/${userId}`);
     const { value: role } = await getRoleById(res.data?.idRole);
 
     return {
@@ -273,85 +274,6 @@ export const updateUserRole = async (
     });
 
     return { type: "success", value: null };
-  } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
-  }
-};
-
-export const getAllRoles = async (): Promise<Result<Role[]>> => {
-  try {
-    const res = await api.user.get<Role[]>("/role");
-
-    const orderedRolesNames = [
-      "Estagiário",
-      "Servidor",
-      "Diretor",
-      "Juiz",
-      "Administrador",
-    ];
-
-    const orderedData = res.data?.sort(
-      (a, b) =>
-        orderedRolesNames.indexOf(a.name) - orderedRolesNames.indexOf(b.name)
-    );
-
-    return {
-      type: "success",
-      value: orderedData,
-    };
-  } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
-  }
-};
-
-export const getRoleById = async (idRole: number): Promise<Result<Role>> => {
-  try {
-    const { data } = await api.user.get<Role>(`/roleAdmins/${idRole}`);
-
-    return {
-      type: "success",
-      value: data,
-    };
-  } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
-  }
-};
-
-export const updateRoleAllowedActions = async ({
-  idRole,
-  allowedActions,
-}: {
-  idRole: number;
-  allowedActions: string[];
-}): Promise<Result<Role>> => {
-  try {
-    const res = await api.user.put<Role>(
-      `/updateRoleAllowedActions/${idRole}`,
-      { allowedActions }
-    );
-
-    return { type: "success", value: res.data };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
