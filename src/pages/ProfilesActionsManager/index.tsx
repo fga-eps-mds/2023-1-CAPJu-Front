@@ -15,7 +15,7 @@ import {
 
 import { PrivateLayout } from "layouts/Private";
 import { actionsForm } from "utils/permissions";
-import { getAllRoles, updateRoleAllowedActions } from "services/user";
+import { updateRoleAllowedActions, getAllRoles } from "services/role";
 import { useLoading } from "hooks/useLoading";
 
 function ProfilesActionsManager() {

@@ -23,8 +23,8 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
 
-import { getProcesses } from "services/processes";
-import { getFlows } from "services/flows";
+import { getProcesses } from "services/processManagement/processes";
+import { getFlows } from "services/processManagement/flows";
 import { isActionAllowedToUser } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";

@@ -21,9 +21,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input, Select } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
-import { getPriorities } from "services/priorities";
-import { getFlows } from "services/flows";
-import { updateProcess } from "services/processes";
+import { getPriorities } from "services/processManagement/priority";
+import { getFlows } from "services/processManagement/flows";
+import { updateProcess } from "services/processManagement/processes";
 
 type FormValues = {
   record: string;

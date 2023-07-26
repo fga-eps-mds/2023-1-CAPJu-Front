@@ -17,7 +17,7 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { isActionAllowedToUser } from "utils/permissions";
 import { Pagination } from "components/Pagination";
-import { getStages } from "../../services/stages";
+import { getStages } from "../../services/processManagement/stage";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";

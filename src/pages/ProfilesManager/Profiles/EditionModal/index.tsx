@@ -17,7 +17,8 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import { getAllRoles, updateUserRole } from "services/user";
+import { updateUserRole } from "services/user";
+import { getAllRoles } from "services/role";
 import { Select } from "components/FormFields/Select";
 import { useLoading } from "hooks/useLoading";
 

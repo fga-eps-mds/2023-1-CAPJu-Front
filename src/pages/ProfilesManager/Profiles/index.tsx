@@ -7,11 +7,12 @@ import { MdEdit, MdDelete } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { DataTable } from "components/DataTable";
-import { getAcceptedUsers, getAllRoles } from "services/user";
+import { getAcceptedUsers } from "services/user";
+import { getAllRoles } from "services/role";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { isActionAllowedToUser } from "utils/permissions";
-import { getUnits } from "services/units";
+import { getUnits } from "services/unit";
 import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { EditionModal } from "./EditionModal";

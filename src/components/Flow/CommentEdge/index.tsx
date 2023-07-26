@@ -17,7 +17,7 @@ import {
 import { MdDelete, MdEdit } from "react-icons/md";
 import { ViewIcon } from "@chakra-ui/icons";
 
-import { addNoteToProcess, deleteProcessNote } from "services/processes";
+import { addNoteToProcess, deleteProcessNote } from "services/note";
 import { useLoading } from "hooks/useLoading";
 import { AddModal } from "./AddModal";
 import { DeletionModal } from "./DeletionModal";

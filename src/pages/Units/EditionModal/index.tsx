@@ -15,7 +15,7 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import { updateUnit } from "services/units";
+import { updateUnit } from "services/unit";
 import { Input } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
 
