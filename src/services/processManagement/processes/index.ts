@@ -3,7 +3,9 @@ import { api } from "services/api";
 export const getProcesses = async (
   flowId: number | undefined,
   pagination?: Pagination,
-  filter?: string
+  filter?: string,
+  filterByLegalPriority?: boolean,
+  showArchivedAndFinished?: boolean
 ): Promise<Result<Process[]>> => {
   try {
     const res = await api.processManagement.get<{
@@ -14,6 +16,8 @@ export const getProcesses = async (
         offset: pagination?.offset ?? 0,
         limit: pagination?.limit,
         filter,
+        showArchivedAndFinished,
+        filterByLegalPriority,
       },
     });
 

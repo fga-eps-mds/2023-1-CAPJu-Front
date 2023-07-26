@@ -61,10 +61,9 @@ export const updateRoleAllowedActions = async ({
   allowedActions: string[];
 }): Promise<Result<Role>> => {
   try {
-    const res = await api.role.put<Role>(
-      `/updateRoleAllowedActions/${idRole}`,
-      { allowedActions }
-    );
+    const res = await api.role.put<Role>(`/updateRole/${idRole}`, {
+      allowedActions,
+    });
 
     return { type: "success", value: res.data };
   } catch (error) {

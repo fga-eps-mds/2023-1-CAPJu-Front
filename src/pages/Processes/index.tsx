@@ -49,7 +49,7 @@ function Processes() {
   });
   const [filter, setFilter] = useState<string | undefined>(undefined);
   const [legalPriority, setLegalPriority] = useState(false);
-  const [showFinished, setShowFinished] = useState<boolean>(true);
+  const [showFinished, setShowFinished] = useState(false);
   const {
     isOpen: isCreationOpen,
     onOpen: onCreationOpen,
@@ -72,7 +72,7 @@ function Processes() {
   const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
-      const res = await getFlows(undefined, filter);
+      const res = await getFlows();
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -102,7 +102,9 @@ function Processes() {
           offset: currentPage * 5,
           limit: 5,
         },
-        filter
+        filter,
+        legalPriority,
+        showFinished
       );
 
       if (res.type === "error") throw new Error(res.error.message);
@@ -161,28 +163,11 @@ function Processes() {
     ],
     [isProcessesFetched, isUserFetched, userData]
   );
-  const filterByPriority = (processes: Process[]) =>
-    processes?.filter((process: Process) => process.idPriority);
-
-  const filterByStatus = (processes: Process[]) => {
-    if (!showFinished) {
-      return processes?.filter(
-        (process: Process) =>
-          process.status === "finished" || process.status === "archived"
-      );
-    }
-    return processes;
-  };
-  const filteredProcesses = useMemo<TableRow<Process>[]>(() => {
+  const processesTableRows = useMemo<TableRow<Process>[]>(() => {
     if (!isProcessesFetched || !isFlowsFetched) return [];
 
-    let value = processesData?.value;
-
-    if (legalPriority && value) value = filterByPriority(value);
-    if (!showFinished && value) value = filterByStatus(value);
-
     return (
-      (value?.reduce(
+      (processesData?.value?.reduce(
         (
           acc: TableRow<Process>[] | Process[],
           curr: TableRow<Process> | Process
@@ -245,16 +230,13 @@ function Processes() {
       ) as TableRow<Process>[]) || []
     );
   }, [
-    legalPriority,
-    showFinished,
     processesData,
-    filter,
     isProcessesFetched,
-    isUserFetched,
     userData,
-    tableActions,
+    isUserFetched,
+    flowsData,
     isFlowsFetched,
-    isProcessesFetched,
+    tableActions,
   ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
@@ -306,7 +288,7 @@ function Processes() {
 
   useEffect(() => {
     refetchProcesses();
-  }, [flowsData, isFlowsFetched, currentPage]);
+  }, [flowsData, isFlowsFetched, currentPage, showFinished, legalPriority]);
 
   return (
     <PrivateLayout>
@@ -396,13 +378,13 @@ function Processes() {
               checked={showFinished}
               onChange={() => setShowFinished(!showFinished)}
             >
-              Mostrar apenas processos arquivados/finalizados
+              Mostrar processos arquivados/finalizados
             </Checkbox>
           </Flex>
         </Flex>
       </Flex>
       <DataTable
-        data={filteredProcesses}
+        data={processesTableRows}
         columns={tableColumns}
         isDataFetching={!isProcessesFetched || !isUserFetched}
         emptyTableMessage={`Não foram encontrados processos${
