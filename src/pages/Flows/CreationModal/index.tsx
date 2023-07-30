@@ -16,8 +16,8 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import { createFlow } from "services/flows";
-import { getStages } from "services/stages";
+import { createFlow } from "services/processManagement/flows";
+import { getStages } from "services/processManagement/stage";
 import { getAcceptedUsers } from "services/user";
 import { Input, MultiSelect } from "components/FormFields";
 import { Flow } from "components/Flow";

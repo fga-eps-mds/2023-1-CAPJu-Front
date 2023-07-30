@@ -7,7 +7,8 @@ import {
   useCallback,
 } from "react";
 
-import { signIn, getUserById, getRoleById } from "services/user";
+import { signIn, getUserById } from "services/user";
+import { getRoleById } from "services/role";
 
 type AuthContextType = {
   isAuthenticated: boolean;

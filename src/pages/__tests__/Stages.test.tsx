@@ -21,7 +21,7 @@ import Stages from "../Stages";
 
 const restHandlers = [
   rest.get(
-    `${import.meta.env.VITE_STAGES_SERVICE_URL}stages`,
+    `${import.meta.env.VITE_PROCESS_MANAGEMENT_SERVICE_URL}stage`,
     async (req, res, ctx) => {
       const filter = req.url.searchParams.get("filter");
       const offset = Number(req.url.searchParams.get("offset"));
@@ -42,11 +42,11 @@ const restHandlers = [
     }
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedManagerUser.cpf}`,
+    `${import.meta.env.VITE_USER_SERVICE_URL}cpf/${mockedManagerUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedManagerUser))
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}roleAdmins/${
+    `${import.meta.env.VITE_ROLE_SERVICE_URL}roleAdmins/${
       mockedManagerUser.idRole
     }`,
     async (_req, res, ctx) =>

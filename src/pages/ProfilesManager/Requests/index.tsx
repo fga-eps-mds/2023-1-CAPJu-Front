@@ -9,7 +9,7 @@ import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { isActionAllowedToUser } from "utils/permissions";
-import { getUnits } from "services/units";
+import { getUnits } from "services/unit";
 import { Pagination } from "components/Pagination";
 import { getUsersRequests } from "services/user";
 import { AcceptModal } from "./AcceptModal";

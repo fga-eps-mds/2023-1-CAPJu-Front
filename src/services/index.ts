@@ -1,17 +1,17 @@
 export const Services = {
+  note: {
+    baseURL: import.meta.env.VITE_NOTE_SERVICE_URL,
+  },
+  processManagement: {
+    baseURL: import.meta.env.VITE_PROCESS_MANAGEMENT_SERVICE_URL,
+  },
+  role: {
+    baseURL: import.meta.env.VITE_ROLE_SERVICE_URL,
+  },
+  unit: {
+    baseURL: import.meta.env.VITE_UNIT_SERVICE_URL,
+  },
   user: {
     baseURL: import.meta.env.VITE_USER_SERVICE_URL,
-  },
-  units: {
-    baseURL: import.meta.env.VITE_UNITS_SERVICE_URL,
-  },
-  stages: {
-    baseURL: import.meta.env.VITE_STAGES_SERVICE_URL,
-  },
-  processes: {
-    baseURL: import.meta.env.VITE_PROCESSES_SERVICE_URL,
-  },
-  flows: {
-    baseURL: import.meta.env.VITE_FLOWS_SERVICE_URL,
   },
 };

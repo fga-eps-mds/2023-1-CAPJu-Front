@@ -7,18 +7,18 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 
 import { PrivateLayout } from "layouts/Private";
-import { getFlowById } from "services/flows";
+import { getFlowById } from "services/processManagement/flows";
 import { Flow } from "components/Flow";
-import { getStages } from "services/stages";
+import { getStages } from "services/processManagement/stage";
 import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
 import {
   updateStage,
   getProcessByRecord,
   updateProcessStatus,
-  getNotesByProcessRecord,
-} from "services/processes";
-import { getPriorities } from "services/priorities";
+} from "services/processManagement/processes";
+import { getNotesByProcessRecord } from "services/note";
+import { getPriorities } from "services/processManagement/priority";
 import { isActionAllowedToUser } from "utils/permissions";
 import { sortFlowStages } from "utils/sorting";
 import { labelByProcessStatus } from "utils/constants";

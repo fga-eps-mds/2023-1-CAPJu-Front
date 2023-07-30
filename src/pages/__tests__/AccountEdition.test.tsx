@@ -13,11 +13,11 @@ import AccountEdition from "../AccountEdition";
 
 const restHandlers = [
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
+    `${import.meta.env.VITE_USER_SERVICE_URL}cpf/${mockedUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}roleAdmins/${mockedUser.idRole}`,
+    `${import.meta.env.VITE_ROLE_SERVICE_URL}roleAdmins/${mockedUser.idRole}`,
     async (_req, res, ctx) =>
       res(
         ctx.status(200),

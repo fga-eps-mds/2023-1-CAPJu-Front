@@ -7,7 +7,7 @@ import { BaseLayout } from "layouts/Base";
 import { PageSkeleton } from "components/PageSkeleton";
 import { RequireAuth } from "components/RequireAuth";
 import { useAuth } from "hooks/useAuth";
-import { getAllRoles } from "services/user";
+import { getAllRoles } from "services/role";
 import { useQuery } from "react-query";
 
 const getRoutesWithAuthorizedRoles = (

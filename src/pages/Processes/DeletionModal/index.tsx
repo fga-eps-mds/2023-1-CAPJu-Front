@@ -10,7 +10,7 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { deleteProcess } from "services/processes";
+import { deleteProcess } from "services/processManagement/processes";
 import { useLoading } from "hooks/useLoading";
 
 interface DeletionModalProps {

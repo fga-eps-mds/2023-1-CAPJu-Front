@@ -3,17 +3,21 @@ import { api } from "services/api";
 export const getProcesses = async (
   flowId: number | undefined,
   pagination?: Pagination,
-  filter?: string
+  filter?: string,
+  filterByLegalPriority?: boolean,
+  showArchivedAndFinished?: boolean
 ): Promise<Result<Process[]>> => {
   try {
-    const res = await api.processes.get<{
+    const res = await api.processManagement.get<{
       processes: Process[];
       totalPages: number;
-    }>(`/processes${flowId ? `/${flowId}` : ""}`, {
+    }>(`/process${flowId ? `?flowId=${flowId}` : ""}`, {
       params: {
         offset: pagination?.offset ?? 0,
         limit: pagination?.limit,
         filter,
+        showArchivedAndFinished,
+        filterByLegalPriority,
       },
     });
 
@@ -38,8 +42,8 @@ export const deleteProcess = async (
   registro: string
 ): Promise<Result<Process>> => {
   try {
-    const res = await api.processes.delete<Process>(
-      `/deleteProcess/${registro}`
+    const res = await api.processManagement.delete<Process>(
+      `/process/deleteProcess/${registro}`
     );
 
     return {
@@ -65,7 +69,10 @@ export const createProcess = async (data: {
   priority: number;
 }): Promise<Result<Process>> => {
   try {
-    const res = await api.processes.post<Process>("/newProcess", data);
+    const res = await api.processManagement.post<Process>(
+      "/process/newProcess",
+      data
+    );
 
     return {
       type: "success",
@@ -93,7 +100,10 @@ export const updateProcess = async (data: {
   idStage: number | null;
 }): Promise<Result<Process>> => {
   try {
-    const res = await api.processes.put<Process>("/updateProcess", data);
+    const res = await api.processManagement.put<Process>(
+      `/process/updateProcess/${data.record}`,
+      data
+    );
 
     return {
       type: "success",
@@ -115,7 +125,9 @@ export const getProcessByRecord = async (
   record: string
 ): Promise<Result<Process>> => {
   try {
-    const res = await api.processes.get<Process>(`/getOneProcess/${record}`);
+    const res = await api.processManagement.get<Process>(
+      `/process/record/${record}`
+    );
 
     return {
       type: "success",
@@ -142,7 +154,10 @@ export const updateStage = async (data: {
   isNextStage: boolean;
 }): Promise<Result<Process>> => {
   try {
-    const res = await api.processes.put<Process>("/processUpdateStage", data);
+    const res = await api.processManagement.put<Process>(
+      "/process/updateStage",
+      data
+    );
 
     return {
       type: "success",
@@ -167,76 +182,10 @@ export const updateProcessStatus = async (data: {
   status: string;
 }): Promise<Result<Process>> => {
   try {
-    const res = await api.processes.put<Process>("/updateProcess", data);
-
-    return {
-      type: "success",
-      value: res.data,
-    };
-  } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
-  }
-};
-
-export const getNotesByProcessRecord = async (
-  record: string
-): Promise<Result<Note[]>> => {
-  try {
-    const res = await api.processes.get<Note[]>(`/notes/${record}`);
-
-    return {
-      type: "success",
-      value: res.data,
-    };
-  } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
-  }
-};
-
-export const addNoteToProcess = async (data: {
-  record: string;
-  idStageA: string;
-  idStageB: string;
-  commentary: string;
-}): Promise<Result<Note>> => {
-  try {
-    const res = await api.processes.post<Note>("/newNote", data);
-
-    return {
-      type: "success",
-      value: res.data,
-    };
-  } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
-  }
-};
-
-export const deleteProcessNote = async (
-  idNote: number
-): Promise<Result<Note>> => {
-  try {
-    const res = await api.processes.delete<Note>(`/deleteNote/${idNote}`);
+    const res = await api.processManagement.put<Process>(
+      `/process/updateProcess/${data.record}`,
+      data
+    );
 
     return {
       type: "success",

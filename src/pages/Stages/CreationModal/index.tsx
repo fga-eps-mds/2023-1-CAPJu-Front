@@ -17,7 +17,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
-import { createStage } from "../../../services/stages";
+import { createStage } from "../../../services/processManagement/stage";
 
 type FormValues = {
   name: string;

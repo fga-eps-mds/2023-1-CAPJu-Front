@@ -5,16 +5,16 @@ export const getStages = async (
   filter?: string
 ): Promise<Result<Stage[]>> => {
   try {
-    const res = await api.stages.get<{ stages: Stage[]; totalPages: number }>(
-      "/stages",
-      {
-        params: {
-          offset: pagination?.offset ?? 0,
-          limit: pagination?.limit,
-          filter,
-        },
-      }
-    );
+    const res = await api.processManagement.get<{
+      stages: Stage[];
+      totalPages: number;
+    }>("/stage", {
+      params: {
+        offset: pagination?.offset ?? 0,
+        limit: pagination?.limit,
+        filter,
+      },
+    });
 
     return {
       type: "success",
@@ -39,7 +39,10 @@ export const createStage = async (data: {
   idUnit: number;
 }): Promise<Result<Stage>> => {
   try {
-    const res = await api.stages.post<Stage>("/newStage", data);
+    const res = await api.processManagement.post<Stage>(
+      "/stage/newStage",
+      data
+    );
 
     return {
       type: "success",
@@ -62,7 +65,10 @@ export const updateStage = async (data: {
   name: string;
 }): Promise<Result<Stage>> => {
   try {
-    const res = await api.stages.put<Stage>("/updateStage", data);
+    const res = await api.processManagement.put<Stage>(
+      "/stage/updateStage",
+      data
+    );
 
     return {
       type: "success",
@@ -82,7 +88,9 @@ export const updateStage = async (data: {
 
 export const deleteStage = async (idStage: number): Promise<Result<Stage>> => {
   try {
-    const res = await api.stages.delete<Stage>(`/deleteStage/${idStage}`);
+    const res = await api.processManagement.delete<Stage>(
+      `/stage/deleteStage/${idStage}`
+    );
 
     return {
       type: "success",

@@ -21,9 +21,10 @@ import _ from "lodash";
 
 import { useLoading } from "hooks/useLoading";
 import { Input } from "components/FormFields";
-import { getUnits } from "services/units";
+import { getUnits } from "services/unit";
 import { Select } from "components/FormFields/Select";
-import { getAllRoles, signUp } from "services/user";
+import { signUp } from "services/user";
+import { getAllRoles } from "services/role";
 import { validateCPF } from "utils/validators";
 
 type FormValues = {

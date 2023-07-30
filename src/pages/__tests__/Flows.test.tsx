@@ -15,7 +15,7 @@ import Flows from "../Flows";
 
 const restHandlers = [
   rest.get(
-    `${import.meta.env.VITE_FLOWS_SERVICE_URL}flows`,
+    `${import.meta.env.VITE_PROCESS_MANAGEMENT_SERVICE_URL}flow`,
     async (req, res, ctx) => {
       const offset = Number(req.url.searchParams.get("offset"));
       const limit = Number(req.url.searchParams.get("limit"));
@@ -37,11 +37,11 @@ const restHandlers = [
     }
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
+    `${import.meta.env.VITE_USER_SERVICE_URL}cpf/${mockedUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}roleAdmins/${mockedUser.idRole}`,
+    `${import.meta.env.VITE_ROLE_SERVICE_URL}roleAdmins/${mockedUser.idRole}`,
     async (_req, res, ctx) =>
       res(
         ctx.status(200),
