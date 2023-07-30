@@ -183,7 +183,7 @@ export const updateProcessStatus = async (data: {
 }): Promise<Result<Process>> => {
   try {
     const res = await api.processManagement.put<Process>(
-      "/process/updateProcess",
+      `/process/updateProcess/${data.record}`,
       data
     );
 

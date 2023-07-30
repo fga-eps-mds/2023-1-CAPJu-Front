@@ -4,7 +4,7 @@ export const getNotesByProcessRecord = async (
   record: string
 ): Promise<Result<Note[]>> => {
   try {
-    const res = await api.note.get<Note[]>(`/note/${record}`);
+    const res = await api.note.get<Note[]>(`/${record}`);
 
     return {
       type: "success",

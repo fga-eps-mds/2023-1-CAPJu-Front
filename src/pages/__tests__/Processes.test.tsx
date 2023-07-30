@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { describe, expect } from "vitest";
 import {
   render,
@@ -27,18 +28,31 @@ import Processes from "../Processes";
 
 const restHandlers = [
   rest.get(
-    `${import.meta.env.VITE_PROCESSES_SERVICE_URL}processes`,
+    `${import.meta.env.VITE_PROCESS_MANAGEMENT_SERVICE_URL}process`,
     async (req, res, ctx) => {
       const filter = req.url.searchParams.get("filter");
       const offset = Number(req.url.searchParams.get("offset"));
       const limit = Number(req.url.searchParams.get("limit"));
+      const showArchivedAndFinished = JSON.parse(
+        req.url.searchParams.get("showArchivedAndFinished") || "false"
+      );
+
+      const filteredByStatus = mockedProcesses.filter(
+        (p) => p.status === "archived" || p.status === "finished"
+      );
+
       const { paginatedArray, totalPages } = getPaginatedArray(
         filter && filter !== ""
-          ? mockedProcesses.filter(
+          ? (showArchivedAndFinished
+              ? filteredByStatus
+              : mockedProcesses
+            ).filter(
               (process) =>
                 process.nickname.includes(filter) ||
                 process.record.includes(filter)
             )
+          : showArchivedAndFinished
+          ? filteredByStatus
           : mockedProcesses,
         {
           offset,
@@ -53,20 +67,20 @@ const restHandlers = [
     }
   ),
   rest.get(
-    `${import.meta.env.VITE_PROCESSES_SERVICE_URL}priorities`,
+    `${import.meta.env.VITE_PROCESS_MANAGEMENT_SERVICE_URL}priority`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedPriorities))
   ),
   rest.get(
-    `${import.meta.env.VITE_FLOWS_SERVICE_URL}flows`,
+    `${import.meta.env.VITE_PROCESS_MANAGEMENT_SERVICE_URL}flow`,
     async (_req, res, ctx) =>
       res(ctx.status(200), ctx.json({ flows: mockedFlows }))
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
+    `${import.meta.env.VITE_USER_SERVICE_URL}cpf/${mockedUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}roleAdmins/${mockedUser.idRole}`,
+    `${import.meta.env.VITE_ROLE_SERVICE_URL}roleAdmins/${mockedUser.idRole}`,
     async (_req, res, ctx) =>
       res(
         ctx.status(200),
@@ -143,9 +157,7 @@ describe("Processes page", () => {
   });
 
   it("toggles 'archived/finished processes' checkbox correctly", async () => {
-    const button = screen.getByText(
-      "Mostrar apenas processos arquivados/finalizados"
-    );
+    const button = screen.getByText("Mostrar processos arquivados/finalizados");
 
     expect(button).not.toBe(null);
 
@@ -177,8 +189,8 @@ describe("Processes page", () => {
       await fireEvent.click(closeModalButton);
     });
 
-    await waitFor(() => {
-      expect(screen.queryByText("CreationModal")).toBeNull();
+    await waitFor(async () => {
+      expect(await screen.getByPlaceholderText("N do Registro")).not.toBeNull();
     });
   });
 
@@ -220,7 +232,7 @@ describe("Processes page", () => {
     expect(await screen.queryByText("12345678912345678918")).toBe(null);
   });
 
-  it("status processes correctly", async () => {
+  it("shows processes status correctly", async () => {
     const validStatus = new Set(Object.values(labelByProcessStatus));
     const status = await mockedProcesses[0].status;
     const teste =

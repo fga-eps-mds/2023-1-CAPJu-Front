@@ -526,3 +526,13 @@ export const mockedFlowSequence = [
     commentary: "Comentário de teste para aparecer no componente",
   },
 ];
+
+export const mockedNotes = [
+  {
+    idNote: 1,
+    commentary: "Comentário de teste para aparecer no componente",
+    record: 12345678912345678915,
+    idStageA: 1,
+    idStageB: 2,
+  },
+];

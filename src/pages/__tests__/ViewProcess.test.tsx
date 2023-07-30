@@ -16,42 +16,47 @@ import {
   mockedPriorities,
   mockedFlow,
   mockedRoles,
+  mockedNotes,
 } from "utils/mocks";
 import ViewProcess from "../ViewProcess";
 
 const restHandlers = [
   rest.get(
-    `${import.meta.env.VITE_STAGES_SERVICE_URL}stages`,
+    `${import.meta.env.VITE_PROCESS_MANAGEMENT_SERVICE_URL}stage`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedStages))
   ),
   rest.get(
-    `${import.meta.env.VITE_FLOWS_SERVICE_URL}flow/${
+    `${import.meta.env.VITE_PROCESS_MANAGEMENT_SERVICE_URL}flow/${
       mockedNotStartedProcess.idFlow
     }`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedFlow))
   ),
   rest.get(
-    `${import.meta.env.VITE_PROCESSES_SERVICE_URL}priorities`,
+    `${import.meta.env.VITE_PROCESS_MANAGEMENT_SERVICE_URL}priority`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedPriorities))
   ),
   rest.get(
-    `${import.meta.env.VITE_PROCESSES_SERVICE_URL}getOneProcess/${
+    `${import.meta.env.VITE_PROCESS_MANAGEMENT_SERVICE_URL}process/record/${
       mockedNotStartedProcess.record
     }`,
     async (_req, res, ctx) =>
       res(ctx.status(200), ctx.json(mockedNotStartedProcess))
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedUser.cpf}`,
+    `${import.meta.env.VITE_USER_SERVICE_URL}cpf/${mockedUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedUser))
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}roleAdmins/${mockedUser.idRole}`,
+    `${import.meta.env.VITE_ROLE_SERVICE_URL}roleAdmins/${mockedUser.idRole}`,
     async (_req, res, ctx) =>
       res(
         ctx.status(200),
         ctx.json(mockedRoles?.find((i) => i.idRole === mockedUser.idRole))
       )
+  ),
+  rest.get(
+    `${import.meta.env.VITE_NOTE_SERVICE_URL}${mockedNotStartedProcess.record}`,
+    async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedNotes))
   ),
 ];
 

@@ -24,7 +24,7 @@ import Units from "../Units";
 
 const restHandlers = [
   rest.get(
-    `${import.meta.env.VITE_UNITS_SERVICE_URL}units`,
+    `${import.meta.env.VITE_UNIT_SERVICE_URL}`,
     async (req, res, ctx) => {
       const filter = req.url.searchParams.get("filter");
       const offset = Number(req.url.searchParams.get("offset"));
@@ -46,11 +46,11 @@ const restHandlers = [
     }
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}user/${mockedAdminUser.cpf}`,
+    `${import.meta.env.VITE_USER_SERVICE_URL}cpf/${mockedAdminUser.cpf}`,
     async (_req, res, ctx) => res(ctx.status(200), ctx.json(mockedAdminUser))
   ),
   rest.get(
-    `${import.meta.env.VITE_USER_SERVICE_URL}roleAdmins/${
+    `${import.meta.env.VITE_ROLE_SERVICE_URL}roleAdmins/${
       mockedAdminUser.idRole
     }`,
     async (_req, res, ctx) =>
