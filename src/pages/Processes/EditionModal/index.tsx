@@ -21,9 +21,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input, Select } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
-import { getPriorities } from "services/priorities";
-import { getFlows } from "services/flows";
-import { updateProcess } from "services/processes";
+import { getPriorities } from "services/processManagement/priority";
+import { getFlows } from "services/processManagement/flows";
+import { updateProcess } from "services/processManagement/processes";
 
 type FormValues = {
   record: string;
@@ -36,9 +36,9 @@ type FormValues = {
 const validationSchema = yup.object({
   record: yup.string().required("Digite o registro do processo."),
   nickname: yup.string().required("Dê um apelido para o processo."),
-  idFlow: yup.string().required("Selecione um fluxo para o processo."),
+  idFlow: yup.number().required("Selecione um fluxo para o processo."),
   hasLegalPriority: yup.bool(),
-  idPriority: yup.string().when("hasLegalPriority", (hasLegalPriority) => {
+  idPriority: yup.number().when("hasLegalPriority", (hasLegalPriority) => {
     return hasLegalPriority[0]
       ? yup.string().required("Escolha a prioridade legal do processo.")
       : yup.string().notRequired();
@@ -79,7 +79,13 @@ export function EditionModal({
   });
   const { data: flowsData } = useQuery({
     queryKey: ["flows"],
-    queryFn: getFlows,
+    queryFn: async () => {
+      const res = await getFlows();
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
     onError: () => {
       toast({
         id: "flows-error",
@@ -98,6 +104,7 @@ export function EditionModal({
     reset,
     watch,
   } = useForm<FormValues>({
+    // @ts-ignore
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });
@@ -107,6 +114,7 @@ export function EditionModal({
     handleLoading(true);
 
     const body = {
+      ...selectedProcess,
       record: selectedProcess?.record as string,
       nickname: formData.nickname,
       idFlow: formData.idFlow,

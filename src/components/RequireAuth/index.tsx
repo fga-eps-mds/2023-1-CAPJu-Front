@@ -2,8 +2,8 @@ import { useEffect, useMemo } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "hooks/useAuth";
-import { roles } from "utils/roles";
 import { getAllowedTabPath } from "utils/permissions";
+import { useQuery } from "react-query";
 
 interface RequireAuthProps {
   children: JSX.Element;
@@ -30,7 +30,11 @@ interface RequireAuthProps {
  */
 
 export function RequireAuth({ children, authorizedRoles }: RequireAuthProps) {
-  const { user, validateAuthentication, handleLogout } = useAuth();
+  const { validateAuthentication, getUserData } = useAuth();
+  const { data: userData } = useQuery({
+    queryKey: ["user-data"],
+    queryFn: getUserData,
+  });
   const location = useLocation();
 
   const saveFrom = useMemo(() => ({ from: location }), [location]);
@@ -38,18 +42,16 @@ export function RequireAuth({ children, authorizedRoles }: RequireAuthProps) {
   useEffect(() => validateAuthentication(), []);
 
   // Sem authorizedRoles, todo mundo é autorizado
-  if (!authorizedRoles || user?.idRole === 5) return children;
-
-  // Para estar logado role precisa ser válida
-  if (!roles.some((role) => role.idRole === user?.idRole)) {
-    window.location.reload();
-    handleLogout();
-    return children;
-  }
+  if (!authorizedRoles) return children;
 
   // Se não é autorizado, é redirecionado para um aba em que seja
-  if (user?.idRole && !authorizedRoles.includes(user?.idRole)) {
-    const userAllowedTabPath = getAllowedTabPath(user.idRole);
+  if (
+    userData?.value?.idRole &&
+    !authorizedRoles.includes(userData?.value?.idRole)
+  ) {
+    const userAllowedTabPath = getAllowedTabPath(
+      userData?.value?.allowedActions || []
+    );
 
     return <Navigate to={userAllowedTabPath} state={saveFrom} replace />;
   }

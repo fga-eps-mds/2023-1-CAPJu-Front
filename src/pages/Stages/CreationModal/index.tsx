@@ -17,7 +17,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
-import { createStage } from "../../../services/stages";
+import { createStage } from "../../../services/processManagement/stage";
 
 type FormValues = {
   name: string;
@@ -26,7 +26,7 @@ type FormValues = {
 
 const validationSchema = yup.object({
   name: yup.string().required("Dê um nome à etapa"),
-  duration: yup.string().required("Dê uma duração para esta etapa"),
+  duration: yup.number().required().typeError("Dê uma duração para esta etapa"),
 });
 
 interface CreationModalProps {

@@ -1,5 +1,5 @@
 import { api } from "services/api";
-import { roleNameById } from "utils/roles";
+import { getRoleById, getAllRoles } from "services/role";
 
 export const signIn = async (credentials: {
   cpf: string;
@@ -46,11 +46,17 @@ export const signUp = async (credentials: {
   }
 };
 
-export const getUserById = async (userId: string): Promise<Result<User>> => {
+export const getUserById = async (
+  userId: string
+): Promise<Result<User & { allowedActions: string[] }>> => {
   try {
-    const res = await api.user.get<User>(`/user/${userId}`);
+    const res = await api.user.get<User>(`/cpf/${userId}`);
+    const { value: role } = await getRoleById(res.data?.idRole);
 
-    return { type: "success", value: res.data };
+    return {
+      type: "success",
+      value: { ...res.data, allowedActions: role?.allowedActions || [] },
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
@@ -100,6 +106,26 @@ export const updateUserPassword = async (
   }
 };
 
+export const updateUserEmailAndPassword = async (
+  data: { email: string; password: string },
+  cpf: string
+) => {
+  try {
+    const res = await api.user.put(`/updateUserEmailAndPassword/${cpf}`, data);
+
+    return { type: "success", value: res.data };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
 export const forgotPassword = async (data: { email: string }) => {
   try {
     const res = await api.user.post("/requestRecovery", data);
@@ -117,11 +143,27 @@ export const forgotPassword = async (data: { email: string }) => {
   }
 };
 
-export const getAcceptedUsers = async (): Promise<Result<User[]>> => {
+export const getAcceptedUsers = async (
+  pagination?: Pagination,
+  filter?: string
+): Promise<Result<User[]>> => {
   try {
-    const res = await api.user.get<User[]>(`/allUser?accepted=true`);
+    const res = await api.user.get<{ users: User[]; totalPages: number }>(
+      `/allUser?accepted=true`,
+      {
+        params: {
+          offset: pagination?.offset ?? 0,
+          limit: pagination?.limit,
+          filter,
+        },
+      }
+    );
 
-    return { type: "success", value: res.data };
+    return {
+      type: "success",
+      value: res.data?.users?.filter((user) => user.idRole !== 5),
+      totalPages: res?.data?.totalPages,
+    };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };
@@ -134,14 +176,30 @@ export const getAcceptedUsers = async (): Promise<Result<User[]>> => {
   }
 };
 
-export const getUsersRequests = async (): Promise<Result<User[]>> => {
+export const getUsersRequests = async (
+  pagination?: Pagination,
+  filter?: string
+): Promise<Result<User[]>> => {
   try {
-    const res = await api.user.get<User[]>(`/allUser?accepted=false`);
-    const value = res.data?.map((item: User) => {
-      return { ...item, role: roleNameById(item.idRole) };
+    const res = await api.user.get<{ users: User[]; totalPages: number }>(
+      `/allUser?accepted=false`,
+      {
+        params: {
+          offset: pagination?.offset ?? 0,
+          limit: pagination?.limit,
+          filter,
+        },
+      }
+    );
+    const { value: roles } = await getAllRoles();
+    const value = res.data?.users?.map((item: User) => {
+      return {
+        ...item,
+        role: roles?.find((i) => i.idRole === item.idRole)?.name || "-",
+      };
     });
 
-    return { type: "success", value };
+    return { type: "success", value, totalPages: res?.data?.totalPages };
   } catch (error) {
     if (error instanceof Error)
       return { type: "error", error, value: undefined };

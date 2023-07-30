@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from "react";
 import {
   Flex,
   Card,
@@ -16,14 +17,14 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useQuery } from "react-query";
+import _ from "lodash";
 
 import { useLoading } from "hooks/useLoading";
 import { Input } from "components/FormFields";
-import { getUnits } from "services/units";
-import { useEffect, useMemo } from "react";
+import { getUnits } from "services/unit";
 import { Select } from "components/FormFields/Select";
-import { roleOptions } from "utils/roles";
 import { signUp } from "services/user";
+import { getAllRoles } from "services/role";
 import { validateCPF } from "utils/validators";
 
 type FormValues = {
@@ -60,8 +61,8 @@ const validationSchema = yup.object({
   passwordConfirmation: yup
     .string()
     .required("Confirme sua senha")
-    .oneOf([yup.ref("password")], "Suas senhas não batem."),
-  idUnit: yup.string().required("Selecione sua unidade"),
+    .oneOf([yup.ref("password")], "Suas senhas não batem"),
+  idUnit: yup.string().required("Selecione uma unidade"),
   idRole: yup.string().required("Selecione um perfil"),
 });
 
@@ -71,14 +72,29 @@ function Signup() {
   const { handleLoading } = useLoading();
   const { data: unitsData } = useQuery({
     queryKey: ["units"],
-    queryFn: getUnits,
+    queryFn: async () => {
+      const res = await getUnits();
+      return res;
+    },
     onError: () => {
       toast({
         id: "units-error",
         title: "Erro ao carregar unidade",
         description: "Houve um erro ao carregar unidades, tentando novamente.",
         status: "error",
-
+        isClosable: true,
+      });
+    },
+  });
+  const { data: rolesData } = useQuery({
+    queryKey: ["roles"],
+    queryFn: getAllRoles,
+    onError: () => {
+      toast({
+        id: "roles-error",
+        title: "Erro ao carregar perfis",
+        description: "Houve um erro ao carregar perfis, tentando novamente.",
+        status: "error",
         isClosable: true,
       });
     },
@@ -90,6 +106,13 @@ function Signup() {
       }) || []
     );
   }, [unitsData]);
+  const roles = useMemo(() => {
+    return (
+      rolesData?.value?.map((role) => {
+        return { label: role.name, value: role.idRole };
+      }) || []
+    );
+  }, [rolesData]);
   const {
     register,
     handleSubmit,
@@ -101,7 +124,11 @@ function Signup() {
 
   const onSubmit = handleSubmit(async (data) => {
     handleLoading(true);
-    const res = await signUp(data);
+    const res = await signUp({
+      ...data,
+      fullName: _.startCase(data.fullName.toLocaleLowerCase()),
+      email: data.email.toLocaleLowerCase(),
+    });
 
     if (res.type === "success") {
       handleLoading(false);
@@ -146,9 +173,8 @@ function Signup() {
       justifyContent="center"
       w="100%"
       maxW="100vw"
-      py="16"
     >
-      <Card p={["10", "20"]} w="90%" maxW="520">
+      <Card p={["10", "20"]} w="90%" maxW="520" my="16">
         <CardBody
           w="100%"
           p={0}
@@ -201,7 +227,10 @@ function Signup() {
               infoText={
                 <Stack spacing="0">
                   <Text>Deve conter ao menos um dígito;</Text>
-                  <Text>Deve conter ao menos uma letra maiúscula;</Text>
+                  <Text>
+                    Deve conter ao menos uma letra maiúscula e uma letra
+                    minuscula;
+                  </Text>
                   <Text>Deve conter ao menos 6 caracteres;</Text>
                 </Stack>
               }
@@ -210,7 +239,7 @@ function Signup() {
             <Input
               type="password"
               label="Confirmação de senha"
-              placeholder="Confirme sua senha"
+              placeholder="Confirme uma senha"
               errors={errors.passwordConfirmation}
               {...register("passwordConfirmation")}
             />
@@ -226,7 +255,7 @@ function Signup() {
               label="Perfil"
               placeholder="Selecione seu perfil"
               errors={errors.idRole}
-              options={roleOptions(false)}
+              options={roles}
               {...register("idRole")}
             />
             <Button

@@ -10,7 +10,7 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { deleteStage } from "services/stages";
+import { deleteStage } from "services/processManagement/stage";
 import { useLoading } from "hooks/useLoading";
 
 interface DeletionModalProps {
@@ -37,13 +37,13 @@ export function DeletionModal({
       toast({
         id: "delete-stage-success",
         title: "Sucesso!",
-        description: "Etapa deletada com sucesso!",
+        description: "Etapa excluída com sucesso!",
         status: "success",
       });
     } else {
       toast({
         id: "delete-stage-error",
-        title: "Erro na deleção da etaoa.",
+        title: "Erro na exclusão da etapa.",
         description: res.error?.message,
         status: "error",
         isClosable: true,

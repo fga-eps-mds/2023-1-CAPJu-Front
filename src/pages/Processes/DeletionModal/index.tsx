@@ -10,7 +10,7 @@ import {
   Text,
   useToast,
 } from "@chakra-ui/react";
-import { deleteProcess } from "services/processes";
+import { deleteProcess } from "services/processManagement/processes";
 import { useLoading } from "hooks/useLoading";
 
 interface DeletionModalProps {
@@ -37,13 +37,13 @@ export function DeletionModal({
       toast({
         id: "delete-process-success",
         title: "Sucesso!",
-        description: "Processo deletado com sucesso!",
+        description: "Processo excluído com sucesso!",
         status: "success",
       });
     } else {
       toast({
         id: "delete-process-error",
-        title: "Erro na deleção do processo.",
+        title: "Erro na exclusão do processo.",
         description: res.error?.message,
         status: "error",
         isClosable: true,

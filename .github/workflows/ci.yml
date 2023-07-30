@@ -93,6 +93,12 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    env:
+      VITE_USER_SERVICE_URL: ${{ secrets.VITE_USER_SERVICE_URL }}
+      VITE_ROLE_SERVICE_URL: ${{ secrets.VITE_ROLE_SERVICE_URL }}
+      VITE_UNIT_SERVICE_URL: ${{ secrets.VITE_UNIT_SERVICE_URL }}
+      VITE_PROCESS_MANAGEMENT_SERVICE_URL: ${{ secrets.VITE_PROCESS_MANAGEMENT_SERVICE_URL }}
+      VITE_NOTE_SERVICE_URL: ${{ secrets.VITE_NOTE_SERVICE_URL }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -150,6 +156,12 @@ jobs:
     name: sonarcloud
     runs-on: ubuntu-latest
     continue-on-error: true
+    env:
+      VITE_USER_SERVICE_URL: ${{ secrets.VITE_USER_SERVICE_URL }}
+      VITE_ROLE_SERVICE_URL: ${{ secrets.VITE_ROLE_SERVICE_URL }}
+      VITE_UNIT_SERVICE_URL: ${{ secrets.VITE_UNIT_SERVICE_URL }}
+      VITE_PROCESS_MANAGEMENT_SERVICE_URL: ${{ secrets.VITE_PROCESS_MANAGEMENT_SERVICE_URL }}
+      VITE_NOTE_SERVICE_URL: ${{ secrets.VITE_NOTE_SERVICE_URL }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -173,7 +185,7 @@ jobs:
         run: npx eslint -f json -o reports/eslint-report.json src || true
 
       - name: 🧪 Testes e cobertura
-        run: yarn test --coverage --passWithNoTests
+        run: VITEST_REPORTERS=vitest-sonar-reporter yarn test --coverage
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master

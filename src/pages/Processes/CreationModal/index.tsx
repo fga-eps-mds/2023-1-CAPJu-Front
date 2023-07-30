@@ -20,9 +20,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input, Select } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
-import { getPriorities } from "services/priorities";
-import { getFlows } from "services/flows";
-import { createProcess } from "services/processes";
+import { getPriorities } from "services/processManagement/priority";
+import { getFlows } from "services/processManagement/flows";
+import { createProcess } from "services/processManagement/processes";
 
 type FormValues = {
   record: string;
@@ -35,9 +35,12 @@ type FormValues = {
 const validationSchema = yup.object({
   record: yup.string().required("Digite o registro do processo."),
   nickname: yup.string().required("Dê um apelido para o processo."),
-  idFlow: yup.string().required("Selecione um fluxo para o processo."),
+  idFlow: yup
+    .number()
+    .required()
+    .typeError("Selecione um fluxo para o processo."),
   hasLegalPriority: yup.bool(),
-  idPriority: yup.string().when("hasLegalPriority", (hasLegalPriority) => {
+  idPriority: yup.number().when("hasLegalPriority", (hasLegalPriority) => {
     return hasLegalPriority[0]
       ? yup.string().required("Escolha a prioridade legal do processo.")
       : yup.string().notRequired();
@@ -76,7 +79,13 @@ export function CreationModal({
   });
   const { data: flowsData } = useQuery({
     queryKey: ["flows"],
-    queryFn: getFlows,
+    queryFn: async () => {
+      const res = await getFlows();
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
     onError: () => {
       toast({
         id: "flows-error",
@@ -95,6 +104,7 @@ export function CreationModal({
     reset,
     watch,
   } = useForm<FormValues>({
+    // @ts-ignore
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });
@@ -108,7 +118,6 @@ export function CreationModal({
       nickname: formData.nickname,
       idFlow: formData.idFlow,
       priority: formData.hasLegalPriority ? formData.idPriority : 0,
-      effectiveDate: new Date(),
     };
 
     const res = await createProcess(body);

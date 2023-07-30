@@ -1,18 +1,27 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
-import { Flex, useToast, Text, Button, useDisclosure } from "@chakra-ui/react";
-import { AddIcon, Icon } from "@chakra-ui/icons";
-import { MdDelete } from "react-icons/md";
+import {
+  Flex,
+  useToast,
+  Text,
+  Button,
+  useDisclosure,
+  chakra,
+} from "@chakra-ui/react";
+import { AddIcon, Icon, SearchIcon } from "@chakra-ui/icons";
+import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 
 import { PrivateLayout } from "layouts/Private";
-import { getUnits } from "services/units";
+import { getUnits } from "services/unit";
 import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
-import { hasPermission } from "utils/permissions";
+import { isActionAllowedToUser } from "utils/permissions";
+import { Pagination } from "components/Pagination";
 import { CreationModal } from "./CreationModal";
 import { DeletionModal } from "./DeletionModal";
+import { EditionModal } from "./EditionModal";
 
 function Units() {
   const toast = useToast();
@@ -30,12 +39,27 @@ function Units() {
     onClose: onDeletionClose,
   } = useDisclosure();
   const {
+    isOpen: isEditionOpen,
+    onOpen: onEditionOpen,
+    onClose: onEditionClose,
+  } = useDisclosure();
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+  const {
     data: unitsData,
     isFetched: isUnitsFetched,
     refetch: refetchUnits,
   } = useQuery({
     queryKey: ["units"],
-    queryFn: getUnits,
+    queryFn: async () => {
+      const res = await getUnits({ offset: currentPage * 5, limit: 5 }, filter);
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
     onError: () => {
       toast({
         id: "units-error",
@@ -51,10 +75,21 @@ function Units() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const isActionDisabled = (actionName: string) =>
-    userData?.value ? !hasPermission(userData.value, actionName) : true;
   const tableActions = useMemo(
     () => [
+      {
+        label: "Editar Unidade",
+        icon: <Icon as={MdEdit} boxSize={4} />,
+        action: ({ unit }: { unit: Unit }) => {
+          selectUnit(unit);
+          onEditionOpen();
+        },
+        actionName: "edit-unit",
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "edit-unit"
+        ),
+      },
       {
         label: "Excluir Unidade",
         icon: <Icon as={MdDelete} boxSize={4} />,
@@ -63,20 +98,18 @@ function Units() {
           onDeletionOpen();
         },
         actionName: "delete-unit",
-        disabled: isActionDisabled("delete-unit"),
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "edit-unit"
+        ),
       },
     ],
-    [isUnitsFetched, isUserFetched]
+    [isUnitsFetched, isUserFetched, userData]
   );
   const filteredUnits = useMemo<TableRow<Unit>[]>(() => {
     if (!isUnitsFetched) return [];
 
-    const value =
-      filter !== ""
-        ? unitsData?.value?.filter((unit) =>
-            unit.name.toLowerCase().includes(filter.toLocaleLowerCase())
-          )
-        : unitsData?.value;
+    const value = unitsData?.value;
 
     return (
       (value?.reduce(
@@ -87,7 +120,14 @@ function Units() {
         []
       ) as TableRow<Unit>[]) || []
     );
-  }, [unitsData, filter, isUnitsFetched]);
+  }, [
+    unitsData,
+    filter,
+    isUnitsFetched,
+    isUserFetched,
+    userData,
+    tableActions,
+  ]);
 
   const tableColumnHelper = createColumnHelper<TableRow<Unit>>();
   const tableColumns = [
@@ -108,6 +148,10 @@ function Units() {
     }),
   ];
 
+  useEffect(() => {
+    refetchUnits();
+  }, [currentPage]);
+
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -119,24 +163,48 @@ function Units() {
             size="xs"
             fontSize="sm"
             colorScheme="green"
-            isDisabled={isActionDisabled("create-unit")}
+            isDisabled={
+              !isActionAllowedToUser(
+                userData?.value?.allowedActions || [],
+                "create-unit"
+              )
+            }
             onClick={onCreationOpen}
           >
             <AddIcon mr="2" boxSize={3} /> Criar Unidade
           </Button>
         </Flex>
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Input
-            placeholder="Pesquisar unidades"
-            value={filter}
-            onChange={({ target }) => setFilter(target.value)}
-            variant="filled"
-            css={{
-              "&, &:hover, &:focus": {
-                background: "white",
-              },
+        <Flex justifyContent="flex-start" w="100%">
+          <chakra.form
+            onSubmit={(e) => {
+              e.preventDefault();
+              refetchUnits();
             }}
-          />
+            w="100%"
+            display="flex"
+            flexDirection="row"
+          >
+            <Input
+              placeholder="Pesquisar unidades"
+              value={filter}
+              onChange={({ target }) => setFilter(target.value)}
+              variant="filled"
+              css={{
+                "&, &:hover, &:focus": {
+                  background: "white",
+                },
+              }}
+            />
+            <Button
+              aria-label="botão de busca"
+              colorScheme="green"
+              marginLeft="2"
+              justifyContent="center"
+              type="submit"
+            >
+              <SearchIcon boxSize={4} />
+            </Button>
+          </chakra.form>
         </Flex>
       </Flex>
       <DataTable
@@ -145,6 +213,12 @@ function Units() {
         isDataFetching={!isUnitsFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas unidades."
       />
+      {unitsData?.totalPages !== undefined ? (
+        <Pagination
+          pageCount={unitsData?.totalPages}
+          onPageChange={handlePageChange}
+        />
+      ) : null}
       <CreationModal
         isOpen={isCreationOpen}
         onClose={onCreationClose}
@@ -156,6 +230,14 @@ function Units() {
           isOpen={isDeletionOpen}
           onClose={onDeletionClose}
           refetchUnits={refetchUnits}
+        />
+      ) : null}
+      {selectedUnit ? (
+        <EditionModal
+          unit={selectedUnit}
+          isOpen={isEditionOpen}
+          onClose={onEditionClose}
+          afterSubmission={refetchUnits}
         />
       ) : null}
     </PrivateLayout>

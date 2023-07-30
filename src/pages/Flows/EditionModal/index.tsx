@@ -16,8 +16,8 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import { updateFlow } from "services/flows";
-import { getStages } from "services/stages";
+import { updateFlow } from "services/processManagement/flows";
+import { getStages } from "services/processManagement/stage";
 import { getAcceptedUsers } from "services/user";
 import { Input, MultiSelect } from "components/FormFields";
 import { Flow } from "components/Flow";
@@ -49,11 +49,17 @@ export function EditionModal({
   const { handleLoading } = useLoading();
   const { data: stagesData, isFetched: isStagesFetched } = useQuery({
     queryKey: ["stages"],
-    queryFn: getStages,
+    queryFn: async () => {
+      const res = await getStages();
+      return res;
+    },
   });
   const { data: usersData } = useQuery({
     queryKey: ["accepted-users"],
-    queryFn: getAcceptedUsers,
+    queryFn: async () => {
+      const res = await getAcceptedUsers();
+      return res;
+    },
   });
   const [selectedStages, setSelectedStages] = useState<Stage[]>(
     stagesData?.value?.filter((item) =>
@@ -83,6 +89,7 @@ export function EditionModal({
     handleSubmit,
     formState: { errors, isSubmitted },
   } = useForm<FormValues>({
+    // @ts-ignore
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });
@@ -122,7 +129,9 @@ export function EditionModal({
   function stageToSelectOption(value: Stage[]): SelectOption[] {
     return value?.map((item: Stage) => {
       return {
-        label: item.name,
+        label: `${item.name}, (${item.duration} dia${
+          item.duration > 1 ? "s" : ""
+        })`,
         value: item.idStage,
       };
     });
