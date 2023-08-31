@@ -104,11 +104,11 @@ exit
 
 ## Contribuição
 
-Certifique-se de ler o [Guia de Contribuição](https://github.com/fga-eps-mds/2023-1-CAPJu-Front/blob/main/.github/CONTRIBUTING.md) antes de realizar qualquer atividade no projeto!
+Certifique-se de ler o [Guia de Contribuição](https://github.com/fga-eps-mds/2023-2-CAPJu-Front/blob/main/.github/CONTRIBUTING.md) antes de realizar qualquer atividade no projeto!
 
 ## Licença
 
-O CAPJu está sob as regras aplicadas na licença [MIT](https://github.com/fga-eps-mds/2023-1-CAPJu-Front/blob/main/LICENSE)
+O CAPJu está sob as regras aplicadas na licença [MIT](https://github.com/fga-eps-mds/2023-2-CAPJu-Front/blob/main/LICENSE)
 
 ## Contribuidores
 
