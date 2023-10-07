@@ -47,7 +47,7 @@ function Processes() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const [filter, setFilter] = useState<string | undefined>(undefined);
+  const [filter, setFilter] = useState<string>('');
   const [legalPriority, setLegalPriority] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
   const {
@@ -292,98 +292,100 @@ function Processes() {
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text fontSize="lg" fontWeight="semibold">
+      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4" color="white">
+        <Flex w="120%" flexDirection="column" gap="2">
+          <Text fontSize="30px" fontWeight="semibold" color="white">
             Processos{flow ? ` - Fluxo ${flow?.name}` : ""}
           </Text>
-          <Flex
-            alignItems="center"
-            justifyContent="start"
-            gap="2"
-            flexWrap="wrap"
-          >
-            {flow ? (
+          <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap" mt="25px">
+            <Flex justifyContent="flex-start" w="100%" alignItems="center" gap="2" flexWrap="wrap">
+              {flow ? (
+                  <Button
+                      size="md"
+                      fontSize="md"
+                      colorScheme="blue"
+                      onClick={() => navigate("/fluxos", { replace: true })}
+                  >
+                    <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar aos Fluxos
+                  </Button>
+              ) : null}
               <Button
-                size="xs"
-                fontSize="sm"
-                colorScheme="blue"
-                onClick={() => navigate("/fluxos", { replace: true })}
+                  size="md"
+                  fontSize="md"
+                  colorScheme="green"
+                  isDisabled={
+                    !isActionAllowedToUser(
+                        userData?.value?.allowedActions || [],
+                        "create-process"
+                    )
+                  }
+                  onClick={onCreationOpen}
               >
-                <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar
-                aos Fluxos
+                <AddIcon mr="2" boxSize={3} /> Criar Processo
               </Button>
-            ) : null}
-            <Button
-              size="xs"
-              fontSize="sm"
-              colorScheme="green"
-              isDisabled={
-                !isActionAllowedToUser(
-                  userData?.value?.allowedActions || [],
-                  "create-process"
-                )
-              }
-              onClick={onCreationOpen}
-            >
-              <AddIcon mr="2" boxSize={3} /> Criar Processo
-            </Button>
+              <chakra.form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    refetchProcesses();
+                  }}
+                  width="69%"
+                  display="flex"
+                  flexDirection="row"
+                  alignItems="center"
+                  gap="2"
+                  ml="auto"
+              >
+                <Checkbox
+                    colorScheme="green"
+                    borderColor="gray.600"
+                    checked={legalPriority}
+                    onChange={() => setLegalPriority(!legalPriority)}
+                    flexShrink={0}  // Prevent checkbox from shrinking
+                    maxWidth="unset" // Override any max width constraints
+                >
+                  Prioridade legal
+                </Checkbox>
+                <Checkbox
+                    colorScheme="green"
+                    borderColor="gray.600"
+                    checked={showFinished}
+                    onChange={() => setShowFinished(!showFinished)}
+                    flexShrink={0}  // Prevent checkbox from shrinking
+                    maxWidth="unset" // Override any max width constraints
+                >
+                  Arquivados/finalizados
+                </Checkbox>
+                <Input
+                    color="black"
+                    placeholder="Pesquisar processos (por registro ou apelido)"
+                    value={filter}
+                    onChange={({ target }) => setFilter(target.value)}
+                    variant="filled"
+                    css={{
+                      "&, &:hover, &:focus": {
+                        background: "white",
+                      },
+                    }}
+                />
+                <Button
+                    aria-label="botão de busca"
+                    colorScheme="green"
+                    justifyContent="center"
+                    type="submit"
+                >
+                  <SearchIcon boxSize={4} />
+                </Button>
+              </chakra.form>
+
+            </Flex>
           </Flex>
         </Flex>
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Flex justifyContent="flex-start" w="100%">
-            <chakra.form
-              onSubmit={(e) => {
-                e.preventDefault();
-                refetchProcesses();
-              }}
-              w="100%"
-              display="flex"
-              flexDirection="row"
-            >
-              <Input
-                placeholder="Pesquisar processos (por registro ou apelido)"
-                value={filter}
-                onChange={({ target }) => setFilter(target.value)}
-                variant="filled"
-                css={{
-                  "&, &:hover, &:focus": {
-                    background: "white",
-                  },
-                }}
-              />
-              <Button
-                aria-label="botão de busca"
-                colorScheme="green"
-                marginLeft="2"
-                justifyContent="center"
-                type="submit"
-              >
-                <SearchIcon boxSize={4} />
-              </Button>
-            </chakra.form>
-          </Flex>
-          <Flex flexDir="row" rowGap="1" columnGap="3" flexWrap="wrap">
-            <Checkbox
-              colorScheme="green"
-              borderColor="gray.600"
-              checked={legalPriority}
-              onChange={() => setLegalPriority(!legalPriority)}
-            >
-              Mostrar apenas processos com prioridade legal
-            </Checkbox>
-            <Checkbox
-              colorScheme="green"
-              borderColor="gray.600"
-              checked={showFinished}
-              onChange={() => setShowFinished(!showFinished)}
-            >
-              Mostrar processos arquivados/finalizados
-            </Checkbox>
-          </Flex>
-        </Flex>
+
       </Flex>
       <DataTable
+          w="100%"  // Ensure it takes the full width of its parent
+
+          size="lg"
         data={processesTableRows}
         columns={tableColumns}
         isDataFetching={!isProcessesFetched || !isUserFetched}
