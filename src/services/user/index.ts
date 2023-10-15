@@ -4,18 +4,18 @@ import { getRoleById, getAllRoles } from "services/role";
 export const signIn = async (credentials: {
   cpf: string;
   password: string;
-}): Promise<Result<User>> => {
+}): Promise<Result<string>> => {
   try {
-    const res = await api.user.post<User>("/login", credentials);
+    const res = await api.user.post<string>("/login", credentials);
 
-    return { type: "success", value: res.data };
+    return { type: 'success', value: res.data };
   } catch (error) {
     if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+      return { type: 'error', error, value: undefined };
 
     return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
+      type: 'error',
+      error: new Error('Erro desconhecido'),
       value: undefined,
     };
   }

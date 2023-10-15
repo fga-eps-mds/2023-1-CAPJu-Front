@@ -1,40 +1,40 @@
-import { useState, useMemo, useEffect } from "react";
-import { useQuery } from "react-query";
+import {useEffect, useMemo, useState} from "react";
+import {useQuery} from "react-query";
 import {
-  Flex,
-  Text,
   Button,
-  useDisclosure,
-  Input,
-  Checkbox,
-  useToast,
-  Tooltip,
   chakra,
+  Checkbox,
+  Flex,
+  Input,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
+  Tooltip,
+  useDisclosure,
+  useToast
 } from "@chakra-ui/react";
-import {
-  AddIcon,
-  ArrowUpIcon,
-  Icon,
-  ViewIcon,
-  SearchIcon,
-} from "@chakra-ui/icons";
-import { MdDelete, MdEdit } from "react-icons/md";
-import { createColumnHelper } from "@tanstack/react-table";
-import { useLocation, useNavigate } from "react-router-dom";
-import { IoReturnDownBackOutline } from "react-icons/io5";
+import {AddIcon, ArrowUpIcon, Icon, SearchIcon, ViewIcon,} from "@chakra-ui/icons";
+import {MdDelete, MdEdit} from "react-icons/md";
+import {createColumnHelper} from "@tanstack/react-table";
+import {useLocation, useNavigate} from "react-router-dom";
+import {IoReturnDownBackOutline} from "react-icons/io5";
 
-import { getProcesses } from "services/processManagement/processes";
-import { getFlows } from "services/processManagement/flows";
-import { isActionAllowedToUser } from "utils/permissions";
-import { useAuth } from "hooks/useAuth";
-import { PrivateLayout } from "layouts/Private";
-import { DataTable } from "components/DataTable";
-import { labelByProcessStatus } from "utils/constants";
-import { getSequencesSortedStagesIds } from "utils/sorting";
-import { Pagination } from "components/Pagination";
-import { DeletionModal } from "./DeletionModal";
-import { CreationModal } from "./CreationModal";
-import { EditionModal } from "./EditionModal";
+import {getProcesses} from 'services/processManagement/processes';
+import {isActionAllowedToUser} from "utils/permissions";
+import {useAuth} from 'hooks/useAuth';
+import {PrivateLayout} from 'layouts/Private';
+import {DataTable} from 'components/DataTable';
+import {labelByProcessStatus} from 'utils/constants';
+import {Pagination} from 'components/Pagination';
+import {FaFileUpload} from "react-icons/fa";
+import {DeletionModal} from './DeletionModal';
+import {CreationModal} from './CreationModal';
+import {EditionModal} from './EditionModal';
+import {ImportProcessesModal} from './ImportProcessesModal';
+import ProcessesFileComponent from './ProcessesFile';
 
 function Processes() {
   const { getUserData } = useAuth();
@@ -46,8 +46,9 @@ function Processes() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
-  const [filter, setFilter] = useState<string>('');
+  const [nicknameOrRecordFilter, setNicknameOrRecordFilter] = useState<string>('');
   const [legalPriority, setLegalPriority] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
   const {
@@ -65,44 +66,34 @@ function Processes() {
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+  const {
+    isOpen: isImportationOpen,
+    onOpen: onImportationOpen,
+    onClose: onImportationClose,
+  } = useDisclosure();
+
   const [currentPage, setCurrentPage] = useState(0);
+
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
   };
-  const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
-    queryKey: ["flows"],
-    queryFn: async () => {
-      const res = await getFlows();
 
-      if (res.type === "error") throw new Error(res.error.message);
-
-      return res;
-    },
-    onError: () => {
-      toast({
-        id: "flows-error",
-        title: "Erro ao carregar fluxos",
-        description:
-          "Houve um erro ao carregar fluxos, favor tentar novamente.",
-        status: "error",
-        isClosable: true,
-      });
-    },
-  });
   const {
     data: processesData,
     isFetched: isProcessesFetched,
     refetch: refetchProcesses,
   } = useQuery({
     queryKey: ["processes"],
+    refetchOnWindowFocus: false,
     queryFn: async () => {
+      const hasFilter = nicknameOrRecordFilter.trim() || legalPriority || showFinished;
       const res = await getProcesses(
         flow?.idFlow,
         {
-          offset: currentPage * 5,
-          limit: 5,
+          offset: hasFilter ? 0 : currentPage * 10,
+          limit: 10,
         },
-        filter,
+        nicknameOrRecordFilter.trim(),
         legalPriority,
         showFinished
       );
@@ -122,11 +113,12 @@ function Processes() {
       });
     },
   });
+
   const tableActions = useMemo<TableAction[]>(
     () => [
       {
         label: "Visualizar Processo",
-        icon: <ViewIcon boxSize={4} />,
+        icon: <ViewIcon boxSize={6} />,
         isNavigate: true,
         actionName: "see-process",
         disabled: !isActionAllowedToUser(
@@ -136,7 +128,7 @@ function Processes() {
       },
       {
         label: "Editar Processo",
-        icon: <Icon as={MdEdit} boxSize={4} />,
+        icon: <Icon as={MdEdit} boxSize={6} />,
         action: ({ process }: { process: Process }) => {
           selectProcess(process);
           onEditionOpen();
@@ -149,7 +141,7 @@ function Processes() {
       },
       {
         label: "Excluir Processo",
-        icon: <Icon as={MdDelete} boxSize={4} />,
+        icon: <Icon as={MdDelete} boxSize={6} />,
         action: async ({ process }: { process: Process }) => {
           selectProcess(process);
           onDeletionOpen();
@@ -164,7 +156,7 @@ function Processes() {
     [isProcessesFetched, isUserFetched, userData]
   );
   const processesTableRows = useMemo<TableRow<Process>[]>(() => {
-    if (!isProcessesFetched || !isFlowsFetched) return [];
+    if (!isProcessesFetched) return [];
 
     return (
       (processesData?.value?.reduce(
@@ -172,19 +164,6 @@ function Processes() {
           acc: TableRow<Process>[] | Process[],
           curr: TableRow<Process> | Process
         ) => {
-          const currFlow = flowsData?.value?.find(
-            (item) =>
-              item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
-          ) as Flow;
-          const sortedStagesIds = getSequencesSortedStagesIds(
-            currFlow?.sequences
-          );
-          const currIndexInFlow = sortedStagesIds?.indexOf(curr?.idStage) || -1;
-          const currentState =
-            (currFlow?.stages && currIndexInFlow !== -1) ||
-            curr.status === "notStarted"
-              ? `${currIndexInFlow + 1}/${sortedStagesIds?.length}`
-              : `${currIndexInFlow + 2}/${sortedStagesIds?.length}`;
 
           return [
             ...acc,
@@ -193,7 +172,7 @@ function Processes() {
               tableActions,
               actionsProps: {
                 process: curr,
-                pathname: `/processos/${curr.record}`,
+                pathname: `/processos/${curr.idProcess}`,
                 state: {
                   process: curr,
                   ...(state || {}),
@@ -204,7 +183,7 @@ function Processes() {
                 <Flex flex="1" alignItems="center" gap="1">
                   {curr.record}
                   <Tooltip
-                    label="Prioridade legal"
+                    label={(curr as any)['processPriority.description']}
                     hasArrow
                     background="blackAlpha.900"
                     placement="right"
@@ -215,12 +194,8 @@ function Processes() {
               ) : (
                 curr.record
               ),
-              currentState: `${
-                curr.status === "finished"
-                  ? `${currFlow?.stages?.length}/${currFlow?.stages?.length}`
-                  : currentState
-              }`,
-              flowName: currFlow?.name,
+              currentState: curr.progress,
+              flowName: (curr as any)['flowInfo.name'],
               // @ts-ignore
               status: labelByProcessStatus[curr.status],
             },
@@ -234,8 +209,6 @@ function Processes() {
     isProcessesFetched,
     userData,
     isUserFetched,
-    flowsData,
-    isFlowsFetched,
     tableActions,
   ]);
 
@@ -288,138 +261,175 @@ function Processes() {
 
   useEffect(() => {
     refetchProcesses();
-  }, [flowsData, isFlowsFetched, currentPage, showFinished, legalPriority]);
+  }, [currentPage, showFinished, legalPriority]);
+
+  const [isProcessesFileTabEnabled, setIsProcessesFileTabEnabled] = useState<boolean>(false);
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4" color="white">
-        <Flex w="120%" flexDirection="column" gap="2">
-          <Text fontSize="30px" fontWeight="semibold" color="white">
-            Processos{flow ? ` - Fluxo ${flow?.name}` : ""}
-          </Text>
-          <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap" mt="25px">
-            <Flex justifyContent="flex-start" w="100%" alignItems="center" gap="2" flexWrap="wrap">
-              {flow ? (
-                  <Button
-                      size="md"
-                      fontSize="md"
-                      colorScheme="blue"
-                      onClick={() => navigate("/fluxos", { replace: true })}
-                  >
-                    <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar aos Fluxos
-                  </Button>
-              ) : null}
-              <Button
-                  size="md"
-                  fontSize="md"
-                  colorScheme="green"
-                  isDisabled={
-                    !isActionAllowedToUser(
-                        userData?.value?.allowedActions || [],
-                        "create-process"
-                    )
-                  }
-                  onClick={onCreationOpen}
-              >
-                <AddIcon mr="2" boxSize={3} /> Criar Processo
-              </Button>
-              <chakra.form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    refetchProcesses();
-                  }}
-                  width="69%"
-                  display="flex"
-                  flexDirection="row"
-                  alignItems="center"
-                  gap="2"
-                  ml="auto"
-              >
-                <Checkbox
-                    colorScheme="green"
-                    borderColor="gray.600"
-                    checked={legalPriority}
-                    onChange={() => setLegalPriority(!legalPriority)}
-                    flexShrink={0}  // Prevent checkbox from shrinking
-                    maxWidth="unset" // Override any max width constraints
-                >
-                  Prioridade legal
-                </Checkbox>
-                <Checkbox
-                    colorScheme="green"
-                    borderColor="gray.600"
-                    checked={showFinished}
-                    onChange={() => setShowFinished(!showFinished)}
-                    flexShrink={0}  // Prevent checkbox from shrinking
-                    maxWidth="unset" // Override any max width constraints
-                >
-                  Arquivados/finalizados
-                </Checkbox>
-                <Input
-                    color="black"
-                    placeholder="Pesquisar processos (por registro ou apelido)"
-                    value={filter}
-                    onChange={({ target }) => setFilter(target.value)}
-                    variant="filled"
-                    css={{
-                      "&, &:hover, &:focus": {
-                        background: "white",
-                      },
-                    }}
-                />
-                <Button
-                    aria-label="botão de busca"
-                    colorScheme="green"
-                    justifyContent="center"
-                    type="submit"
-                >
-                  <SearchIcon boxSize={4} />
-                </Button>
-              </chakra.form>
 
+      <Tabs  w="50%" variant="line" colorScheme="green" size='lg'>
+        <TabList mb="4">
+          <Tab sx={{ paddingBottom: "0", fontSize: '23px', fontFamily: 'Lingconsolata', color: 'white' }}>Processos</Tab>
+          <Tab onClick={() => setIsProcessesFileTabEnabled(true)} sx={{ paddingBottom: "0", fontSize: '23px', fontFamily: 'Lingconsolata', color: 'white' }}>Lotes</Tab>
+        </TabList>
+
+        <TabPanels>
+          <TabPanel>
+            <Flex w="50%" flexDir="column" gap="3" mb="4" color="white">
+              <Flex flexDirection="column" gap="2">
+                <Text fontSize="30px" fontWeight="semibold" color="white">
+                  Processos{flow ? ` - Fluxo ${flow?.name}` : ""}
+                </Text>
+                <Flex width="200%"  justifyContent="space-between" gap="2" flexWrap="wrap" mt="25px">
+                  <Flex w="100%" justifyContent="flex-start" alignItems="center" gap="2" flexWrap="wrap">
+                    {flow ? (
+                        <Button
+                            size="md"
+                            fontSize="md"
+                            colorScheme="blue"
+                            onClick={() => navigate("/fluxos", { replace: true })}
+                        >
+                          <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar aos Fluxos
+                        </Button>
+                    ) : null}
+                    <Button
+                        size="md"
+                        fontSize="md"
+                        colorScheme="green"
+                        isDisabled={
+                          !isActionAllowedToUser(
+                              userData?.value?.allowedActions || [],
+                              "create-process"
+                          )
+                        }
+                        onClick={onCreationOpen}
+                    >
+                      <AddIcon mr="2" boxSize={3} /> Cadastrar processo
+                    </Button>
+                    <Button
+                        size="md"
+                        fontSize="md"
+                        colorScheme="green"
+                        isDisabled={
+                          !isActionAllowedToUser(
+                              userData?.value?.allowedActions || [],
+                              "create-process"
+                          )
+                        }
+                        onClick={onImportationOpen}
+                    >
+                      <Icon as={FaFileUpload} mr="2" boxSize={4} style={{ marginRight: '8px' }}/> Importar lote
+                    </Button>
+                    <chakra.form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          refetchProcesses();
+                        }}
+                        width="69%"
+                        display="flex"
+                        flexDirection="row"
+                        alignItems="center"
+                        gap="2"
+                        ml="auto"
+                    >
+                      <Checkbox
+                          colorScheme="green"
+                          borderColor="gray.600"
+                          checked={legalPriority}
+                          onChange={() => setLegalPriority(!legalPriority)}
+                          flexShrink={0}  // Prevent checkbox from shrinking
+                          maxWidth="unset" // Override any max width constraints
+                      >
+                        Prioridade legal
+                      </Checkbox>
+                      <Checkbox
+                          colorScheme="green"
+                          borderColor="gray.600"
+                          checked={showFinished}
+                          onChange={() => setShowFinished(!showFinished)}
+                          flexShrink={0}  // Prevent checkbox from shrinking
+                          maxWidth="unset" // Override any max width constraints
+                      >
+                        Arquivados/finalizados
+                      </Checkbox>
+                      <Input
+                          color="black"
+                          placeholder="Pesquisar processos (por registro ou apelido)"
+                          value={nicknameOrRecordFilter}
+                          onChange={({ target }) => setNicknameOrRecordFilter(target.value)}
+                          variant="filled"
+                          css={{
+                            "&, &:hover, &:focus": {
+                              background: "white",
+                            },
+                          }}
+                      />
+                      <Button
+                          aria-label="botão de busca"
+                          colorScheme="green"
+                          justifyContent="center"
+                          type="submit"
+                      >
+                        <SearchIcon boxSize={4} />
+                      </Button>
+                    </chakra.form>
+
+                  </Flex>
+                </Flex>
+              </Flex>
             </Flex>
-          </Flex>
-        </Flex>
-
-      </Flex>
-      <DataTable
-          w="100%"  // Ensure it takes the full width of its parent
-
-          size="lg"
-        data={processesTableRows}
-        columns={tableColumns}
-        isDataFetching={!isProcessesFetched || !isUserFetched}
-        emptyTableMessage={`Não foram encontrados processos${
-          flow ? ` no fluxo ${flow.name}` : ""
-        }.`}
-      />
-      {processesData?.totalPages !== undefined ? (
-        <Pagination
-          pageCount={processesData?.totalPages}
-          onPageChange={handlePageChange}
-        />
-      ) : null}
-      <CreationModal
-        isOpen={isCreationOpen}
-        onClose={onCreationClose}
-        afterSubmission={refetchProcesses}
-      />
-      {selectedProcess && (
-        <EditionModal
-          selectedProcess={selectedProcess}
-          isOpen={isEditionOpen}
-          onClose={onEditionClose}
-          afterSubmission={refetchProcesses}
-        />
-      )}
-      {selectedProcess && (
-        <DeletionModal
-          process={selectedProcess}
-          isOpen={isDeletionOpen}
-          onClose={onDeletionClose}
-          refetchStages={refetchProcesses}
-        />
-      )}
+            <DataTable
+                maxWidth='unset'
+                width='100%'
+                size="lg"
+                data={processesTableRows}
+                columns={tableColumns}
+                isDataFetching={!isProcessesFetched || !isUserFetched}
+                emptyTableMessage={`Não foram encontrados processos${
+                    flow ? ` no fluxo ${flow.name}` : ""
+                }.`}
+            />
+            {processesData?.totalPages !== undefined ? (
+                <Pagination
+                    pageCount={processesData?.totalPages}
+                    onPageChange={handlePageChange}
+                />
+            ) : null}
+            <CreationModal
+                isOpen={isCreationOpen}
+                onClose={onCreationClose}
+                afterSubmission={refetchProcesses}
+            />
+            {selectedProcess && (
+                <EditionModal
+                    selectedProcess={selectedProcess}
+                    isOpen={isEditionOpen}
+                    onClose={onEditionClose}
+                    afterSubmission={refetchProcesses}
+                />
+            )}
+            {selectedProcess && (
+                <DeletionModal
+                    process={selectedProcess}
+                    isOpen={isDeletionOpen}
+                    onClose={onDeletionClose}
+                    refetchStages={refetchProcesses}
+                />
+            )}
+            <ImportProcessesModal
+                isOpen={isImportationOpen}
+                onClose={onImportationClose}
+                afterSubmission={refetchProcesses} />
+          </TabPanel>
+          <TabPanel>
+            <ProcessesFileComponent
+                isProcessesFileTabEnabled={isProcessesFileTabEnabled}
+                isUserFetched={isUserFetched}
+                userData={userData} />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </PrivateLayout>
   );
 }

@@ -18,6 +18,7 @@ export function Header() {
   const { data: userData } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
 
   const location = useLocation();

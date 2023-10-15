@@ -70,10 +70,12 @@ function Units() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const tableActions = useMemo(
     () => [
@@ -160,13 +162,12 @@ function Units() {
             Unidades
           </Text>
           <Button
-            size="xs"
-            fontSize="sm"
             colorScheme="green"
             isDisabled={
               !isActionAllowedToUser(
                 userData?.value?.allowedActions || [],
-                "create-unit"
+                "create-unit",
+                  userData
               )
             }
             onClick={onCreationOpen}

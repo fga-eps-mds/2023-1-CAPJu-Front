@@ -241,6 +241,7 @@ export function Flow({
             : null,
         data: {
           ...sequence,
+          idProcess: process?.idProcess,
           processRecord: process?.record,
           refetch,
           commentary: note?.commentary,

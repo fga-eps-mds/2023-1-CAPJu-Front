@@ -26,20 +26,20 @@ export function FinalizationModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Finalizar Processo</ModalHeader>
+      <ModalContent mx="auto" my="auto">
+        <ModalHeader fontSize="19px">Finalizar processo</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text>
+          <Text fontSize="19px">
             Tem certeza que deseja finalizar o processo{" "}
             <strong>{process?.nickname}</strong>?
           </Text>
         </ModalBody>
         <ModalFooter gap="2">
-          <Button variant="ghost" onClick={onClose} size="sm">
+          <Button variant="ghost" onClick={onClose}>
             Cancelar
           </Button>
-          <Button colorScheme="red" onClick={handleFinishProcess} size="sm">
+          <Button colorScheme="red" onClick={handleFinishProcess}>
             Finalizar
           </Button>
         </ModalFooter>

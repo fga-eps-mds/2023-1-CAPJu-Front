@@ -43,6 +43,7 @@ export function Requests() {
 
       return res;
     },
+    refetchOnWindowFocus: false,
   });
   const {
     isOpen: isAcceptOpen,
@@ -57,6 +58,7 @@ export function Requests() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const {
     isOpen: isViewOpen,
@@ -76,6 +78,7 @@ export function Requests() {
 
       return res;
     },
+    refetchOnWindowFocus: false,
   });
 
   const tableActions = useMemo(

@@ -31,6 +31,7 @@ export type DataTableProps<Data extends object> = {
   maxWidth?: string | number;
   size?: string | string[];
   emptyTableMessage?: string;
+  rawData?: any;
 };
 
 export function DataTable<Data extends object>({
@@ -42,6 +43,7 @@ export function DataTable<Data extends object>({
   maxWidth = 1120,
   size = ["sm", "md"],
   emptyTableMessage = "Esta tabela está vazia no momento.",
+  rawData,
 }: DataTableProps<Data>) {
   const navigate = useNavigate();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -118,8 +120,7 @@ export function DataTable<Data extends object>({
               <Tr key={row.id}>
                 {row.getVisibleCells().map(({ id, column, getValue }) => {
                   const { meta } = column.columnDef;
-                  const isLastRow =
-                    table.getRowModel().rows?.length - 1 === index;
+                  const isLastRow = table.getRowModel().rows?.length - 1 === index;
                   const value = getValue();
 
                   return meta?.isTableActions ? (
@@ -131,11 +132,16 @@ export function DataTable<Data extends object>({
                     >
                       {(value as TableAction[])?.map(
                         (actionItem: TableAction) => {
+                          const disabled = actionItem.disabled || (actionItem.disabledOn && actionItem.disabledOn(rawData[index]));
+                          const label = disabled ? actionItem.labelOnDisable || actionItem.label : actionItem.label;
+                          actionItem = { ...actionItem, label };
                           return (
                             <ActionButton
                               key={actionItem.label}
+                              disabled={disabled}
                               {...actionItem}
                               action={() => {
+                                console.log(actionItem)
                                 if (actionItem.action)
                                   actionItem.action(row.original.actionsProps);
 

@@ -110,7 +110,7 @@ export function EditionModal({
             <Button variant="ghost" onClick={onClose} size="sm">
               Cancelar
             </Button>
-            <Button colorScheme="green" type="submit" size="sm">
+            <Button colorScheme="green" type="submit">
               Salvar
             </Button>
           </ModalFooter>

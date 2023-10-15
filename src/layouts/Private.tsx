@@ -20,10 +20,9 @@ export function PrivateLayout({ children }: BaseLayoutProps) {
       alignItems="center"
       justifyContent="start"
       pb="8"
-      bg="#1E2952"  // this sets the background color
+      bg="#1E2952"
 
     >
-      asdsadasd
       {children}
 
       {user?.firstLogin &&

@@ -37,7 +37,6 @@ interface CreationModalProps {
 }
 
 export function CreationModal({
-  user,
   isOpen,
   onClose,
   afterSubmission,
@@ -60,7 +59,6 @@ export function CreationModal({
     const body = {
       name: formData.name,
       duration: formData.duration,
-      idUnit: user.idUnit,
     };
 
     const res = await createStage(body);
@@ -115,13 +113,14 @@ export function CreationModal({
               placeholder="Duração da etapa"
               errors={errors.duration}
               {...register("duration")}
+              min={1}
             />
           </ModalBody>
           <ModalFooter gap="2">
-            <Button variant="ghost" onClick={onClose} size="sm">
+            <Button variant="ghost" onClick={onClose}>
               Cancelar
             </Button>
-            <Button colorScheme="blue" type="submit" size="sm">
+            <Button colorScheme="blue" type="submit">
               Salvar
             </Button>
           </ModalFooter>

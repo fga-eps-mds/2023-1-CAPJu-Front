@@ -49,6 +49,7 @@ function Stages() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const {
     data: stagesData,
@@ -76,14 +77,16 @@ function Stages() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
 
   const tableActions = useMemo(
     () => [
       {
-        label: "Editar Etapa",
+        label: "Editar etapa",
         icon: <Icon as={MdEdit} boxSize={4} />,
         action: ({ stage }: { stage: Stage }) => {
+          console.log(stage)
           selectStage(stage);
           onEditionOpen();
         },
@@ -103,7 +106,8 @@ function Stages() {
         actionName: "delete-stage",
         disabled: !isActionAllowedToUser(
           userData?.value?.allowedActions || [],
-          "delete-stage"
+          "delete-stage",
+            userData
         ),
       },
     ],
@@ -170,8 +174,6 @@ function Stages() {
             Etapas
           </Text>
           <Button
-            size="xs"
-            fontSize="sm"
             colorScheme="green"
             isDisabled={
               !isActionAllowedToUser(

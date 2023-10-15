@@ -6,13 +6,17 @@ ul.pagination {
   margin-top: 10px;
 }
 
+.pagination {
+  color: white;
+}
+
 .pagination__link--disabled {
   pointer-events: none;
   opacity: 0.6;
-  color: gray;
+  color: white;
 }
 
 .active {
-  color: #1b9454;
+  color: white;
   font-weight: 700;
 }

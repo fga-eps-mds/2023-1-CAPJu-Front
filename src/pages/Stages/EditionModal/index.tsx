@@ -111,15 +111,17 @@ export function EditionModal({
               type="number"
               label="Duração (em dias)"
               placeholder="Duração da etapa"
+              defaultValue={stage.duration}
               errors={errors.duration}
               {...register("duration")}
+              min={1}
             />
           </ModalBody>
           <ModalFooter gap="2">
             <Button variant="ghost" onClick={onClose} size="sm">
               Cancelar
             </Button>
-            <Button colorScheme="green" type="submit" size="sm">
+            <Button colorScheme="green" type="submit">
               Salvar
             </Button>
           </ModalFooter>

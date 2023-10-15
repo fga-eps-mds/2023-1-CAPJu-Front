@@ -1,24 +1,21 @@
-import { AxiosError, InternalAxiosRequestConfig } from "axios";
+import {AxiosError, InternalAxiosRequestConfig} from 'axios';
 
-export function authorization(
-  config: InternalAxiosRequestConfig<any>
-): InternalAxiosRequestConfig<any> {
-  const localStorageUser = localStorage.getItem("@CAPJu:user");
+export function authorization(config: InternalAxiosRequestConfig<any>): InternalAxiosRequestConfig<any> {
 
-  if (!localStorageUser) return config;
+  const bearerTokenWithQuotes = localStorage.getItem("@CAPJu:jwt_user");
 
-  const user = JSON.parse(localStorageUser);
+  if (!bearerTokenWithQuotes) return config;
+
+  const bearerToken = JSON.parse(bearerTokenWithQuotes);
 
   const authConfig = config;
 
-  authConfig.headers.Authorization = user?.token ? `Bearer ${user?.token}` : "";
+  authConfig.headers.Authorization = `Bearer ${bearerToken}`;
 
   return authConfig;
 }
 
-export const errorResponseHandler = (
-  error: AxiosError<ApiResponse<string>>
-) => {
+export const errorResponseHandler = (error: AxiosError<ApiResponse<string>>) => {
   if (error?.response) {
     console.log("AXIOS INTERCEPTED ERROR: ", error.response);
 

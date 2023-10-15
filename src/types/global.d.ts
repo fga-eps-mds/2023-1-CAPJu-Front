@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import {number} from "yup";
 
 /* eslint-disable no-unused-vars */
 export {};
@@ -13,7 +14,7 @@ declare global {
     idRole: number;
     role?: string;
     idUnit: number;
-    unit?: string;
+    unit?: Unit;
     firstLogin?: boolean;
   };
 
@@ -64,6 +65,7 @@ declare global {
   };
 
   type Process = {
+    idProcess: number,
     record: string | ReactNode;
     nickname: string;
     idFlow: number[] | number;
@@ -76,6 +78,30 @@ declare global {
     isNextSage?: boolean;
   };
 
+  type ProcessesFile = {
+    idProcessesFile: number;
+    status: 'waiting' | 'inProgress' | 'imported' | 'error';
+    items?: ProcessesFileItem[];
+    name?: string;
+    fileName: string;
+    message?: string;
+    createdAt: Date;
+    dataOriginalFile?: Blob;
+    dataResultingFile?: Blob;
+  }
+
+  type ProcessesFileItem = {
+    idProcessesFileItem: number;
+    idProcessesFile: number;
+    status: 'error' | 'imported';
+    record: string;
+    priority: string;
+    flow: string;
+    nickname: string;
+    message?: string;
+    idProcess?: number;
+  }
+
   type Note = {
     idNote?: number;
     commentary: string;
@@ -83,6 +109,12 @@ declare global {
     idStageA: number;
     idStageB: number;
   };
+
+  type ProcessEvent = {
+    messages: string[],
+    changedBy: string,
+    changedAt: Date,
+  }
 
   type SelectOption = {
     label: string;
@@ -120,6 +152,8 @@ declare global {
     actionName: string;
     action?: (actionProps?: any) => any;
     disabled?: boolean;
+    disabledOn?: (data?: any) => boolean,
+    labelOnDisable?: string,
     isNavigate?: boolean;
   };
 

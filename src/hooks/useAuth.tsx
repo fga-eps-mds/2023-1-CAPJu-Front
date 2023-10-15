@@ -7,8 +7,10 @@ import {
   useCallback,
 } from "react";
 
-import { signIn, getUserById } from "services/user";
-import { getRoleById } from "services/role";
+import jwtDecode from 'jwt-decode'
+
+import { signIn } from "services/user";
+import {useToast} from "@chakra-ui/react";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -26,48 +28,35 @@ type AuthContextType = {
 const AuthContext = createContext({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const localUser = localStorage.getItem("@CAPJu:user");
-  const [user, setUser] = useState<User | null>(
-    localUser ? JSON.parse(localUser) : null
-  );
+
+  const toast = useToast();
+
+  const localUser = getUserFromLocalStorageDecoded();
+
+  const [user, setUser] = useState<User | null>(localUser?.cpf ? localUser : null);
 
   const handleLogin = useCallback(
-    async (credentials: {
-      cpf: string;
-      password: string;
-    }): Promise<Result<User>> => {
+    async (credentials: {cpf: string; password: string; }): Promise<Result<User>> => {
       const res = await signIn(credentials);
-      const { value: roleValue } = res.value?.idRole
-        ? await getRoleById(res.value?.idRole)
-        : { value: { name: "-" } };
-
       if (res.type === "success") {
         localStorage.setItem(
-          "@CAPJu:user",
-          JSON.stringify({
-            ...res.value,
-            role: roleValue?.name,
-          })
+          "@CAPJu:jwt_user",
+          JSON.stringify(res.value)
         );
-        setUser({
-          ...res.value,
-          role: roleValue?.name,
-        });
+        setUser(getUserFromLocalStorageDecoded());
       }
-
-      return res;
+      return { type: res.type, value: getUserFromLocalStorageDecoded() } as Result<User>;
     },
     []
   );
 
   function handleLogout() {
-    localStorage.removeItem("@CAPJu:user");
+    localStorage.removeItem("@CAPJu:jwt_user");
     setUser(null);
   }
 
-  const getUserData = async (): Promise<
-    Result<User & { allowedActions: string[] }>
-  > => {
+  const getUserData = async (): Promise<Result<User & { allowedActions: string[] }>> => {
+
     if (!user?.cpf) {
       handleLogout();
       return {
@@ -77,54 +66,59 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       };
     }
 
-    const res = await getUserById(user?.cpf);
-    const { value: roleValue } = res?.value?.idRole
-      ? await getRoleById(res?.value?.idRole)
-      : { value: { name: "-" } };
+    return { value: {...user, allowedActions: (user as any).role.allowedActions } } as any;
 
-    if (res.type === "error" || res.value?.idRole !== user.idRole) {
-      handleLogout();
-      return {
-        type: "error",
-        error: new Error("Autenticação inválida."),
-        value: undefined,
-      };
-    }
-
-    setUser({
-      ...user,
-      ...res.value,
-      role: roleValue?.name,
-    });
-
-    localStorage.setItem("@CAPJu:user", JSON.stringify(user));
-
-    return res;
   };
 
   function validateAuthentication() {
-    const currentDate = new Date();
-    const localStorageUser = localStorage.getItem("@CAPJu:user");
 
-    if (!localStorageUser) {
+    const localStorageUser = getUserFromLocalStorageDecoded();
+
+    if (!localStorageUser.cpf) {
       setUser(null);
       return;
     }
 
-    if (
-      !JSON.parse(localStorageUser)?.expiresIn ||
-      new Date(JSON.parse(localStorageUser)?.expiresIn) < currentDate
-    ) {
-      setUser(null);
-      return;
+    setUser(localStorageUser);
+
+  }
+
+  function getUserFromLocalStorageDecoded() {
+
+    const jwtToken = localStorage.getItem("@CAPJu:jwt_user") as string;
+
+    if(!jwtToken) return {} as User;
+
+    const currentTimeInSeconds = Math.floor(Date.now() / 1000);
+
+    if(getJwtFromLocalStorageDecoded().exp < currentTimeInSeconds) {
+      localStorage.removeItem("@CAPJu:jwt_user");
+      toast({
+        id: "token-expired",
+        description: "Sessão expirada. Realize o login novamente",
+        status: "error",
+        isClosable: true,
+      });
     }
 
-    setUser(JSON.parse(localStorageUser));
+    return getJwtFromLocalStorageDecoded().id as User
+
+  }
+
+  function getJwtFromLocalStorageDecoded() {
+
+    const jwtToken = localStorage.getItem("@CAPJu:jwt_user") as string;
+
+    if(!jwtToken) return '';
+
+    return jwtDecode(JSON.stringify(jwtToken)) as any;
+
   }
 
   useEffect(() => {
     validateAuthentication();
   }, []);
+
 
   return (
     <AuthContext.Provider

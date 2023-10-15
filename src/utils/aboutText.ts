@@ -1,6 +1,6 @@
 export const aboutCapju = `CAPJu é a abreviação para "Controle e Acompanhamento de Processos da Justiça". Trata-se de uma aplicação web com o propósito de auxiliar o usuário a criar e gerenciar fluxos de atividades de trabalho. A ferramenta busca substituir a utilização de planilhas, que são comumente usadas no controle e gerenciamento de diversas atividades da Secretaria de uma unidade judicial, como, por exemplo, o controle de perícias médicas. O sistema é intuitivo e oferece diversas facilidades como a notificação do usuário sobre o atraso em uma tarefa definida. Não há tarefas e fluxos pré-definidos, os quais podem ser criados de acordo com a necessidade e, principalmente, a criatividade. Aproveite!`;
 
-export const aboutYears = ["2023.1", "2022.2", "2022.1"];
+export const aboutYears = ["2023.2", "2023.1", "2022.2", "2022.1"];
 
 export const creatorsName = "Wellington José Barbosa Carlos";
 export const creatorsEmail = "wellington.carlos@trf1.jus.br";
@@ -12,6 +12,14 @@ export const techinicalManagerName =
 export const epsName = "Engenharia de Produto de Software - EPS";
 export const mdsName = "Métodos de Desenvolvimento de Software - MDS";
 
+export const epsStudents20232 = [
+  { name: "Brenda Vitória dos Santos", profile: 'https://github.com/brendavsantos' },
+  { name: "Denniel William Roriz Lima", profile: 'https://github.com/Denniel-sudo' },
+  { name: "João Gabriel de Campos de Matos", profile: 'https://github.com/JongaMatos' },
+  { name: "Nícolas Georgeos Mantzos", profile: 'https://github.com/ngm1450' },
+  { name: "Washington Bispo Arishita Júnior", profile: 'https://github.com/WashingtonBispo' },
+];
+
 export const epsStudents20231 = [
   "Arthur Manuel Florêncio Sena",
   "Peniel Etamana Desirez Jesus Zannoukou",
@@ -20,6 +28,16 @@ export const epsStudents20231 = [
   "Victor Samuel dos Santos Lucas",
   "Vinícius Vieira de Souza",
   "Wellington Jonathan Rodrigues",
+];
+
+export const mdsStudents20232 = [
+  "Amanda de Moura",
+  "Bruno Ricardo de Menezes",
+  "Camila Costa de Souza Careli",
+  "Daniel Rodrigues da Rocha",
+  "Davi Rodrigues da Rocha",
+  "Felipe de Oliveira Motta",
+  "Leandro Almeida Rocha Santos",
 ];
 
 export const mdsStudents20231 = [

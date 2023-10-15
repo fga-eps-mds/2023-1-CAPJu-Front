@@ -31,7 +31,7 @@ export function DeletionModal({
 
   const handleDeleteProcess = async () => {
     handleLoading(true);
-    const res = await deleteProcess(process?.record as string);
+    const res = await deleteProcess(process?.idProcess);
     if (res.type === "success") {
       refetchStages();
       toast({

@@ -18,21 +18,21 @@ export function Pagination({ pageCount, onPageChange }: PaginationProps) {
   };
 
   return (
-    <ReactPaginate
-      previousLabel="Anterior"
-      nextLabel="Próximo"
-      pageCount={pageCount}
-      onPageChange={handlePageChange}
-      containerClassName="pagination"
-      previousLinkClassName="pagination__link"
-      nextLinkClassName="pagination__link"
-      disabledClassName="pagination__link--disabled"
-      activeClassName="active"
-    />
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <ReactPaginate
+            previousLabel="Anterior"
+            nextLabel="Próximo"
+            pageCount={pageCount}
+            onPageChange={handlePageChange}
+            containerClassName="pagination"
+            previousLinkClassName="pagination__link"
+            nextLinkClassName="pagination__link"
+            disabledClassName="pagination__link--disabled"
+            activeClassName="active"
+        />
+      </div>
+
   );
 }
 
 export default Pagination;
-
-// Exemplo de uso:
-// <Pagination pageCount={pageCount} onPageChange={handlePageChange} />

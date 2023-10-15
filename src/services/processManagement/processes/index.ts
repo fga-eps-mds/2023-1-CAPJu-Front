@@ -3,10 +3,11 @@ import { api } from "services/api";
 export const getProcesses = async (
   flowId: number | undefined,
   pagination?: Pagination,
-  filter?: string,
+  nicknameOrRecordFilter?: string,
   filterByLegalPriority?: boolean,
   showArchivedAndFinished?: boolean
 ): Promise<Result<Process[]>> => {
+
   try {
     const res = await api.processManagement.get<{
       processes: Process[];
@@ -15,7 +16,7 @@ export const getProcesses = async (
       params: {
         offset: pagination?.offset ?? 0,
         limit: pagination?.limit,
-        filter,
+        nicknameOrRecordFilter,
         showArchivedAndFinished,
         filterByLegalPriority,
       },
@@ -39,11 +40,11 @@ export const getProcesses = async (
 };
 
 export const deleteProcess = async (
-  registro: string
+    idProcess: number
 ): Promise<Result<Process>> => {
   try {
     const res = await api.processManagement.delete<Process>(
-      `/process/deleteProcess/${registro}`
+      `/process/deleteProcess/${idProcess}`
     );
 
     return {
@@ -91,7 +92,7 @@ export const createProcess = async (data: {
 };
 
 export const updateProcess = async (data: {
-  record: string;
+  idProcess: number,
   nickname: string;
   idFlow: number | number[];
   priority: number;
@@ -101,7 +102,7 @@ export const updateProcess = async (data: {
 }): Promise<Result<Process>> => {
   try {
     const res = await api.processManagement.put<Process>(
-      `/process/updateProcess/${data.record}`,
+      `/process/updateProcess/${data.idProcess}`,
       data
     );
 
@@ -145,8 +146,32 @@ export const getProcessByRecord = async (
   }
 };
 
+export const getProcessById = async (
+    idProcess: string | number
+): Promise<Result<Process>> => {
+  try {
+    const res = await api.processManagement.get<Process>(
+        `/process/${idProcess}`
+    );
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
 export const updateStage = async (data: {
-  record: string;
+  idProcess: number;
   from: number;
   to: number;
   commentary: string;
@@ -178,12 +203,14 @@ export const updateStage = async (data: {
 export const updateProcessStatus = async (data: {
   priority: number;
   idFlow: number;
-  record: string;
+  idProcess: number,
   status: string;
 }): Promise<Result<Process>> => {
+
+  console.log(data);
   try {
     const res = await api.processManagement.put<Process>(
-      `/process/updateProcess/${data.record}`,
+      `/process/updateProcess/${data.idProcess}`,
       data
     );
 
@@ -202,3 +229,47 @@ export const updateProcessStatus = async (data: {
     };
   }
 };
+
+export const finalizeProcess = async (process: Process): Promise<Result<Process>> => {
+  try {
+    const res = await api.processManagement.put<Process>(`/process/finalizeProcess/${process.idProcess}`);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const archiveProcess = async (process: Process): Promise<Result<Process>> => {
+  try {
+
+    const res = await api.processManagement.put<Process>(`/process/archiveProcess/${process.idProcess}/${process.status !== 'archived'}`);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+
+

@@ -36,7 +36,6 @@ export const getStages = async (
 export const createStage = async (data: {
   name: string;
   duration: number;
-  idUnit: number;
 }): Promise<Result<Stage>> => {
   try {
     const res = await api.processManagement.post<Stage>(

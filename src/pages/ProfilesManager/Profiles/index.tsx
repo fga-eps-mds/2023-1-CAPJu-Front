@@ -44,6 +44,7 @@ export function Profiles() {
 
       return res;
     },
+    refetchOnWindowFocus: false,
   });
   const {
     isOpen: isDeleteOpen,
@@ -64,6 +65,7 @@ export function Profiles() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const { data: unitsData, isFetched: isUnitsFetched } = useQuery({
     queryKey: ["units"],
@@ -74,10 +76,12 @@ export function Profiles() {
 
       return res;
     },
+    refetchOnWindowFocus: false,
   });
   const { data: rolesData, isFetched: isRolesFetched } = useQuery({
     queryKey: ["roles"],
     queryFn: getAllRoles,
+    refetchOnWindowFocus: false,
   });
   const tableActions = useMemo(
     () => [
@@ -202,7 +206,7 @@ export function Profiles() {
       <Flex mt="4" w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Text fontSize="lg" fontWeight="semibold">
-            Perfil de Acesso
+            Perfil de acesso
           </Text>
         </Flex>
         <Flex justifyContent="flex-start" w="100%">
