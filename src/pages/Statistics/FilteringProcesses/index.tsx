@@ -1,4 +1,5 @@
 import {
+  useToast,
   Accordion,
   AccordionButton,
   AccordionIcon,
@@ -9,25 +10,112 @@ import {
   Select,
   Button,
   Text,
-  Input
+  Input,
 } from "@chakra-ui/react";
 import { DataTable } from "components/DataTable";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getFlows } from "services/processManagement/flows";
 import { createColumnHelper } from "@tanstack/react-table";
+import { getProcesses } from "services/processManagement/processes";
+import { useQuery } from "react-query";
+import { useAuth } from "hooks/useAuth";
+import { isActionAllowedToUser } from "utils/permissions";
+import { ViewIcon } from "@chakra-ui/icons";
 
 export default function FilteringProcesses() {
-  const [flows, setFlows] = useState([] as Flow[]);
+  const toast = useToast();
+  const { getUserData } = useAuth();
+  const { data: userData, isFetched: isUserFetched } = useQuery({
+    queryKey: ["user-data"],
+    queryFn: getUserData,
+  });
 
-  const getData = async () => {
-    const data = await getFlows();
-    if (data.value) setFlows(data.value);
+  // ----------------------------------------- useStates ----------------------------------------------
+  const [flows, setFlows] = useState([] as Flow[]);
+  const [isFetching, setIsFetching] = useState<boolean>(true);
+
+  // ----------------------------------------- Funções ----------------------------------------------
+  const getDataFlows = async () => {
+    const dataFlows = await getFlows();
+    if (dataFlows.value) setFlows(dataFlows.value);
   };
 
+  // ----------------------------------------- useEffect ----------------------------------------------
   useEffect(() => {
-    getData();
+    getDataFlows();
+    // refetchProcesses();
   }, []);
 
+  const {
+    data: processesData,
+    isFetched: isProcessesFetched,
+    refetch: refetchProcesses,
+  } = useQuery({
+    queryKey: ["processes"],
+    queryFn: async () => {
+      setIsFetching(true);
+      const res = await getProcesses(2, undefined, undefined, false, true);
+      setIsFetching(false);
+
+      if (res.type === "error") throw new Error(res.error.message);
+      // console.log("batata")
+      return res;
+    },
+    onError: () => {
+      toast({
+        id: "processes-error",
+        title: "Erro ao carregar processos",
+        description:
+          "Houve um erro ao carregar processos, favor tentar novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    },
+  });
+
+  // ----------------------------------------- Coluna de Ações
+  const tableActions = useMemo<TableAction[]>(
+    () => [
+      {
+        label: "Visualizar Processo",
+        icon: <ViewIcon boxSize={4} />,
+        isNavigate: true,
+        actionName: "see-process",
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "see-process"
+        ),
+      },
+    ],
+    [isProcessesFetched, isUserFetched, userData]
+  );
+
+  const filteredProcesses = useMemo<TableRow<Process>[]>(() => {
+    if (isFetching) return [];
+
+    const value = processesData?.value;
+    console.log({ value });
+    return (
+      (value?.reduce(
+        (
+          acc: TableRow<Process>[] | Process[],
+          curr: TableRow<Process> | Process
+        ) => [
+          ...acc,
+          { ...curr, tableActions, actionsProps: { process: curr } },
+        ],
+        []
+      ) as TableRow<Process>[]) || []
+    );
+  }, [
+    processesData,
+    isProcessesFetched,
+    isUserFetched,
+    tableActions,
+    isFetching,
+  ]);
+
+  // ----------------------------------------- Colunas da Tabela ----------------------------------------------
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [
     tableColumnHelper.accessor("record", {
@@ -40,13 +128,6 @@ export default function FilteringProcesses() {
     tableColumnHelper.accessor("nickname", {
       cell: (info) => info.getValue(),
       header: "Apelido",
-      meta: {
-        isSortable: true,
-      },
-    }),
-    tableColumnHelper.accessor("currentState", {
-      cell: (info) => info.getValue(),
-      header: "Situação atual",
       meta: {
         isSortable: true,
       },
@@ -68,10 +149,15 @@ export default function FilteringProcesses() {
     }),
   ];
 
+  // ----------------------------------------- Funções ----------------------------------------------
+  const handleConfirmClick = async () => {
+    refetchProcesses();
+  };
+
   return (
     <Box backgroundColor="#FFF" borderRadius="8px">
       <Flex justifyContent="flex-start" w="100%">
-        <Accordion defaultIndex={[1]} allowMultiple w="100%">
+        <Accordion defaultIndex={[0]} allowMultiple w="100%">
           <AccordionItem>
             <h2>
               <AccordionButton>
@@ -93,31 +179,33 @@ export default function FilteringProcesses() {
             </h2>
             <AccordionPanel pb={4}>
               <Flex gap="5" w="70%">
-                <Select placeholder="Selecione o Fluxo">
+                <Select placeholder="Selecione o Fluxo" color="gray.500">
                   {flows?.map((flow) => {
                     return <option value={flow.idFlow}>{flow.name}</option>;
                   })}
                 </Select>
-                <Select placeholder="Status" w="35%">
+                <Select placeholder="Status" w="35%" color="gray.500">
                   <option value="archived">Concluído</option>
                   <option value="finished">Interrompido</option>
                 </Select>
               </Flex>
               <Flex gap="5" w="70%" marginTop="15" alignItems="center">
-                <Input w="50%" type="date" />
-                <Text>
-                  à
-                </Text>
-                <Input w="50%" type="date" />
-                <Button colorScheme="whatsapp" w="20%">
+                <Input w="50%" type="date" color="gray.500" />
+                <Text>à</Text>
+                <Input w="50%" type="date" color="gray.500" />
+                <Button
+                  colorScheme="whatsapp"
+                  w="20%"
+                  onClick={handleConfirmClick}
+                >
                   Confirmar
                 </Button>
               </Flex>
-              <Flex w="110%">
+              <Flex w="110%" marginTop="15">
                 <DataTable
-                  data={[]}
+                  data={filteredProcesses}
                   columns={tableColumns}
-                  isDataFetching={false}
+                  isDataFetching={!isProcessesFetched || !isUserFetched}
                   emptyTableMessage="Não foram encontrados processos"
                 />
               </Flex>
