@@ -145,29 +145,6 @@ export const getProcessByRecord = async (
   }
 };
 
-export const getProcessesByIdFlow = async (
-  idFlow: number
-): Promise<Result<Process[]>> => {
-  try {
-    const res = await api.processManagement.get<Process[]>(
-      `/process/idFlow/${idFlow}`
-    );
-    return {
-      type: "success",
-      value: res.data,
-    };
-  } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
-  }
-};
-
 export const updateStage = async (data: {
   record: string;
   from: number;
