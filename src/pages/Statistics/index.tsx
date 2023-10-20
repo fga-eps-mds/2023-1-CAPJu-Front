@@ -7,6 +7,7 @@ import {
   Box,
   Flex,
   Text,
+  Button,
 } from "@chakra-ui/react";
 import { PrivateLayout } from "layouts/Private";
 
@@ -19,7 +20,6 @@ export default function Statistics() {
             fontSize="22px"
             fontWeight="600"
             fontStyle="normal"
-            fontFamily="Inter"
             lineHeight="24px"
           >
             Estatísticas
@@ -40,14 +40,15 @@ export default function Statistics() {
                       fontSize="17px"
                       fontWeight="600"
                       fontStyle="normal"
-                      fontFamily="Inter"
                       lineHeight="24px"
                     >
                       Visualizar quantidade de processos em cada etapa
                     </Box>
                   </AccordionButton>
                 </h2>
-                <AccordionPanel pb={4}></AccordionPanel>
+                <AccordionPanel pb={4}>
+                  <Button colorScheme="green">Confirmar</Button>
+                </AccordionPanel>
               </AccordionItem>
             </Accordion>
           </Flex>
