@@ -66,7 +66,7 @@ export function CommentEdge({
     handleLoading(true);
 
     try {
-      console.log(idProcess);
+
       const res = await addNoteToProcess({
         idProcess,
         idStageA: from,

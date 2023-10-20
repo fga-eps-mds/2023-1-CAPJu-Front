@@ -29,12 +29,11 @@ import {PrivateLayout} from 'layouts/Private';
 import {DataTable} from 'components/DataTable';
 import {labelByProcessStatus} from 'utils/constants';
 import {Pagination} from 'components/Pagination';
-import {FaFileUpload} from "react-icons/fa";
+import {FaEye} from "react-icons/fa";
 import {DeletionModal} from './DeletionModal';
 import {CreationModal} from './CreationModal';
 import {EditionModal} from './EditionModal';
-import {ImportProcessesModal} from './ImportProcessesModal';
-import ProcessesFileComponent from './ProcessesFile';
+import {VisualizationFilesModal} from "./ProcessesFile/VisualizationFilesModal";
 
 function Processes() {
   const { getUserData } = useAuth();
@@ -51,25 +50,29 @@ function Processes() {
   const [nicknameOrRecordFilter, setNicknameOrRecordFilter] = useState<string>('');
   const [legalPriority, setLegalPriority] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
+
   const {
     isOpen: isCreationOpen,
     onOpen: onCreationOpen,
     onClose: onCreationClose,
   } = useDisclosure();
+
   const {
     isOpen: isDeletionOpen,
     onOpen: onDeletionOpen,
     onClose: onDeletionClose,
   } = useDisclosure();
+
   const {
     isOpen: isEditionOpen,
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+
   const {
-    isOpen: isImportationOpen,
-    onOpen: onImportationOpen,
-    onClose: onImportationClose,
+    isOpen: isProcessesFileModalOpen,
+    onOpen: onProcessesFileModalOpen,
+    onClose: onProcessesFileModalClose,
   } = useDisclosure();
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -93,7 +96,7 @@ function Processes() {
           offset: hasFilter ? 0 : currentPage * 10,
           limit: 10,
         },
-        nicknameOrRecordFilter.trim(),
+        nicknameOrRecordFilter.replace(/[ \/.-]/g, ''),
         legalPriority,
         showFinished
       );
@@ -263,173 +266,145 @@ function Processes() {
     refetchProcesses();
   }, [currentPage, showFinished, legalPriority]);
 
-  const [isProcessesFileTabEnabled, setIsProcessesFileTabEnabled] = useState<boolean>(false);
-
   return (
     <PrivateLayout>
 
-      <Tabs  w="50%" variant="line" colorScheme="green" size='lg'>
-        <TabList mb="4">
-          <Tab sx={{ paddingBottom: "0", fontSize: '23px', fontFamily: 'Lingconsolata', color: 'white' }}>Processos</Tab>
-          <Tab onClick={() => setIsProcessesFileTabEnabled(true)} sx={{ paddingBottom: "0", fontSize: '23px', fontFamily: 'Lingconsolata', color: 'white' }}>Lotes</Tab>
-        </TabList>
+      <Flex w="50%" flexDir="column" gap="3" mb="4" color="white">
+        <Flex flexDirection="column" gap="2">
+          <Text fontSize="30px" fontWeight="semibold" color="white">
+            Processos{flow ? ` - Fluxo ${flow?.name}` : ""}
+          </Text>
+          <Flex width="200%"  justifyContent="space-between" gap="2" flexWrap="wrap" mt="25px">
+            <Flex w="50%" justifyContent="flex-start" alignItems="center" gap="2" flexWrap="wrap">
+              {flow ? (
+                  <Button
+                      size="md"
+                      fontSize="md"
+                      colorScheme="blue"
+                      onClick={() => navigate("/fluxos", { replace: true })}
+                  >
+                    <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar aos Fluxos
+                  </Button>
+              ) : null}
+              <Button
+                  size="md"
+                  fontSize="md"
+                  colorScheme="green"
+                  isDisabled={
+                    !isActionAllowedToUser(
+                        userData?.value?.allowedActions || [],
+                        "create-process"
+                    )
+                  }
+                  onClick={onCreationOpen}
+              >
+                <AddIcon mr="2" boxSize={3} /> Cadastrar processo
+              </Button>
+              <Button
+                  size="md"
+                  fontSize="md"
+                  colorScheme="green"
+                  onClick={onProcessesFileModalOpen}
+              >
+                <Icon as={FaEye} mr="2" boxSize={4} style={{ marginRight: '8px' }}/> Visualizar lotes
+              </Button>
+              <chakra.form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    refetchProcesses();
+                  }}
+                  width="69%"
+                  display="flex"
+                  flexDirection="row"
+                  alignItems="center"
+                  gap="2"
+                  ml="auto"
+              >
+                <Checkbox
+                    colorScheme="green"
+                    borderColor="gray.600"
+                    checked={legalPriority}
+                    onChange={() => setLegalPriority(!legalPriority)}
+                    flexShrink={0}  // Prevent checkbox from shrinking
+                    maxWidth="unset" // Override any max width constraints
+                >
+                  Prioridade legal
+                </Checkbox>
+                <Checkbox
+                    colorScheme="green"
+                    borderColor="gray.600"
+                    checked={showFinished}
+                    onChange={() => setShowFinished(!showFinished)}
+                    flexShrink={0}  // Prevent checkbox from shrinking
+                    maxWidth="unset" // Override any max width constraints
+                >
+                  Arquivados/finalizados
+                </Checkbox>
+                <Input
+                    color="black"
+                    placeholder="Pesquisar processos (por registro ou apelido)"
+                    value={nicknameOrRecordFilter}
+                    onChange={({ target }) => setNicknameOrRecordFilter(target.value)}
+                    variant="filled"
+                    css={{
+                      "&, &:hover, &:focus": {
+                        background: "white",
+                      },
+                    }}
+                />
+                <Button
+                    aria-label="botão de busca"
+                    colorScheme="green"
+                    justifyContent="center"
+                    type="submit"
+                >
+                  <SearchIcon boxSize={4} />
+                </Button>
+              </chakra.form>
 
-        <TabPanels>
-          <TabPanel>
-            <Flex w="50%" flexDir="column" gap="3" mb="4" color="white">
-              <Flex flexDirection="column" gap="2">
-                <Text fontSize="30px" fontWeight="semibold" color="white">
-                  Processos{flow ? ` - Fluxo ${flow?.name}` : ""}
-                </Text>
-                <Flex width="200%"  justifyContent="space-between" gap="2" flexWrap="wrap" mt="25px">
-                  <Flex w="100%" justifyContent="flex-start" alignItems="center" gap="2" flexWrap="wrap">
-                    {flow ? (
-                        <Button
-                            size="md"
-                            fontSize="md"
-                            colorScheme="blue"
-                            onClick={() => navigate("/fluxos", { replace: true })}
-                        >
-                          <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar aos Fluxos
-                        </Button>
-                    ) : null}
-                    <Button
-                        size="md"
-                        fontSize="md"
-                        colorScheme="green"
-                        isDisabled={
-                          !isActionAllowedToUser(
-                              userData?.value?.allowedActions || [],
-                              "create-process"
-                          )
-                        }
-                        onClick={onCreationOpen}
-                    >
-                      <AddIcon mr="2" boxSize={3} /> Cadastrar processo
-                    </Button>
-                    <Button
-                        size="md"
-                        fontSize="md"
-                        colorScheme="green"
-                        isDisabled={
-                          !isActionAllowedToUser(
-                              userData?.value?.allowedActions || [],
-                              "create-process"
-                          )
-                        }
-                        onClick={onImportationOpen}
-                    >
-                      <Icon as={FaFileUpload} mr="2" boxSize={4} style={{ marginRight: '8px' }}/> Importar lote
-                    </Button>
-                    <chakra.form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          refetchProcesses();
-                        }}
-                        width="69%"
-                        display="flex"
-                        flexDirection="row"
-                        alignItems="center"
-                        gap="2"
-                        ml="auto"
-                    >
-                      <Checkbox
-                          colorScheme="green"
-                          borderColor="gray.600"
-                          checked={legalPriority}
-                          onChange={() => setLegalPriority(!legalPriority)}
-                          flexShrink={0}  // Prevent checkbox from shrinking
-                          maxWidth="unset" // Override any max width constraints
-                      >
-                        Prioridade legal
-                      </Checkbox>
-                      <Checkbox
-                          colorScheme="green"
-                          borderColor="gray.600"
-                          checked={showFinished}
-                          onChange={() => setShowFinished(!showFinished)}
-                          flexShrink={0}  // Prevent checkbox from shrinking
-                          maxWidth="unset" // Override any max width constraints
-                      >
-                        Arquivados/finalizados
-                      </Checkbox>
-                      <Input
-                          color="black"
-                          placeholder="Pesquisar processos (por registro ou apelido)"
-                          value={nicknameOrRecordFilter}
-                          onChange={({ target }) => setNicknameOrRecordFilter(target.value)}
-                          variant="filled"
-                          css={{
-                            "&, &:hover, &:focus": {
-                              background: "white",
-                            },
-                          }}
-                      />
-                      <Button
-                          aria-label="botão de busca"
-                          colorScheme="green"
-                          justifyContent="center"
-                          type="submit"
-                      >
-                        <SearchIcon boxSize={4} />
-                      </Button>
-                    </chakra.form>
-
-                  </Flex>
-                </Flex>
-              </Flex>
             </Flex>
-            <DataTable
-                maxWidth='unset'
-                width='100%'
-                size="lg"
-                data={processesTableRows}
-                columns={tableColumns}
-                isDataFetching={!isProcessesFetched || !isUserFetched}
-                emptyTableMessage={`Não foram encontrados processos${
-                    flow ? ` no fluxo ${flow.name}` : ""
-                }.`}
-            />
-            {processesData?.totalPages !== undefined ? (
-                <Pagination
-                    pageCount={processesData?.totalPages}
-                    onPageChange={handlePageChange}
-                />
-            ) : null}
-            <CreationModal
-                isOpen={isCreationOpen}
-                onClose={onCreationClose}
-                afterSubmission={refetchProcesses}
-            />
-            {selectedProcess && (
-                <EditionModal
-                    selectedProcess={selectedProcess}
-                    isOpen={isEditionOpen}
-                    onClose={onEditionClose}
-                    afterSubmission={refetchProcesses}
-                />
-            )}
-            {selectedProcess && (
-                <DeletionModal
-                    process={selectedProcess}
-                    isOpen={isDeletionOpen}
-                    onClose={onDeletionClose}
-                    refetchStages={refetchProcesses}
-                />
-            )}
-            <ImportProcessesModal
-                isOpen={isImportationOpen}
-                onClose={onImportationClose}
-                afterSubmission={refetchProcesses} />
-          </TabPanel>
-          <TabPanel>
-            <ProcessesFileComponent
-                isProcessesFileTabEnabled={isProcessesFileTabEnabled}
-                isUserFetched={isUserFetched}
-                userData={userData} />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+          </Flex>
+        </Flex>
+      </Flex>
+      <DataTable
+          maxWidth='unset'
+          width='50%'
+          size="lg"
+          data={processesTableRows}
+          columns={tableColumns}
+          isDataFetching={!isProcessesFetched || !isUserFetched}
+          emptyTableMessage={`Não foram encontrados processos${
+              flow ? ` no fluxo ${flow.name}` : ""
+          }.`}
+      />
+      {processesData?.totalPages ? (
+          <Pagination
+              pageCount={processesData?.totalPages}
+              onPageChange={handlePageChange}
+          />
+      ) : null}
+      <CreationModal
+          isOpen={isCreationOpen}
+          onClose={onCreationClose}
+          afterSubmission={refetchProcesses}
+      />
+      {selectedProcess && (
+          <EditionModal
+              selectedProcess={selectedProcess}
+              isOpen={isEditionOpen}
+              onClose={onEditionClose}
+              afterSubmission={refetchProcesses}
+          />
+      )}
+      {selectedProcess && (
+          <DeletionModal
+              process={selectedProcess}
+              isOpen={isDeletionOpen}
+              onClose={onDeletionClose}
+              refetchStages={refetchProcesses}
+          />
+      )}
+      <VisualizationFilesModal isOpen={isProcessesFileModalOpen} onClose={onProcessesFileModalClose} />
     </PrivateLayout>
   );
 }

@@ -12,9 +12,9 @@ import {Icon, ViewIcon} from '@chakra-ui/icons';
 import {useEffect, useMemo, useState} from "react";
 import {FaEdit} from "react-icons/fa";
 import {DataTable} from '../../../../components/DataTable';
-import {findAllItemsPaged} from "../../../../services/processManagement/processesFile";
+import {findAllItemsPaged, updateFileItemById} from '../../../../services/processManagement/processesFile';
 import {Pagination} from '../../../../components/Pagination';
-import {CreationModal} from "../../CreationModal";
+import {CreationModal} from '../../CreationModal';
 
 interface VisualizationItemsModalProps {
     processesFile: ProcessesFile;
@@ -32,8 +32,7 @@ export function VisualizationItemsModal({ processesFile, isOpen, onClose }: Visu
 
     const tableColumnHelper = createColumnHelper<TableRow<any>>();
 
-    const [recordSelected, setRecordSelected] = useState<string>('');
-    const [nicknameSelected, setNicknameSelected] = useState<string>('');
+    const [fileItemSelected, setFileItemSelected] = useState<ProcessesFileItem | null>(null);
 
     // @ts-ignore
     const tableActions = useMemo<TableAction[]>(
@@ -44,7 +43,7 @@ export function VisualizationItemsModal({ processesFile, isOpen, onClose }: Visu
                 isNavigate: true,
                 actionName: "see-items",
                 labelOnDisable: 'Item não importado',
-                disabledOn: (fileItem: ProcessesFileItem) => fileItem.status !== 'imported' || !fileItem.idProcess
+                disabledOn: (fileItem: ProcessesFileItem) => !fileItem.idProcess
             },
             {
                 label: "Importar manualmente",
@@ -53,8 +52,7 @@ export function VisualizationItemsModal({ processesFile, isOpen, onClose }: Visu
                 labelOnDisable: 'Item já importado',
                 action: ({ processesFileItem }) => {
                     onCreationOpen();
-                    setRecordSelected(processesFileItem.record);
-                    setNicknameSelected(processesFileItem.nickname);
+                    setFileItemSelected(processesFileItem);
                 },
                 disabledOn: (fileItem: ProcessesFileItem) => fileItem.status !== 'error' || !fileItem.idProcess
             },
@@ -125,6 +123,7 @@ export function VisualizationItemsModal({ processesFile, isOpen, onClose }: Visu
         return {
             error:  { text: 'Erro', color: 'red' },
             imported: { text: 'Importado', color: 'green' },
+            manuallyImported: { text: 'Importado manualmente', color: 'green' }
         }[fileStatus] as { text: string, color: string }
     }
 
@@ -198,13 +197,22 @@ export function VisualizationItemsModal({ processesFile, isOpen, onClose }: Visu
                         />
                     ) : null}
                     {
-                        (recordSelected || nicknameSelected) &&
+                        (fileItemSelected) &&
                         <CreationModal
                             isOpen={isCreationOpen}
                             onClose={onCreationClose}
-                            recordParam={recordSelected}
-                            nicknameParam={nicknameSelected}
-                            afterSubmission={() => onCreationOpen()}
+                            recordParam={fileItemSelected?.record}
+                            nicknameParam={fileItemSelected?.nickname}
+                            afterSubmission={ async (createdProcess) => {
+                                await updateFileItemById(fileItemSelected.idProcessesFileItem, {
+                                    status: 'manuallyImported',
+                                    message: null,
+                                    idProcess: createdProcess?.idProcess,
+                                });
+                                await refetchItems();
+                                onCreationOpen();
+                                setFileItemSelected(null);
+                            }}
                         />
                     }
                 </ModalBody>

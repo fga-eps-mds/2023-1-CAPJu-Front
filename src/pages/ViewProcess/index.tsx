@@ -2,10 +2,10 @@ import {Button, Flex, Text, useDisclosure, useToast} from "@chakra-ui/react";
 import {Icon} from "@chakra-ui/icons";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {IoReturnDownBackOutline} from "react-icons/io5";
-import {FiArchive, FiDownload, FiSkipBack, FiSkipForward} from "react-icons/fi";
+import {FiArchive, FiSkipBack, FiSkipForward} from "react-icons/fi";
 import {useEffect, useMemo, useState} from "react";
 import {useQuery} from "react-query";
-
+import {FaFilePdf, FaFileExcel} from "react-icons/fa";
 import {PrivateLayout} from "layouts/Private";
 import {getFlowById} from "services/processManagement/flows";
 import {Flow} from "components/Flow";
@@ -30,7 +30,7 @@ import {FinalizationModal} from "./FinalizationModal";
 import {ArchivationModal} from "./ArchivationModal";
 import {ReturnModal} from "./ReturnModal";
 import {DataTable} from "../../components/DataTable";
-import {downloadEventsPdf, findAllPaged} from "../../services/processManagement/processAud";
+import {downloadEventsPdf, downloadEventsXlsx, findAllPaged} from "../../services/processManagement/processAud";
 import {formatDateTimeToBrazilian} from "../../utils/dates";
 
 function ViewProcess() {
@@ -328,13 +328,6 @@ function ViewProcess() {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("actions", {
-      cell: (info) => info.getValue(),
-      header: "Ações",
-      meta: {
-        isSortable: false,
-      },
-    }),
   ];
 
   return (
@@ -575,16 +568,36 @@ function ViewProcess() {
           >
             Eventos
           </Text>
-          <Button
-              colorScheme="green"
-              onClick={(event) => {
-                event.preventDefault();
-                downloadEventsPdf({ idProcess: process.idProcess, record: process.record }).finally();
-              }}
+          <Flex
+              flexDir="row"
+              alignItems="center"
+              gap="2"
           >
-            <Icon as={FiDownload} mr="2" boxSize={4} />
-            Download PDF
-          </Button>
+            <Button
+                colorScheme="green"
+                onClick={(event) => {
+                  event.preventDefault();
+                  downloadEventsXlsx(process.record as string, process.idProcess).finally();
+                }}
+            >
+              <Icon as={FaFileExcel} mr="2" boxSize={4} />
+              Baixar excel
+            </Button>
+            <Button
+                colorScheme="green"
+                onClick={(event) => {
+                  event.preventDefault();
+                  downloadEventsPdf({ idProcess: process.idProcess, record: process.record }).catch(r => toast({
+                    description: r.message,
+                    status: "error",
+                    isClosable: true,
+                  }));
+                }}
+            >
+              <Icon as={FaFilePdf} mr="2" boxSize={4} />
+              Baixar pdf
+            </Button>
+          </Flex>
         </Flex>
         <Flex
             w="100%"

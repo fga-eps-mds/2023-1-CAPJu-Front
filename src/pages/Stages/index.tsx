@@ -225,11 +225,11 @@ function Stages() {
         isDataFetching={!isStagesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas etapas."
       />
-      {stagesData?.totalPages !== undefined ? (
-        <Pagination
-          pageCount={stagesData?.totalPages}
-          onPageChange={handlePageChange}
-        />
+      {![undefined, 0, null].includes(stagesData?.totalPages) ? (
+          <Pagination
+              pageCount={stagesData?.totalPages}
+              onPageChange={handlePageChange}
+          />
       ) : null}
       <CreationModal
         user={userData?.value!}

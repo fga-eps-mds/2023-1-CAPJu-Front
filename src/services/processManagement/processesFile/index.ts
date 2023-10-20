@@ -104,10 +104,33 @@ export const findAllItemsPaged = async (idProcessesFile: number, pagination?: Pa
     }
 }
 
-
-export const deleteById = async (idProcessesFile: number): Promise<Result<Process>> => {
+export const deleteById = async (idProcessesFile: number): Promise<Result<void>> => {
     try {
-        const res = await api.processManagement.delete<Process>(`/${processFileUrl}/deleteFile/${idProcessesFile}`);
+        await api.processManagement.delete<void>(`/${processFileUrl}/deleteFile/${idProcessesFile}`);
+
+        return {
+            type: "success",
+            value: undefined,
+        };
+    } catch (error) {
+        if (error instanceof Error)
+            return { type: "error", error, value: undefined };
+
+        return {
+            type: "error",
+            error: new Error("Erro desconhecido"),
+            value: undefined,
+        };
+    }
+};
+
+export const updateFileItemById = async (idProcessesFileItem: number, data: any): Promise<Result<number>> => {
+    try {
+
+        const res = await api.processManagement.put<number>(
+            `/${processFileUrl}/updateFileItem/${idProcessesFileItem}`,
+            data
+        );
 
         return {
             type: "success",
@@ -123,5 +146,4 @@ export const deleteById = async (idProcessesFile: number): Promise<Result<Proces
             value: undefined,
         };
     }
-};
-
+}

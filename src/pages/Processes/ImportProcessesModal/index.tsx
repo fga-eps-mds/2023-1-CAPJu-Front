@@ -132,7 +132,7 @@ export function ImportProcessesModal({isOpen, onClose, afterSubmission}: ImportP
                             download
                             style={{ textDecoration: 'none' }}>
                             <Button variant="outline" colorScheme="black">
-                                <Icon as={FaFileDownload} boxSize={4} style={{ marginRight: '8px' }}/> Download template
+                                <Icon as={FaFileDownload} boxSize={4} style={{ marginRight: '8px' }}/> Baixar modelo
                             </Button>
                         </a>
                         <Spacer />

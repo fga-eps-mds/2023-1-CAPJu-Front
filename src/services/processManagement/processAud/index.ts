@@ -1,9 +1,11 @@
 import { jsPDF } from "jspdf";
-import {api} from "../../api";
 import { v4 as uuidv4 } from 'uuid';
+import {api} from "../../api";
 import 'jspdf-autotable';
 import {formatDateTimeToBrazilian} from "../../../utils/dates";
 import {getUserInfo} from "../../../utils/user";
+import {downloadFileFromBuffer} from "../../../utils/file";
+import {registerEvent} from "../../documentAud";
 
 const processAudUrl = 'processAud';
 
@@ -57,29 +59,38 @@ export const downloadEventsPdf = async (processInfo: { record: any; idProcess: n
 
     const uuid = uuidv4();
 
-    const emissionDate = formatDateTimeToBrazilian(new Date());
+    const emitedAt = new Date();
+
+    const emissionDate = formatDateTimeToBrazilian(emitedAt);
 
     pdf.setFontSize(12);
     pdf.text('Histórico de eventos', 105, 20, { align: 'center' });
     pdf.text(`Processo: ${record}`, 15, 30);
     pdf.text(`Data emissão: ${emissionDate}`, 15, 40);
-    pdf.text(`Emissor: ${getUserInfo().fullName}`, 15, 50);
+    pdf.text(`Emissor: ${getUserInfo().fullName} (${(getUserInfo().role as any).name})`, 15, 50);
     pdf.text(`Documento: ${uuid}`, 15, 60);
 
     pdf.autoTable({ html: '#processEvents', useCss : true, startY: 70 })
 
-    // const imagesY = 200;
     const spacingBetweenImages = 60;
 
-    const tableFinalY = (pdf as any).lastAutoTable.finalY;
+    let tableFinalY = (pdf as any).lastAutoTable.finalY;
+
+    if (tableFinalY > 267) {
+        pdf.addPage();
+        tableFinalY = 20;
+    }
 
     pdf.addImage(await imgToBase64('/src/images/logo.png'), 'png', 15, tableFinalY + 10, 20, 12);
     pdf.addImage(await imgToBase64('/src/images/unb.png'), 'png', 30 + spacingBetweenImages, tableFinalY + 10, 20, 20);
     pdf.addImage(await imgToBase64('/src/images/justica_federal.png'), 'png', 50 + 2 * spacingBetweenImages, tableFinalY + 10, 20, 15);
 
-    const docAudInfo = { uuid, emissionDate, emitedBy: getUserInfo().cpf, info: processEvents };
+    const result = await registerEvent({ emitedBy: getUserInfo().cpf, emitedAt, uuid, type: 'PROCESS_EVENTS_PDF' });
 
-    console.log(docAudInfo);
+    if(result.type !== 'success') {
+        document.body.removeChild(container);
+        throw new Error((result as any).value)
+    }
 
     pdf.save(`eventosProcesso${record}.pdf`);
 
@@ -87,9 +98,17 @@ export const downloadEventsPdf = async (processInfo: { record: any; idProcess: n
 
 };
 
+export const downloadEventsXlsx = async (record: string, idProcess: number): Promise<void> => {
+
+    const response = await api.processManagement.get(`/${processAudUrl}/generateXlsx/${idProcess}`);
+
+    downloadFileFromBuffer(response.data.data, `eventosProcesso${record}.xlsx`);
+
+};
+
 function constructTableHTML(processEvents: any[]): string {
     let tableHTML = `
-        <div class="table-wrapper" style="display: none">
+        <div class="table-wrapper" style="display: none" hidden>
             <table class="fl-table" id="processEvents">
                 <style>
                     * {
@@ -181,8 +200,3 @@ function imgToBase64(src: string): Promise<string> {
         img.src = src;
     });
 }
-
-
-
-
-

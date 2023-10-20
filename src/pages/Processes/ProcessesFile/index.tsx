@@ -1,20 +1,22 @@
 import {createColumnHelper} from '@tanstack/react-table';
 import {useEffect, useMemo, useState} from 'react';
 import {Icon, SearchIcon, ViewIcon} from '@chakra-ui/icons';
-import {FaDownload, FaFileDownload, FaFileUpload} from 'react-icons/fa';
+import {FaEraser, FaDownload, FaFileDownload, FaFileUpload} from "react-icons/fa";
 import { MdDelete} from 'react-icons/md';
 import {Button, chakra, Flex, Input, Text, useDisclosure} from '@chakra-ui/react';
+import {useQuery} from "react-query";
 import {Pagination} from '../../../components/Pagination';
 import {findAllPaged, findFileById} from '../../../services/processManagement/processesFile';
 import {formatDateTimeToBrazilian} from '../../../utils/dates';
 import {DataTable} from '../../../components/DataTable';
 import {DeletionModal} from './DeletionModal';
-import {VisualizationItemsModal} from "./VisualizationModal";
+import {VisualizationItemsModal} from "./VisualizationFileItemsModal";
 import {ImportProcessesModal} from "../ImportProcessesModal";
+import {useAuth} from "../../../hooks/useAuth";
 
-function ProcessesFileComponent (props: any) {
+export default function ProcessesFileComponent () {
 
-    const { isUserFetched, userData, isProcessesFileTabEnabled } = props;
+    const { getUserData } = useAuth();
 
     const tableColumnHelper = createColumnHelper<TableRow<any>>();
 
@@ -64,6 +66,12 @@ function ProcessesFileComponent (props: any) {
     ]
 
     const [selectedFile, selectFile] = useState<ProcessesFile>();
+
+    const { data: userData, isFetched: isUserFetched } = useQuery({
+        queryKey: ["user-data"],
+        queryFn: getUserData,
+        refetchOnWindowFocus: false,
+    });
 
     const {
         isOpen: isDeletionOpen,
@@ -127,11 +135,8 @@ function ProcessesFileComponent (props: any) {
     )
 
     useEffect(() => {
-        if(isProcessesFileTabEnabled) {
-            refetchProcessesFile().finally();
-        }
-    }, [isProcessesFileTabEnabled]);
-
+        refetchProcessesFile().finally();
+    }, []);
 
     const [nameOrRecordFilter, setNameOrRecordFilter] = useState<string>('');
 
@@ -170,9 +175,12 @@ function ProcessesFileComponent (props: any) {
 
     const [rawFiles, setRawFiles] = useState<ProcessesFile[]>([]);
 
-    const refetchProcessesFile = async (selectedPage?: { selected: number }) => {
+    const [isFetchingFiles, setIsFetchingFiles] = useState<boolean>(true)
+
+    const refetchProcessesFile = async (selectedPage?: { selected: number }, nameOrRecordFilterParam = nameOrRecordFilter) => {
         const offset = selectedPage ? selectedPage.selected * 10 : 0;
-        const result = await findAllPaged({ offset, limit: 10 }, nameOrRecordFilter);
+        setIsFetchingFiles(true);
+        const result = await findAllPaged({ offset, limit: 10 }, nameOrRecordFilterParam);
         const value = result.value as  { data: ProcessesFile[], pagination: any };
         if (result && result.type === 'success') {
             const { data, pagination } = value;
@@ -193,6 +201,7 @@ function ProcessesFileComponent (props: any) {
             });
             setProcessesFileTableRows(rows as any);
         }
+        setIsFetchingFiles(false);
     };
 
     const getProcessesFileStatusPt = (fileStatus: string) => {
@@ -237,6 +246,7 @@ function ProcessesFileComponent (props: any) {
                                     placeholder="Pesquisar lotes por nome, arquivo ou processo"
                                     variant="filled"
                                     onChange={({ target }) => setNameOrRecordFilter(target.value)}
+                                    value={nameOrRecordFilter}
                                     css={{
                                         "&, &:hover, &:focus": {
                                             background: "white",
@@ -244,11 +254,24 @@ function ProcessesFileComponent (props: any) {
                                     }}
                                 />
                                 <Button
+                                    aria-label="botão de limpeza"
+                                    colorScheme="green"
+                                    justifyContent="center"
+                                    title={nameOrRecordFilter && "Limpar filtro"}
+                                    isDisabled={!nameOrRecordFilter}
+                                    onClick={() => {
+                                        setNameOrRecordFilter('');
+                                        refetchProcessesFile(undefined, '').finally();
+                                    }}
+                                >
+                                    <Icon as={FaEraser} boxSize={4} />
+                                </Button>
+                                <Button
                                     aria-label="botão de busca"
                                     colorScheme="green"
                                     justifyContent="center"
-                                    type="submit"
-                                >
+                                    title="Pesquisar"
+                                    type="submit">
                                     <SearchIcon boxSize={4} />
                                 </Button>
                             </chakra.form>
@@ -263,16 +286,16 @@ function ProcessesFileComponent (props: any) {
                 data={processesFileTableRows}
                 rawData={rawFiles}
                 columns={processesFileTableColumns}
-                isDataFetching={!isUserFetched}
+                isDataFetching={!isUserFetched || isFetchingFiles}
                 emptyTableMessage="Não foram encontrados lotes"
             />
-            {![undefined, 0].includes(processesFileTablePaginationInfo?.totalPages) ? (
+            {processesFileTablePaginationInfo?.totalPages ? (
                 <Pagination
                     pageCount={processesFileTablePaginationInfo?.totalPages}
                     onPageChange={refetchProcessesFile}
                 />
             ) : null}
-            {selectedFile && (
+            {selectedFile && isDeletionOpen && (
                 <DeletionModal
                     processesFile={selectedFile}
                     isOpen={isDeletionOpen}
@@ -280,7 +303,7 @@ function ProcessesFileComponent (props: any) {
                     refetchProcessesFile={refetchProcessesFile}
                 />
             )}
-            {selectedFile && (
+            {selectedFile && isVisualizationOpen && (
                 <VisualizationItemsModal
                     processesFile={selectedFile}
                     isOpen={isVisualizationOpen}
@@ -293,7 +316,4 @@ function ProcessesFileComponent (props: any) {
                 afterSubmission={refetchProcessesFile} />
         </>
     )
-
 }
-
-export default ProcessesFileComponent;

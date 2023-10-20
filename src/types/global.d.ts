@@ -93,7 +93,7 @@ declare global {
   type ProcessesFileItem = {
     idProcessesFileItem: number;
     idProcessesFile: number;
-    status: 'error' | 'imported';
+    status: 'error' | 'imported' | 'manuallyImported';
     record: string;
     priority: string;
     flow: string;
@@ -155,6 +155,13 @@ declare global {
     disabledOn?: (data?: any) => boolean,
     labelOnDisable?: string,
     isNavigate?: boolean;
+  };
+
+  type DocumentAudInput = {
+    emitedAt: Date,
+    emitedBy: string,
+    type: string,
+    uuid?: string
   };
 
   type TableRow<T> = T & {

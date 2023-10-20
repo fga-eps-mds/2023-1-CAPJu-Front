@@ -27,9 +27,8 @@ export function DeletionModal({processesFile, isOpen, onClose, refetchProcessesF
     const handleDeleteProcessesFile = async () => {
         handleLoading(true);
         const res = await deleteById(processesFile?.idProcessesFile);
-        console.log(res)
         if (res.type === "success") {
-            refetchProcessesFile();
+            await refetchProcessesFile();
             toast({
                 id: "delete-process-success",
                 title: "Sucesso!",

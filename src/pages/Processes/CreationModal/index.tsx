@@ -50,7 +50,8 @@ const validationSchema = yup.object({
 interface CreationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  afterSubmission: () => void;
+  // eslint-disable-next-line no-unused-vars
+  afterSubmission: (createdProcess: Process | undefined) => void;
   recordParam?: string;
   nicknameParam?: string;
 }
@@ -83,7 +84,7 @@ export function CreationModal({
     queryKey: ["priorities"],
     queryFn: async () => {
       if(!isOpen || !hasLegalPriority) return {};
-      return await getPriorities();
+      return getPriorities();
     },
     onError: () => {
       toast({
@@ -154,7 +155,7 @@ export function CreationModal({
     }
 
     onClose();
-    afterSubmission();
+    afterSubmission((res.value as any)?.data);
     handleLoading(false);
   });
 
