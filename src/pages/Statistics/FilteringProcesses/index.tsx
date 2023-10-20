@@ -8,6 +8,8 @@ import {
   Flex,
   Select,
   Button,
+  Text,
+  Input
 } from "@chakra-ui/react";
 import { DataTable } from "components/DataTable";
 import { useEffect, useState } from "react";
@@ -100,6 +102,13 @@ export default function FilteringProcesses() {
                   <option value="archived">Concluído</option>
                   <option value="finished">Interrompido</option>
                 </Select>
+              </Flex>
+              <Flex gap="5" w="70%" marginTop="15" alignItems="center">
+                <Input w="50%" type="date" />
+                <Text>
+                  à
+                </Text>
+                <Input w="50%" type="date" />
                 <Button colorScheme="whatsapp" w="20%">
                   Confirmar
                 </Button>
@@ -109,7 +118,7 @@ export default function FilteringProcesses() {
                   data={[]}
                   columns={tableColumns}
                   isDataFetching={false}
-                  emptyTableMessage={`Não foram encontrados processos`}
+                  emptyTableMessage="Não foram encontrados processos"
                 />
               </Flex>
             </AccordionPanel>

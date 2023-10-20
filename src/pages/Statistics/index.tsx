@@ -6,6 +6,7 @@ import { PrivateLayout } from "layouts/Private";
 import FilteringProcesses from "./FilteringProcesses";
 
 export default function Statistics() {
+
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -14,7 +15,7 @@ export default function Statistics() {
             Estatísticas
           </Text>
         </Flex>
-        <FilteringProcesses/>
+        <FilteringProcesses />
       </Flex>
     </PrivateLayout>
   );
