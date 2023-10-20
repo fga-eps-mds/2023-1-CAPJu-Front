@@ -9,8 +9,10 @@ import {
   Select,
   Button,
 } from "@chakra-ui/react";
+import { DataTable } from "components/DataTable";
 import { useEffect, useState } from "react";
 import { getFlows } from "services/processManagement/flows";
+import { createColumnHelper } from "@tanstack/react-table";
 
 export default function FilteringProcesses() {
   const [flows, setFlows] = useState([] as Flow[]);
@@ -24,10 +26,50 @@ export default function FilteringProcesses() {
     getData();
   }, []);
 
+  const tableColumnHelper = createColumnHelper<TableRow<any>>();
+  const tableColumns = [
+    tableColumnHelper.accessor("record", {
+      cell: (info) => info.getValue(),
+      header: "Registro",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("nickname", {
+      cell: (info) => info.getValue(),
+      header: "Apelido",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("currentState", {
+      cell: (info) => info.getValue(),
+      header: "Situação atual",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("status", {
+      cell: (info) => info.getValue(),
+      header: "Status",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("tableActions", {
+      cell: (info) => info.getValue(),
+      header: "Ações",
+      meta: {
+        isTableActions: true,
+        isSortable: false,
+      },
+    }),
+  ];
+
   return (
     <Box backgroundColor="#FFF" borderRadius="8px">
       <Flex justifyContent="flex-start" w="100%">
-        <Accordion defaultIndex={[1]} allowMultiple>
+        <Accordion defaultIndex={[1]} allowMultiple w="100%">
           <AccordionItem>
             <h2>
               <AccordionButton>
@@ -48,7 +90,7 @@ export default function FilteringProcesses() {
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              <Flex gap="5">
+              <Flex gap="5" w="70%">
                 <Select placeholder="Selecione o Fluxo">
                   {flows?.map((flow) => {
                     return <option value={flow.idFlow}>{flow.name}</option>;
@@ -61,6 +103,14 @@ export default function FilteringProcesses() {
                 <Button colorScheme="whatsapp" w="20%">
                   Confirmar
                 </Button>
+              </Flex>
+              <Flex w="110%">
+                <DataTable
+                  data={[]}
+                  columns={tableColumns}
+                  isDataFetching={false}
+                  emptyTableMessage={`Não foram encontrados processos`}
+                />
               </Flex>
             </AccordionPanel>
           </AccordionItem>
