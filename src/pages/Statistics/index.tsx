@@ -17,15 +17,14 @@ import { useQuery } from "react-query";
 import { getFlows } from "services/processManagement/flows";
 import { getStagesByIdFlow } from "services/processManagement/statistics";
 
-
 export default function Statistics() {
   const toast = useToast();
 
-  useEffect(()=>{
+  useEffect(() => {
     return () => {
       setOpenSelectStage(false);
-    }
-  },[]);
+    };
+  }, []);
 
   const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
     queryKey: ["flows"],
@@ -48,8 +47,6 @@ export default function Statistics() {
     },
   });
 
-
-
   const [openSelectStage, setOpenSelectStage] = useState(isFlowsFetched);
 
   const [selectedFlow, setSelectedFlow] = useState(-1);
@@ -57,7 +54,6 @@ export default function Statistics() {
 
   const handleConfirmSelection = async () => {
     if (selectedFlow) {
-
       setOpenSelectStage(true);
 
       const stagesResult = await getStagesByIdFlow(selectedFlow);
@@ -76,12 +72,13 @@ export default function Statistics() {
           status: "error",
           isClosable: true,
         });
-      }} else {
+      }
+    } else {
       toast({
-        id: 'error-no-selection',
-        title: 'Erro!',
-        description: 'Selecione um fluxo antes de confirmar.',
-        status: 'error',
+        id: "error-no-selection",
+        title: "Erro!",
+        description: "Selecione um fluxo antes de confirmar.",
+        status: "error",
         isClosable: true,
       });
 
@@ -150,7 +147,9 @@ export default function Statistics() {
                         placeholder="Selecione o fluxo"
                         marginLeft="36px"
                         width="302px"
-                        onChange={(e) => setSelectedFlow(Number(e.target.value))}
+                        onChange={(e) =>
+                          setSelectedFlow(Number(e.target.value))
+                        }
                       >
                         {flowsData?.value?.map((flow) => (
                           <option value={flow.idFlow} key={flow.name}>
@@ -161,7 +160,10 @@ export default function Statistics() {
                       <Button
                         colorScheme="green"
                         marginLeft="20px"
-                        onClick={() => {setOpenSelectStage(true); handleConfirmSelection();}}
+                        onClick={() => {
+                          setOpenSelectStage(true);
+                          handleConfirmSelection();
+                        }}
                       >
                         Confirmar
                       </Button>
