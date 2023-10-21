@@ -1,21 +1,9 @@
-import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-  Box,
-  Flex,
-  Text,
-  Button,
-  useToast,
-  Select,
-} from "@chakra-ui/react";
+import { Box, Flex, Text, Button, useToast, Select } from "@chakra-ui/react";
 import { PrivateLayout } from "layouts/Private";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { getFlows } from "services/processManagement/flows";
-import { getStagesByIdFlow } from "services/processManagement/statistics";
+import CustomAccordion from "../../components/CustomAccordion";
 
 export default function Statistics() {
   const toast = useToast();
@@ -50,29 +38,10 @@ export default function Statistics() {
   const [openSelectStage, setOpenSelectStage] = useState(isFlowsFetched);
 
   const [selectedFlow, setSelectedFlow] = useState(-1);
-  const [stages, setStages] = useState<Stage[]>([]);
 
   const handleConfirmSelection = async () => {
     if (selectedFlow) {
       setOpenSelectStage(true);
-
-      const stagesResult = await getStagesByIdFlow(selectedFlow);
-
-      console.log("Etapas :", stagesResult);
-
-      if (stagesResult.type === "success") {
-        const storeStages = stagesResult.value;
-        setStages(storeStages);
-        console.log("Etapas:", stages);
-      } else {
-        toast({
-          id: "error-getting-stages",
-          title: "Erro ao buscar etapas",
-          description: "Houve um erro ao buscar as etapas.",
-          status: "error",
-          isClosable: true,
-        });
-      }
     } else {
       toast({
         id: "error-no-selection",
@@ -85,8 +54,6 @@ export default function Statistics() {
       setOpenSelectStage(false);
     }
   };
-
-  console.log(selectedFlow);
 
   return (
     <PrivateLayout>
@@ -101,77 +68,58 @@ export default function Statistics() {
             Estatísticas
           </Text>
         </Flex>
-        <Box backgroundColor="#FFF" borderRadius="8px">
-          <Flex justifyContent="flex-start" w="100%">
-            <Accordion defaultIndex={[0]} allowMultiple width="100%">
-              <AccordionItem>
-                <h2>
-                  <AccordionButton>
-                    <AccordionIcon />
-                    <Box
-                      as="span"
-                      textAlign="left"
-                      marginLeft="18"
-                      fontSize="17px"
-                      fontWeight="600"
-                      fontStyle="normal"
-                      lineHeight="24px"
+        <Box borderRadius="8px">
+          <Flex justifyContent="flex-start" w="100%" flexDirection="column">
+            <CustomAccordion
+              title="Visualizar quantidade de processos em cada etapa"
+              marginBottom={18}
+            >
+              {openSelectStage ? (
+                <>
+                  <Flex>
+                    <Select
+                      placeholder="Selecione a etapa"
+                      marginLeft="36px"
+                      width="302px"
                     >
-                      Visualizar quantidade de processos em cada etapa
-                    </Box>
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4} width="100%">
-                  {openSelectStage ? (
-                    <>
-                      <Flex>
-                        <Select
-                          placeholder="Selecione a etapa"
-                          marginLeft="36px"
-                          width="302px"
-                        >
-                          <option>dfsfsf</option>
-                        </Select>
-                        <Button
-                          colorScheme="green"
-                          marginLeft="20px"
-                          onClick={() => setOpenSelectStage(true)}
-                        >
-                          Confirmar
-                        </Button>
-                      </Flex>
-                    </>
-                  ) : (
-                    <Flex>
-                      <Select
-                        placeholder="Selecione o fluxo"
-                        marginLeft="36px"
-                        width="302px"
-                        onChange={(e) =>
-                          setSelectedFlow(Number(e.target.value))
-                        }
-                      >
-                        {flowsData?.value?.map((flow) => (
-                          <option value={flow.idFlow} key={flow.name}>
-                            {flow.name}
-                          </option>
-                        ))}
-                      </Select>
-                      <Button
-                        colorScheme="green"
-                        marginLeft="20px"
-                        onClick={() => {
-                          setOpenSelectStage(true);
-                          handleConfirmSelection();
-                        }}
-                      >
-                        Confirmar
-                      </Button>
-                    </Flex>
-                  )}
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
+                      <option>dfsfsf</option>
+                    </Select>
+                    <Button
+                      colorScheme="green"
+                      marginLeft="20px"
+                      onClick={() => setOpenSelectStage(true)}
+                    >
+                      Confirmar
+                    </Button>
+                  </Flex>
+                </>
+              ) : (
+                <Flex>
+                  <Select
+                    placeholder="Selecione o fluxo"
+                    marginLeft="36px"
+                    width="302px"
+                    onChange={(e) => setSelectedFlow(Number(e.target.value))}
+                  >
+                    {flowsData?.value?.map((flow: any) => (
+                      <option value={flow.idFlow} key={flow.name}>
+                        {flow.name}
+                      </option>
+                    ))}
+                  </Select>
+                  <Button
+                    colorScheme="green"
+                    marginLeft="20px"
+                    onClick={() => {
+                      setOpenSelectStage(true);
+                      handleConfirmSelection();
+                    }}
+                  >
+                    Confirmar
+                  </Button>
+                </Flex>
+              )}
+            </CustomAccordion>
           </Flex>
         </Box>
       </Flex>
