@@ -5,7 +5,7 @@ export const getProcesses = async (
   pagination?: Pagination,
   filter?: string,
   filterByLegalPriority?: boolean,
-  showArchivedAndFinished?: boolean
+  status?: String[]
 ): Promise<Result<Process[]>> => {
   try {
     const res = await api.processManagement.get<{
@@ -16,7 +16,7 @@ export const getProcesses = async (
         offset: pagination?.offset ?? 0,
         limit: pagination?.limit,
         filter,
-        showArchivedAndFinished,
+        status: status || undefined,
         filterByLegalPriority,
       },
     });

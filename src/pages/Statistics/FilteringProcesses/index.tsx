@@ -53,11 +53,10 @@ export default function FilteringProcesses() {
     queryFn: async () => {
       setIsFetching(true);
       const res = await getProcesses(
-        parseInt(selectedFlowValue),
+        parseInt(selectedFlowValue, 10),
         undefined,
         undefined,
-        false,
-        true
+        false
       );
       setIsFetching(false);
 
@@ -218,14 +217,14 @@ export default function FilteringProcesses() {
                   </Flex>
                 </Flex>
                 <Flex>
-                <Flex gap="2" alignItems="flex-end" alignSelf="end">
-                  <Button colorScheme='blue' variant='outline'>
-                    Ver Gráfico
-                  </Button>
-                  <Button colorScheme='facebook'>PDF</Button>
-                  <Button colorScheme='facebook'>CSV</Button>
+                  <Flex gap="2" alignItems="flex-end" alignSelf="end">
+                    <Button colorScheme="blue" variant="outline">
+                      Ver Gráfico
+                    </Button>
+                    <Button colorScheme="facebook">PDF</Button>
+                    <Button colorScheme="facebook">CSV</Button>
+                  </Flex>
                 </Flex>
-              </Flex>
               </Flex>
 
               <Flex w="110%" marginTop="15">

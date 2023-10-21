@@ -104,7 +104,7 @@ function Processes() {
         },
         filter,
         legalPriority,
-        showFinished
+        showFinished ? ["archived", "finished"] : ["inProgress", "notStarted"]
       );
 
       if (res.type === "error") throw new Error(res.error.message);
@@ -176,6 +176,7 @@ function Processes() {
             (item) =>
               item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
           ) as Flow;
+          console.log({ currFlow });
           const sortedStagesIds = getSequencesSortedStagesIds(
             currFlow?.sequences
           );
