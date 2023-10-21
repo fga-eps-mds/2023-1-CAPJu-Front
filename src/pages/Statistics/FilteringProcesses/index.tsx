@@ -186,34 +186,48 @@ export default function FilteringProcesses() {
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              <Flex gap="5" w="70%">
-                <Select
-                  placeholder="Selecione o Fluxo"
-                  color="gray.500"
-                  value={selectedFlowValue}
-                  onChange={handleSelectChange}
-                >
-                  {flows?.map((flow) => {
-                    return <option value={flow.idFlow}>{flow.name}</option>;
-                  })}
-                </Select>
-                <Select placeholder="Status" w="35%" color="gray.500">
-                  <option value="archived">Concluído</option>
-                  <option value="finished">Interrompido</option>
-                </Select>
+              <Flex justifyContent="space-between">
+                <Flex w="70%" flexDirection="column">
+                  <Flex gap="5">
+                    <Select
+                      placeholder="Selecione o Fluxo"
+                      color="gray.500"
+                      value={selectedFlowValue}
+                      onChange={handleSelectChange}
+                    >
+                      {flows?.map((flow) => {
+                        return <option value={flow.idFlow}>{flow.name}</option>;
+                      })}
+                    </Select>
+                    <Select placeholder="Status" w="35%" color="gray.500">
+                      <option value="archived">Concluído</option>
+                      <option value="finished">Interrompido</option>
+                    </Select>
+                  </Flex>
+                  <Flex alignItems="center" gap="5" marginTop="15">
+                    <Input w="50%" type="date" color="gray.500" />
+                    <Text>à</Text>
+                    <Input w="50%" type="date" color="gray.500" />
+                    <Button
+                      colorScheme="whatsapp"
+                      w="20%"
+                      onClick={handleConfirmClick}
+                    >
+                      Confirmar
+                    </Button>
+                  </Flex>
+                </Flex>
+                <Flex>
+                <Flex gap="2" alignItems="flex-end" alignSelf="end">
+                  <Button colorScheme='blue' variant='outline'>
+                    Ver Gráfico
+                  </Button>
+                  <Button colorScheme='facebook'>PDF</Button>
+                  <Button colorScheme='facebook'>CSV</Button>
+                </Flex>
               </Flex>
-              <Flex gap="5" w="70%" marginTop="15" alignItems="center">
-                <Input w="50%" type="date" color="gray.500" />
-                <Text>à</Text>
-                <Input w="50%" type="date" color="gray.500" />
-                <Button
-                  colorScheme="whatsapp"
-                  w="20%"
-                  onClick={handleConfirmClick}
-                >
-                  Confirmar
-                </Button>
               </Flex>
+
               <Flex w="110%" marginTop="15">
                 {tableVisible && (
                   <DataTable
