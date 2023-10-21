@@ -12,12 +12,20 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { PrivateLayout } from "layouts/Private";
-import { Fragment, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { getFlows } from "services/processManagement/flows";
+import { getStagesByIdFlow } from "services/processManagement/statistics";
+
 
 export default function Statistics() {
   const toast = useToast();
+
+  useEffect(()=>{
+    return () => {
+      setOpenSelectStage(false);
+    }
+  },[]);
 
   const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
     queryKey: ["flows"],
@@ -40,7 +48,48 @@ export default function Statistics() {
     },
   });
 
-  var [bool, setBool] = useState(isFlowsFetched);
+
+
+  const [openSelectStage, setOpenSelectStage] = useState(isFlowsFetched);
+
+  const [selectedFlow, setSelectedFlow] = useState(-1);
+  const [stages, setStages] = useState<Stage[]>([]);
+
+  const handleConfirmSelection = async () => {
+    if (selectedFlow) {
+
+      setOpenSelectStage(true);
+
+      const stagesResult = await getStagesByIdFlow(selectedFlow);
+
+      console.log("Etapas :", stagesResult);
+
+      if (stagesResult.type === "success") {
+        const storeStages = stagesResult.value;
+        setStages(storeStages);
+        console.log("Etapas:", stages);
+      } else {
+        toast({
+          id: "error-getting-stages",
+          title: "Erro ao buscar etapas",
+          description: "Houve um erro ao buscar as etapas.",
+          status: "error",
+          isClosable: true,
+        });
+      }} else {
+      toast({
+        id: 'error-no-selection',
+        title: 'Erro!',
+        description: 'Selecione um fluxo antes de confirmar.',
+        status: 'error',
+        isClosable: true,
+      });
+
+      setOpenSelectStage(false);
+    }
+  };
+
+  console.log(selectedFlow);
 
   return (
     <PrivateLayout>
@@ -76,8 +125,8 @@ export default function Statistics() {
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4} width="100%">
-                  {bool ? (
-                    <Fragment>
+                  {openSelectStage ? (
+                    <>
                       <Flex>
                         <Select
                           placeholder="Selecione a etapa"
@@ -89,21 +138,22 @@ export default function Statistics() {
                         <Button
                           colorScheme="green"
                           marginLeft="20px"
-                          onClick={() => setBool(false)}
+                          onClick={() => setOpenSelectStage(true)}
                         >
                           Confirmar
                         </Button>
                       </Flex>
-                    </Fragment>
+                    </>
                   ) : (
                     <Flex>
                       <Select
                         placeholder="Selecione o fluxo"
                         marginLeft="36px"
                         width="302px"
+                        onChange={(e) => setSelectedFlow(Number(e.target.value))}
                       >
                         {flowsData?.value?.map((flow) => (
-                          <option key={flow.idFlow} value={flow.name} >
+                          <option value={flow.idFlow} key={flow.name}>
                             {flow.name}
                           </option>
                         ))}
@@ -111,7 +161,7 @@ export default function Statistics() {
                       <Button
                         colorScheme="green"
                         marginLeft="20px"
-                        onClick={() => setBool(true)}
+                        onClick={() => {setOpenSelectStage(true); handleConfirmSelection();}}
                       >
                         Confirmar
                       </Button>
