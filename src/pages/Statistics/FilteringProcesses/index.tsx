@@ -13,7 +13,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { DataTable } from "components/DataTable";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, ChangeEvent } from "react";
 import { getFlows } from "services/processManagement/flows";
 import { createColumnHelper } from "@tanstack/react-table";
 import { getProcesses } from "services/processManagement/processes";
@@ -30,20 +30,18 @@ export default function FilteringProcesses() {
     queryFn: getUserData,
   });
 
-  // ----------------------------------------- useStates ----------------------------------------------
   const [flows, setFlows] = useState([] as Flow[]);
   const [isFetching, setIsFetching] = useState<boolean>(true);
+  const [tableVisible, setTableVisible] = useState(false);
+  const [selectedFlowValue, setSelectedFlowValue] = useState<string>("");
 
-  // ----------------------------------------- Funções ----------------------------------------------
   const getDataFlows = async () => {
     const dataFlows = await getFlows();
     if (dataFlows.value) setFlows(dataFlows.value);
   };
 
-  // ----------------------------------------- useEffect ----------------------------------------------
   useEffect(() => {
     getDataFlows();
-    // refetchProcesses();
   }, []);
 
   const {
@@ -54,11 +52,16 @@ export default function FilteringProcesses() {
     queryKey: ["processes"],
     queryFn: async () => {
       setIsFetching(true);
-      const res = await getProcesses(2, undefined, undefined, false, true);
+      const res = await getProcesses(
+        parseInt(selectedFlowValue),
+        undefined,
+        undefined,
+        false,
+        true
+      );
       setIsFetching(false);
 
       if (res.type === "error") throw new Error(res.error.message);
-      // console.log("batata")
       return res;
     },
     onError: () => {
@@ -73,7 +76,6 @@ export default function FilteringProcesses() {
     },
   });
 
-  // ----------------------------------------- Coluna de Ações
   const tableActions = useMemo<TableAction[]>(
     () => [
       {
@@ -114,8 +116,6 @@ export default function FilteringProcesses() {
     tableActions,
     isFetching,
   ]);
-
-  // ----------------------------------------- Colunas da Tabela ----------------------------------------------
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [
     tableColumnHelper.accessor("record", {
@@ -149,8 +149,13 @@ export default function FilteringProcesses() {
     }),
   ];
 
-  // ----------------------------------------- Funções ----------------------------------------------
+  const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = event.target.value;
+    setSelectedFlowValue(selectedValue);
+  };
+
   const handleConfirmClick = async () => {
+    setTableVisible(true);
     refetchProcesses();
   };
 
@@ -161,7 +166,10 @@ export default function FilteringProcesses() {
           <AccordionItem>
             <h2>
               <AccordionButton>
-                <AccordionIcon />
+                <AccordionIcon
+                  transform="rotate(270deg)"
+                  transition="transform 0.2s"
+                />
                 <Box
                   as="span"
                   flex="1"
@@ -179,7 +187,12 @@ export default function FilteringProcesses() {
             </h2>
             <AccordionPanel pb={4}>
               <Flex gap="5" w="70%">
-                <Select placeholder="Selecione o Fluxo" color="gray.500">
+                <Select
+                  placeholder="Selecione o Fluxo"
+                  color="gray.500"
+                  value={selectedFlowValue}
+                  onChange={handleSelectChange}
+                >
                   {flows?.map((flow) => {
                     return <option value={flow.idFlow}>{flow.name}</option>;
                   })}
@@ -202,12 +215,14 @@ export default function FilteringProcesses() {
                 </Button>
               </Flex>
               <Flex w="110%" marginTop="15">
-                <DataTable
-                  data={filteredProcesses}
-                  columns={tableColumns}
-                  isDataFetching={!isProcessesFetched || !isUserFetched}
-                  emptyTableMessage="Não foram encontrados processos"
-                />
+                {tableVisible && (
+                  <DataTable
+                    data={filteredProcesses}
+                    columns={tableColumns}
+                    isDataFetching={!isProcessesFetched || !isUserFetched}
+                    emptyTableMessage="Não foram encontrados processos"
+                  />
+                )}
               </Flex>
             </AccordionPanel>
           </AccordionItem>
