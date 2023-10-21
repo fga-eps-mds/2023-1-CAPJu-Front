@@ -3,6 +3,7 @@ import { PrivateLayout } from "layouts/Private";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { getFlows } from "services/processManagement/flows";
+import { getStagesByIdFlow } from "services/processManagement/statistics";
 import CustomAccordion from "../../components/CustomAccordion";
 
 export default function Statistics() {
@@ -38,10 +39,31 @@ export default function Statistics() {
   const [openSelectStage, setOpenSelectStage] = useState(isFlowsFetched);
 
   const [selectedFlow, setSelectedFlow] = useState(-1);
+  const [selectedStage, setSelectedStage] = useState(-1);
+  const [stages, setStages] = useState<Stage[]>([]);
 
   const handleConfirmSelection = async () => {
     if (selectedFlow) {
       setOpenSelectStage(true);
+
+      const stagesResult = await getStagesByIdFlow(selectedFlow);
+
+      if (stagesResult.type === "success") {
+        const storeStages = stagesResult.value;
+
+        setStages(storeStages);
+
+        console.log(selectedStage);
+
+      } else {
+        toast({
+          id: "error-getting-stages",
+          title: "Erro ao buscar etapas",
+          description: "Houve um erro ao buscar as etapas.",
+          status: "error",
+          isClosable: true,
+        });
+      }
     } else {
       toast({
         id: "error-no-selection",
@@ -81,8 +103,13 @@ export default function Statistics() {
                       placeholder="Selecione a etapa"
                       marginLeft="36px"
                       width="302px"
+                      onChange={(e) => setSelectedStage(Number(e.target.value))}
                     >
-                      <option>dfsfsf</option>
+                      {Object.values(stages).map((stage) => (
+                        <option key={stage.idStage} value={stage.idStage}>
+                          {stage.name}
+                        </option>
+                      ))}
                     </Select>
                     <Button
                       colorScheme="green"
