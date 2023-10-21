@@ -13,9 +13,9 @@ import {
   import {Select} from "components/FormFields";
   // import { useState} from "react";
   import { PrivateLayout } from "layouts/Private";
-  import { getFlows, getHistoricFlow  } from "services/processManagement/flows";
   import {useQuery} from "react-query";
   import { useState } from "react";
+  import { getFlows, getHistoricFlow, getExpectedFlow  } from "../../services/processManagement/flows";
   import ChartTempos from "./ChartTempos";
 
 
@@ -24,14 +24,13 @@ import {
     const [idFlow, setIdFlow] = useState<number>();
 
     const [chartData, setChartData] = useState<any>(null);
-    const vetor1 = [1, 2 ];
 
-    const mesclaVetores = (v1: Array<number>, v2:Array<number>) => {
-        return v1.map((valor, i) => ({
-          label: `Etapa ${i + 1}`,
-          medio: valor,
-          previsto: v2[i],
-        }));
+    const mesclaVetores = (labels: Array<string>, medio: Array<number>, previsto:Array<number>) => {
+        const resultado = labels.map((label, index) => {
+          return { label, medio: medio[index], previsto: previsto[index] };
+        });
+
+        return resultado;
     };
 
     const { data: flowsData } = useQuery({
@@ -57,13 +56,18 @@ import {
     });
 
     const getDataChart = async () => {
-
       
       if(idFlow){
-        const historic= (await getHistoricFlow(idFlow)).value;
+        const historic = (await getHistoricFlow(idFlow)).value;
+        const expected = (await getExpectedFlow(idFlow)).value;
+
+        console.log(expected);
         
-        if(historic){
-          const resultado = mesclaVetores(vetor1, historic);
+        if(historic && expected){
+          const expectedArray = expected.map((item) => item.duration);
+          const labels = expected.map((item) => item.name);
+         
+          const resultado = mesclaVetores(labels, historic, expectedArray);
           setChartData(resultado)
         }
       }
@@ -101,7 +105,7 @@ import {
                         fontFamily="Inter"
                         lineHeight="24px"
                       >
-                        Visualizar tempo médio de cada etapa
+                        Visualizar tempo médio de cgit ada etapa
                       </Box>
                     </AccordionButton>
                   </h2>
@@ -131,7 +135,7 @@ import {
                         onClick={getDataChart}
                         >Testando rota da API
                       </Button>
-                      { chartData? (<ChartTempos value={chartData}/>) : "com media"}
+                      { chartData? (<ChartTempos value={chartData}/>) : ""}
 
                   </AccordionPanel>
                 </AccordionItem>
