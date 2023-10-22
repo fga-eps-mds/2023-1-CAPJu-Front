@@ -1,13 +1,30 @@
+import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "hooks/useAuth";
+import type { ChartData } from "chart.js";
+import { CategoryScale } from "chart.js";
+import { useLocation } from "react-router";
 import { Box, Flex, Text, Button, useToast, Select } from "@chakra-ui/react";
-import { PrivateLayout } from "layouts/Private";
-import { useEffect, useState } from "react";
+import { ViewIcon } from "@chakra-ui/icons";
+import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "react-query";
+import Chart from "chart.js/auto";
+import { PrivateLayout } from "layouts/Private";
 import { getFlows } from "services/processManagement/flows";
 import { getStagesByIdFlow } from "services/processManagement/statistics";
-import CustomAccordion from "../../components/CustomAccordion";
+import { DataTable } from "components/DataTable";
+import CustomAccordion from "components/CustomAccordion";
+import { generateColorTransition } from "utils/geradorCor";
+import { isActionAllowedToUser } from "utils/permissions";
+import BarChart from "./Graphic/BarChart";
 
 export default function Statistics() {
-  const toast = useToast();
+  const { getUserData } = useAuth();
+  const { state } = useLocation();
+
+  const { data: userData, isFetched: isUserFetched } = useQuery({
+    queryKey: ["user-data"],
+    queryFn: getUserData,
+  });
 
   useEffect(() => {
     return () => {
@@ -15,7 +32,8 @@ export default function Statistics() {
     };
   }, []);
 
-  const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
+  const toast = useToast();
+  const { data: flowsData } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
       const res = await getFlows();
@@ -36,13 +54,89 @@ export default function Statistics() {
     },
   });
 
-  const [openSelectStage, setOpenSelectStage] = useState(isFlowsFetched);
+  const [openSelectStage, setOpenSelectStage] = useState(false);
 
   const [selectedFlow, setSelectedFlow] = useState(-1);
   const [selectedStage, setSelectedStage] = useState(-1);
-  const [stages, setStages] = useState<Stage[]>([]);
+  const [stages, setStages] = useState<{ [key: number]: any }>([]);
+  const [filteredProcess, setFilteredProcess] = useState<Process[]>([]);
+  const [showProcesses, setShowProcesses] = useState(false);
 
-  const handleConfirmSelection = async () => {
+  const tableColumnHelper = createColumnHelper<TableRow<any>>();
+
+  const tableActions = useMemo<TableAction[]>(
+    () => [
+      {
+        label: "Visualizar Processo",
+        icon: <ViewIcon boxSize={4} />,
+        isNavigate: true,
+        actionName: "see-process",
+        disabled: !isActionAllowedToUser(
+          userData?.value?.allowedActions || [],
+          "see-process"
+        ),
+      },
+    ],
+    [isUserFetched, userData]
+  );
+
+  const tableColumns = [
+    tableColumnHelper.accessor("record", {
+      cell: (info) => info.getValue(),
+      header: "Registro",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("nickname", {
+      cell: (info) => info.getValue(),
+      header: "Apelido",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("tableActions", {
+      cell: (info) => info.getValue(),
+      header: "Ações",
+      meta: {
+        isTableActions: true,
+        isSortable: false,
+      },
+    }),
+  ];
+
+  const processesTableRows = useMemo<TableRow<Process>[]>(() => {
+    if (filteredProcess.length <= 0) return [];
+
+    return (
+      (filteredProcess.reduce(
+        (
+          acc: TableRow<Process>[] | Process[],
+          curr: TableRow<Process> | Process
+        ) => {
+          return [
+            ...acc,
+            {
+              ...curr,
+              tableActions,
+              actionsProps: {
+                process: curr,
+                pathname: `/processos/${curr.record}`,
+                state: {
+                  process: curr,
+                  ...(state || {}),
+                },
+              },
+              record: curr.record,
+            },
+          ];
+        },
+        []
+      ) as TableRow<Process>[]) || []
+    );
+  }, [filteredProcess, tableActions]);
+
+  const handleConfirmSelectionFlow = async () => {
     if (selectedFlow) {
       setOpenSelectStage(true);
 
@@ -52,9 +146,7 @@ export default function Statistics() {
         const storeStages = stagesResult.value;
 
         setStages(storeStages);
-
-        console.log(selectedStage);
-
+        console.log("storeStages", storeStages);
       } else {
         toast({
           id: "error-getting-stages",
@@ -75,6 +167,59 @@ export default function Statistics() {
 
       setOpenSelectStage(false);
     }
+  };
+
+  const handleConfirmSelectionStages = () => {
+    if (selectedStage) {
+      setOpenSelectStage(true);
+
+      try {
+        setFilteredProcess(stages[selectedStage].process);
+        setShowProcesses(true);
+      } catch (error) {
+        toast({
+          id: "error-getting-process",
+          title: "Erro ao buscar processos",
+          description: "Houve um erro ao buscar os processos.",
+          status: "error",
+          isClosable: true,
+        });
+      }
+    } else {
+      toast({
+        id: "error-no-selection",
+        title: "Erro!",
+        description: "Selecione uma etapa antes de confirmar.",
+        status: "error",
+        isClosable: true,
+      });
+    }
+  };
+
+  Chart.register(CategoryScale);
+
+  const chartData: ChartData<"bar"> = useMemo(() => {
+    return {
+      labels: Object.values(stages).map((stage) => stage.name),
+      datasets: [
+        {
+          barPercentage: 0.75,
+          barThickness: "flex",
+          label: "Etapas",
+          data: Object.values(stages).map((stage) => stage.countProcess),
+          backgroundColor: generateColorTransition(
+            "#FF0000",
+            "#FBF3AC",
+            Object.values(stages).length
+          ),
+          borderColor: "none",
+        },
+      ],
+    };
+  }, [stages]);
+
+  const scaleStyle = {
+    padding: "4rem",
   };
 
   return (
@@ -114,11 +259,31 @@ export default function Statistics() {
                     <Button
                       colorScheme="green"
                       marginLeft="20px"
-                      onClick={() => setOpenSelectStage(true)}
+                      onClick={() => {
+                        setOpenSelectStage(false);
+                        handleConfirmSelectionStages();
+                      }}
                     >
                       Confirmar
                     </Button>
                   </Flex>
+                  {showProcesses ? (
+                    <Flex marginTop="20px">
+                      <DataTable
+                        data={processesTableRows}
+                        columns={tableColumns}
+                        isDataFetching={false}
+                        emptyTableMessage="Não foram encontrados processos"
+                      />
+                    </Flex>
+                  ) : (
+                    <Flex style={scaleStyle}>
+                      <BarChart
+                        selectedFlow={selectedFlow}
+                        chartData={chartData}
+                      />
+                    </Flex>
+                  )}
                 </>
               ) : (
                 <Flex>
@@ -139,7 +304,7 @@ export default function Statistics() {
                     marginLeft="20px"
                     onClick={() => {
                       setOpenSelectStage(true);
-                      handleConfirmSelection();
+                      handleConfirmSelectionFlow();
                     }}
                   >
                     Confirmar
