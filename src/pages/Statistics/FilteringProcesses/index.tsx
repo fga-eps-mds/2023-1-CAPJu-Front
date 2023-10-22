@@ -319,11 +319,6 @@ export default function FilteringProcesses() {
                     >
                       {!tableVisible ? "Ver relatório" : "Ver Gráfico"}
                     </Button>
-
-                    <Button colorScheme="facebook">PDF</Button>
-                    {!tableVisible && (
-                      <Button colorScheme="facebook">CSV</Button>
-                    )}
                   </Flex>
                 </Flex>
               </Flex>
