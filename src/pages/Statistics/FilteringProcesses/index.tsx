@@ -21,6 +21,42 @@ import { useQuery } from "react-query";
 import { useAuth } from "hooks/useAuth";
 import { isActionAllowedToUser } from "utils/permissions";
 import { ViewIcon } from "@chakra-ui/icons";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
+import organizedChartData from "./chartUtils";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+export const options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: "top" as const,
+    },
+    title: {
+      display: true,
+      text: "Comparativo de Processos Concluídos e Interrompidos por Mês",
+    },
+  },
+};
+
+/* const [months, archived, finished] = organizedChartData(filteredProcesses, new Date(toDate), new Date(fromDate)); */
+/* const labels = ["January", "February", "March", "April", "May", "June", "July"]; */
 
 export default function FilteringProcesses() {
   const toast = useToast();
@@ -33,6 +69,8 @@ export default function FilteringProcesses() {
   const [flows, setFlows] = useState([] as Flow[]);
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [tableVisible, setTableVisible] = useState(false);
+  const [chartVisible, setChartVisible] = useState(true);
+  const [buttonText, setButtonText] = useState("Ver Gráfico");
   const [selectedFlowValue, setSelectedFlowValue] = useState<string>("");
 
   const [fromDate, setFromDate] = useState<string>("");
@@ -165,9 +203,59 @@ export default function FilteringProcesses() {
   };
 
   const handleConfirmClick = async () => {
-    setTableVisible(true);
+    if (
+      selectedFlowValue === "" ||
+      selectedStatus === "" ||
+      toDate === "" ||
+      fromDate === ""
+    ) {
+      setTableVisible(false);
+    } else {
+      setTableVisible(true);
+    }
     refetchProcesses();
   };
+
+  const handleChartClick = async () => {
+    /* Ao clicar em "Ver gráfico": vai para a seção de gráfico ocultando a tabela e mostrando um gráfico, caso exista. */
+    if (tableVisible === false) {
+      setTableVisible(false);
+    } else {
+      setTableVisible(!tableVisible);
+    }
+
+    setChartVisible(!chartVisible);
+
+    if (buttonText === "Ver Gráfico") {
+      setButtonText("Ver Relatório");
+    } else {
+      setButtonText("Ver Gráfico");
+    }
+  };
+
+  const data = useMemo(() => {
+    const [months, archived, finished] = organizedChartData(
+      filteredProcesses,
+      new Date(toDate),
+      new Date(fromDate)
+    );
+
+    return {
+      months,
+      datasets: [
+        {
+          label: "Processos Concluídos",
+          data: archived,
+          backgroundColor: "rgba(255, 99, 132, 0.5)",
+        },
+        {
+          label: "Processos Interrompidos",
+          data: finished,
+          backgroundColor: "rgba(53, 162, 235, 0.5)",
+        },
+      ],
+    };
+  }, [filteredProcesses, toDate, fromDate]);
 
   return (
     <Box backgroundColor="#FFF" borderRadius="8px">
@@ -209,16 +297,18 @@ export default function FilteringProcesses() {
                         return <option value={flow.idFlow}>{flow.name}</option>;
                       })}
                     </Select>
-                    <Select
-                      value={selectedStatus}
-                      onChange={handleStatusChange}
-                      placeholder="Status"
-                      w="35%"
-                      color="gray.500"
-                    >
-                      <option value="archived">Concluído</option>
-                      <option value="finished">Interrompido</option>
-                    </Select>
+                    {chartVisible && (
+                      <Select
+                        value={selectedStatus}
+                        onChange={handleStatusChange}
+                        placeholder="Status"
+                        w="35%"
+                        color="gray.500"
+                      >
+                        <option value="archived">Concluído</option>
+                        <option value="finished">Interrompido</option>
+                      </Select>
+                    )}
                   </Flex>
                   <Flex alignItems="center" gap="5" marginTop="15">
                     <Input
@@ -251,24 +341,35 @@ export default function FilteringProcesses() {
                 </Flex>
                 <Flex>
                   <Flex gap="2" alignItems="flex-end" alignSelf="end">
-                    <Button colorScheme="blue" variant="outline">
-                      Ver Gráfico
+                    <Button
+                      colorScheme="blue"
+                      variant="outline"
+                      onClick={handleChartClick}
+                    >
+                      {buttonText}
                     </Button>
+
                     <Button colorScheme="facebook">PDF</Button>
-                    <Button colorScheme="facebook">CSV</Button>
+                    {chartVisible && (
+                      <Button colorScheme="facebook">CSV</Button>
+                    )}
                   </Flex>
                 </Flex>
               </Flex>
-
-              <Flex w="110%" marginTop="15">
-                {tableVisible && (
-                  <DataTable
-                    data={filteredProcesses}
-                    columns={tableColumns}
-                    isDataFetching={!isProcessesFetched || !isUserFetched}
-                    emptyTableMessage="Não foram encontrados processos"
-                  />
-                )}
+              <Flex flexDirection="column">
+                <Flex w="110%" marginTop="15">
+                  {tableVisible && (
+                    <DataTable
+                      data={filteredProcesses}
+                      columns={tableColumns}
+                      isDataFetching={!isProcessesFetched || !isUserFetched}
+                      emptyTableMessage="Não foram encontrados processos"
+                    />
+                  )}
+                </Flex>
+                <Flex w="70%" alignSelf="center">
+                  {!chartVisible && <Bar options={options} data={data} />}
+                </Flex>
               </Flex>
             </AccordionPanel>
           </AccordionItem>
