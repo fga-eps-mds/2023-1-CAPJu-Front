@@ -13,6 +13,7 @@ const Processes = lazy(() => import("pages/Processes"));
 const ViewProcess = lazy(() => import("pages/ViewProcess"));
 const About = lazy(() => import("pages/About"));
 const ActionsManager = lazy(() => import("pages/ProfilesActionsManager"));
+const Statistics = lazy(() => import("pages/Statistics"));
 
 export const PrivateRoutes: MenuItem[] = [
   {
@@ -44,6 +45,12 @@ export const PrivateRoutes: MenuItem[] = [
     name: "ViewProcess",
     actionName: "see-process",
     element: <ViewProcess />,
+  },
+  {
+    path: "estatisticas",
+    name: "Estatisticas",
+    actionName: "see-process",
+    element: <Statistics />,
   },
   {
     path: "acessos",
