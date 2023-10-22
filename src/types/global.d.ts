@@ -74,6 +74,8 @@ declare global {
     status: string;
     progress?: Progress[];
     isNextSage?: boolean;
+    nameStage?: string;
+    nameFlow?: string;
   };
 
   type Note = {
