@@ -5,7 +5,9 @@ export const getProcesses = async (
   pagination?: Pagination,
   filter?: string,
   filterByLegalPriority?: boolean,
-  status?: String[]
+  status?: String[],
+  from?: string,
+  to?: string
 ): Promise<Result<Process[]>> => {
   try {
     const res = await api.processManagement.get<{
@@ -18,6 +20,8 @@ export const getProcesses = async (
         filter,
         status: status || undefined,
         filterByLegalPriority,
+        from,
+        to,
       },
     });
 

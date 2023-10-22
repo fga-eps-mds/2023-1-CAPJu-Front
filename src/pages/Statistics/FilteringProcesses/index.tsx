@@ -35,13 +35,22 @@ export default function FilteringProcesses() {
   const [tableVisible, setTableVisible] = useState(false);
   const [selectedFlowValue, setSelectedFlowValue] = useState<string>("");
 
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedStatus(event.target.value);
+  };
+
   const getDataFlows = async () => {
     const dataFlows = await getFlows();
     if (dataFlows.value) setFlows(dataFlows.value);
   };
 
   useEffect(() => {
-    getDataFlows();
+    if (flows.length === 0) getDataFlows();
   }, []);
 
   const {
@@ -56,7 +65,10 @@ export default function FilteringProcesses() {
         parseInt(selectedFlowValue, 10),
         undefined,
         undefined,
-        false
+        false,
+        selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
+        fromDate === "" ? undefined : fromDate,
+        toDate === "" ? undefined : toDate
       );
       setIsFetching(false);
 
@@ -94,8 +106,7 @@ export default function FilteringProcesses() {
   const filteredProcesses = useMemo<TableRow<Process>[]>(() => {
     if (isFetching) return [];
 
-    const value = processesData?.value;
-    console.log({ value });
+    const value = replacer(processesData?.value);
     return (
       (value?.reduce(
         (
@@ -198,15 +209,37 @@ export default function FilteringProcesses() {
                         return <option value={flow.idFlow}>{flow.name}</option>;
                       })}
                     </Select>
-                    <Select placeholder="Status" w="35%" color="gray.500">
+                    <Select
+                      value={selectedStatus}
+                      onChange={handleStatusChange}
+                      placeholder="Status"
+                      w="35%"
+                      color="gray.500"
+                    >
                       <option value="archived">Concluído</option>
                       <option value="finished">Interrompido</option>
                     </Select>
                   </Flex>
                   <Flex alignItems="center" gap="5" marginTop="15">
-                    <Input w="50%" type="date" color="gray.500" />
+                    <Input
+                      w="50%"
+                      type="date"
+                      color="gray.500"
+                      value={fromDate}
+                      onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                        setFromDate(event.target.value);
+                      }}
+                    />
                     <Text>à</Text>
-                    <Input w="50%" type="date" color="gray.500" />
+                    <Input
+                      w="50%"
+                      type="date"
+                      color="gray.500"
+                      value={toDate}
+                      onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                        setToDate(event.target.value);
+                      }}
+                    />
                     <Button
                       colorScheme="whatsapp"
                       w="20%"
@@ -244,3 +277,14 @@ export default function FilteringProcesses() {
     </Box>
   );
 }
+
+const replacer = (processes: Process[] | undefined) => {
+  if (!processes) return undefined;
+
+  return processes.map((process) => {
+    return {
+      ...process,
+      status: process.status === "archived" ? "Concluido" : "Interrompido",
+    };
+  });
+};
