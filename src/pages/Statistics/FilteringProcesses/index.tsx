@@ -31,7 +31,7 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import organizedChartData from "./chartUtils";
+import useChartData from "./chartUtils";
 
 ChartJS.register(
   CategoryScale,
@@ -55,9 +55,6 @@ export const options = {
   },
 };
 
-/* const [months, archived, finished] = organizedChartData(filteredProcesses, new Date(toDate), new Date(fromDate)); */
-/* const labels = ["January", "February", "March", "April", "May", "June", "July"]; */
-
 export default function FilteringProcesses() {
   const toast = useToast();
   const { getUserData } = useAuth();
@@ -68,9 +65,7 @@ export default function FilteringProcesses() {
 
   const [flows, setFlows] = useState([] as Flow[]);
   const [isFetching, setIsFetching] = useState<boolean>(true);
-  const [tableVisible, setTableVisible] = useState(false);
-  const [chartVisible, setChartVisible] = useState(true);
-  const [buttonText, setButtonText] = useState("Ver Gráfico");
+  const [tableVisible, setTableVisible] = useState(true);
   const [selectedFlowValue, setSelectedFlowValue] = useState<string>("");
 
   const [fromDate, setFromDate] = useState<string>("");
@@ -104,7 +99,9 @@ export default function FilteringProcesses() {
         undefined,
         undefined,
         false,
-        selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
+        selectedStatus === "" || tableVisible
+          ? ["archived", "finished"]
+          : [selectedStatus],
         fromDate === "" ? undefined : fromDate,
         toDate === "" ? undefined : toDate
       );
@@ -203,59 +200,30 @@ export default function FilteringProcesses() {
   };
 
   const handleConfirmClick = async () => {
-    if (
-      selectedFlowValue === "" ||
-      selectedStatus === "" ||
-      toDate === "" ||
-      fromDate === ""
-    ) {
-      setTableVisible(false);
-    } else {
-      setTableVisible(true);
-    }
     refetchProcesses();
+    reload();
   };
 
   const handleChartClick = async () => {
-    /* Ao clicar em "Ver gráfico": vai para a seção de gráfico ocultando a tabela e mostrando um gráfico, caso exista. */
-    if (tableVisible === false) {
-      setTableVisible(false);
-    } else {
-      setTableVisible(!tableVisible);
-    }
-
-    setChartVisible(!chartVisible);
-
-    if (buttonText === "Ver Gráfico") {
-      setButtonText("Ver Relatório");
-    } else {
-      setButtonText("Ver Gráfico");
+    if (toDate.length > 0 && fromDate.length > 0) {
+      setTableVisible((current) => !current);
+    } else if (tableVisible) {
+      toast({
+        id: "date-error",
+        title: "Datas não preenchidas",
+        description: "Preencha o periodo para ver o gráfico.",
+        status: "error",
+        isClosable: true,
+      });
+      setTableVisible(true);
     }
   };
 
-  const data = useMemo(() => {
-    const [months, archived, finished] = organizedChartData(
-      filteredProcesses,
-      new Date(toDate),
-      new Date(fromDate)
-    );
-
-    return {
-      months,
-      datasets: [
-        {
-          label: "Processos Concluídos",
-          data: archived,
-          backgroundColor: "rgba(255, 99, 132, 0.5)",
-        },
-        {
-          label: "Processos Interrompidos",
-          data: finished,
-          backgroundColor: "rgba(53, 162, 235, 0.5)",
-        },
-      ],
-    };
-  }, [filteredProcesses, toDate, fromDate]);
+  const [months, archived, finished, reload] = useChartData(
+    filteredProcesses,
+    fromDate,
+    toDate
+  );
 
   return (
     <Box backgroundColor="#FFF" borderRadius="8px">
@@ -297,7 +265,7 @@ export default function FilteringProcesses() {
                         return <option value={flow.idFlow}>{flow.name}</option>;
                       })}
                     </Select>
-                    {chartVisible && (
+                    {!tableVisible && (
                       <Select
                         value={selectedStatus}
                         onChange={handleStatusChange}
@@ -344,13 +312,16 @@ export default function FilteringProcesses() {
                     <Button
                       colorScheme="blue"
                       variant="outline"
-                      onClick={handleChartClick}
+                      onClick={() => {
+                        handleChartClick();
+                        // reload();
+                      }}
                     >
-                      {buttonText}
+                      {!tableVisible ? "Ver relatório" : "Ver Gráfico"}
                     </Button>
 
                     <Button colorScheme="facebook">PDF</Button>
-                    {chartVisible && (
+                    {!tableVisible && (
                       <Button colorScheme="facebook">CSV</Button>
                     )}
                   </Flex>
@@ -368,7 +339,26 @@ export default function FilteringProcesses() {
                   )}
                 </Flex>
                 <Flex w="70%" alignSelf="center">
-                  {!chartVisible && <Bar options={options} data={data} />}
+                  {!tableVisible && (
+                    <Bar
+                      options={options}
+                      data={{
+                        labels: months,
+                        datasets: [
+                          {
+                            label: "Processos Concluídos",
+                            data: archived,
+                            backgroundColor: "rgba(255, 99, 132, 0.5)",
+                          },
+                          {
+                            label: "Processos Interrompidos",
+                            data: finished,
+                            backgroundColor: "rgba(53, 162, 235, 0.5)",
+                          },
+                        ],
+                      }}
+                    />
+                  )}
                 </Flex>
               </Flex>
             </AccordionPanel>
