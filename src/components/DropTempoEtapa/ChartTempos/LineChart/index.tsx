@@ -1,21 +1,21 @@
 import { Line } from "react-chartjs-2";
-import {Data} from "../Data.tsx";
+import { ChartData } from "../index";
 
-function LineChart({ chartData }: any) {
+function LineChart({ chartData, nameFlow }: { chartData: ChartData, nameFlow: string }) {
   return (
     <div className="chart-container">
-      <h2 style={{ textAlign: "center" }}>Tempo de Conclusão por Etapa</h2>
+      <h2 style={{ textAlign: "center", fontWeight: "bolder", marginTop: "10px" }}>Tempo de Conclusão por Etapa</h2>
       <Line
         data={chartData}
         options={{
           responsive: true,
           plugins: {
             legend: {
-              position: "top"
+              position: "bottom"
             },
             title: {
               display: true,
-              text: "Fluxo 01"
+              text: nameFlow,
             }
           }
         }}

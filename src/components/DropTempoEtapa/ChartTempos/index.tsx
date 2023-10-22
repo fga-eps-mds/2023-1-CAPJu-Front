@@ -1,32 +1,41 @@
 import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
-import { useState } from "react";
-import Data from "./Data";
-// import Config from "../utils/Config";
+import { Dispatch, SetStateAction, useState } from "react";
 import LineChart from "./LineChart";
+import { Data } from "../index";
 import "./styles.css"
+
+export interface ChartData {
+  labels: Array<string>;
+  datasets: Array<{
+    label: string;
+    data: Array<number>;
+    borderColor: string;
+    backgroundColor: string;
+    borderWidth: number;
+    tension: number;
+  }>;
+}
 
 Chart.register(CategoryScale);
 
-interface Props {
-  value: Promise<number[]>;
-}
+export default function ChartTempos({ value, nameFlow }: { value: Data[], nameFlow: string }) {
+  const [nameFlow2] = useState<string>(nameFlow);
 
-export default function ChartTempos( { value }: Props ) {
-  const [chartData] = useState({
-    labels: value.map((data: any) => data.label),
+  const [chartData]: [ChartData, Dispatch<SetStateAction<ChartData>>] = useState<ChartData>({
+    labels: value.map(({ label }) => label),
     datasets: [
       {
         label: "Tempo Médio",
-        data: value.map((data: any) => data.medio),
-        backgroundColor: "#ff5252",
+        data: value.map(({ medio }) => medio),
         borderColor: "#ff5252",
+        backgroundColor: "#ff5252",
         borderWidth: 4,
         tension: 0.4
       },
       {
         label: "Tempo Previsto",
-        data: value.map((data: any) => data.previsto),
+        data: value.map(({ previsto }) => previsto),
         borderColor: "#0090ff",
         backgroundColor: "#0090ff",
         borderWidth: 4,
@@ -36,8 +45,8 @@ export default function ChartTempos( { value }: Props ) {
   });
 
   return (
-    <div className="LineChart">
-      <LineChart chartData={chartData} />
+    <div className="LineChart" >
+      <LineChart chartData={chartData} nameFlow={nameFlow2} />
     </div>
   );
 }
