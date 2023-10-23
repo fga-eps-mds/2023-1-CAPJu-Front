@@ -7,13 +7,7 @@ export const getStagesByIdFlow = async (
     const res = await api.processManagement.get<{
       stages: Stage[];
       totalPages: number;
-    }>(`statistics/qtdFlow/${IdFlow}`, {
-      params: {
-        name: String,
-        idStage: Number,
-      },
-    });
-
+    }>(`statistics/qtdFlow/${IdFlow}`);
     return {
       type: "success",
       value: res.data.stages,
