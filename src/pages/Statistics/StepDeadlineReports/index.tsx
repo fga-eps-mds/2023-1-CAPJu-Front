@@ -40,9 +40,12 @@ export default function StepDeadlineReports() {
   } = useQuery({
     queryKey: ["processesInDue"],
     queryFn: async () => {
-      setIsFetching(true);
-      const res = await getProcessesByDueDate(minDate, maxDate);
       setIsFetching(false);
+      const res = await getProcessesByDueDate(
+        minDate,
+        maxDate,
+      );
+      setIsFetching(true);
 
       if (res.type === "error") throw new Error(res.error.message);
       return res;
@@ -51,7 +54,8 @@ export default function StepDeadlineReports() {
       toast({
         id: "processes-error",
         title: "Erro ao carregar processos",
-        description: "Insira o período de validade.",
+        description:
+          "Insira o período de validade.",
         status: "error",
         isClosable: true,
       });
@@ -102,7 +106,7 @@ export default function StepDeadlineReports() {
   const tableColumns = [
     tableColumnHelper.accessor("record", {
       cell: (info) => info.getValue(),
-      header: "REGISTRO",
+      header: "Registro",
       meta: {
         isSortable: true,
       },
@@ -114,14 +118,14 @@ export default function StepDeadlineReports() {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("status", {
+    tableColumnHelper.accessor("nameflow", {
       cell: (info) => info.getValue(),
       header: "Fluxo",
       meta: {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("status", {
+    tableColumnHelper.accessor("namestage", {
       cell: (info) => info.getValue(),
       header: "Etapa Atual",
       meta: {

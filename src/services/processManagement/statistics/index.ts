@@ -6,13 +6,13 @@ export const getProcessesByDueDate = async (
 ): Promise<Result<Process[]>> => {
   try {
     const res = await api.processManagement.get<{
-      processes: Process[];
+      processInDue: Process[];
       totalPages: number;
     }>(`/statistics/${minDate}/${maxDate}`);
 
     return {
       type: "success",
-      value: res.data.processes,
+      value: res.data.processInDue,
       totalPages: res.data.totalPages,
     };
   } catch (error) {
