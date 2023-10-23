@@ -34,7 +34,6 @@ export default function StepDeadlineReports() {
     if (flows.length === 0) getDataFlows();
   }, []);
 
-
   const tableActions = useMemo<TableAction[]>(
     () => [
       {
@@ -48,7 +47,7 @@ export default function StepDeadlineReports() {
         ),
       },
     ],
-    [ isUserFetched, userData]
+    [isUserFetched, userData]
   );
 
   const filteredStepDeadlineReports = useMemo<TableRow<Process>[]>(() => {
@@ -112,7 +111,7 @@ export default function StepDeadlineReports() {
     const minDateValue = Date.parse(minDate);
     const maxDateValue = Date.parse(maxDate);
 
-    if (isNaN(minDateValue) || isNaN(maxDateValue)) {
+    if (Number.isNaN(minDateValue) || Number.isNaN(maxDateValue)) {
       toast({
         id: "date-validation-error",
         title: "Erro",
@@ -121,29 +120,25 @@ export default function StepDeadlineReports() {
         isClosable: true,
       });
     } else {
-      setTableVisible(true)
+      setTableVisible(true);
       try {
         setIsFetching(true);
-        const res = await getProcessesByDueDate(
-          minDate,
-          maxDate,
-        );
+        const res = await getProcessesByDueDate(minDate, maxDate);
 
         if (res.type === "error") throw new Error(res.error.message);
         setProcessData(res.value);
-        setIsFetching(false)
+        setIsFetching(false);
       } catch (error) {
         toast({
           id: "processes-error",
           title: "Erro ao carregar processos",
-          description:
-            "Insira o período de validade.",
+          description: "Insira o período de validade.",
           status: "error",
           isClosable: true,
-        })
-      };
+        });
+      }
     }
-  }
+  };
 
   return (
     <Flex
