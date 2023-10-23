@@ -19,10 +19,11 @@ export default function StepDeadlineReports() {
   });
 
   const [flows, setFlows] = useState([] as Flow[]);
-  const [isFetching, setIsFetching] = useState<boolean>(true);
   const [tableVisible, setTableVisible] = useState(false);
   const [minDate, setMinDate] = useState<string>("");
+  const [isFetching, setIsFetching] = useState<boolean>(true);
   const [maxDate, setMaxDate] = useState<string>("");
+  const [processData, setProcessData] = useState<Process[]>([]);
 
   const getDataFlows = async () => {
     const dataFlows = await getFlows();
@@ -33,34 +34,6 @@ export default function StepDeadlineReports() {
     if (flows.length === 0) getDataFlows();
   }, []);
 
-  const {
-    data: processesData,
-    isFetched: isProcessesFetched,
-    refetch: refetchProcesses,
-  } = useQuery({
-    queryKey: ["processesInDue"],
-    queryFn: async () => {
-      setIsFetching(false);
-      const res = await getProcessesByDueDate(
-        minDate,
-        maxDate,
-      );
-      setIsFetching(true);
-
-      if (res.type === "error") throw new Error(res.error.message);
-      return res;
-    },
-    onError: () => {
-      toast({
-        id: "processes-error",
-        title: "Erro ao carregar processos",
-        description:
-          "Insira o período de validade.",
-        status: "error",
-        isClosable: true,
-      });
-    },
-  });
 
   const tableActions = useMemo<TableAction[]>(
     () => [
@@ -75,16 +48,14 @@ export default function StepDeadlineReports() {
         ),
       },
     ],
-    [isProcessesFetched, isUserFetched, userData]
+    [ isUserFetched, userData]
   );
 
   const filteredStepDeadlineReports = useMemo<TableRow<Process>[]>(() => {
-    if (isFetching) return [];
+    if (processData.length <= 0) return [];
 
-    const value = processesData?.value;
-    console.log({ value });
     return (
-      (value?.reduce(
+      (processData?.reduce(
         (
           acc: TableRow<Process>[] | Process[],
           curr: TableRow<Process> | Process
@@ -95,13 +66,8 @@ export default function StepDeadlineReports() {
         []
       ) as TableRow<Process>[]) || []
     );
-  }, [
-    processesData,
-    isProcessesFetched,
-    isUserFetched,
-    tableActions,
-    isFetching,
-  ]);
+  }, [tableActions, processData]);
+
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [
     tableColumnHelper.accessor("record", {
@@ -143,9 +109,41 @@ export default function StepDeadlineReports() {
   ];
 
   const handleConfirmClick = async () => {
-    setTableVisible(true);
-    refetchProcesses();
-  };
+    const minDateValue = Date.parse(minDate);
+    const maxDateValue = Date.parse(maxDate);
+
+    if (isNaN(minDateValue) || isNaN(maxDateValue)) {
+      toast({
+        id: "date-validation-error",
+        title: "Erro",
+        description: "Por favor, insira datas válidas.",
+        status: "error",
+        isClosable: true,
+      });
+    } else {
+      setTableVisible(true)
+      try {
+        setIsFetching(true);
+        const res = await getProcessesByDueDate(
+          minDate,
+          maxDate,
+        );
+
+        if (res.type === "error") throw new Error(res.error.message);
+        setProcessData(res.value);
+        setIsFetching(false)
+      } catch (error) {
+        toast({
+          id: "processes-error",
+          title: "Erro ao carregar processos",
+          description:
+            "Insira o período de validade.",
+          status: "error",
+          isClosable: true,
+        })
+      };
+    }
+  }
 
   return (
     <Flex
@@ -226,7 +224,7 @@ export default function StepDeadlineReports() {
                   <DataTable
                     data={filteredStepDeadlineReports}
                     columns={tableColumns}
-                    isDataFetching={!isProcessesFetched || !isUserFetched}
+                    isDataFetching={isFetching}
                     emptyTableMessage="Não foram encontrados processos"
                   />
                 )}
