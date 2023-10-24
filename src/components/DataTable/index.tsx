@@ -141,7 +141,6 @@ export function DataTable<Data extends object>({
                               disabled={disabled}
                               {...actionItem}
                               action={() => {
-                                console.log(actionItem)
                                 if (actionItem.action)
                                   actionItem.action(row.original.actionsProps);
 

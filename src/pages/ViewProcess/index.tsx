@@ -341,7 +341,6 @@ function ViewProcess() {
           flexWrap="wrap"
         >
           <Text
-              color="white"
             fontSize="25px"
             fontWeight="semibold"
             display="flex"
@@ -368,7 +367,6 @@ function ViewProcess() {
           alignItems="center"
           gap="1"
           flexWrap="wrap"
-          color="white"
         >
           <Text fontWeight="semibold" fontSize="20px">
             Status:{" "}
@@ -384,7 +382,7 @@ function ViewProcess() {
             </Text>
           </Text>
           {isPriorityFetched ? (
-            <Text fontWeight="semibold" color="white" fontSize="20px">
+            <Text fontWeight="semibold" fontSize="20px">
               Prioridade Legal:{" "}
               <Text as="span" fontWeight="300" fontSize="15px">
                 {(priorityData?.value as Priority)?.description || "Não tem"}
@@ -559,7 +557,6 @@ function ViewProcess() {
             flexWrap="wrap"
         >
           <Text
-              color="white"
               fontSize="30px"
               fontWeight="semibold"
               display="flex"
@@ -574,14 +571,14 @@ function ViewProcess() {
               gap="2"
           >
             <Button
+                title="Baixar excel"
                 colorScheme="green"
                 onClick={(event) => {
                   event.preventDefault();
                   downloadEventsXlsx(process.record as string, process.idProcess).finally();
                 }}
             >
-              <Icon as={FaFileExcel} mr="2" boxSize={4} />
-              Baixar excel
+              <Icon as={FaFileExcel} boxSize={4} />
             </Button>
             <Button
                 colorScheme="green"
@@ -594,8 +591,7 @@ function ViewProcess() {
                   }));
                 }}
             >
-              <Icon as={FaFilePdf} mr="2" boxSize={4} />
-              Baixar pdf
+              <Icon as={FaFilePdf} boxSize={4} />
             </Button>
           </Flex>
         </Flex>

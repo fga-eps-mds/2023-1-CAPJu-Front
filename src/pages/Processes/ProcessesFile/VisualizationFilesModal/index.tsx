@@ -11,7 +11,7 @@ export function VisualizationFilesModal({ isOpen, onClose }: VisualizationFilesM
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="6xl" colorScheme="red" >
             <ModalOverlay backdropFilter="blur(12px)" />
-            <ModalContent backgroundColor="#1E2952">
+            <ModalContent backgroundColor="#E2E8F0">
                 <ModalCloseButton color="white" />
                 <ModalBody>
                     <ProcessesFileComponent />

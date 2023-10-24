@@ -216,9 +216,9 @@ export default function ProcessesFileComponent () {
     
     return (
         <>
-            <Flex w="50%" flexDir="column" gap="3" mb="4" color="white">
+            <Flex w="50%" flexDir="column" gap="3" mb="4">
                 <Flex flexDirection="column" gap="2">
-                    <Text fontSize="30px" fontWeight="semibold" color="white">
+                    <Text fontSize="30px" fontWeight="semibold">
                         Lotes
                     </Text>
                     <Flex width="200%"  justifyContent="space-between" gap="2" flexWrap="wrap" mt="25px">

@@ -5,7 +5,8 @@ import {
     ModalContent,
     ModalHeader,
     ModalOverlay,
-    Text, useDisclosure,
+    Text,
+    useDisclosure,
 } from '@chakra-ui/react';
 import {createColumnHelper} from '@tanstack/react-table';
 import {Icon, ViewIcon} from '@chakra-ui/icons';
@@ -43,18 +44,18 @@ export function VisualizationItemsModal({ processesFile, isOpen, onClose }: Visu
                 isNavigate: true,
                 actionName: "see-items",
                 labelOnDisable: 'Item não importado',
-                disabledOn: (fileItem: ProcessesFileItem) => !fileItem.idProcess
+                disabledOn: (fileItem: ProcessesFileItem) => !fileItem.idProcess,
             },
             {
                 label: "Importar manualmente",
                 icon: <Icon as={FaEdit} boxSize={6} style={{ marginLeft: '8px' }}/>,
                 actionName: "see-items",
                 labelOnDisable: 'Item já importado',
-                action: ({ processesFileItem }) => {
+                action: ( { processesFileItem }) => {
                     onCreationOpen();
                     setFileItemSelected(processesFileItem);
                 },
-                disabledOn: (fileItem: ProcessesFileItem) => fileItem.status !== 'error' || !fileItem.idProcess
+                disabledOn: (fileItem: ProcessesFileItem) => fileItem.status !== 'error'
             },
         ],
         [processesFile]
@@ -144,7 +145,8 @@ export function VisualizationItemsModal({ processesFile, isOpen, onClose }: Visu
             const { data, pagination } = value;
             setProcessesFileTablePaginationInfo(pagination);
             setRawItems(data);
-            const rows = (data || []).map(processesFileItem  => {
+            const rows = (data || []).map(item  => {
+                const processesFileItem = { ...item };
                 // @ts-ignore
                 // eslint-disable-next-line no-return-assign
                 Object.keys(processesFileItem).forEach(key => !processesFileItem[key] && (processesFileItem[key] = '-'));
@@ -176,8 +178,8 @@ export function VisualizationItemsModal({ processesFile, isOpen, onClose }: Visu
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="6xl" colorScheme="red" >
             <ModalOverlay backdropFilter="blur(12px)" />
-            <ModalContent backgroundColor="#1E2952">
-                <ModalHeader color="white">Itens lote - {processesFile?.name || processesFile?.fileName}</ModalHeader>
+            <ModalContent backgroundColor="#E2E8F0">
+                <ModalHeader fontSize="25px">Itens lote - {processesFile?.name || processesFile?.fileName}</ModalHeader>
                 <ModalCloseButton color="white" />
                 <ModalBody>
                     <DataTable
@@ -197,23 +199,24 @@ export function VisualizationItemsModal({ processesFile, isOpen, onClose }: Visu
                         />
                     ) : null}
                     {
-                        (fileItemSelected) &&
-                        <CreationModal
-                            isOpen={isCreationOpen}
-                            onClose={onCreationClose}
-                            recordParam={fileItemSelected?.record}
-                            nicknameParam={fileItemSelected?.nickname}
-                            afterSubmission={ async (createdProcess) => {
-                                await updateFileItemById(fileItemSelected.idProcessesFileItem, {
-                                    status: 'manuallyImported',
-                                    message: null,
-                                    idProcess: createdProcess?.idProcess,
-                                });
-                                await refetchItems();
-                                onCreationOpen();
-                                setFileItemSelected(null);
-                            }}
-                        />
+                        (fileItemSelected && isCreationOpen &&
+                            <CreationModal
+                                isOpen={isCreationOpen}
+                                onClose={onCreationClose}
+                                recordParam={fileItemSelected?.record}
+                                nicknameParam={fileItemSelected?.nickname}
+                                afterSubmission={ async (createdProcess) => {
+                                    await updateFileItemById(fileItemSelected.idProcessesFileItem, {
+                                        status: 'manuallyImported',
+                                        message: null,
+                                        idProcess: createdProcess?.idProcess,
+                                    });
+                                    await refetchItems();
+                                    onCreationOpen();
+                                    setFileItemSelected(null);
+                                }}
+                            />
+                        )
                     }
                 </ModalBody>
             </ModalContent>

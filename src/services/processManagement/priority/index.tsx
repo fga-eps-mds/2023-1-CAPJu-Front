@@ -4,7 +4,6 @@ export const getPriorities = async (
   id?: number
 ): Promise<Result<Priority[] | Priority>> => {
 
-  console.log('entrei')
   try {
     const res = await api.processManagement.get<Priority[]>("/priority");
     const priorityById = id

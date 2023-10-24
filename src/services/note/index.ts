@@ -26,7 +26,6 @@ export const getNotesByProcessId = async (
     idProcess: number
 ): Promise<Result<Note[]>> => {
 
-  console.log(idProcess)
   try {
     const res = await api.note.get<Note[]>(`/${idProcess}`);
 

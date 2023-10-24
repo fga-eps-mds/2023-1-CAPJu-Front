@@ -57,8 +57,7 @@ export function Header() {
       position="relative"
     >
         <Flex
-        w="90%"
-        maxW={1120}
+        w="75%"
         alignItems="center"
         justifyContent="space-between"
       >
@@ -83,7 +82,7 @@ export function Header() {
 
                                 return (
                                     <Tab
-                                        sx={{ paddingBottom: "0", fontSize: '23px', fontFamily: 'Lingconsolata' }}
+                                        sx={{ paddingBottom: "0", fontSize: '23px' }}
                                         key={tab.label}
                                         onClick={handleClick}
                                         cursor={cursor}
@@ -99,7 +98,6 @@ export function Header() {
                 <Flex alignItems="center" ml="auto" gap="5">
                     <HeaderLink href="/contribuidores">Sobre</HeaderLink>
                     <Button
-                        size={["xs", "sm"]}
                         colorScheme="red"
                         onClick={handleLogout}
                     >

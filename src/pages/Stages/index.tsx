@@ -86,7 +86,6 @@ function Stages() {
         label: "Editar etapa",
         icon: <Icon as={MdEdit} boxSize={4} />,
         action: ({ stage }: { stage: Stage }) => {
-          console.log(stage)
           selectStage(stage);
           onEditionOpen();
         },

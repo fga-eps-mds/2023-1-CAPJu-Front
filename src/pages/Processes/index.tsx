@@ -269,9 +269,9 @@ function Processes() {
   return (
     <PrivateLayout>
 
-      <Flex w="50%" flexDir="column" gap="3" mb="4" color="white">
+      <Flex w="50%" flexDir="column" gap="3" mb="4">
         <Flex flexDirection="column" gap="2">
-          <Text fontSize="30px" fontWeight="semibold" color="white">
+          <Text fontSize="30px" fontWeight="semibold">
             Processos{flow ? ` - Fluxo ${flow?.name}` : ""}
           </Text>
           <Flex width="200%"  justifyContent="space-between" gap="2" flexWrap="wrap" mt="25px">
@@ -325,8 +325,8 @@ function Processes() {
                     borderColor="gray.600"
                     checked={legalPriority}
                     onChange={() => setLegalPriority(!legalPriority)}
-                    flexShrink={0}  // Prevent checkbox from shrinking
-                    maxWidth="unset" // Override any max width constraints
+                    flexShrink={0}
+                    maxWidth="unset"
                 >
                   Prioridade legal
                 </Checkbox>
@@ -335,8 +335,8 @@ function Processes() {
                     borderColor="gray.600"
                     checked={showFinished}
                     onChange={() => setShowFinished(!showFinished)}
-                    flexShrink={0}  // Prevent checkbox from shrinking
-                    maxWidth="unset" // Override any max width constraints
+                    flexShrink={0}
+                    maxWidth="unset"
                 >
                   Arquivados/finalizados
                 </Checkbox>
