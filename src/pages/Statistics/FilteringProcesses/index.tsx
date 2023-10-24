@@ -11,6 +11,7 @@ import {
   Button,
   Text,
   Input,
+  Center,
 } from "@chakra-ui/react";
 import { DataTable } from "components/DataTable";
 import { useEffect, useState, useMemo, ChangeEvent } from "react";
@@ -32,6 +33,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import useChartData from "./chartUtils";
+import { Pagination } from "components/Pagination";
 
 ChartJS.register(
   CategoryScale,
@@ -72,7 +74,7 @@ export default function FilteringProcesses() {
   const [toDate, setToDate] = useState<string>("");
 
   const [selectedStatus, setSelectedStatus] = useState("");
-
+  const [filter, setFilter] = useState<string | undefined>(undefined);
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedStatus(event.target.value);
   };
@@ -96,10 +98,15 @@ export default function FilteringProcesses() {
       setIsFetching(true);
       const res = await getProcesses(
         parseInt(selectedFlowValue, 10),
-        undefined,
-        undefined,
+        !tableVisible
+          ? undefined
+          : {
+              offset: currentPage * 5,
+              limit: 5,
+            },
+        filter,
         false,
-        selectedStatus === "" || tableVisible
+        selectedStatus === "" || !tableVisible
           ? ["archived", "finished"]
           : [selectedStatus],
         fromDate === "" ? undefined : fromDate,
@@ -203,6 +210,14 @@ export default function FilteringProcesses() {
     refetchProcesses();
     reload();
   };
+  const [currentPage, setCurrentPage] = useState(0);
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+
+  useEffect(() => {
+    refetchProcesses();
+  }, [currentPage]);
 
   const handleChartClick = async () => {
     if (toDate.length > 0 && fromDate.length > 0) {
@@ -215,7 +230,6 @@ export default function FilteringProcesses() {
         status: "error",
         isClosable: true,
       });
-      setTableVisible(true);
     }
   };
 
@@ -228,14 +242,11 @@ export default function FilteringProcesses() {
   return (
     <Box backgroundColor="#FFF" borderRadius="8px">
       <Flex justifyContent="flex-start" w="100%">
-        <Accordion defaultIndex={[0]} allowMultiple w="100%">
+        <Accordion defaultIndex={[4]} allowMultiple w="100%">
           <AccordionItem>
             <h2>
               <AccordionButton>
-                <AccordionIcon
-                  transform="rotate(270deg)"
-                  transition="transform 0.2s"
-                />
+                <AccordionIcon />
                 <Box
                   as="span"
                   flex="1"
@@ -265,7 +276,7 @@ export default function FilteringProcesses() {
                         return <option value={flow.idFlow}>{flow.name}</option>;
                       })}
                     </Select>
-                    {!tableVisible && (
+                    {tableVisible && (
                       <Select
                         value={selectedStatus}
                         onChange={handleStatusChange}
@@ -273,7 +284,7 @@ export default function FilteringProcesses() {
                         w="35%"
                         color="gray.500"
                       >
-                        <option value="archived">Concluído</option>
+                        <option value="archived">Concluído</option>;
                         <option value="finished">Interrompido</option>
                       </Select>
                     )}
@@ -323,13 +334,24 @@ export default function FilteringProcesses() {
                 </Flex>
               </Flex>
               <Flex flexDirection="column">
-                <Flex w="110%" marginTop="15">
+                <Flex
+                  w="100%"
+                  marginTop="15"
+                  alignItems="center"
+                  flexDirection="column"
+                >
                   {tableVisible && (
                     <DataTable
                       data={filteredProcesses}
                       columns={tableColumns}
                       isDataFetching={!isProcessesFetched || !isUserFetched}
                       emptyTableMessage="Não foram encontrados processos"
+                    />
+                  )}
+                  {processesData?.totalPages !== undefined && tableVisible && (
+                    <Pagination
+                      pageCount={processesData?.totalPages}
+                      onPageChange={handlePageChange}
                     />
                   )}
                 </Flex>
