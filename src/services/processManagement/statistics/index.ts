@@ -2,14 +2,20 @@ import { api } from "services/api";
 
 export const getProcessesByDueDate = async (
   minDate: string,
-  maxDate: string
+  maxDate: string,
+  pagination?: Pagination
 ): Promise<Result<Process[]>> => {
   try {
     const res = await api.processManagement.get<{
       processInDue: Process[];
       totalPages: number;
-    }>(`/statistics/${minDate}/${maxDate}`);
-
+    }>(`/statistics/${minDate}/${maxDate}`, {
+      params: {
+        offset: pagination?.offset ?? 0,
+        limit: pagination?.limit,
+      },
+    });
+    
     return {
       type: "success",
       value: res.data.processInDue,
@@ -26,3 +32,4 @@ export const getProcessesByDueDate = async (
     };
   }
 };
+

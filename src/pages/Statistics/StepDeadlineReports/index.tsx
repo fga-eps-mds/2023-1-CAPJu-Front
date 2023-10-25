@@ -1,13 +1,14 @@
+import { useEffect, useState, useMemo } from "react";
 import { useToast, Box, Flex, Button, Text, Input } from "@chakra-ui/react";
 import CustomAccordion from "components/CustomAccordion";
 import { DataTable } from "components/DataTable";
-import { useEffect, useState, useMemo } from "react";
 import { getFlows } from "services/processManagement/flows";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "react-query";
 import { useAuth } from "hooks/useAuth";
 import { isActionAllowedToUser } from "utils/permissions";
 import { ViewIcon } from "@chakra-ui/icons";
+import { Pagination } from "components/Pagination";
 import { getProcessesByDueDate } from "services/processManagement/statistics";
 
 export default function StepDeadlineReports() {
@@ -24,11 +25,35 @@ export default function StepDeadlineReports() {
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [maxDate, setMaxDate] = useState<string>("");
   const [processData, setProcessData] = useState<Process[]>([]);
+  const [processDueTotalPages, setProcessDueTotalPages] = useState<number | undefined>();
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  
+  useEffect(() => {
+    const handlePageChange = async () => {
+      setLoading(true);
+      await handleProcessByDueDate();
+      setLoading(false)
+    };
+
+    if(minDate && maxDate)
+      handlePageChange();
+
+  }, [currentPage])
 
   const getDataFlows = async () => {
     const dataFlows = await getFlows();
     if (dataFlows.value) setFlows(dataFlows.value);
   };
+
+  const handleProcessByDueDate = async () => {
+    const res = await getProcessesByDueDate(minDate, maxDate, { offset: currentPage * 5, limit: 5 });
+
+    if (res.type === "error") throw new Error(res.error.message);
+
+    setProcessData(res.value);
+    setProcessDueTotalPages(res.totalPages);
+  }
 
   useEffect(() => {
     if (flows.length === 0) getDataFlows();
@@ -51,7 +76,7 @@ export default function StepDeadlineReports() {
   );
 
   const filteredStepDeadlineReports = useMemo<TableRow<Process>[]>(() => {
-    if (processData.length <= 0) return [];
+    if (!processData) return [];
 
     return (
       (processData?.reduce(
@@ -123,10 +148,7 @@ export default function StepDeadlineReports() {
       setTableVisible(true);
       try {
         setIsFetching(true);
-        const res = await getProcessesByDueDate(minDate, maxDate);
-
-        if (res.type === "error") throw new Error(res.error.message);
-        setProcessData(res.value);
+        await handleProcessByDueDate();
         setIsFetching(false);
       } catch (error) {
         toast({
@@ -191,7 +213,7 @@ export default function StepDeadlineReports() {
                     <Button
                       colorScheme="whatsapp"
                       w="20%"
-                      onClick={handleConfirmClick}
+                      onClick={() => handleConfirmClick()}
                     >
                       Confirmar
                     </Button>
@@ -219,11 +241,17 @@ export default function StepDeadlineReports() {
                   <DataTable
                     data={filteredStepDeadlineReports}
                     columns={tableColumns}
-                    isDataFetching={isFetching}
+                    isDataFetching={isFetching || loading}
                     emptyTableMessage="Não foram encontrados processos"
                   />
                 )}
               </Flex>
+              {processDueTotalPages !== undefined ? (
+                  <Pagination
+                    pageCount={processDueTotalPages}
+                    onPageChange={(selectedPage) => setCurrentPage(selectedPage.selected)}
+                  />
+                ) : null}
             </>
           </CustomAccordion>
         </Flex>
