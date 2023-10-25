@@ -93,14 +93,14 @@ export default function StepDeadlineReports() {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("nameflow", {
+    tableColumnHelper.accessor("nameFlow", {
       cell: (info) => info.getValue(),
       header: "Fluxo",
       meta: {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("namestage", {
+    tableColumnHelper.accessor("nameStage", {
       cell: (info) => info.getValue(),
       header: "Etapa Atual",
       meta: {
