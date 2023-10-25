@@ -33,6 +33,7 @@ import {
 import { Bar } from "react-chartjs-2";
 import { Pagination } from "components/Pagination";
 import useChartData from "./chartUtils";
+import { useLocation } from "react-router-dom";
 
 ChartJS.register(
   CategoryScale,
@@ -77,6 +78,7 @@ export default function FilteringProcesses() {
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedStatus(event.target.value);
   };
+  const { state } = useLocation();
 
   const getDataFlows = async () => {
     const dataFlows = await getFlows();
@@ -155,7 +157,16 @@ export default function FilteringProcesses() {
           curr: TableRow<Process> | Process
         ) => [
           ...acc,
-          { ...curr, tableActions, actionsProps: { process: curr } },
+          {
+            ...curr,
+            tableActions,
+            actionsProps: {
+              process: curr,
+              pathname: `/processos/${curr.record}`,
+              state: { process: curr, ...(state || {}) },
+            },
+            record: curr.record,
+          },
         ],
         []
       ) as TableRow<Process>[]) || []
