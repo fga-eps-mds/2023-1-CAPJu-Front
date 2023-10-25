@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "hooks/useAuth";
 import type { ChartData } from "chart.js";
 import { CategoryScale } from "chart.js";
@@ -10,6 +10,7 @@ import {
   Button,
   useToast,
   Select,
+  Grid,
   Image,
 } from "@chakra-ui/react";
 import { ViewIcon } from "@chakra-ui/icons";
@@ -23,6 +24,9 @@ import { DataTable } from "components/DataTable";
 import CustomAccordion from "components/CustomAccordion";
 import { generateColorTransition } from "utils/geradorCor";
 import { isActionAllowedToUser } from "utils/permissions";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
+import { downloadProcess } from "utils/pdf";
 import BarChart from "./Graphic/BarChart";
 
 export default function Statistics() {
@@ -37,6 +41,8 @@ export default function Statistics() {
   useEffect(() => {
     return () => {
       setOpenSelectStage(false);
+      setSelectedFlow(-1);
+      setShowProcesses(false);
     };
   }, []);
 
@@ -113,6 +119,36 @@ export default function Statistics() {
     }),
   ];
 
+  const DownloadPDFChart = () => {
+    const elem = document.querySelector<HTMLElement>("#chart-etapas-fluxo");
+
+    if (elem) {
+      html2canvas(elem).then((canvas) => {
+        const dataURI = canvas.toDataURL("image/jpeg");
+
+        canvas.remove();
+
+        const doc = new jsPDF({
+          orientation: "p",
+          format: "a4",
+          unit: "pt",
+        });
+
+        doc.addImage(dataURI, "JPEG", 35, 50, 520, 0);
+        doc.save(`quantidade_processos_por_etapa_do_fluxo_${selectedFlow}`);
+      });
+    }
+  };
+
+  const DownloadPDFProcess = useCallback(() => {
+    if (flowsData?.value) {
+      const flow = flowsData?.value?.find(
+        (flow) => flow.idFlow === selectedFlow
+      ) ?? { name: "" };
+      downloadProcess(stages[selectedStage].name, flow.name, filteredProcess);
+    }
+  }, [stages, filteredProcess, flowsData]);
+
   const processesTableRows = useMemo<TableRow<Process>[]>(() => {
     if (filteredProcess.length <= 0) return [];
 
@@ -145,7 +181,7 @@ export default function Statistics() {
   }, [filteredProcess, tableActions]);
 
   const handleConfirmSelectionFlow = async () => {
-    if (selectedFlow) {
+    if (selectedFlow >= 0) {
       setOpenSelectStage(true);
 
       const stagesResult = await getStagesByIdFlow(selectedFlow);
@@ -183,6 +219,7 @@ export default function Statistics() {
 
       try {
         setFilteredProcess(stages[selectedStage].process);
+
         setShowProcesses(true);
       } catch (error) {
         toast({
@@ -211,13 +248,13 @@ export default function Statistics() {
       labels: Object.values(stages).map((stage) => stage.name),
       datasets: [
         {
-          barPercentage: 0.75,
+          barPercentage: 0.6,
           barThickness: "flex",
           label: "Etapas",
           data: Object.values(stages).map((stage) => stage.countProcess),
           backgroundColor: generateColorTransition(
             "#FF0000",
-            "#FBF3AC",
+            "#f7e90f",
             Object.values(stages).length
           ),
           borderColor: "none",
@@ -225,10 +262,6 @@ export default function Statistics() {
       ],
     };
   }, [stages]);
-
-  const scaleStyle = {
-    padding: "4rem",
-  };
 
   return (
     <PrivateLayout>
@@ -277,6 +310,11 @@ export default function Statistics() {
                     </Button>
                     <Flex>
                       <Button
+                        onClick={
+                          showProcesses
+                            ? () => DownloadPDFProcess()
+                            : DownloadPDFChart
+                        }
                         colorScheme="blue"
                         size="md"
                         gap={8}
@@ -291,7 +329,7 @@ export default function Statistics() {
                     </Flex>
                   </Flex>
                   {showProcesses ? (
-                    <Flex marginTop="20px">
+                    <Flex marginTop="2%">
                       <DataTable
                         data={processesTableRows}
                         columns={tableColumns}
@@ -300,11 +338,19 @@ export default function Statistics() {
                       />
                     </Flex>
                   ) : (
-                    <Flex style={scaleStyle}>
-                      <BarChart
-                        selectedFlow={selectedFlow}
-                        chartData={chartData}
-                      />
+                    <Flex flexDir="column">
+                      <Grid
+                        w="50%"
+                        h="30%"
+                        marginLeft="3.2%"
+                        marginTop="57.12px"
+                      >
+                        <BarChart
+                          id="chart-etapas-fluxo"
+                          selectedFlow={selectedFlow}
+                          chartData={chartData}
+                        />
+                      </Grid>
                     </Flex>
                   )}
                 </>
