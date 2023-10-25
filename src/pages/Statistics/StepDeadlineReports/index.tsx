@@ -27,21 +27,21 @@ export default function StepDeadlineReports() {
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [maxDate, setMaxDate] = useState<string>("");
   const [processData, setProcessData] = useState<Process[]>([]);
-  const [processDueTotalPages, setProcessDueTotalPages] = useState<number | undefined>();
+  const [processDueTotalPages, setProcessDueTotalPages] = useState<
+    number | undefined
+  >();
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  
+
   useEffect(() => {
     const handlePageChange = async () => {
       setLoading(true);
       await handleProcessByDueDate();
-      setLoading(false)
+      setLoading(false);
     };
 
-    if(minDate && maxDate)
-      handlePageChange();
-
-  }, [currentPage])
+    if (minDate && maxDate) handlePageChange();
+  }, [currentPage]);
 
   const getDataFlows = async () => {
     const dataFlows = await getFlows();
@@ -49,13 +49,16 @@ export default function StepDeadlineReports() {
   };
 
   const handleProcessByDueDate = async () => {
-    const res = await getProcessesByDueDate(minDate, maxDate, { offset: currentPage * 5, limit: 5 });
+    const res = await getProcessesByDueDate(minDate, maxDate, {
+      offset: currentPage * 5,
+      limit: 5,
+    });
 
     if (res.type === "error") throw new Error(res.error.message);
 
     setProcessData(res.value);
     setProcessDueTotalPages(res.totalPages);
-  }
+  };
 
   useEffect(() => {
     if (flows.length === 0) getDataFlows();
@@ -256,24 +259,26 @@ export default function StepDeadlineReports() {
                   </Flex>
                 </Flex>
               </Flex>
-                <Flex w="110%" marginTop="15">
-                  {tableVisible && (
-                    <DataTable
-                      data={filteredStepDeadlineReports}
-                      columns={tableColumns}
-                      isDataFetching={isFetching || loading}
-                      emptyTableMessage="Não foram encontrados processos"
-                    />
-                  )}
-                </Flex>
-                <Flex justifyContent={"center"}>
-                  {processDueTotalPages !== undefined ? (
-                    <Pagination
-                      pageCount={processDueTotalPages}
-                      onPageChange={(selectedPage) => setCurrentPage(selectedPage.selected)}
-                    />
-                  ) : null}
-                </Flex>
+              <Flex w="110%" marginTop="15">
+                {tableVisible && (
+                  <DataTable
+                    data={filteredStepDeadlineReports}
+                    columns={tableColumns}
+                    isDataFetching={isFetching || loading}
+                    emptyTableMessage="Não foram encontrados processos"
+                  />
+                )}
+              </Flex>
+              <Flex justifyContent={"center"}>
+                {processDueTotalPages !== undefined ? (
+                  <Pagination
+                    pageCount={processDueTotalPages}
+                    onPageChange={(selectedPage) =>
+                      setCurrentPage(selectedPage.selected)
+                    }
+                  />
+                ) : null}
+              </Flex>
             </>
           </CustomAccordion>
         </Flex>

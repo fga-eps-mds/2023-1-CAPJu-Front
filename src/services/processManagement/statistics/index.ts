@@ -15,7 +15,7 @@ export const getProcessesByDueDate = async (
         limit: pagination?.limit,
       },
     });
-    
+
     return {
       type: "success",
       value: res.data.processInDue,
@@ -32,4 +32,3 @@ export const getProcessesByDueDate = async (
     };
   }
 };
-
