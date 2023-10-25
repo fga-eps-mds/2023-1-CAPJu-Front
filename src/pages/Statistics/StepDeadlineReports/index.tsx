@@ -256,23 +256,24 @@ export default function StepDeadlineReports() {
                   </Flex>
                 </Flex>
               </Flex>
-
-              <Flex w="110%" marginTop="15">
-                {tableVisible && (
-                  <DataTable
-                    data={filteredStepDeadlineReports}
-                    columns={tableColumns}
-                    isDataFetching={isFetching || loading}
-                    emptyTableMessage="Não foram encontrados processos"
-                  />
-                )}
-              </Flex>
-              {processDueTotalPages !== undefined ? (
-                  <Pagination
-                    pageCount={processDueTotalPages}
-                    onPageChange={(selectedPage) => setCurrentPage(selectedPage.selected)}
-                  />
-                ) : null}
+                <Flex w="110%" marginTop="15">
+                  {tableVisible && (
+                    <DataTable
+                      data={filteredStepDeadlineReports}
+                      columns={tableColumns}
+                      isDataFetching={isFetching || loading}
+                      emptyTableMessage="Não foram encontrados processos"
+                    />
+                  )}
+                </Flex>
+                <Flex justifyContent={"center"}>
+                  {processDueTotalPages !== undefined ? (
+                    <Pagination
+                      pageCount={processDueTotalPages}
+                      onPageChange={(selectedPage) => setCurrentPage(selectedPage.selected)}
+                    />
+                  ) : null}
+                </Flex>
             </>
           </CustomAccordion>
         </Flex>
