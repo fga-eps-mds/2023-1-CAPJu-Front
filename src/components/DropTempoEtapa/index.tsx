@@ -1,6 +1,7 @@
+/* eslint-disable import/no-duplicates */
 import {
-    Accordion,
-    AccordionButton,
+  Accordion,
+  AccordionButton,
     AccordionIcon,
     AccordionItem,
     AccordionPanel,
@@ -14,17 +15,27 @@ import {
   // import { useState} from "react";
 import { useState, useEffect } from "react";
 import {useQuery} from "react-query"; 
-import { PrivateLayout } from "../../layouts/Private";
+import "jspdf-autotable";
+import { UserOptions } from "jspdf-autotable";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { formatDateTimeToBrazilian } from "utils/dates";
+import { constructTableHTML, imgToBase64 } from "utils/pdf";
 import { Select } from "../FormFields";
 import { getFlows, getHistoricFlow, getExpectedFlow  } from "../../services/processManagement/flows";
 import ChartTempos from "./ChartTempos";
 import ExportExcel from "../ExportExcel";
 
-  export interface Data {
-    Etapa: string,
-    "Tempo Médio": number,
-    "Tempo Previsto": number,
-  }
+
+export interface Data {
+  Etapa: string,
+  "Tempo Médio": number,
+  "Tempo Previsto": number,
+};
+
+interface jsPDFCustom extends jsPDF {
+  autoTable: (options: UserOptions) => void;
+};
 
   export default function Statistics() {
     
@@ -89,6 +100,81 @@ import ExportExcel from "../ExportExcel";
         console.log("erro")
       }
     };
+    
+    const downloadPDF = async () => {
+      alert("PDF?")
+      const elem = document.querySelector<HTMLElement>("#chart-tempo-medio-etapa");
+    
+      const nameFlowReplaced = nameFlow.replace(/ /g, "_");
+    
+      if (elem) {
+          const container = document.createElement("div");
+          
+          const emitedAt = new Date();
+          
+          const emissionDate = formatDateTimeToBrazilian(emitedAt);
+          
+          const pdf = new jsPDF() as jsPDFCustom;
+    
+
+          pdf.setFontSize(12);
+          pdf.setFont("helvetica", "bold");
+          pdf.text("Tempo de Conclusão por Etapa de um Fluxo", 105, 20, { align: "center" });
+          pdf.setFont("helvetica", "normal");
+          pdf.text(`Fluxo: ${nameFlow}`, 15, 30);
+          pdf.text(`Data emissão: ${emissionDate}`, 15, 40);
+    
+          const currentY = 60;
+        
+          pdf.text(`Etapas do fluxo ${nameFlow}`, 15, 55);
+          const tableHTML = constructTableHTML(chartData || []);
+          container.style.display = "none";
+          container.innerHTML = tableHTML;
+          document.body.appendChild(container);
+          
+          pdf.autoTable({ html: "#flowStagesData", useCss: true, startY: currentY });
+          
+          const spacingBetweenImages = 60;
+          let tableFinalY = (pdf as any).lastAutoTable.finalY;
+    
+          if (tableFinalY + 100 > 267) {
+            pdf.addPage();
+            tableFinalY = 20;
+          }
+
+          await html2canvas(elem).then(async (canvas) => {
+            const dataURI = canvas.toDataURL("image/jpeg");
+
+            pdf.setFont("helvetica", "bold");
+            pdf.text("Tempo de Conclusão por Etapa de um Fluxo", 105, tableFinalY + 8, { align: "center" });
+            pdf.addImage(dataURI, "JPEG", 30, tableFinalY + 10, 150, 0);
+
+            canvas.remove();
+          });
+
+          pdf.addImage(
+            await imgToBase64("/src/images/UnB.png"),
+            "png",
+            spacingBetweenImages - 50,
+            270,
+            20,
+            20
+          );
+          pdf.addImage(
+            await imgToBase64("/src/images/justica_federal.png"),
+            "png",
+            60 + 2 * spacingBetweenImages,
+            270,
+            20,
+            15
+          );
+    
+          pdf.save(`tempo_medio-previsto_por_etapa_do_fluxo_${nameFlowReplaced}.pdf`);
+    
+          document.body.removeChild(container);
+      }
+    };
+    
 
     return (
         <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -117,7 +203,7 @@ import ExportExcel from "../ExportExcel";
                   </h2>
                   <AccordionPanel pb={4}>
                   <Box display="flex" flexDirection="row">
-                    <Flex width="100%" justifyContent="space-between">
+                    <Flex width="100%" justifyContent="space-around">
                       <Flex width="80%">
                           <Select
                             id="flowSelect"
@@ -155,7 +241,8 @@ import ExportExcel from "../ExportExcel";
                             size="md"
                             gap={8}
                             marginLeft="8px"
-                            marginRight="8px" 
+                            marginRight="8px"
+                            onClick={downloadPDF}
                           >
                             <Image width="20px" src="src/images/pdf.svg" />
                           </Button>

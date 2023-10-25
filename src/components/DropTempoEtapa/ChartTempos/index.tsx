@@ -46,7 +46,7 @@ export default function ChartTempos({ value, nameFlow }: { value: Data[], nameFl
 
   return (
     <div className="LineChart" >
-      <LineChart chartData={chartData} nameFlow={nameFlow2} />
+      <LineChart id="chart-tempo-medio-etapa" chartData={chartData} nameFlow={nameFlow2} />
     </div>
   );
 }
