@@ -127,11 +127,16 @@ export default function StepDeadlineReports() {
     const minDateValue = Date.parse(minDate);
     const maxDateValue = Date.parse(maxDate);
 
-    if (Number.isNaN(minDateValue) || Number.isNaN(maxDateValue) || minDateValue > maxDateValue) {
+    if (
+      Number.isNaN(minDateValue) ||
+      Number.isNaN(maxDateValue) ||
+      minDateValue > maxDateValue
+    ) {
       toast({
         id: "date-validation-error",
         title: "Erro",
-        description: "Por favor, insira datas válidas e data da direita menor que a da esquerda",
+        description:
+          "Por favor, insira datas válidas e data da direita menor que a da esquerda",
         status: "error",
         isClosable: true,
       });
