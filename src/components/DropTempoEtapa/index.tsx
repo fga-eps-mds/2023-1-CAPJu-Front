@@ -12,17 +12,18 @@ import {
     useToast,
   } from "@chakra-ui/react";
   // import { useState} from "react";
-  import { useState, useEffect } from "react";
-  import {useQuery} from "react-query";
-  import { PrivateLayout } from "../../layouts/Private";
-  import { Select } from "../FormFields";
-  import { getFlows, getHistoricFlow, getExpectedFlow  } from "../../services/processManagement/flows";
-  import ChartTempos from "./ChartTempos";
+import { useState, useEffect } from "react";
+import {useQuery} from "react-query"; 
+import { PrivateLayout } from "../../layouts/Private";
+import { Select } from "../FormFields";
+import { getFlows, getHistoricFlow, getExpectedFlow  } from "../../services/processManagement/flows";
+import ChartTempos from "./ChartTempos";
+import ExportExcel from "../ExportExcel";
 
   export interface Data {
-    label: string,
-    medio: number,
-    previsto: number,
+    Etapa: string,
+    "Tempo Médio": number,
+    "Tempo Previsto": number,
   }
 
   export default function Statistics() {
@@ -38,7 +39,7 @@ import {
 
     const mesclaVetores = (labels: Array<string>, medio: Array<number>, previsto:Array<number>) => {
         const resultado = labels.map((label, index) => {
-          const obj: Data = { label, medio: medio[index], previsto: previsto[index] }
+          const obj: Data = { Etapa: label, "Tempo Médio": medio[index], "Tempo Previsto": previsto[index] }
           return obj;
         });
 
@@ -87,7 +88,7 @@ import {
       } catch (error) {
         console.log("erro")
       }
-    }
+    };
 
     return (
         <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -158,9 +159,7 @@ import {
                           >
                             <Image width="20px" src="src/images/pdf.svg" />
                           </Button>
-                          <Button colorScheme="blue" size="md">
-                            <Image width="20px" src="src/images/csv.svg" />
-                          </Button>
+                          <ExportExcel fileName={nameFlow} excelData={chartData || []} />
                       </Flex>
                     </Flex>
                   </Box>
