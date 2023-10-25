@@ -105,7 +105,7 @@ function ViewProcess() {
       "flow",
       typeof process?.idFlow === "number"
         ? process?.idFlow
-        : process?.idFlow[0],
+        : Array.isArray(process?.idFlow) ? process.idFlow[0] : process.idFlow,
     ],
     queryFn: async () => {
       const res = process.idFlow
@@ -288,8 +288,7 @@ function ViewProcess() {
             colorScheme="blue"
             onClick={() => navigate(-1)}
           >
-            <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar aos
-            Processos{flow ? ` do Fluxo ${flow?.name}` : ""}
+            <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar {flow ? ` do Fluxo ${flow?.name}` : ""}
           </Button>
         </Flex>
         <Flex

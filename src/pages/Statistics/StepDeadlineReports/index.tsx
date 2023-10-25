@@ -9,6 +9,7 @@ import { useAuth } from "hooks/useAuth";
 import { isActionAllowedToUser } from "utils/permissions";
 import { ViewIcon } from "@chakra-ui/icons";
 import { getProcessesByDueDate } from "services/processManagement/statistics";
+import { useLocation } from "react-router-dom";
 
 export default function StepDeadlineReports() {
   const toast = useToast();
@@ -19,11 +20,12 @@ export default function StepDeadlineReports() {
   });
 
   const [flows, setFlows] = useState([] as Flow[]);
+  const { state } = useLocation();
   const [tableVisible, setTableVisible] = useState(false);
   const [minDate, setMinDate] = useState<string>("");
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [maxDate, setMaxDate] = useState<string>("");
-  const [processData, setProcessData] = useState<Process[]>([]);
+  const [filteredProcess, setFilteredProcess] = useState<Process[]>([]);
 
   const getDataFlows = async () => {
     const dataFlows = await getFlows();
@@ -34,6 +36,7 @@ export default function StepDeadlineReports() {
     if (flows.length === 0) getDataFlows();
   }, []);
 
+  const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableActions = useMemo<TableAction[]>(
     () => [
       {
@@ -50,24 +53,6 @@ export default function StepDeadlineReports() {
     [isUserFetched, userData]
   );
 
-  const filteredStepDeadlineReports = useMemo<TableRow<Process>[]>(() => {
-    if (processData.length <= 0) return [];
-
-    return (
-      (processData?.reduce(
-        (
-          acc: TableRow<Process>[] | Process[],
-          curr: TableRow<Process> | Process
-        ) => [
-          ...acc,
-          { ...curr, tableActions, actionsProps: { process: curr } },
-        ],
-        []
-      ) as TableRow<Process>[]) || []
-    );
-  }, [tableActions, processData]);
-
-  const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [
     tableColumnHelper.accessor("record", {
       cell: (info) => info.getValue(),
@@ -107,15 +92,46 @@ export default function StepDeadlineReports() {
     }),
   ];
 
+  const filteredStepDeadlineReports = useMemo<TableRow<Process>[]>(() => {
+    if (filteredProcess.length <= 0) return [];
+
+    return (
+      (filteredProcess.reduce(
+        (
+          acc: TableRow<Process>[] | Process[],
+          curr: TableRow<Process> | Process
+        ) => {
+          return [
+            ...acc,
+            {
+              ...curr,
+              tableActions,
+              actionsProps: {
+                process: curr,
+                pathname: `/processos/${curr.record}`,
+                state: {
+                  process: curr,
+                  ...(state || {}),
+                },
+              },
+              record: curr.record,
+            },
+          ];
+        },
+        []
+      ) as TableRow<Process>[]) || []
+    );
+  }, [filteredProcess, tableActions]);
+
   const handleConfirmClick = async () => {
     const minDateValue = Date.parse(minDate);
     const maxDateValue = Date.parse(maxDate);
 
-    if (Number.isNaN(minDateValue) || Number.isNaN(maxDateValue)) {
+    if (Number.isNaN(minDateValue) || Number.isNaN(maxDateValue) || minDateValue > maxDateValue) {
       toast({
         id: "date-validation-error",
         title: "Erro",
-        description: "Por favor, insira datas válidas.",
+        description: "Por favor, insira datas válidas e data da direita menor que a da esquerda",
         status: "error",
         isClosable: true,
       });
@@ -126,7 +142,7 @@ export default function StepDeadlineReports() {
         const res = await getProcessesByDueDate(minDate, maxDate);
 
         if (res.type === "error") throw new Error(res.error.message);
-        setProcessData(res.value);
+        setFilteredProcess(res.value);
         setIsFetching(false);
       } catch (error) {
         toast({
