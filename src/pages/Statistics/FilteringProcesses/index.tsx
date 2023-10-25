@@ -206,9 +206,35 @@ export default function FilteringProcesses() {
   };
 
   const handleConfirmClick = async () => {
-    setCurrentPage(0);
-    refetchProcesses();
-    reload();
+    const minDateValue = Date.parse(fromDate);
+    const maxDateValue = Date.parse(toDate);
+
+    if (
+      (fromDate.length === 0 && toDate.length === 0) ||
+      (fromDate.length > 0 && toDate.length > 0 && maxDateValue > minDateValue)
+    ) {
+      setCurrentPage(0);
+      refetchProcesses();
+      reload();
+    } else if (fromDate.length === 0 || toDate.length === 0) {
+      toast({
+        id: "date-error",
+        title: "Datas não preenchidas",
+        description:
+          "Por favor, preencha ambas as datas (início e fim) para filtrar por período.",
+        status: "error",
+        isClosable: true,
+      });
+    } else {
+      toast({
+        id: "date-order-error",
+        title: "Ordem das datas incorreta",
+        description:
+          "A data de início deve ser anterior à data de fim. Por favor, ajuste as datas e tente novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    }
   };
   const [currentPage, setCurrentPage] = useState(0);
   const handlePageChange = (selectedPage: { selected: number }) => {
@@ -220,17 +246,36 @@ export default function FilteringProcesses() {
   }, [currentPage, tableVisible]);
 
   const handleChartClick = async () => {
-    if (toDate.length > 0 && fromDate.length > 0) {
+    const minDateValue = Date.parse(fromDate);
+    const maxDateValue = Date.parse(toDate);
+
+    if (
+      fromDate.length > 0 &&
+      toDate.length > 0 &&
+      maxDateValue > minDateValue
+    ) {
       setTableVisible((current) => !current);
       setCurrentPage(0);
     } else if (tableVisible) {
-      toast({
-        id: "date-error",
-        title: "Datas não preenchidas",
-        description: "Preencha o periodo para ver o gráfico.",
-        status: "error",
-        isClosable: true,
-      });
+      if (fromDate.length === 0 || toDate.length === 0) {
+        toast({
+          id: "date-error",
+          title: "Datas não preenchidas",
+          description:
+            "Por favor, preencha ambas as datas (início e fim) para ver o gráfico.",
+          status: "error",
+          isClosable: true,
+        });
+      } else if (maxDateValue <= minDateValue) {
+        toast({
+          id: "date-order-error",
+          title: "Ordem das datas incorreta",
+          description:
+            "A data de início deve ser anterior à data de fim. Por favor, ajuste as datas e tente novamente.",
+          status: "error",
+          isClosable: true,
+        });
+      }
     }
   };
 
