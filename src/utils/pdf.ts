@@ -1,14 +1,15 @@
-import { jsPDF } from "jspdf";
-import { UserOptions } from "jspdf-autotable";
+import JsPDF from "jspdf";
+import type { UserOptions } from "jspdf-autotable";
 import { formatDateTimeToBrazilian } from "./dates";
+import "jspdf-autotable";
 
-interface jsPDFCustom extends jsPDF {
+interface jsPDFCustom extends JsPDF {
   autoTable: (options: UserOptions) => void;
 }
 
 export const downloadProcess = async (
   stage: string,
-  fluxo: string,
+  flow: string,
   processes: Process[]
 ): Promise<void> => {
   const container = document.createElement("div");
@@ -17,15 +18,15 @@ export const downloadProcess = async (
 
   const emissionDate = formatDateTimeToBrazilian(emitedAt);
 
-  const pdf = new jsPDF() as jsPDFCustom;
+  const pdf = new JsPDF() as jsPDFCustom;
 
   pdf.setFontSize(12);
   pdf.text("Processos por etapa", 105, 20, { align: "center" });
   pdf.text(`Etapa: ${stage}`, 15, 30);
-  pdf.text(`Fluxo: ${fluxo}`, 15, 40);
+  pdf.text(`Fluxo: ${flow}`, 15, 40);
   pdf.text(`Data emissão: ${emissionDate}`, 15, 50);
 
-  let currentY = 70;
+  const currentY = 70;
 
   pdf.text(`Processo da etapa ${stage}`, 15, 60);
   const tableHTML = constructTableHTML(processes);
@@ -61,7 +62,7 @@ export const downloadProcess = async (
     15
   );
 
-  pdf.save(`relatorio_processos.pdf`);
+  pdf.save(`quantidade_de_processos_no_fluxo_${flow}_na_etapa_${stage}`);
 
   document.body.removeChild(container);
 };
@@ -126,8 +127,7 @@ function constructTableHTML(processData: Process[]): string {
   console.log(processData);
 
   processData.forEach((event) => {
-    const record = event.record;
-    const nickname = event.nickname;
+    const { record, nickname } = event;
     const etapa = event.idStage;
     tableHTML += `
           <tr>

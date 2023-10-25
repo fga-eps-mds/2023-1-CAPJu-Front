@@ -38,6 +38,7 @@
     "chakra-react-select": "^4.6.0",
     "chart.js": "^4.4.0",
     "export-from-json": "^1.7.3",
+    "export-to-csv": "^1.2.0",
     "file-saver": "^2.0.5",
     "framer-motion": "^10.12.4",
     "horizon-ui-chakra": "github:horizon-ui/horizon-ui-chakra",
@@ -63,9 +64,11 @@
     "react-table": "^7.8.0",
     "reactflow": "^11.7.2",
     "resize-observer-polyfill": "^1.5.1",
+    "sheetjs-style": "^0.15.8",
     "vite": "^4.3.0",
     "vite-tsconfig-paths": "^4.2.0",
     "vitest-sonar-reporter": "^0.4.1",
+    "xlsx": "^0.18.5",
     "yup": "^1.1.1"
   },
   "devDependencies": {

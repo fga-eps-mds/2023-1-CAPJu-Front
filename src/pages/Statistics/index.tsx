@@ -25,8 +25,9 @@ import CustomAccordion from "components/CustomAccordion";
 import { generateColorTransition } from "utils/geradorCor";
 import { isActionAllowedToUser } from "utils/permissions";
 import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
+import JsPDF from "jspdf";
 import { downloadProcess } from "utils/pdf";
+import ExportExcel from "components/ExportExcel";
 import BarChart from "./Graphic/BarChart";
 
 export default function Statistics() {
@@ -128,7 +129,7 @@ export default function Statistics() {
 
         canvas.remove();
 
-        const doc = new jsPDF({
+        const doc = new JsPDF({
           orientation: "p",
           format: "a4",
           unit: "pt",
@@ -142,10 +143,10 @@ export default function Statistics() {
 
   const DownloadPDFProcess = useCallback(() => {
     if (flowsData?.value) {
-      const flow = flowsData?.value?.find(
+      const res = flowsData?.value?.find(
         (flow) => flow.idFlow === selectedFlow
       ) ?? { name: "" };
-      downloadProcess(stages[selectedStage].name, flow.name, filteredProcess);
+      downloadProcess(stages[selectedStage].name, res.name, filteredProcess);
     }
   }, [stages, filteredProcess, flowsData]);
 
@@ -321,11 +322,12 @@ export default function Statistics() {
                         marginLeft="8px"
                         marginRight="8px"
                       >
-                        <Image src="src/images/pdf.svg" />
+                        <Image width="20px" src="src/images/pdf.svg" />
                       </Button>
-                      <Button colorScheme="blue" size="md">
-                        <Image src="src/images/csv.svg" />
-                      </Button>
+                      <ExportExcel
+                        excelData={filteredProcess}
+                        fileName={`Processos_do_fluxo_${selectedFlow}_na_etapa_${selectedStage}`}
+                      />
                     </Flex>
                   </Flex>
                   {showProcesses ? (
