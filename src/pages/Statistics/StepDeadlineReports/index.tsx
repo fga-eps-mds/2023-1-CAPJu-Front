@@ -250,12 +250,16 @@ export default function StepDeadlineReports() {
                     alignSelf="end"
                     marginEnd={-5}
                   >
-                    <Button colorScheme="facebook" w="10%">
-                      PDF
-                    </Button>
-                    <Button colorScheme="facebook" w="10%">
-                      CSV
-                    </Button>
+                    {tableVisible && (
+                      <>
+                        <Button colorScheme="facebook" w="10%">
+                          PDF
+                        </Button>
+                        <Button colorScheme="facebook" w="10%">
+                          CSV
+                        </Button>
+                      </>
+                    )}
                   </Flex>
                 </Flex>
               </Flex>
