@@ -3,7 +3,15 @@ import { useAuth } from "hooks/useAuth";
 import type { ChartData } from "chart.js";
 import { CategoryScale } from "chart.js";
 import { useLocation } from "react-router";
-import { Box, Flex, Text, Button, useToast, Select } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Text,
+  Button,
+  useToast,
+  Select,
+  Image,
+} from "@chakra-ui/react";
 import { ViewIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "react-query";
@@ -243,7 +251,7 @@ export default function Statistics() {
             >
               {openSelectStage ? (
                 <>
-                  <Flex>
+                  <Flex alignItems="center">
                     <Select
                       placeholder="Selecione a etapa"
                       marginLeft="36px"
@@ -259,6 +267,7 @@ export default function Statistics() {
                     <Button
                       colorScheme="green"
                       marginLeft="20px"
+                      marginRight="42%"
                       onClick={() => {
                         setOpenSelectStage(false);
                         handleConfirmSelectionStages();
@@ -266,6 +275,20 @@ export default function Statistics() {
                     >
                       Confirmar
                     </Button>
+                    <Flex>
+                      <Button
+                        colorScheme="blue"
+                        size="md"
+                        gap={8}
+                        marginLeft="8px"
+                        marginRight="8px"
+                      >
+                        <Image src="src/images/pdf.svg" />
+                      </Button>
+                      <Button colorScheme="blue" size="md">
+                        <Image src="src/images/csv.svg" />
+                      </Button>
+                    </Flex>
                   </Flex>
                   {showProcesses ? (
                     <Flex marginTop="20px">
