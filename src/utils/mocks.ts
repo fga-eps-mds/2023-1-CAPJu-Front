@@ -26,6 +26,7 @@ export const mockedAllowedActions = [
   "edit-profile",
   "delete-profile",
   "manage-profiles",
+  "see-statistics",
 ];
 
 export const mockedRoleEstagiario = {

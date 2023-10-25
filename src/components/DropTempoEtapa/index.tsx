@@ -6,6 +6,7 @@ import {
     AccordionPanel,
     Box,
     Flex,
+    Image,
     Text,
     Button,
     useToast,
@@ -115,35 +116,53 @@ import {
                   </h2>
                   <AccordionPanel pb={4}>
                   <Box display="flex" flexDirection="row">
-                    <Select
-                      id="flowSelect"
-                      placeholder="Selecionar Fluxo"
-                      color="gray.500"
-                      onChange={(e) => {
-                        setIdFlow(parseInt(e.target.value, 10));
-                        setNameFlow(e.target.children[e.target.selectedIndex].text);
-                      }}
-                      options={
-                        flowsData?.value
-                          ? flowsData?.value?.map((flow) => {
-                            return {
-                              value: flow.idFlow,
-                              label: flow.name,
-                            };
-                          })
-                          : []
-                      }
-                    />
+                    <Flex width="100%" justifyContent="space-between">
+                      <Flex width="80%">
+                          <Select
+                            id="flowSelect"
+                            placeholder="Selecionar Fluxo"
+                            color="gray.500"
+                            onChange={(e) => {
+                              setIdFlow(parseInt(e.target.value, 10));
+                              setNameFlow(e.target.children[e.target.selectedIndex].text);
+                            }}
+                            options={
+                              flowsData?.value
+                                ? flowsData?.value?.map((flow) => {
+                                  return {
+                                    value: flow.idFlow,
+                                    label: flow.name,
+                                  };
+                                })
+                                : []
+                            }
+                          />
 
-                    <Button
-                      aria-label="Pesquisar"
-                      colorScheme="green"
-                      marginLeft="2"
-                      justifyContent="center"
-                      type="submit"
-                      onClick={getDataChart}
-                      >Pesquisar
-                    </Button>
+                          <Button
+                            aria-label="Pesquisar"
+                            colorScheme="green"
+                            marginLeft="2"
+                            justifyContent="center"
+                            type="submit"
+                            onClick={getDataChart}
+                            >Pesquisar
+                          </Button>
+                      </Flex>
+                        <Flex justifyContent="end">
+                          <Button
+                            colorScheme="blue"
+                            size="md"
+                            gap={8}
+                            marginLeft="8px"
+                            marginRight="8px" 
+                          >
+                            <Image width="20px" src="src/images/pdf.svg" />
+                          </Button>
+                          <Button colorScheme="blue" size="md">
+                            <Image width="20px" src="src/images/csv.svg" />
+                          </Button>
+                      </Flex>
+                    </Flex>
                   </Box>
                   <Flex justifyContent="center">
                     <Box width="60%" justifyContent="space-around">
