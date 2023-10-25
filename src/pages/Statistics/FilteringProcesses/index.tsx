@@ -11,7 +11,6 @@ import {
   Button,
   Text,
   Input,
-  Center,
 } from "@chakra-ui/react";
 import { DataTable } from "components/DataTable";
 import { useEffect, useState, useMemo, ChangeEvent } from "react";
@@ -32,8 +31,8 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import useChartData from "./chartUtils";
 import { Pagination } from "components/Pagination";
+import useChartData from "./chartUtils";
 
 ChartJS.register(
   CategoryScale,
@@ -74,7 +73,7 @@ export default function FilteringProcesses() {
   const [toDate, setToDate] = useState<string>("");
 
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [filter, setFilter] = useState<string | undefined>(undefined);
+  const [filter] = useState<string | undefined>(undefined);
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedStatus(event.target.value);
   };
@@ -207,6 +206,7 @@ export default function FilteringProcesses() {
   };
 
   const handleConfirmClick = async () => {
+    setCurrentPage(0);
     refetchProcesses();
     reload();
   };
@@ -217,11 +217,12 @@ export default function FilteringProcesses() {
 
   useEffect(() => {
     refetchProcesses();
-  }, [currentPage]);
+  }, [currentPage, tableVisible]);
 
   const handleChartClick = async () => {
     if (toDate.length > 0 && fromDate.length > 0) {
       setTableVisible((current) => !current);
+      setCurrentPage(0);
     } else if (tableVisible) {
       toast({
         id: "date-error",
