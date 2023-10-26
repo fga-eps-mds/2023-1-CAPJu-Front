@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { DataTable } from "components/DataTable";
 import { useEffect, useState, useMemo, ChangeEvent } from "react";
+import { useLocation } from "react-router-dom";
 import { getFlows } from "services/processManagement/flows";
 import { createColumnHelper } from "@tanstack/react-table";
 import { getProcesses } from "services/processManagement/processes";
@@ -33,7 +34,6 @@ import {
 import { Bar } from "react-chartjs-2";
 import { Pagination } from "components/Pagination";
 import useChartData from "./chartUtils";
-import { useLocation } from "react-router-dom";
 
 ChartJS.register(
   CategoryScale,
@@ -72,6 +72,7 @@ export default function FilteringProcesses() {
 
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
+  const [key, setKey] = useState(Math.random());
 
   const [selectedStatus, setSelectedStatus] = useState("");
   const [filter] = useState<string | undefined>(undefined);
@@ -216,7 +217,7 @@ export default function FilteringProcesses() {
     setSelectedFlowValue(selectedValue);
   };
 
-  const handleConfirmClick = async () => {
+  const handleConfirmClick = () => {
     const minDateValue = Date.parse(fromDate);
     const maxDateValue = Date.parse(toDate);
 
@@ -224,9 +225,8 @@ export default function FilteringProcesses() {
       (fromDate.length === 0 && toDate.length === 0) ||
       (fromDate.length > 0 && toDate.length > 0 && maxDateValue > minDateValue)
     ) {
-      setCurrentPage(0);
-      refetchProcesses();
-      reload();
+      setCurrentPage(-1);
+      setKey(Math.random());
     } else if (fromDate.length === 0 || toDate.length === 0) {
       toast({
         id: "date-error",
@@ -253,7 +253,11 @@ export default function FilteringProcesses() {
   };
 
   useEffect(() => {
-    refetchProcesses();
+    if (currentPage === -1) {
+      setCurrentPage(0);
+    } else {
+      refetchProcesses();
+    }
   }, [currentPage, tableVisible]);
 
   const handleChartClick = async () => {
@@ -290,7 +294,7 @@ export default function FilteringProcesses() {
     }
   };
 
-  const [months, archived, finished, reload] = useChartData(
+  const [months, archived, finished] = useChartData(
     filteredProcesses,
     fromDate,
     toDate
@@ -407,6 +411,7 @@ export default function FilteringProcesses() {
                   )}
                   {processesData?.totalPages !== undefined && tableVisible && (
                     <Pagination
+                      key={key}
                       pageCount={processesData?.totalPages}
                       onPageChange={handlePageChange}
                     />
