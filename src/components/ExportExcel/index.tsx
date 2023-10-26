@@ -18,7 +18,7 @@ const ExportExcel = ({ excelData, fileName }: ExportExcelProps) => {
 
   return (
     <Button onClick={exportToExcel} colorScheme="blue" size="md">
-      <Image width="20px" src="src/images/xlsx.svg" />
+      <Image width="28px" src="src/images/spreadsheet-file-icon.png" />
     </Button>
   );
 };
