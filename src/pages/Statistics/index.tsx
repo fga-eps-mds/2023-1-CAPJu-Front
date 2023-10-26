@@ -19,7 +19,11 @@ import { useQuery } from "react-query";
 import Chart from "chart.js/auto";
 import { PrivateLayout } from "layouts/Private";
 import { getFlows } from "services/processManagement/flows";
-import { getStagesByIdFlow } from "services/processManagement/statistics";
+import {
+  getAllProcessByStage,
+  getCountProcessByIdFlow,
+  getStagesByIdFlow,
+} from "services/processManagement/statistics";
 import { DataTable } from "components/DataTable";
 import CustomAccordion from "components/CustomAccordion";
 import { generateColorTransition } from "utils/geradorCor";
@@ -28,6 +32,7 @@ import html2canvas from "html2canvas";
 import JsPDF from "jspdf";
 import { downloadProcess } from "utils/pdf";
 import ExportExcel from "components/ExportExcel";
+import { Pagination } from "components/Pagination";
 import BarChart from "./Graphic/BarChart";
 
 export default function Statistics() {
@@ -70,12 +75,15 @@ export default function Statistics() {
   });
 
   const [openSelectStage, setOpenSelectStage] = useState(false);
-
   const [selectedFlow, setSelectedFlow] = useState(-1);
   const [selectedStage, setSelectedStage] = useState(-1);
   const [stages, setStages] = useState<{ [key: number]: any }>([]);
   const [filteredProcess, setFilteredProcess] = useState<Process[]>([]);
   const [showProcesses, setShowProcesses] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const limit = 3;
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
 
@@ -141,12 +149,35 @@ export default function Statistics() {
     }
   };
 
-  const DownloadPDFProcess = useCallback(() => {
+  const DownloadPDFProcess = useCallback(async () => {
     if (flowsData?.value) {
+      setLoading(true);
       const res = flowsData?.value?.find(
         (flow) => flow.idFlow === selectedFlow
       ) ?? { name: "" };
-      downloadProcess(stages[selectedStage].name, res.name, filteredProcess);
+
+      const resAllProcess = await getAllProcessByStage(
+        selectedFlow,
+        selectedStage
+      );
+
+      if (resAllProcess.type === "success") {
+        downloadProcess(
+          stages[selectedStage].name,
+          res.name,
+          resAllProcess.value
+        );
+      } else {
+        toast({
+          id: "error-getting-stages",
+          title: "Erro ao baixar pdf",
+          description: "Houve um erro ao buscar processos.",
+          status: "error",
+          isClosable: true,
+        });
+      }
+
+      setLoading(false);
     }
   }, [stages, filteredProcess, flowsData]);
 
@@ -185,21 +216,10 @@ export default function Statistics() {
     if (selectedFlow >= 0) {
       setOpenSelectStage(true);
 
-      const stagesResult = await getStagesByIdFlow(selectedFlow);
+      const stagesResult = await getCountProcessByIdFlow(selectedFlow);
 
       if (stagesResult.type === "success") {
-        const storeStages = stagesResult.value;
-
-        setStages(storeStages);
-        console.log("storeStages", storeStages);
-      } else {
-        toast({
-          id: "error-getting-stages",
-          title: "Erro ao buscar etapas",
-          description: "Houve um erro ao buscar as etapas.",
-          status: "error",
-          isClosable: true,
-        });
+        setStages(stagesResult.value);
       }
     } else {
       toast({
@@ -214,23 +234,53 @@ export default function Statistics() {
     }
   };
 
-  const handleConfirmSelectionStages = () => {
-    if (selectedStage) {
-      setOpenSelectStage(true);
+  const getProcessByPage = async () => {
+    const offset = currentPage * limit;
 
-      try {
-        setFilteredProcess(stages[selectedStage].process);
+    try {
+      const processResult = await getStagesByIdFlow(
+        selectedFlow,
+        selectedStage,
+        offset,
+        limit
+      );
 
-        setShowProcesses(true);
-      } catch (error) {
+      if (processResult.type === "success") {
+        const { value, totalPages } = processResult;
+        setFilteredProcess(value);
+        setTotalPages(totalPages ?? 0);
+      } else {
         toast({
-          id: "error-getting-process",
+          id: "error-getting-stages",
           title: "Erro ao buscar processos",
-          description: "Houve um erro ao buscar os processos.",
+          description: "Houve um erro ao buscar processos.",
           status: "error",
           isClosable: true,
         });
       }
+    } catch (error) {
+      toast({
+        id: "error-getting-process",
+        title: "Erro ao buscar processos",
+        description: "Houve um erro ao buscar os processos.",
+        status: "error",
+        isClosable: true,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (showProcesses) {
+      getProcessByPage();
+    }
+  }, [currentPage, showProcesses]);
+
+  const handleConfirmSelectionStages = async () => {
+    if (selectedStage) {
+      setOpenSelectStage(true);
+
+      await getProcessByPage();
+      setShowProcesses(true);
     } else {
       toast({
         id: "error-no-selection",
@@ -290,7 +340,10 @@ export default function Statistics() {
                       placeholder="Selecione a etapa"
                       marginLeft="36px"
                       width="302px"
-                      onChange={(e) => setSelectedStage(Number(e.target.value))}
+                      onChange={(e) => {
+                        setSelectedStage(Number(e.target.value));
+                        setCurrentPage(0);
+                      }}
                     >
                       {Object.values(stages).map((stage) => (
                         <option key={stage.idStage} value={stage.idStage}>
@@ -331,12 +384,18 @@ export default function Statistics() {
                     </Flex>
                   </Flex>
                   {showProcesses ? (
-                    <Flex marginTop="2%">
+                    <Flex flexDir="column" alignItems="center" marginTop="2%">
                       <DataTable
                         data={processesTableRows}
                         columns={tableColumns}
-                        isDataFetching={false}
+                        isDataFetching={loading}
                         emptyTableMessage="Não foram encontrados processos"
+                      />
+                      <Pagination
+                        pageCount={totalPages}
+                        onPageChange={({ selected }) =>
+                          setCurrentPage(selected)
+                        }
                       />
                     </Flex>
                   ) : (
