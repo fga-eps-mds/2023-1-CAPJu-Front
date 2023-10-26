@@ -363,24 +363,25 @@ export default function Statistics() {
                       Confirmar
                     </Button>
                     <Flex>
-                      <Button
-                        onClick={
-                          showProcesses
-                            ? () => DownloadPDFProcess()
-                            : DownloadPDFChart
-                        }
-                        colorScheme="blue"
-                        size="md"
-                        gap={8}
-                        marginLeft="8px"
-                        marginRight="8px"
-                      >
-                        <Image width="20px" src="src/images/pdf.svg" />
-                      </Button>
-                      <ExportExcel
-                        excelData={filteredProcess}
-                        fileName={`Processos_do_fluxo_${selectedFlow}_na_etapa_${selectedStage}`}
-                      />
+                      {showProcesses && (
+                        <ExportExcel
+                          excelData={filteredProcess}
+                          fileName={`Processos_do_fluxo_${selectedFlow}_na_etapa_${selectedStage}`}
+                        />
+                      )}
+                      <Flex marginRight="30%">
+                        <Button
+                          onClick={
+                            showProcesses
+                              ? () => DownloadPDFProcess()
+                              : DownloadPDFChart
+                          }
+                          colorScheme="blue"
+                          size="md"
+                        >
+                          <Image width="3em" src="src/images/pdf.svg" />
+                        </Button>
+                      </Flex>
                     </Flex>
                   </Flex>
                   {showProcesses ? (
