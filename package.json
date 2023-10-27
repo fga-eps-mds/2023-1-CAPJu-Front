@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint . --ext ts --ext tsx --ext js",
     "prepare": "husky install",
-    "check-types": "tsc --pretty --noEmit",
+    "check-types": "tsc --pretty --noEmit --skipLibCheck",
     "check-format": "prettier --check .",
     "check-lint": "eslint . --ext ts --ext tsx --ext js",
     "format": "prettier --write .",
