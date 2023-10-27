@@ -20,7 +20,7 @@ const useChartData = (
 
   useEffect(() => {
     if (months.length > 0 && processes.length > 0) {
-      setArchived(getStatusMonthly(processes, months, "Concluido"));
+      setArchived(getStatusMonthly(processes, months, "Concluído"));
       setFinished(getStatusMonthly(processes, months, "Interrompido"));
     } else {
       setArchived([]);
@@ -54,8 +54,6 @@ const getMonthRange = (start: string, end: string) => {
     months.push({ month: date.getMonth() + 1, year: date.getFullYear() });
   }
 
-  // const archived = getStatusMonthly(processes, months, "archived");
-  // const finished = getStatusMonthly(processes, months, "finished");
   return months;
 };
 

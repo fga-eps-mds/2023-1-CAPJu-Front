@@ -454,7 +454,7 @@ const replacer = (processes: Process[] | undefined) => {
   return processes.map((process) => {
     return {
       ...process,
-      status: process.status === "archived" ? "Concluido" : "Interrompido",
+      status: process.status === "archived" ? "Interrompido" : "Concluído",
     };
   });
 };
