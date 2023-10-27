@@ -31,7 +31,7 @@ jobs:
         run: |
           git config --global user.email "${{ secrets.GIT_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_USER }}"
-          git clone --single-branch --branch main "https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/fga-eps-mds/2023-1-CAPJu-Doc" doc
+          git clone --single-branch --branch master "https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/fga-eps-mds/2023-2-CAPJu-Doc" doc
           mkdir -p doc/analytics-raw-data
           cp -R fga-eps-mds*.json doc/analytics-raw-data
           cd doc
