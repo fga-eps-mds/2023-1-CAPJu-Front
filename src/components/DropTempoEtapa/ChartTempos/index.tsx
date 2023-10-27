@@ -23,11 +23,11 @@ export default function ChartTempos({ value, nameFlow }: { value: Data[], nameFl
   const [nameFlow2] = useState<string>(nameFlow);
 
   const [chartData]: [ChartData, Dispatch<SetStateAction<ChartData>>] = useState<ChartData>({
-    labels: value.map(({ label }) => label),
+    labels: value.map(({ Etapa }) => Etapa),
     datasets: [
       {
         label: "Tempo Médio",
-        data: value.map(({ medio }) => medio),
+        data: value.map(({ "Tempo Médio": medio }) => medio),
         borderColor: "#ff5252",
         backgroundColor: "#ff5252",
         borderWidth: 4,
@@ -35,7 +35,7 @@ export default function ChartTempos({ value, nameFlow }: { value: Data[], nameFl
       },
       {
         label: "Tempo Previsto",
-        data: value.map(({ previsto }) => previsto),
+        data: value.map(({ "Tempo Previsto": previsto }) => previsto),
         borderColor: "#0090ff",
         backgroundColor: "#0090ff",
         borderWidth: 4,
@@ -46,7 +46,7 @@ export default function ChartTempos({ value, nameFlow }: { value: Data[], nameFl
 
   return (
     <div className="LineChart" >
-      <LineChart chartData={chartData} nameFlow={nameFlow2} />
+      <LineChart id="chart-tempo-medio-etapa" chartData={chartData} nameFlow={nameFlow2} />
     </div>
   );
 }
