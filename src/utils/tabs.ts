@@ -37,13 +37,13 @@ export const tabs = [
   },
   {
     label: "Estatísticas",
-    pathIndex: "/perfis",
-    path: "/perfis",
-    action: "manage-profiles",
+    pathIndex: "/estatisticas",
+    path: "/estatisticas",
+    action: "see-statistics",
   },
-  // {
-  //   label: "Editar Conta",
-  //   pathIndex: "/editar-conta",
-  //   path: "/editar-conta",
-  // },
+  {
+    label: "Editar Conta",
+    pathIndex: "/editar-conta",
+    path: "/editar-conta",
+  },
 ];
