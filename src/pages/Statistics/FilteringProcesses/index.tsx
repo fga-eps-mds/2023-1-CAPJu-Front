@@ -345,8 +345,8 @@ export default function FilteringProcesses() {
                         w="35%"
                         color="gray.500"
                       >
-                        <option value="archived">Concluído</option>;
-                        <option value="finished">Interrompido</option>
+                        <option value="finished">Concluído</option>;
+                        <option value="archived">Interrompido</option>
                       </Select>
                     )}
                   </Flex>

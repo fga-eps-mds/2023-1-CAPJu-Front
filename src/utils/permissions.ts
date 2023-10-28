@@ -96,6 +96,10 @@ export const actionsForm = [
     value: "end-process",
   },
   {
+    label: "Visualizar Estatísticas",
+    value: "see-statistics",
+  },
+  {
     label: "Visualizar Solicitações",
     value: "see-request",
   },

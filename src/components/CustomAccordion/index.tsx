@@ -10,8 +10,9 @@ import {
 interface CustomAccordionProps {
   title: String;
   children: JSX.Element;
-  marginBottom: number;
+  marginBottom?: number;
 }
+
 export default function CustomAccordion({
   title,
   children,

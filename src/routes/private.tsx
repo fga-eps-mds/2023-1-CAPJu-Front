@@ -48,8 +48,8 @@ export const PrivateRoutes: MenuItem[] = [
   },
   {
     path: "estatisticas",
-    name: "Estatisticas",
-    actionName: "see-process",
+    name: "Statistics",
+    actionName: "see-statistics",
     element: <Statistics />,
   },
   {
