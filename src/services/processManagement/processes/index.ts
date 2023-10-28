@@ -5,19 +5,23 @@ export const getProcesses = async (
   pagination?: Pagination,
   filter?: string,
   filterByLegalPriority?: boolean,
-  showArchivedAndFinished?: boolean
+  status?: String[],
+  from?: string,
+  to?: string
 ): Promise<Result<Process[]>> => {
   try {
     const res = await api.processManagement.get<{
       processes: Process[];
       totalPages: number;
-    }>(`/process${flowId ? `?flowId=${flowId}` : ""}`, {
+    }>(`/process${flowId ? `?idFlow=${flowId}` : ""}`, {
       params: {
         offset: pagination?.offset ?? 0,
         limit: pagination?.limit,
         filter,
-        showArchivedAndFinished,
+        status: status || undefined,
         filterByLegalPriority,
+        from,
+        to,
       },
     });
 

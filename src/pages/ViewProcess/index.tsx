@@ -96,19 +96,20 @@ function ViewProcess() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
+
+  function verifyIdFlow() {
+    if (typeof process?.idFlow === "number") return process?.idFlow;
+    if (Array.isArray(process?.idFlow)) return process.idFlow[0];
+
+    return process.idFlow;
+  }
+
   const {
     data: flowData,
     isFetched: isFlowFetched,
     refetch: refetchFlow,
   } = useQuery({
-    queryKey: [
-      "flow",
-      typeof process?.idFlow === "number"
-        ? process?.idFlow
-        : Array.isArray(process?.idFlow)
-        ? process.idFlow[0]
-        : process.idFlow,
-    ],
+    queryKey: ["flow", verifyIdFlow()],
     queryFn: async () => {
       const res = process.idFlow
         ? await getFlowById(

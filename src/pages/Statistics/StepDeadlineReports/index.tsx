@@ -273,7 +273,7 @@ export default function StepDeadlineReports() {
                   />
                 )}
               </Flex>
-              <Flex justifyContent={"center"}>
+              <Flex justifyContent="center">
                 {processDueTotalPages !== undefined ? (
                   <Pagination
                     pageCount={processDueTotalPages}
