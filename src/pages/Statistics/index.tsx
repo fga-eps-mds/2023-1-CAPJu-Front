@@ -34,6 +34,8 @@ import { downloadProcess } from "utils/pdf";
 import ExportExcel from "components/ExportExcel";
 import { Pagination } from "components/Pagination";
 import BarChart from "./Graphic/BarChart";
+import StepDeadlineReports from "./StepDeadlineReports";
+import FilteringProcesses from "./FilteringProcesses";
 
 export default function Statistics() {
   const { getUserData } = useAuth();
@@ -246,9 +248,9 @@ export default function Statistics() {
       );
 
       if (processResult.type === "success") {
-        const { value, totalPages } = processResult;
+        const { value, totalPages: total } = processResult;
         setFilteredProcess(value);
-        setTotalPages(totalPages ?? 0);
+        setTotalPages(total ?? 0);
       } else {
         toast({
           id: "error-getting-stages",
@@ -445,6 +447,8 @@ export default function Statistics() {
             </CustomAccordion>
           </Flex>
         </Box>
+        <StepDeadlineReports />
+        <FilteringProcesses />
       </Flex>
     </PrivateLayout>
   );
