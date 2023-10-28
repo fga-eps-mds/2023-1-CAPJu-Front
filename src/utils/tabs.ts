@@ -24,6 +24,12 @@ export const tabs = [
     action: "see-process",
   },
   {
+    label: "Estatisticas",
+    pathIndex: "/estatisticas",
+    path: "/estatisticas",
+    action: "see-process",
+  },
+  {
     label: "Cadastro",
     pathIndex: "/acessos",
     path: "/acessos",
