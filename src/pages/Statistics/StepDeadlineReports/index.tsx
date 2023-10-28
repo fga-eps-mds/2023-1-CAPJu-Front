@@ -189,28 +189,15 @@ export default function StepDeadlineReports() {
   return (
     <Flex
       justifyContent="flex-start"
-      w="90%"
+      w="100%"
       maxW={1120}
       flexDir="column"
       gap="3"
       mb="4"
     >
-      <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-        <Text
-          fontSize="lg"
-          fontWeight="600"
-          fontStyle="normal"
-          lineHeight="24px"
-        >
-          Estatísticas
-        </Text>
-      </Flex>
       <Box borderRadius="8px">
         <Flex justifyContent="flex-start" w="100%" flexDirection="column">
-          <CustomAccordion
-            title="Visualizar processos filtrados por data de vencimento"
-            marginBottom={18}
-          >
+          <CustomAccordion title="Visualizar processos filtrados por data de vencimento">
             <>
               <Flex justifyContent="space-between">
                 <Flex w="70%" flexDirection="column">
