@@ -51,7 +51,7 @@ interface CreationModalProps {
   isOpen: boolean;
   onClose: () => void;
   // eslint-disable-next-line no-unused-vars
-  afterSubmission: (createdProcess: Process | undefined) => void;
+  afterSubmission: (createdProcess: Result<Process>) => void;
   recordParam?: string;
   nicknameParam?: string;
 }
@@ -99,6 +99,7 @@ export function CreationModal({
     refetchOnWindowFocus: false,
     enabled: isOpen && hasLegalPriority,
   });
+
   const { data: flowsData } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
@@ -144,6 +145,7 @@ export function CreationModal({
         description: "O Processo foi criado.",
         status: "success",
       });
+      onClose();
     } else {
       toast({
         id: "create-process-error",
@@ -153,9 +155,7 @@ export function CreationModal({
         isClosable: true,
       });
     }
-
-    onClose();
-    afterSubmission((res.value as any)?.data);
+    afterSubmission(res);
     handleLoading(false);
   });
 

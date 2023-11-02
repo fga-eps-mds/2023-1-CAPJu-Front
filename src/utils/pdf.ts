@@ -1,9 +1,16 @@
-import { Data } from "components/DropTempoEtapa"
+import JsPDF from "jspdf";
+import {UserOptions} from "jspdf-autotable";
+import { formatDateTimeToBrazilian } from "./dates";
 
-export function constructTableHTML(flowStagesData: Data[]): string {
+interface jsPDFCustom extends JsPDF {
+  // eslint-disable-next-line no-unused-vars
+  autoTable: (options: UserOptions) => void;
+}
+
+function constructTableHTML(processData: Process[]): string {
   let tableHTML = `
       <div class="table-wrapper" style="display: none" hidden>
-          <table class="fl-table" id="flowStagesData">
+          <table class="fl-table" id="processData">
               <style>
                   * {
                     box-sizing: border-box;
@@ -49,25 +56,24 @@ export function constructTableHTML(flowStagesData: Data[]): string {
               </style>
               <thead>
                   <tr>
+                      <th>Registro</th>
+                      <th>Apelido</th>
                       <th>Etapa</th>
-                      <th>Tempo Médio em dias</th>
-                      <th>Tempo Previsto em dias</th>
                   </tr>
               </thead>
               <tbody>
   `;
 
-  flowStagesData.forEach((event) => {
-    const {
-      Etapa,
-      "Tempo Médio": medio,
-      "Tempo Previsto": previsto
-    } = event;
+  console.log(processData);
+
+  processData.forEach((event) => {
+    const { record, nickname } = event;
+    const etapa = event.idStage;
     tableHTML += `
           <tr>
-              <td>${Etapa}</td>
-              <td>${medio}</td>
-              <td>${previsto}</td>
+              <td>${record}</td>
+              <td>${nickname}</td>
+              <td>${etapa}</td>
           </tr>
       `;
   });
@@ -98,3 +104,63 @@ export function imgToBase64(src: string): Promise<string> {
     img.src = src;
   });
 }
+
+export const downloadProcess = async (
+    stage: string,
+    flow: string,
+    processes: Process[]
+): Promise<void> => {
+  const container = document.createElement("div");
+
+  const emitedAt = new Date();
+
+  const emissionDate = formatDateTimeToBrazilian(emitedAt);
+
+  const pdf = new JsPDF() as jsPDFCustom;
+
+  pdf.setFontSize(12);
+  pdf.text("Processos por etapa", 105, 20, { align: "center" });
+  pdf.text(`Etapa: ${stage}`, 15, 30);
+  pdf.text(`Fluxo: ${flow}`, 15, 40);
+  pdf.text(`Data emissão: ${emissionDate}`, 15, 50);
+
+  const currentY = 70;
+
+  pdf.text(`Processo da etapa ${stage}`, 15, 60);
+  const tableHTML = constructTableHTML(processes);
+  container.style.display = "none";
+  container.innerHTML = tableHTML;
+  document.body.appendChild(container);
+
+  pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
+
+  const spacingBetweenImages = 60;
+
+  let tableFinalY = (pdf as any).lastAutoTable.finalY;
+
+  if (tableFinalY > 267) {
+    pdf.addPage();
+    tableFinalY = 20;
+  }
+
+  pdf.addImage(
+      await imgToBase64("/src/images/UnB.png"),
+      "png",
+      30 + spacingBetweenImages,
+      tableFinalY + 10,
+      20,
+      20
+  );
+  pdf.addImage(
+      await imgToBase64("/src/images/justica_federal.png"),
+      "png",
+      50 + 2 * spacingBetweenImages,
+      tableFinalY + 10,
+      20,
+      15
+  );
+
+  pdf.save(`quantidade_de_processos_no_fluxo_${flow}_na_etapa_${stage}`);
+
+  document.body.removeChild(container);
+};

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -115,6 +115,13 @@ export function EditionModal({
               errors={errors.duration}
               {...register("duration")}
               min={1}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const { value } = e.target;
+                const numValue = parseFloat(value);
+                if (value && (numValue < 1 || !Number.isInteger(numValue))) {
+                  e.target.value = '';
+                }
+              }}
             />
           </ModalBody>
           <ModalFooter gap="2">

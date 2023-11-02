@@ -180,7 +180,7 @@ export function VisualizationItemsModal({ processesFile, isOpen, onClose }: Visu
             <ModalOverlay backdropFilter="blur(12px)" />
             <ModalContent backgroundColor="#E2E8F0">
                 <ModalHeader fontSize="25px">Itens lote - {processesFile?.name || processesFile?.fileName}</ModalHeader>
-                <ModalCloseButton color="white" />
+                <ModalCloseButton />
                 <ModalBody>
                     <DataTable
                         maxWidth='unset'
@@ -205,7 +205,9 @@ export function VisualizationItemsModal({ processesFile, isOpen, onClose }: Visu
                                 onClose={onCreationClose}
                                 recordParam={fileItemSelected?.record}
                                 nicknameParam={fileItemSelected?.nickname}
-                                afterSubmission={ async (createdProcess) => {
+                                afterSubmission={ async (res) => {
+                                    if(res.type !== 'success') return;
+                                    const createdProcess = (res.value as any)?.data;
                                     await updateFileItemById(fileItemSelected.idProcessesFileItem, {
                                         status: 'manuallyImported',
                                         message: null,

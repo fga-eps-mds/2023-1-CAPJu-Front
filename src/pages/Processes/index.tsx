@@ -98,7 +98,7 @@ function Processes() {
         },
         nicknameOrRecordFilter.replace(/[ \/.-]/g, ''),
         legalPriority,
-        showFinished
+        showFinished ? ["archived", "finished"] : ["inProgress", "notStarted"]
       );
 
       if (res.type === "error") throw new Error(res.error.message);

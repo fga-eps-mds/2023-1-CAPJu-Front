@@ -1,4 +1,4 @@
-import { Button, Image } from '@chakra-ui/react';
+import { Button, Flex, Image } from "@chakra-ui/react";
 import * as XLSX from "xlsx";
 
 interface ExportExcelProps {
@@ -7,24 +7,22 @@ interface ExportExcelProps {
 }
 
 const ExportExcel = ({ excelData, fileName }: ExportExcelProps) => {
-    fileName = fileName.replace(/ /g, "_");
+  const fileExtension = ".xlsx";
 
-    const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-    const fileExtension = '.xlsx';
+  const exportToExcel = async () => {
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, fileName + fileExtension);
+  };
 
-    const exportToExcel = async () => {
-      const worksheet = XLSX.utils.json_to_sheet(excelData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-      XLSX.writeFile(workbook, fileName + fileExtension);
-    }
-
-    return (
+  return (
+    <Flex marginRight="1em">
       <Button onClick={exportToExcel} colorScheme="blue" size="md">
-        <Image width="20px" src="src/images/csv.svg" />
+        <Image width="3.5em" src="src/images/spreadsheet-file-icon.png" />
       </Button>
-    )
-}
-
+    </Flex>
+  );
+};
 
 export default ExportExcel;

@@ -35,3 +35,4 @@ export const handleExpiration = (vencimento: Date) => {
   if (processDate < currentDate) return true;
   return false;
 };
+

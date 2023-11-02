@@ -1,13 +1,5 @@
 name: front-ci
-
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches:
-      - main
-      - develop
-    types: [opened, synchronize, reopened]
+on: [push]
 
 jobs:
   format:
@@ -122,7 +114,9 @@ jobs:
         run: npm i yarn -g && yarn 
 
       - name: 🧪 Roda suíte de testes
-        run: yarn test
+        run: |
+          export NODE_OPTIONS="--max_old_space_size=4096"
+          yarn test
 
   build:
     needs: [format, lint, type-check]
