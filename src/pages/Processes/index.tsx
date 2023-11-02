@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, ChangeEvent } from "react";
 import { useQuery } from "react-query";
 import {
   Flex,
@@ -10,6 +10,7 @@ import {
   useToast,
   Tooltip,
   chakra,
+  Select,
 } from "@chakra-ui/react";
 import {
   AddIcon,
@@ -290,6 +291,12 @@ function Processes() {
     refetchProcesses();
   }, [flowsData, isFlowsFetched, currentPage, showFinished, legalPriority]);
 
+  const [selectedFilter, setSelectedFilter] = useState("process");
+  // const [filter] = useState<string | undefined>(undefined);
+  const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedFilter(event.target.value);
+  };
+
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -340,18 +347,42 @@ function Processes() {
               w="100%"
               display="flex"
               flexDirection="row"
+              color="gray.500"
             >
-              <Input
-                placeholder="Pesquisar processos (por registro ou apelido)"
-                value={filter}
-                onChange={({ target }) => setFilter(target.value)}
-                variant="filled"
-                css={{
-                  "&, &:hover, &:focus": {
-                    background: "white",
-                  },
-                }}
-              />
+              <Flex
+                borderRadius="8px"
+                w="100%"
+                justifyContent="flex-start"
+                gap="2"
+              >
+                <Select
+                  value={selectedFilter}
+                  onChange={handleFilterChange}
+                  w="35%"
+                  css={{
+                    "&, &:hover, &:focus": {
+                      background: "white",
+                    },
+                  }}
+                >
+                  <option value="stage">Etapa</option>
+                  <option value="flow">Fluxo</option>
+                  <option value="process">Processo</option>
+                </Select>
+                <Input
+                  placeholder="Pesquisar processos (por registro ou apelido)"
+                  value={filter}
+                  onChange={({ target }) => setFilter(target.value)}
+                  variant="filled"
+                  w="65%"
+                  css={{
+                    "&, &:hover, &:focus": {
+                      background: "white",
+                    },
+                  }}
+                />
+              </Flex>
+
               <Button
                 aria-label="botão de busca"
                 colorScheme="green"
