@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, ChangeEvent } from "react";
+import { useState, useMemo, useEffect, /* ChangeEvent */ } from "react";
 import { useQuery } from "react-query";
 import {
   Flex,
@@ -36,6 +36,7 @@ import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
+
 
 function Processes() {
   const { getUserData } = useAuth();
@@ -291,11 +292,11 @@ function Processes() {
     refetchProcesses();
   }, [flowsData, isFlowsFetched, currentPage, showFinished, legalPriority]);
 
-  const [selectedFilter, setSelectedFilter] = useState("process");
-  // const [filter] = useState<string | undefined>(undefined);
-  const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedFilter(event.target.value);
-  };
+  // const [selectedFilter, setSelectedFilter] = useState("process");
+  // // const [filter] = useState<string | undefined>(undefined);
+  // const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  //   setSelectedFilter(event.target.value);
+  // };
 
   return (
     <PrivateLayout>
@@ -349,40 +350,43 @@ function Processes() {
               flexDirection="row"
               color="gray.500"
             >
-              <Flex
-                borderRadius="8px"
-                w="100%"
-                justifyContent="flex-start"
-                gap="2"
-              >
-                <Select
-                  value={selectedFilter}
-                  onChange={handleFilterChange}
-                  w="35%"
-                  css={{
-                    "&, &:hover, &:focus": {
-                      background: "white",
-                    },
-                  }}
-                >
-                  <option value="stage">Etapa</option>
-                  <option value="flow">Fluxo</option>
-                  <option value="process">Processo</option>
-                </Select>
+              <Flex borderRadius="8px" w="100%" justifyContent="flex-start" gap="2">
                 <Input
                   placeholder="Pesquisar processos (por registro ou apelido)"
                   value={filter}
                   onChange={({ target }) => setFilter(target.value)}
                   variant="filled"
-                  w="65%"
+                  position="absolute"
+                  w="74%"
                   css={{
                     "&, &:hover, &:focus": {
                       background: "white",
                     },
                   }}
                 />
-              </Flex>
 
+                <Select
+                  css={{
+                    "&, &:hover, &:focus": {
+                      background: "white",
+                    },
+                  }}
+                  borderWidth="0"
+                  // borderLeftColor="#898989"
+                  // borderLeftRadius="0px"
+                  // borderRightWidth="0"
+                  marginLeft="57em"
+                  w="25%"
+                //   textAlign="center"
+                >
+                  
+                  
+                  <option value="stage">Etapa</option>
+                  <option value="flow">Fluxo</option>
+                  <option value="process">Processo</option>
+
+                </Select>
+              </Flex>
               <Button
                 aria-label="botão de busca"
                 colorScheme="green"
