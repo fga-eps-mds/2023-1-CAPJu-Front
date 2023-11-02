@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, /* ChangeEvent */ } from "react";
+import { useState, useMemo, useEffect, ChangeEvent, /* ChangeEvent */ } from "react";
 import { useQuery } from "react-query";
 import {
   Flex,
@@ -49,7 +49,7 @@ function Processes() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const [filter, setFilter] = useState<string | undefined>(undefined);
+  const [filter, setFilter] = useState< { type: string, value: string } | undefined>(undefined);
   const [legalPriority, setLegalPriority] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
   const {
@@ -292,11 +292,10 @@ function Processes() {
     refetchProcesses();
   }, [flowsData, isFlowsFetched, currentPage, showFinished, legalPriority]);
 
-  // const [selectedFilter, setSelectedFilter] = useState("process");
-  // // const [filter] = useState<string | undefined>(undefined);
-  // const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
-  //   setSelectedFilter(event.target.value);
-  // };
+   const [selectedFilter, setSelectedFilter] = useState("process");
+   const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedFilter(event.target.value);
+  };
 
   return (
     <PrivateLayout>
@@ -353,11 +352,11 @@ function Processes() {
               <Flex borderRadius="8px" w="100%" justifyContent="flex-start" gap="2">
                 <Input
                   placeholder="Pesquisar processos (por registro ou apelido)"
-                  value={filter}
-                  onChange={({ target }) => setFilter(target.value)}
+                  value={filter?.value}
+                  onChange={({ target }) => setFilter({ type: selectedFilter, value: target.value })}
                   variant="filled"
                   position="absolute"
-                  w="74%"
+                  w="70%"
                   css={{
                     "&, &:hover, &:focus": {
                       background: "white",
@@ -376,8 +375,10 @@ function Processes() {
                   // borderLeftRadius="0px"
                   // borderRightWidth="0"
                   marginLeft="57em"
-                  w="25%"
-                //   textAlign="center"
+                  w="20%"
+                  value={selectedFilter}
+                  onChange={handleFilterChange}
+                  
                 >
                   
                   

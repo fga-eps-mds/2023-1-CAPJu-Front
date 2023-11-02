@@ -3,7 +3,7 @@ import { api } from "services/api";
 export const getProcesses = async (
   flowId: number | undefined,
   pagination?: Pagination,
-  filter?: string,
+  filter?: { type: string, value: string},
   filterByLegalPriority?: boolean,
   status?: String[],
   from?: string,

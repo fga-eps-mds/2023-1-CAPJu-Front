@@ -25,7 +25,7 @@ import { EditionModal } from "./EditionModal";
 function Stages() {
   const toast = useToast();
   const [selectedStage, selectStage] = useState<Stage>();
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<{ type: string, value: string } | undefined>(undefined);
   const { getUserData } = useAuth();
   const {
     isOpen: isCreationOpen,
@@ -196,8 +196,8 @@ function Stages() {
           >
             <Input
               placeholder="Pesquisar etapas"
-              value={filter}
-              onChange={({ target }) => setFilter(target.value)}
+              value={filter?.value}
+              onChange={({ target }) => setFilter({ type: "stage", value: target.value })}
               variant="filled"
               css={{
                 "&, &:hover, &:focus": {
