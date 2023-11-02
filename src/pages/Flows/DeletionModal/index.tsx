@@ -36,12 +36,7 @@ export function DeletionModal({
 
     if (res.type === "success") {
       refetchFlows();
-      toast({
-        id: "delete-flow-success",
-        title: "Sucesso!",
-        description: "Fluxo excluído com sucesso!",
-        status: "success",
-      });
+      window.location.href = window.location.pathname + '?deleteSuccess=1';
     } else {
       toast({
         id: "delete-flow-error",
@@ -57,15 +52,18 @@ export function DeletionModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
+    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Excluir fluxo</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text>
+          <Text align={"center"}>
             Tem certeza que deseja excluir o fluxo <strong>{flow?.name}</strong>
             ?
+          </Text>
+          <Text fontSize={15} fontStyle={"italic"} align={"center"}>
+            (esteja ciente que isto apagará todos os processos envolvidos nesse fluxo)
           </Text>
         </ModalBody>
         <ModalFooter gap="2">
