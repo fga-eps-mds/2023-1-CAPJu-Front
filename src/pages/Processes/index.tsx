@@ -1,4 +1,9 @@
-import { useState, useMemo, useEffect, ChangeEvent, /* ChangeEvent */ } from "react";
+import {
+  useState,
+  useMemo,
+  useEffect,
+  ChangeEvent /* ChangeEvent */,
+} from "react";
 import { useQuery } from "react-query";
 import {
   Flex,
@@ -37,7 +42,6 @@ import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
 
-
 function Processes() {
   const { getUserData } = useAuth();
   const { state } = useLocation();
@@ -49,7 +53,9 @@ function Processes() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const [filter, setFilter] = useState< { type: string, value: string } | undefined>(undefined);
+  const [filter, setFilter] = useState<
+    { type: string; value: string } | undefined
+  >(undefined);
   const [legalPriority, setLegalPriority] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
   const {
@@ -292,8 +298,8 @@ function Processes() {
     refetchProcesses();
   }, [flowsData, isFlowsFetched, currentPage, showFinished, legalPriority]);
 
-   const [selectedFilter, setSelectedFilter] = useState("process");
-   const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  const [selectedFilter, setSelectedFilter] = useState("process");
+  const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedFilter(event.target.value);
   };
 
@@ -349,11 +355,18 @@ function Processes() {
               flexDirection="row"
               color="gray.500"
             >
-              <Flex borderRadius="8px" w="100%" justifyContent="flex-start" gap="2">
+              <Flex
+                borderRadius="8px"
+                w="100%"
+                justifyContent="flex-start"
+                gap="2"
+              >
                 <Input
                   placeholder="Pesquisar processos (por registro ou apelido)"
                   value={filter?.value}
-                  onChange={({ target }) => setFilter({ type: selectedFilter, value: target.value })}
+                  onChange={({ target }) =>
+                    setFilter({ type: selectedFilter, value: target.value })
+                  }
                   variant="filled"
                   position="absolute"
                   w="70%"
@@ -374,18 +387,14 @@ function Processes() {
                   // borderLeftColor="#898989"
                   // borderLeftRadius="0px"
                   // borderRightWidth="0"
-                  marginLeft="57em"
+                  marginLeft="87%"
                   w="20%"
                   value={selectedFilter}
                   onChange={handleFilterChange}
-                  
                 >
-                  
-                  
                   <option value="stage">Etapa</option>
                   <option value="flow">Fluxo</option>
                   <option value="process">Processo</option>
-
                 </Select>
               </Flex>
               <Button

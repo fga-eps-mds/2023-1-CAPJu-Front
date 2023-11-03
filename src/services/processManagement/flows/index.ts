@@ -2,7 +2,7 @@ import { api } from "services/api";
 
 export const getFlows = async (
   pagination?: Pagination,
-  filter?: { type: string, value: string }
+  filter?: { type: string; value: string }
 ): Promise<Result<Flow[]>> => {
   try {
     const res = await api.processManagement.get<{

@@ -26,7 +26,9 @@ import { EditionModal } from "./EditionModal";
 function Units() {
   const toast = useToast();
   const [selectedUnit, selectUnit] = useState<Unit | null>(null);
-  const [filter, setFilter] = useState<{ type: string, value: string } | undefined >(undefined);
+  const [filter, setFilter] = useState<
+    { type: string; value: string } | undefined
+  >(undefined);
   const { getUserData } = useAuth();
   const {
     isOpen: isCreationOpen,
@@ -187,7 +189,9 @@ function Units() {
             <Input
               placeholder="Pesquisar unidades"
               value={filter?.value}
-              onChange={({ target }) => setFilter({ type: "unit", value: target.value })}
+              onChange={({ target }) =>
+                setFilter({ type: "unit", value: target.value })
+              }
               variant="filled"
               css={{
                 "&, &:hover, &:focus": {

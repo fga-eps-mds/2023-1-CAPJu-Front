@@ -2,7 +2,7 @@ import { api } from "services/api";
 
 export const getUnits = async (
   pagination?: Pagination,
-  filter?: { type: string, value: string }
+  filter?: { type: string; value: string }
 ): Promise<Result<Unit[]>> => {
   try {
     const res = await api.unit.get<{ units: Unit[]; totalPages: number }>("/", {

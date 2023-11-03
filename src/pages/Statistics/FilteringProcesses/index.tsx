@@ -75,7 +75,9 @@ export default function FilteringProcesses() {
   const [key, setKey] = useState(Math.random());
 
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [filter] = useState<{ type: string, value: string } | undefined>(undefined);
+  const [filter] = useState<{ type: string; value: string } | undefined>(
+    undefined
+  );
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedStatus(event.target.value);
   };
