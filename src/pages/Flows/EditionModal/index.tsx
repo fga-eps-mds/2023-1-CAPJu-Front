@@ -142,6 +142,7 @@ export function EditionModal({
       isOpen={isOpen}
       onClose={onClose}
       size={["full", "md", "2xl", "4xl"]}
+      isCentered
     >
       <ModalOverlay />
       <ModalContent>

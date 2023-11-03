@@ -54,7 +54,7 @@ export function DeletionModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
+    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Excluir Processo</ModalHeader>
