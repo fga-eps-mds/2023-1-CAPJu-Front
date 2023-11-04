@@ -129,7 +129,7 @@ describe("Processes page", () => {
     expect(await screen.queryByText("Registro")).not.toBe(null);
     expect(await screen.queryByText("Apelido")).not.toBe(null);
     expect(await screen.queryByText("Situação atual")).not.toBe(null);
-    expect(await screen.queryByText("Fluxo")).not.toBe(null);
+    expect(await screen.findAllByText("Fluxo")).not.toBe(null);
     expect(await screen.queryByText("Status")).not.toBe(null);
     expect(await screen.queryByText("Ações")).not.toBe(null);
   });
