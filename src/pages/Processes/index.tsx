@@ -16,6 +16,7 @@ import {
   Tooltip,
   chakra,
   Select,
+  Image,
 } from "@chakra-ui/react";
 import {
   AddIcon,
@@ -360,6 +361,7 @@ function Processes() {
                 w="100%"
                 justifyContent="flex-start"
                 gap="2"
+                alignItems="center"
               >
                 <Input
                   placeholder="Pesquisar processos (por registro ou apelido)"
@@ -376,7 +378,14 @@ function Processes() {
                     },
                   }}
                 />
-
+                <Image
+                  zIndex="9999"
+                  src="src/images/Line_52.svg"
+                  marginLeft="85%"
+                  width="1%"
+                  height="35px"
+                  border="30px"
+                />
                 <Select
                   css={{
                     "&, &:hover, &:focus": {
@@ -387,7 +396,7 @@ function Processes() {
                   // borderLeftColor="#898989"
                   // borderLeftRadius="0px"
                   // borderRightWidth="0"
-                  marginLeft="87%"
+                  marginLeft="1%"
                   w="20%"
                   value={selectedFilter}
                   onChange={handleFilterChange}
