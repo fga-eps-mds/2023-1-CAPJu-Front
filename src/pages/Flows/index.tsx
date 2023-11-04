@@ -169,14 +169,16 @@ function Flows() {
 
   useEffect(() => {
     const { search } = window.location;
-    const deleteSuccess = (new URLSearchParams(search)).get('deleteSuccess');
+    const deleteSuccess = new URLSearchParams(search).get("deleteSuccess");
 
-    if (deleteSuccess === '1') {
+    if (deleteSuccess === "1") {
       const urlSearchParams = new URLSearchParams(search);
-      urlSearchParams.delete('deleteSuccess');
-      const newURL = `${window.location.pathname}?${urlSearchParams.toString()}`;
+      urlSearchParams.delete("deleteSuccess");
+      const newURL = `${
+        window.location.pathname
+      }?${urlSearchParams.toString()}`;
       window.history.replaceState({}, document.title, newURL);
-      
+
       toast({
         id: "delete-flow-success",
         title: "Sucesso!",
@@ -184,7 +186,7 @@ function Flows() {
         status: "success",
       });
     }
-    
+
     refetchFlows();
   }, [currentPage]);
 
