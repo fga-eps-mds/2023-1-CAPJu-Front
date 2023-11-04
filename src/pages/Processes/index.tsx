@@ -382,8 +382,8 @@ function Processes() {
                   zIndex="9999"
                   src="src/images/Line_52.svg"
                   marginLeft="85%"
-                  width="1%"
-                  height="35px"
+                  width="3%"
+                  height="27px"
                   border="30px"
                 />
                 <Select
@@ -396,8 +396,8 @@ function Processes() {
                   // borderLeftColor="#898989"
                   // borderLeftRadius="0px"
                   // borderRightWidth="0"
-                  marginLeft="1%"
-                  w="20%"
+                  marginRight="0%"
+                  w="40%"
                   value={selectedFilter}
                   onChange={handleFilterChange}
                 >
