@@ -21,7 +21,7 @@ export default function CustomAccordion({
   return (
     <Accordion
       marginBottom={marginBottom}
-      defaultIndex={[0]}
+      defaultIndex={[4]}
       allowMultiple
       width="100%"
       backgroundColor="#FFF"
