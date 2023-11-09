@@ -110,6 +110,13 @@ export default function StepDeadlineReports() {
         isSortable: true,
       },
     }),
+    tableColumnHelper.accessor("dueDate", {
+      cell: (info) => info.getValue(),
+      header: "Prazo do precesso na etapa",
+      meta: {
+        isSortable: true,
+      },
+    }),
     tableColumnHelper.accessor("tableActions", {
       cell: (info) => info.getValue(),
       header: "Ações",
@@ -197,7 +204,10 @@ export default function StepDeadlineReports() {
     >
       <Box borderRadius="8px">
         <Flex justifyContent="flex-start" w="100%" flexDirection="column">
-          <CustomAccordion title="Visualizar processos filtrados por data de vencimento">
+          <CustomAccordion
+            defaultIndex={[4]}
+            title="Visualizar processos filtrados por data de vencimento"
+          >
             <>
               <Flex justifyContent="space-between">
                 <Flex w="70%" flexDirection="column">
@@ -250,7 +260,7 @@ export default function StepDeadlineReports() {
                   </Flex>
                 </Flex>
               </Flex>
-              <Flex w="110%" marginTop="15">
+              <Flex w="100%" marginTop="15">
                 {tableVisible && (
                   <DataTable
                     data={filteredStepDeadlineReports}
