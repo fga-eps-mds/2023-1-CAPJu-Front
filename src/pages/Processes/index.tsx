@@ -364,7 +364,7 @@ function Processes() {
                 alignItems="center"
               >
                 <Input
-                  placeholder="Pesquisar processos (por registro ou apelido)"
+                  placeholder="O que deseja buscar?"
                   value={filter?.value}
                   onChange={({ target }) =>
                     setFilter({ type: selectedFilter, value: target.value })
