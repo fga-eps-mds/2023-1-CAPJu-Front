@@ -305,7 +305,7 @@ export default function Statistics() {
         {
           barPercentage: 0.6,
           barThickness: "flex",
-          label: "Etapas",
+          label: "Processos",
           data: Object.values(stages).map((stage) => stage.countProcess),
           backgroundColor: generateColorTransition(
             "#FF0000",
