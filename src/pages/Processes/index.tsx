@@ -271,16 +271,16 @@ function Processes() {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("flowName", {
+    tableColumnHelper.accessor("stageName", {
       cell: (info) => info.getValue(),
-      header: "Fluxo",
+      header: "Etapa Atual",
       meta: {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("stageName", {
+    tableColumnHelper.accessor("flowName", {
       cell: (info) => info.getValue(),
-      header: "Etapa Atual",
+      header: "Fluxo",
       meta: {
         isSortable: true,
       },
@@ -371,7 +371,7 @@ function Processes() {
                 alignItems="center"
               >
                 <Input
-                  placeholder="O que deseja buscar?"
+                  placeholder="Pesquisar processos (por registro ou apelido)"
                   value={filter?.value}
                   onChange={({ target }) =>
                     setFilter({ type: selectedFilter, value: target.value })
