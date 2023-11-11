@@ -51,6 +51,7 @@ export default function Statistics() {
       setSelectedFlow(-1);
       setShowProcesses(false);
       setOpenSelectFlow(true);
+      setOpenChart(false);
     };
   }, []);
 
@@ -86,6 +87,7 @@ export default function Statistics() {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [openSelectFlow, setOpenSelectFlow] = useState(false);
+  const [openChart, setOpenChart] = useState(false);
   const limit = 5;
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
@@ -359,6 +361,7 @@ export default function Statistics() {
                         setOpenSelectStage(true);
                         handleConfirmSelectionFlow();
                         setShowProcesses(false);
+                        setOpenChart(true);
                       }}
                     >
                       Confirmar
@@ -387,6 +390,7 @@ export default function Statistics() {
                           onClick={() => {
                             setOpenSelectStage(true);
                             handleConfirmSelectionStages();
+                            setOpenChart(false);
                           }}
                         >
                           Confirmar
@@ -434,18 +438,22 @@ export default function Statistics() {
                     </Flex>
                   ) : (
                     <Flex flexDir="column">
-                      <Grid
-                        w="50%"
-                        h="30%"
-                        marginLeft="3.2%"
-                        marginTop="57.12px"
-                      >
-                        <BarChart
-                          id="chart-etapas-fluxo"
-                          selectedFlow={selectedFlow}
-                          chartData={chartData}
-                        />
-                      </Grid>
+                      {openChart ? (
+                        <Grid
+                          w="50%"
+                          h="30%"
+                          marginLeft="3.2%"
+                          marginTop="57.12px"
+                        >
+                          <BarChart
+                            id="chart-etapas-fluxo"
+                            selectedFlow={selectedFlow}
+                            chartData={chartData}
+                          />
+                        </Grid>
+                      ) : (
+                        <></>
+                      )}
                     </Flex>
                   )}
                 </>
