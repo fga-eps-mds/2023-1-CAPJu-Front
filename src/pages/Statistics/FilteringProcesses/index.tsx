@@ -13,6 +13,8 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { DataTable } from "components/DataTable";
+import { Pagination } from "components/Pagination";
+import { ProcessQuantifier } from "components/ProcessQuantifier";
 import { useEffect, useState, useMemo, ChangeEvent } from "react";
 import { useLocation } from "react-router-dom";
 import { getFlows } from "services/processManagement/flows";
@@ -32,7 +34,6 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { Pagination } from "components/Pagination";
 import useChartData from "./chartUtils";
 
 ChartJS.register(
@@ -324,76 +325,92 @@ export default function FilteringProcesses() {
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              <Flex justifyContent="space-between">
-                <Flex w="70%" flexDirection="column">
-                  <Flex gap="5">
+              <Flex w="70%" flexDirection="column" marginBottom="4">
+                <Flex gap="5">
+                  <Select
+                    placeholder="Selecione o Fluxo"
+                    color="gray.500"
+                    value={selectedFlowValue}
+                    onChange={handleSelectChange}
+                  >
+                    {flows?.map((flow) => {
+                      return <option value={flow.idFlow}>{flow.name}</option>;
+                    })}
+                  </Select>
+                  {tableVisible && (
                     <Select
-                      placeholder="Selecione o Fluxo"
+                      value={selectedStatus}
+                      onChange={handleStatusChange}
+                      placeholder="Status"
+                      w="35%"
                       color="gray.500"
-                      value={selectedFlowValue}
-                      onChange={handleSelectChange}
                     >
-                      {flows?.map((flow) => {
-                        return <option value={flow.idFlow}>{flow.name}</option>;
-                      })}
+                      <option value="finished">Concluído</option>;
+                      <option value="archived">Interrompido</option>
                     </Select>
-                    {tableVisible && (
-                      <Select
-                        value={selectedStatus}
-                        onChange={handleStatusChange}
-                        placeholder="Status"
-                        w="35%"
-                        color="gray.500"
-                      >
-                        <option value="finished">Concluído</option>;
-                        <option value="archived">Interrompido</option>
-                      </Select>
-                    )}
-                  </Flex>
-                  <Flex alignItems="center" gap="5" marginTop="15">
-                    <Input
-                      w="50%"
-                      type="date"
-                      color="gray.500"
-                      value={fromDate}
-                      onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                        setFromDate(event.target.value);
-                      }}
-                    />
-                    <Text>à</Text>
-                    <Input
-                      w="50%"
-                      type="date"
-                      color="gray.500"
-                      value={toDate}
-                      onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                        setToDate(event.target.value);
-                      }}
-                    />
-                    <Button
-                      colorScheme="whatsapp"
-                      w="20%"
-                      onClick={handleConfirmClick}
-                    >
-                      Confirmar
-                    </Button>
-                  </Flex>
+                  )}
                 </Flex>
-                <Flex>
-                  <Flex gap="2" alignItems="flex-end" alignSelf="end">
-                    <Button
-                      colorScheme="blue"
-                      variant="outline"
-                      onClick={() => {
-                        handleChartClick();
-                        // reload();
-                      }}
-                    >
-                      {!tableVisible ? "Ver relatório" : "Ver Gráfico"}
-                    </Button>
-                  </Flex>
+                <Flex alignItems="center" gap="5" marginTop="15">
+                  <Input
+                    w="50%"
+                    type="date"
+                    color="gray.500"
+                    value={fromDate}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      setFromDate(event.target.value);
+                    }}
+                  />
+                  <Text>à</Text>
+                  <Input
+                    w="50%"
+                    type="date"
+                    color="gray.500"
+                    value={toDate}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      setToDate(event.target.value);
+                    }}
+                  />
+                  <Button
+                    colorScheme="whatsapp"
+                    w="20%"
+                    onClick={handleConfirmClick}
+                  >
+                    Confirmar
+                  </Button>
                 </Flex>
               </Flex>
+
+              <Flex alignItems="flex-end" justifyContent="space-between">
+                <Flex w="100%" gap="5">
+                  <ProcessQuantifier
+                    processQuantity="125"
+                    description="Total de Processos"
+                    numberColor="#44536D"
+                  />
+                  <ProcessQuantifier
+                    processQuantity="57"
+                    description="Processos Concluídos"
+                    numberColor="#208F5C"
+                  />
+                  <ProcessQuantifier
+                    processQuantity="68"
+                    description="Processos Interrompidos"
+                    numberColor="#AE3A33"
+                  />
+                </Flex>
+                <Flex>
+                  <Button
+                    colorScheme="blue"
+                    variant="outline"
+                    onClick={() => {
+                      handleChartClick();
+                    }}
+                  >
+                    {!tableVisible ? "Ver relatório" : "Ver Gráfico"}
+                  </Button>
+                </Flex>
+              </Flex>
+
               <Flex flexDirection="column">
                 <Flex
                   w="100%"
