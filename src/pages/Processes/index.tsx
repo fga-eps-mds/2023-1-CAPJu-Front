@@ -278,6 +278,13 @@ function Processes() {
         isSortable: true,
       },
     }),
+    tableColumnHelper.accessor("stageName", {
+      cell: (info) => info.getValue(),
+      header: "Etapa Atual",
+      meta: {
+        isSortable: true,
+      },
+    }),
     tableColumnHelper.accessor("status", {
       cell: (info) => info.getValue(),
       header: "Status",
