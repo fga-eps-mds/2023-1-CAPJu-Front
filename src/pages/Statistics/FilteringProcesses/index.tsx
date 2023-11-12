@@ -53,7 +53,7 @@ export const options = {
     },
     title: {
       display: true,
-      text: "Comparativo de Processos Concluídos e Interrompidos por Mês",
+      text: "Gráfico de Processos Concluídos / Interrompidos por Mês",
     },
   },
 };
@@ -319,8 +319,8 @@ export default function FilteringProcesses() {
                   fontStyle="normal"
                   lineHeight="24px"
                 >
-                  Visualizar quantidade de processos concluídos e/ou
-                  interrompidos em cada etapa
+                  Visualizar quantidade de processos concluídos /
+                  interrompidos
                 </Box>
               </AccordionButton>
             </h2>
@@ -337,7 +337,7 @@ export default function FilteringProcesses() {
                       return <option value={flow.idFlow}>{flow.name}</option>;
                     })}
                   </Select>
-                  {tableVisible && (
+                  
                     <Select
                       value={selectedStatus}
                       onChange={handleStatusChange}
@@ -348,7 +348,7 @@ export default function FilteringProcesses() {
                       <option value="finished">Concluído</option>;
                       <option value="archived">Interrompido</option>
                     </Select>
-                  )}
+                  
                 </Flex>
                 <Flex alignItems="center" gap="5" marginTop="15">
                   <Input
@@ -450,12 +450,14 @@ export default function FilteringProcesses() {
                           {
                             label: "Processos Concluídos",
                             data: archived,
-                            backgroundColor: "rgba(255, 99, 132, 0.5)",
+                            backgroundColor: "rgba(32, 143, 92, 0.9)",
+                            hidden: selectedStatus === "archived"
                           },
                           {
                             label: "Processos Interrompidos",
                             data: finished,
-                            backgroundColor: "rgba(53, 162, 235, 0.5)",
+                            backgroundColor: "rgba(174, 58, 51, 0.9)",
+                            hidden: selectedStatus === "finished"
                           },
                         ],
                       }}
