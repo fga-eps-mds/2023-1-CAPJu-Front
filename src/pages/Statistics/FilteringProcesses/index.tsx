@@ -116,8 +116,8 @@ export default function FilteringProcesses() {
         toDate === "" ? undefined : toDate
       );
       setIsFetching(false);
-
       if (res.type === "error") throw new Error(res.error.message);
+      console.log(res);
       return res;
     },
     onError: () => {
@@ -383,17 +383,23 @@ export default function FilteringProcesses() {
               <Flex alignItems="flex-end" justifyContent="space-between">
                 <Flex w="100%" gap="5">
                   <ProcessQuantifier
-                    processQuantity="125"
+                    processQuantity={(
+                      processesData?.totalProcesses || "--"
+                    ).toString()}
                     description="Total de Processos"
                     numberColor="#44536D"
                   />
                   <ProcessQuantifier
-                    processQuantity="57"
+                    processQuantity={(
+                      processesData?.totalFinished || "--"
+                    ).toString()}
                     description="Processos Concluídos"
                     numberColor="#208F5C"
                   />
                   <ProcessQuantifier
-                    processQuantity="68"
+                    processQuantity={(processesData?.totalArchived || "--")
+                      .toString()
+                      .toString()}
                     description="Processos Interrompidos"
                     numberColor="#AE3A33"
                   />
