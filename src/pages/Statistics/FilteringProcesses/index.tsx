@@ -319,8 +319,7 @@ export default function FilteringProcesses() {
                   fontStyle="normal"
                   lineHeight="24px"
                 >
-                  Visualizar quantidade de processos concluídos /
-                  interrompidos
+                  Visualizar quantidade de processos concluídos / interrompidos
                 </Box>
               </AccordionButton>
             </h2>
@@ -337,18 +336,17 @@ export default function FilteringProcesses() {
                       return <option value={flow.idFlow}>{flow.name}</option>;
                     })}
                   </Select>
-                  
-                    <Select
-                      value={selectedStatus}
-                      onChange={handleStatusChange}
-                      placeholder="Status"
-                      w="35%"
-                      color="gray.500"
-                    >
-                      <option value="finished">Concluído</option>;
-                      <option value="archived">Interrompido</option>
-                    </Select>
-                  
+
+                  <Select
+                    value={selectedStatus}
+                    onChange={handleStatusChange}
+                    placeholder="Status"
+                    w="35%"
+                    color="gray.500"
+                  >
+                    <option value="finished">Concluído</option>;
+                    <option value="archived">Interrompido</option>
+                  </Select>
                 </Flex>
                 <Flex alignItems="center" gap="5" marginTop="15">
                   <Input
@@ -451,13 +449,13 @@ export default function FilteringProcesses() {
                             label: "Processos Concluídos",
                             data: archived,
                             backgroundColor: "rgba(32, 143, 92, 0.9)",
-                            hidden: selectedStatus === "archived"
+                            hidden: selectedStatus === "archived",
                           },
                           {
                             label: "Processos Interrompidos",
                             data: finished,
                             backgroundColor: "rgba(174, 58, 51, 0.9)",
-                            hidden: selectedStatus === "finished"
+                            hidden: selectedStatus === "finished",
                           },
                         ],
                       }}
