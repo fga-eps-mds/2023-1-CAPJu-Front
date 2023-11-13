@@ -141,7 +141,7 @@ export default function StepDeadlineReports() {
     }),
     tableColumnHelper.accessor("dueDate", {
       cell: (info) => info.getValue(),
-      header: "Prazo do precesso na etapa",
+      header: "Prazo do processo na etapa",
       meta: {
         isSortable: true,
       },
