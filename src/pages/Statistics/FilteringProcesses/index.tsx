@@ -218,6 +218,17 @@ export default function FilteringProcesses() {
     setSelectedFlowValue(selectedValue);
   };
 
+  const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0]; 
+  };
+
+  const getTwoYearsAgoDate = () => {
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+    return twoYearsAgo.toISOString().split('T')[0]; 
+  };
+
   const handleConfirmClick = () => {
     const minDateValue = Date.parse(fromDate);
     const maxDateValue = Date.parse(toDate);
@@ -264,11 +275,18 @@ export default function FilteringProcesses() {
   const handleChartClick = async () => {
     const minDateValue = Date.parse(fromDate);
     const maxDateValue = Date.parse(toDate);
+    const currentDateValue = Date.now();
+
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+    const twoYearsAgoValue = Date.parse(twoYearsAgo.toISOString());
 
     if (
       fromDate.length > 0 &&
       toDate.length > 0 &&
-      maxDateValue > minDateValue
+      maxDateValue > minDateValue &&
+      maxDateValue <= currentDateValue &&
+      minDateValue >= twoYearsAgoValue
     ) {
       setTableVisible((current) => !current);
       setCurrentPage(0);
@@ -357,6 +375,8 @@ export default function FilteringProcesses() {
                     onChange={(event: ChangeEvent<HTMLInputElement>) => {
                       setFromDate(event.target.value);
                     }}
+                    max={getCurrentDate()} // Define a data máxima como a data atual
+                    min={getTwoYearsAgoDate()} // Define a data mínima como a data há dois anos
                   />
                   <Text>à</Text>
                   <Input
@@ -367,6 +387,8 @@ export default function FilteringProcesses() {
                     onChange={(event: ChangeEvent<HTMLInputElement>) => {
                       setToDate(event.target.value);
                     }}
+                    max={getCurrentDate()} // Define a data máxima como a data atual
+                    min={getTwoYearsAgoDate()} // Define a data mínima como a data há dois anos
                   />
                   <Button
                     colorScheme="whatsapp"
