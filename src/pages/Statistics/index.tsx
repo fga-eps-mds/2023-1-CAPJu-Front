@@ -86,7 +86,7 @@ export default function Statistics() {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [openSelectFlow, setOpenSelectFlow] = useState(false);
+  const [openSelectFlow, setOpenSelectFlow] = useState(true);
   const [openChart, setOpenChart] = useState(false);
   const limit = 5;
 
