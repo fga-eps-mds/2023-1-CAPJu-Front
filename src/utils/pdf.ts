@@ -13,50 +13,73 @@ export const downloadProcess = async (
   flow: string,
   processes: Process[]
 ): Promise<void> => {
-  alert("2");
-  const container = document.createElement("div");
+  try {
+    alert("2");
+    const container = document.createElement("div");
 
-  const emitedAt = new Date();
+    const emitedAt = new Date();
 
-  const emissionDate = formatDateTimeToBrazilian(emitedAt);
+    const emissionDate = formatDateTimeToBrazilian(emitedAt);
 
-  const pdf = new JsPDF() as jsPDFCustom;
-  alert("3");
-  pdf.setFontSize(12);
-  pdf.text("Processos por etapa", 105, 20, { align: "center" });
-  pdf.text(`Etapa: ${stage}`, 15, 30);
-  pdf.text(`Fluxo: ${flow}`, 15, 40);
-  pdf.text(`Data emissão: ${emissionDate}`, 15, 50);
+    const pdf = new JsPDF() as jsPDFCustom;
+    alert("3");
+    pdf.setFontSize(12);
+    pdf.text("Processos por etapa", 105, 20, { align: "center" });
+    pdf.text(`Etapa: ${stage}`, 15, 30);
+    pdf.text(`Fluxo: ${flow}`, 15, 40);
+    pdf.text(`Data emissão: ${emissionDate}`, 15, 50);
 
-  const currentY = 70;
+    const currentY = 70;
 
-  pdf.text(`Processo da etapa ${stage}`, 15, 60);
-  const tableHTML = constructTableHTML(processes);
-  container.style.display = "none";
-  container.innerHTML = tableHTML;
-  document.body.appendChild(container);
+    pdf.text(`Processo da etapa ${stage}`, 15, 60);
+    const tableHTML = constructTableHTML(processes);
+    container.style.display = "none";
+    container.innerHTML = tableHTML;
+    document.body.appendChild(container);
 
-  pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
-  alert("4");
+    pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
+    alert("4");
 
-  let tableFinalY = (pdf as any).lastAutoTable.finalY;
+    const spacingBetweenImages = 60;
 
-  if (tableFinalY > 267) {
-    pdf.addPage();
-    tableFinalY = 20;
+    let tableFinalY = (pdf as any).lastAutoTable.finalY;
+
+    if (tableFinalY > 267) {
+      pdf.addPage();
+      tableFinalY = 20;
+    }
+    alert("5");
+    pdf.addImage(
+      await imgToBase64("/src/images/UnB.png"),
+      "png",
+      30 + spacingBetweenImages,
+      tableFinalY + 10,
+      20,
+      20
+    );
+    alert("6");
+    pdf.addImage(
+      await imgToBase64("/src/images/justica_federal.png"),
+      "png",
+      50 + 2 * spacingBetweenImages,
+      tableFinalY + 10,
+      20,
+      15
+    );
+    alert("7");
+    pdf.save(`quantidade_de_processos_no_fluxo_${flow}_na_etapa_${stage}`);
+
+    document.body.removeChild(container);
+    alert("8");
+  } catch (err) {
+    console.log(err);
+    alert("Olha o log pelo error");
   }
-  alert("5");
-
-  alert("6");
-  pdf.save(`quantidade_de_processos_no_fluxo_${flow}_na_etapa_${stage}`);
-
-  document.body.removeChild(container);
-  alert("7");
 };
 
 function constructTableHTML(processData: Process[]): string {
   let tableHTML = `
-      <div class="table-wrapper" style="display: none" hidden>
+        <div class="table-wrapper" style="display: none" hidden>
           <table class="fl-table" id="processData">
               <style>
                   * {
@@ -64,7 +87,7 @@ function constructTableHTML(processData: Process[]): string {
                     -webkit-box-sizing: border-box;
                     -moz-box-sizing: border-box;
                   }
-                  body {z'
+                  body {
                     font-family: Helvetica;
                     -webkit-font-smoothing: antialiased;
                   }
@@ -132,4 +155,22 @@ function constructTableHTML(processData: Process[]): string {
   `;
 
   return tableHTML;
+}
+
+function imgToBase64(src: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.height = img.naturalHeight;
+      canvas.width = img.naturalWidth;
+      ctx!.drawImage(img, 0, 0);
+      const base64String = canvas.toDataURL();
+      resolve(base64String);
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
 }
