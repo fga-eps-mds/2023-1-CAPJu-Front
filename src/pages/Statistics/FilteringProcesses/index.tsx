@@ -91,6 +91,26 @@ export default function FilteringProcesses() {
     if (flows.length === 0) getDataFlows();
   }, []);
 
+  const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
+    queryKey: ["flows"],
+    queryFn: async () => {
+      const res = await getFlows();
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
+    onError: () => {
+      toast({
+        id: "flows-error",
+        title: "Erro ao carregar fluxos",
+        description:
+          "Houve um erro ao carregar fluxos, favor tentar novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    },
+  });
   const {
     data: processesData,
     isFetched: isProcessesFetched,
@@ -150,33 +170,44 @@ export default function FilteringProcesses() {
 
   const filteredProcesses = useMemo<TableRow<Process>[]>(() => {
     if (isFetching) return [];
-
-    const value = replacer(processesData?.value);
     return (
-      (value?.reduce(
+      (processesData?.value?.reduce(
         (
           acc: TableRow<Process>[] | Process[],
           curr: TableRow<Process> | Process
-        ) => [
-          ...acc,
-          {
-            ...curr,
-            tableActions,
-            actionsProps: {
-              process: curr,
-              pathname: `/processos/${curr.record}`,
-              state: { process: curr, ...(state || {}) },
+        ) => {
+          const currFlow = flowsData?.value?.find(
+            (item) =>
+              item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
+          ) as Flow;
+          return [
+            ...acc,
+            {
+              ...curr,
+              tableActions,
+              actionsProps: {
+                process: curr,
+                pathname: `/processos/${curr.record}`,
+                state: {
+                  process: curr,
+                  ...(state || {}),
+                },
+              },
+              flowName: currFlow?.name,
+              status: curr.status,
             },
-            record: curr.record,
-          },
-        ],
+          ];
+        },
         []
       ) as TableRow<Process>[]) || []
     );
   }, [
     processesData,
     isProcessesFetched,
+    userData,
     isUserFetched,
+    flowsData,
+    isFlowsFetched,
     tableActions,
     isFetching,
   ]);
@@ -203,12 +234,11 @@ export default function FilteringProcesses() {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("tableActions", {
+    tableColumnHelper.accessor("flowName", {
       cell: (info) => info.getValue(),
-      header: "Ações",
+      header: "Fluxo",
       meta: {
-        isTableActions: true,
-        isSortable: false,
+        isSortable: true,
       },
     }),
   ];
@@ -492,14 +522,3 @@ export default function FilteringProcesses() {
     </Box>
   );
 }
-
-const replacer = (processes: Process[] | undefined) => {
-  if (!processes) return undefined;
-
-  return processes.map((process) => {
-    return {
-      ...process,
-      status: process.status === "archived" ? "Interrompido" : "Concluído",
-    };
-  });
-};
