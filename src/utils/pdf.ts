@@ -13,6 +13,7 @@ export const downloadProcess = async (
   flow: string,
   processes: Process[]
 ): Promise<void> => {
+  alert("2");
   const container = document.createElement("div");
 
   const emitedAt = new Date();
@@ -20,7 +21,7 @@ export const downloadProcess = async (
   const emissionDate = formatDateTimeToBrazilian(emitedAt);
 
   const pdf = new JsPDF() as jsPDFCustom;
-
+  alert("3");
   pdf.setFontSize(12);
   pdf.text("Processos por etapa", 105, 20, { align: "center" });
   pdf.text(`Etapa: ${stage}`, 15, 30);
@@ -36,6 +37,7 @@ export const downloadProcess = async (
   document.body.appendChild(container);
 
   pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
+  alert("3");
 
   const spacingBetweenImages = 60;
 
@@ -62,10 +64,11 @@ export const downloadProcess = async (
     20,
     15
   );
-
+  alert("4");
   pdf.save(`quantidade_de_processos_no_fluxo_${flow}_na_etapa_${stage}`);
 
   document.body.removeChild(container);
+  alert("5");
 };
 
 function constructTableHTML(processData: Process[]): string {

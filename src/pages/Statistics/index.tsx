@@ -165,7 +165,8 @@ export default function Statistics() {
       );
 
       if (resAllProcess.type === "success") {
-        downloadProcess(
+        alert("1");
+        await downloadProcess(
           stages[selectedStage].name,
           res.name,
           resAllProcess.value
