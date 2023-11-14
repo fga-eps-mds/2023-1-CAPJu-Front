@@ -50,7 +50,6 @@ export default function Statistics() {
       setOpenSelectStage(false);
       setSelectedFlow(-1);
       setShowProcesses(false);
-      setOpenSelectFlow(true);
       setOpenChart(false);
     };
   }, []);
@@ -86,7 +85,6 @@ export default function Statistics() {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [openSelectFlow, setOpenSelectFlow] = useState(true);
   const [openChart, setOpenChart] = useState(false);
   const limit = 5;
 
@@ -219,7 +217,6 @@ export default function Statistics() {
 
   const handleConfirmSelectionFlow = async () => {
     if (selectedFlow >= 0) {
-      setOpenSelectFlow(true);
       setOpenSelectStage(true);
 
       const stagesResult = await getCountProcessByIdFlow(selectedFlow);
@@ -339,127 +336,121 @@ export default function Statistics() {
               title="Visualizar quantidade de processos em cada etapa"
               marginBottom={18}
             >
-              {openSelectFlow ? (
-                <>
-                  <Flex>
-                    <Select
-                      placeholder="Selecione o fluxo"
-                      marginLeft="36px"
-                      width="302px"
-                      onChange={(e) => setSelectedFlow(Number(e.target.value))}
-                    >
-                      {flowsData?.value?.map((flow: any) => (
-                        <option value={flow.idFlow} key={flow.name}>
-                          {flow.name}
-                        </option>
-                      ))}
-                    </Select>
-                    <Button
-                      colorScheme="green"
-                      marginLeft="10px"
-                      onClick={() => {
-                        setOpenSelectStage(true);
-                        handleConfirmSelectionFlow();
-                        setShowProcesses(false);
-                        setOpenChart(true);
-                      }}
-                    >
-                      Confirmar
-                    </Button>
-                    {openSelectStage ? (
-                      <Flex alignItems="center">
-                        <Select
-                          placeholder="Selecione a etapa"
-                          marginLeft="36px"
-                          width="302px"
-                          onChange={(e) => {
-                            setSelectedStage(Number(e.target.value));
-                            setCurrentPage(0);
-                          }}
-                        >
-                          {Object.values(stages).map((stage) => (
-                            <option key={stage.idStage} value={stage.idStage}>
-                              {stage.name}
-                            </option>
-                          ))}
-                        </Select>
-                        <Button
-                          colorScheme="green"
-                          marginLeft="10px"
-                          marginRight="10%"
-                          onClick={() => {
-                            setOpenSelectStage(true);
-                            handleConfirmSelectionStages();
-                            setOpenChart(false);
-                          }}
-                        >
-                          Confirmar
-                        </Button>
-                        <Flex>
-                          {showProcesses && (
-                            <ExportExcel
-                              excelData={filteredProcess}
-                              fileName={`Processos_do_fluxo_${selectedFlow}_na_etapa_${selectedStage}`}
-                            />
-                          )}
-                          <Flex marginRight="30%">
-                            <Button
-                              onClick={
-                                showProcesses
-                                  ? () => DownloadPDFProcess()
-                                  : DownloadPDFChart
-                              }
-                              colorScheme="blue"
-                              size="md"
-                            >
-                              <Text fontSize="16px"> PDF </Text>
-                            </Button>
-                          </Flex>
+              <>
+                <Flex>
+                  <Select
+                    placeholder="Selecione o fluxo"
+                    marginLeft="36px"
+                    width="302px"
+                    onChange={(e) => setSelectedFlow(Number(e.target.value))}
+                  >
+                    {flowsData?.value?.map((flow: any) => (
+                      <option value={flow.idFlow} key={flow.name}>
+                        {flow.name}
+                      </option>
+                    ))}
+                  </Select>
+                  <Button
+                    colorScheme="green"
+                    marginLeft="10px"
+                    onClick={() => {
+                      setOpenSelectStage(true);
+                      handleConfirmSelectionFlow();
+                      setShowProcesses(false);
+                      setOpenChart(true);
+                    }}
+                  >
+                    Confirmar
+                  </Button>
+                  {openSelectStage ? (
+                    <Flex alignItems="center">
+                      <Select
+                        placeholder="Selecione a etapa"
+                        marginLeft="36px"
+                        width="302px"
+                        onChange={(e) => {
+                          setSelectedStage(Number(e.target.value));
+                          setCurrentPage(0);
+                        }}
+                      >
+                        {Object.values(stages).map((stage) => (
+                          <option key={stage.idStage} value={stage.idStage}>
+                            {stage.name}
+                          </option>
+                        ))}
+                      </Select>
+                      <Button
+                        colorScheme="green"
+                        marginLeft="10px"
+                        marginRight="10%"
+                        onClick={() => {
+                          setOpenSelectStage(true);
+                          handleConfirmSelectionStages();
+                          setOpenChart(false);
+                        }}
+                      >
+                        Confirmar
+                      </Button>
+                      <Flex>
+                        {showProcesses && (
+                          <ExportExcel
+                            excelData={filteredProcess}
+                            fileName={`Processos_do_fluxo_${selectedFlow}_na_etapa_${selectedStage}`}
+                          />
+                        )}
+                        <Flex marginRight="30%">
+                          <Button
+                            onClick={
+                              showProcesses
+                                ? () => DownloadPDFProcess()
+                                : DownloadPDFChart
+                            }
+                            colorScheme="blue"
+                            size="md"
+                          >
+                            <Text fontSize="16px"> PDF </Text>
+                          </Button>
                         </Flex>
                       </Flex>
+                    </Flex>
+                  ) : (
+                    <></>
+                  )}
+                </Flex>
+                {showProcesses ? (
+                  <Flex flexDir="column" alignItems="center" marginTop="2%">
+                    <DataTable
+                      data={processesTableRows}
+                      columns={tableColumns}
+                      isDataFetching={loading}
+                      emptyTableMessage="Não foram encontrados processos"
+                    />
+                    <Pagination
+                      pageCount={totalPages}
+                      onPageChange={({ selected }) => setCurrentPage(selected)}
+                    />
+                  </Flex>
+                ) : (
+                  <Flex flexDir="column">
+                    {openChart ? (
+                      <Grid
+                        w="50%"
+                        h="30%"
+                        marginLeft="3.2%"
+                        marginTop="57.12px"
+                      >
+                        <BarChart
+                          id="chart-etapas-fluxo"
+                          selectedFlow={selectedFlow}
+                          chartData={chartData}
+                        />
+                      </Grid>
                     ) : (
                       <></>
                     )}
                   </Flex>
-                  {showProcesses ? (
-                    <Flex flexDir="column" alignItems="center" marginTop="2%">
-                      <DataTable
-                        data={processesTableRows}
-                        columns={tableColumns}
-                        isDataFetching={loading}
-                        emptyTableMessage="Não foram encontrados processos"
-                      />
-                      <Pagination
-                        pageCount={totalPages}
-                        onPageChange={({ selected }) =>
-                          setCurrentPage(selected)
-                        }
-                      />
-                    </Flex>
-                  ) : (
-                    <Flex flexDir="column">
-                      {openChart ? (
-                        <Grid
-                          w="50%"
-                          h="30%"
-                          marginLeft="3.2%"
-                          marginTop="57.12px"
-                        >
-                          <BarChart
-                            id="chart-etapas-fluxo"
-                            selectedFlow={selectedFlow}
-                            chartData={chartData}
-                          />
-                        </Grid>
-                      ) : (
-                        <></>
-                      )}
-                    </Flex>
-                  )}
-                </>
-              ) : (
-                <></>
-              )}
+                )}
+              </>
             </CustomAccordion>
           </Flex>
         </Box>
