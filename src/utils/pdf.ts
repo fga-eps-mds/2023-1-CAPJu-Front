@@ -2,6 +2,7 @@ import JsPDF from "jspdf";
 import type { UserOptions } from "jspdf-autotable";
 import { formatDateTimeToBrazilian } from "./dates";
 import "jspdf-autotable";
+import assets from "./assets";
 
 interface jsPDFCustom extends JsPDF {
   // eslint-disable-next-line no-unused-vars
@@ -14,7 +15,6 @@ export const downloadProcess = async (
   processes: Process[]
 ): Promise<void> => {
   try {
-    alert("2");
     const container = document.createElement("div");
 
     const emitedAt = new Date();
@@ -22,7 +22,6 @@ export const downloadProcess = async (
     const emissionDate = formatDateTimeToBrazilian(emitedAt);
 
     const pdf = new JsPDF() as jsPDFCustom;
-    alert("3");
     pdf.setFontSize(12);
     pdf.text("Processos por etapa", 105, 20, { align: "center" });
     pdf.text(`Etapa: ${stage}`, 15, 30);
@@ -38,7 +37,6 @@ export const downloadProcess = async (
     document.body.appendChild(container);
 
     pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
-    alert("4");
 
     const spacingBetweenImages = 60;
 
@@ -48,32 +46,30 @@ export const downloadProcess = async (
       pdf.addPage();
       tableFinalY = 20;
     }
-    alert("5");
+
     pdf.addImage(
-      await imgToBase64("/src/images/UnB.png"),
+      await imgToBase64(assets.logoUnB),
       "png",
       30 + spacingBetweenImages,
       tableFinalY + 10,
       20,
       20
     );
-    alert("6");
+
     pdf.addImage(
-      await imgToBase64("/src/images/justica_federal.png"),
+      await imgToBase64(assets.justicaFederal),
       "png",
       50 + 2 * spacingBetweenImages,
       tableFinalY + 10,
       20,
       15
     );
-    alert("7");
+
     pdf.save(`quantidade_de_processos_no_fluxo_${flow}_na_etapa_${stage}`);
 
     document.body.removeChild(container);
-    alert("8");
   } catch (err) {
     console.log(err);
-    alert("Olha o log pelo error");
   }
 };
 
