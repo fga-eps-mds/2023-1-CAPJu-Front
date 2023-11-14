@@ -39,8 +39,6 @@ export const downloadProcess = async (
   pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
   alert("4");
 
-  const spacingBetweenImages = 60;
-
   let tableFinalY = (pdf as any).lastAutoTable.finalY;
 
   if (tableFinalY > 267) {
@@ -48,28 +46,12 @@ export const downloadProcess = async (
     tableFinalY = 20;
   }
   alert("5");
-  pdf.addImage(
-    await imgToBase64("/src/images/UnB.png"),
-    "png",
-    30 + spacingBetweenImages,
-    tableFinalY + 10,
-    20,
-    20
-  );
+
   alert("6");
-  pdf.addImage(
-    await imgToBase64("/src/images/justica_federal.png"),
-    "png",
-    50 + 2 * spacingBetweenImages,
-    tableFinalY + 10,
-    20,
-    15
-  );
-  alert("7");
   pdf.save(`quantidade_de_processos_no_fluxo_${flow}_na_etapa_${stage}`);
 
   document.body.removeChild(container);
-  alert("8");
+  alert("7");
 };
 
 function constructTableHTML(processData: Process[]): string {
@@ -82,7 +64,7 @@ function constructTableHTML(processData: Process[]): string {
                     -webkit-box-sizing: border-box;
                     -moz-box-sizing: border-box;
                   }
-                  body {
+                  body {z'
                     font-family: Helvetica;
                     -webkit-font-smoothing: antialiased;
                   }
@@ -150,22 +132,4 @@ function constructTableHTML(processData: Process[]): string {
   `;
 
   return tableHTML;
-}
-
-function imgToBase64(src: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "Anonymous";
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      canvas.height = img.naturalHeight;
-      canvas.width = img.naturalWidth;
-      ctx!.drawImage(img, 0, 0);
-      const base64String = canvas.toDataURL();
-      resolve(base64String);
-    };
-    img.onerror = reject;
-    img.src = src;
-  });
 }
