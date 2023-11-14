@@ -37,7 +37,7 @@ export const downloadProcess = async (
   document.body.appendChild(container);
 
   pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
-  alert("3");
+  alert("4");
 
   const spacingBetweenImages = 60;
 
@@ -47,7 +47,7 @@ export const downloadProcess = async (
     pdf.addPage();
     tableFinalY = 20;
   }
-
+  alert("5");
   pdf.addImage(
     await imgToBase64("/src/images/UnB.png"),
     "png",
@@ -56,6 +56,7 @@ export const downloadProcess = async (
     20,
     20
   );
+  alert("6");
   pdf.addImage(
     await imgToBase64("/src/images/justica_federal.png"),
     "png",
@@ -64,11 +65,11 @@ export const downloadProcess = async (
     20,
     15
   );
-  alert("4");
+  alert("7");
   pdf.save(`quantidade_de_processos_no_fluxo_${flow}_na_etapa_${stage}`);
 
   document.body.removeChild(container);
-  alert("5");
+  alert("8");
 };
 
 function constructTableHTML(processData: Process[]): string {
