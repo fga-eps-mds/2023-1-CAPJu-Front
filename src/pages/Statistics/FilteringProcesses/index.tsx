@@ -24,6 +24,7 @@ import { useQuery } from "react-query";
 import { useAuth } from "hooks/useAuth";
 import { isActionAllowedToUser } from "utils/permissions";
 import { ViewIcon } from "@chakra-ui/icons";
+import { labelByProcessStatus } from "utils/constants";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -194,7 +195,8 @@ export default function FilteringProcesses() {
                 },
               },
               flowName: currFlow?.name,
-              status: curr.status,
+              // @ts-ignore
+              status: labelByProcessStatus[curr.status],
             },
           ];
         },
@@ -250,13 +252,13 @@ export default function FilteringProcesses() {
 
   const getCurrentDate = () => {
     const today = new Date();
-    return today.toISOString().split('T')[0]; 
+    return today.toISOString().split("T")[0];
   };
 
   const getTwoYearsAgoDate = () => {
     const twoYearsAgo = new Date();
     twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-    return twoYearsAgo.toISOString().split('T')[0]; 
+    return twoYearsAgo.toISOString().split("T")[0];
   };
 
   const handleConfirmClick = () => {
