@@ -76,6 +76,7 @@ declare global {
     isNextSage?: boolean;
     nameStage?: string;
     nameFlow?: string;
+    flow?: Flow;
   };
 
   type Note = {

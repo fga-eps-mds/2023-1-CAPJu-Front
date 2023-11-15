@@ -31,7 +31,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
 
 import { getProcesses } from "services/processManagement/processes";
-import { getFlows } from "services/processManagement/flows";
 import { isActionAllowedToUser } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
@@ -78,26 +77,10 @@ function Processes() {
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
   };
-  const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
-    queryKey: ["flows"],
-    queryFn: async () => {
-      const res = await getFlows();
-
-      if (res.type === "error") throw new Error(res.error.message);
-
-      return res;
-    },
-    onError: () => {
-      toast({
-        id: "flows-error",
-        title: "Erro ao carregar fluxos",
-        description:
-          "Houve um erro ao carregar fluxos, favor tentar novamente.",
-        status: "error",
-        isClosable: true,
-      });
-    },
-  });
+  const [selectedFilter, setSelectedFilter] = useState("process");
+  const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedFilter(event.target.value);
+  };
   const {
     data: processesData,
     isFetched: isProcessesFetched,
@@ -173,7 +156,7 @@ function Processes() {
     [isProcessesFetched, isUserFetched, userData]
   );
   const processesTableRows = useMemo<TableRow<Process>[]>(() => {
-    if (!isProcessesFetched || !isFlowsFetched) return [];
+    if (!isProcessesFetched) return [];
 
     return (
       (processesData?.value?.reduce(
@@ -181,10 +164,8 @@ function Processes() {
           acc: TableRow<Process>[] | Process[],
           curr: TableRow<Process> | Process
         ) => {
-          const currFlow = flowsData?.value?.find(
-            (item) =>
-              item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
-          ) as Flow;
+          const currFlow = curr?.flow as Flow;
+
           const sortedStagesIds = getSequencesSortedStagesIds(
             currFlow?.sequences
           );
@@ -243,8 +224,6 @@ function Processes() {
     isProcessesFetched,
     userData,
     isUserFetched,
-    flowsData,
-    isFlowsFetched,
     tableActions,
   ]);
 
@@ -271,16 +250,16 @@ function Processes() {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("stageName", {
+    tableColumnHelper.accessor("flowName", {
       cell: (info) => info.getValue(),
-      header: "Etapa Atual",
+      header: "Fluxo",
       meta: {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("flowName", {
+    tableColumnHelper.accessor("stageName", {
       cell: (info) => info.getValue(),
-      header: "Fluxo",
+      header: "Etapa Atual",
       meta: {
         isSortable: true,
       },
@@ -304,12 +283,7 @@ function Processes() {
 
   useEffect(() => {
     refetchProcesses();
-  }, [flowsData, isFlowsFetched, currentPage, showFinished, legalPriority]);
-
-  const [selectedFilter, setSelectedFilter] = useState("process");
-  const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedFilter(event.target.value);
-  };
+  }, [currentPage, showFinished, legalPriority]);
 
   return (
     <PrivateLayout>
