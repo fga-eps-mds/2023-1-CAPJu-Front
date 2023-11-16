@@ -1,3 +1,11 @@
+name: front-release
+
+on:
+  push:
+#     branches: [main, develop]
+#     tags:
+#       - "v*"
+
 jobs:
   generate-release:
     runs-on: ubuntu-latest
