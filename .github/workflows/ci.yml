@@ -101,23 +101,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
-      - name: 📬 Caching
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/node_modules
-            ${{ github.workspace }}/dist
-          key: ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
-          restore-keys: |
-            ${{ runner.os }}-vite-${{ hashFiles('**/yarn.lock') }}-
-
       - name: 🧰 Instala bibliotecas e dependências
-        run: npm i yarn -g && yarn 
+        run: npm i
 
       - name: 🧪 Roda suíte de testes
         run: |
           export NODE_OPTIONS="--max_old_space_size=32768"
-          yarn test
+          npm test
 
   build:
     needs: [format, lint, type-check]
