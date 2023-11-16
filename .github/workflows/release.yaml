@@ -1,27 +1,23 @@
-name: front-release
-
-on:
-  push:
-#     branches: [main, develop]
-#     tags:
-#       - "v*"
-
 jobs:
   generate-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Get file name
-        run: echo "::set-output name=file_name::fga-eps-mds-2023-2-Capju-Front-$(TZ='America/Sao_Paulo' date +'%m-%d-%Y-%H-%M-%S')-${{github.ref_name}}"
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Copy repository
-        uses: actions/checkout@v2
-      - run: wget $METRICS_URL -O ${{ steps.name.outputs.file_name }}.json
-        env:
-          METRICS_URL: ${{ secrets.METRICS_URL }}
-      - uses: actions/upload-artifact@v2
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
         with:
-          name: ${{ steps.name.outputs.file_name }}.json
-          path: ${{ steps.name.outputs.file_name }}.json
+          fallback: 1.0.0 
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: Cria métricas do SonarCloud
+        run: python metrics/sonar-metrics.py ${{ github.event.repository.name }} ${{ github.ref_name }}
 
       - name: Commita arquivos de métricas do SonarCloud
         run: |
