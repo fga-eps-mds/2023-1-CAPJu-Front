@@ -10,7 +10,7 @@ import {
 interface CustomAccordionProps {
   title: String;
   children: JSX.Element;
-  marginBottom: number;
+  marginBottom?: number;
 }
 
 export default function CustomAccordion({
@@ -21,13 +21,12 @@ export default function CustomAccordion({
   return (
     <Accordion
       marginBottom={marginBottom}
-      defaultIndex={[0]}
       allowMultiple
       width="100%"
       backgroundColor="#FFF"
       borderRadius="8px"
     >
-      <AccordionItem>
+      <AccordionItem border="hidden">
         <h2>
           <AccordionButton>
             <AccordionIcon />

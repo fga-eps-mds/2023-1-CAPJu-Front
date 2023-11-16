@@ -4,6 +4,7 @@ import { formatDateTimeToBrazilian } from "./dates";
 import "jspdf-autotable";
 
 interface jsPDFCustom extends JsPDF {
+  // eslint-disable-next-line no-unused-vars
   autoTable: (options: UserOptions) => void;
 }
 

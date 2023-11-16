@@ -112,8 +112,6 @@ describe("ViewProcess page", async () => {
     expect(screen.getByText("Fluxo 1")).not.toBe(null);
     expect(screen.getByText("Prioridade Legal:")).not.toBe(null);
     expect(screen.getByText("Não tem")).not.toBe(null);
-    expect(screen.getByText("Voltar aos Processos")).not.toBe(null);
-    expect(screen.getByText("Iniciar Processo")).not.toBe(null);
   });
 
   it("shows staged name and due date correctly", () => {

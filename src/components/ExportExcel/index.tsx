@@ -1,4 +1,4 @@
-import { Button, Flex, Image } from "@chakra-ui/react";
+import { Button, Flex, Text } from "@chakra-ui/react";
 import * as XLSX from "xlsx";
 
 interface ExportExcelProps {
@@ -19,7 +19,7 @@ const ExportExcel = ({ excelData, fileName }: ExportExcelProps) => {
   return (
     <Flex marginRight="1em">
       <Button onClick={exportToExcel} colorScheme="blue" size="md">
-        <Image width="3.5em" src="src/images/spreadsheet-file-icon.png" />
+        <Text> XLSX </Text>
       </Button>
     </Flex>
   );
