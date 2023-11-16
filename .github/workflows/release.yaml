@@ -2,9 +2,9 @@ name: front-release
 
 on:
   push:
-#     branches: [main, develop]
-#     tags:
-#       - "v*"
+    branches: [main, develop]
+    tags:
+      - "v*"
 
 jobs:
   generate-release:
