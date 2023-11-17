@@ -130,9 +130,7 @@ export default function FilteringProcesses() {
             },
         filter,
         false,
-        selectedStatus === "" || !tableVisible
-          ? ["archived", "finished"]
-          : [selectedStatus],
+        selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
         fromDate === "" ? undefined : fromDate,
         toDate === "" ? undefined : toDate
       );
@@ -258,6 +256,7 @@ export default function FilteringProcesses() {
   const getTwoYearsAgoDate = () => {
     const twoYearsAgo = new Date();
     twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+    twoYearsAgo.setDate(twoYearsAgo.getDate() + 1);
     return twoYearsAgo.toISOString().split("T")[0];
   };
 
@@ -271,15 +270,6 @@ export default function FilteringProcesses() {
     ) {
       setCurrentPage(-1);
       setKey(Math.random());
-    } else if (fromDate.length === 0 || toDate.length === 0) {
-      toast({
-        id: "date-error",
-        title: "Datas não preenchidas",
-        description:
-          "Por favor, preencha ambas as datas (início e fim) para filtrar por período.",
-        status: "error",
-        isClosable: true,
-      });
     } else {
       toast({
         id: "date-order-error",
@@ -313,6 +303,21 @@ export default function FilteringProcesses() {
     twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
     const twoYearsAgoValue = Date.parse(twoYearsAgo.toISOString());
 
+    if (fromDate.length === 0 || toDate.length === 0) {
+      if (tableVisible) {
+        toast({
+          id: "date-info",
+          title: "Datas não esepcificadas",
+          description:
+            "Buscando todos os processos dentro do intervalo de 2 anos a partir da data atual.",
+          status: "info",
+          isClosable: true,
+        });
+      }
+
+      setTableVisible((current) => !current);
+      setCurrentPage(0);
+    }
     if (
       fromDate.length > 0 &&
       toDate.length > 0 &&
@@ -322,26 +327,17 @@ export default function FilteringProcesses() {
     ) {
       setTableVisible((current) => !current);
       setCurrentPage(0);
-    } else if (tableVisible) {
-      if (fromDate.length === 0 || toDate.length === 0) {
-        toast({
-          id: "date-error",
-          title: "Datas não preenchidas",
-          description:
-            "Por favor, preencha ambas as datas (início e fim) para ver o gráfico.",
-          status: "error",
-          isClosable: true,
-        });
-      } else if (maxDateValue <= minDateValue) {
-        toast({
-          id: "date-order-error",
-          title: "Ordem das datas incorreta",
-          description:
-            "A data de início deve ser anterior à data de fim. Por favor, ajuste as datas e tente novamente.",
-          status: "error",
-          isClosable: true,
-        });
-      }
+    }
+
+    if (maxDateValue <= minDateValue) {
+      toast({
+        id: "date-order-error",
+        title: "Ordem das datas incorreta",
+        description:
+          "A data de início deve ser anterior à data de fim. Por favor, ajuste as datas e tente novamente.",
+        status: "error",
+        isClosable: true,
+      });
     }
   };
 

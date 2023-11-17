@@ -37,17 +37,34 @@ const useChartData = (
 };
 
 const getMonthRange = (start: string, end: string) => {
-  if (start === "" || end === "") return [];
+  // eslint-disable-next-line
+  let startData, endData;
 
-  const startData = {
-    // eslint-disable-next-line
-    month: new Date(start + " 00:00:01").getMonth() + 1,
-    year: new Date(start).getFullYear(),
-  };
-  const endData = {
-    month: new Date(end).getMonth() + 1,
-    year: new Date(end).getFullYear(),
-  };
+  if (start === "" || end === "") {
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+
+    startData = {
+      month: twoYearsAgo.getMonth() + 1,
+      year: twoYearsAgo.getFullYear(),
+    };
+
+    const currentDate = new Date();
+    endData = {
+      month: currentDate.getMonth() + 1,
+      year: currentDate.getFullYear(),
+    };
+  } else {
+    startData = {
+      // eslint-disable-next-line
+      month: new Date(start + " 00:00:01").getMonth() + 1,
+      year: new Date(start).getFullYear(),
+    };
+    endData = {
+      month: new Date(end).getMonth() + 1,
+      year: new Date(end).getFullYear(),
+    };
+  }
 
   const months = [];
 
