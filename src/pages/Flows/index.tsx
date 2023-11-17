@@ -11,7 +11,6 @@ import {
 import { MdDelete, MdEdit } from "react-icons/md";
 import { AddIcon, Icon, ViewIcon, SearchIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
-
 import { PrivateLayout } from "layouts/Private";
 import { getFlows } from "services/processManagement/flows";
 import { DataTable } from "components/DataTable";
@@ -169,6 +168,25 @@ function Flows() {
   ];
 
   useEffect(() => {
+    const { search } = window.location;
+    const deleteSuccess = new URLSearchParams(search).get("deleteSuccess");
+
+    if (deleteSuccess === "1") {
+      const urlSearchParams = new URLSearchParams(search);
+      urlSearchParams.delete("deleteSuccess");
+      const newURL = `${
+        window.location.pathname
+      }?${urlSearchParams.toString()}`;
+      window.history.replaceState({}, document.title, newURL);
+
+      toast({
+        id: "delete-flow-success",
+        title: "Sucesso!",
+        description: "Fluxo excluído com sucesso!",
+        status: "success",
+      });
+    }
+
     refetchFlows();
   }, [currentPage]);
 

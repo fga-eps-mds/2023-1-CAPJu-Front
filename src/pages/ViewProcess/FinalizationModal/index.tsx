@@ -24,7 +24,7 @@ export function FinalizationModal({
   handleFinishProcess,
 }: FinalizationModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
+    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Finalizar Processo</ModalHeader>
