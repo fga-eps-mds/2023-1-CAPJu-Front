@@ -65,37 +65,6 @@ export function Header() {
         {isAuthenticated ? (
             <>
                 <Flex alignItems="center" ml="auto" gap="5">
-                    <Tabs w="100%" variant="line" colorScheme="green" index={tabIndex} size='lg'>
-                        <TabList sx={{ borderBottom: "unset" }}>
-                            {tabs.map((tab, index) => {
-                                const isCurrentTab = currentTabIndex === index;
-                                let cursor = isCurrentTab ? "default" : "pointer";
-
-                                if (!isUserAllowedInTab(tab.action)) cursor = "not-allowed";
-
-                                const handleClick = () => {
-                                    if (isUserAllowedInTab(tab.action)) {
-                                        navigate(tab.path);
-                                        setTabIndex(index);
-                                    }
-                                };
-
-                                return (
-                                    <Tab
-                                        sx={{ paddingBottom: "0", fontSize: '23px' }}
-                                        key={tab.label}
-                                        onClick={handleClick}
-                                        cursor={cursor}
-                                        minW="fit-content"
-                                        opacity={isUserAllowedInTab(tab.action) ? 1 : 0.25}>
-                                        {tab.label}
-                                    </Tab>
-                                );
-                            })}
-                        </TabList>
-                    </Tabs>
-                </Flex>
-                <Flex alignItems="center" ml="auto" gap="5">
                     <HeaderLink href="/contribuidores">Sobre</HeaderLink>
                     <Button
                         colorScheme="red"

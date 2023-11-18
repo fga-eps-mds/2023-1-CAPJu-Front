@@ -1,9 +1,10 @@
-import React, { ReactNode } from "react";
-import { Flex } from '@chakra-ui/react';
-import { useAuth } from 'hooks/useAuth';
-import DataUpdateModal from 'components/DataUpdateModal';
-import { handleVerifyInDefaultEmail } from 'utils/defaultEmails';
-import { Tutorial } from 'components/Tutorial';
+import { ReactNode } from "react";
+import { Flex } from "@chakra-ui/react";
+import { NavigationTabs } from "components/NavigationTabs";
+import { useAuth } from "hooks/useAuth";
+import DataUpdateModal from "components/DataUpdateModal";
+import { handleVerifyInDefaultEmail } from "utils/defaultEmails";
+import { Tutorial } from "components/Tutorial";
 
 interface BaseLayoutProps {
   children?: ReactNode;
@@ -11,28 +12,17 @@ interface BaseLayoutProps {
 
 export function PrivateLayout({ children }: BaseLayoutProps) {
   const { user } = useAuth();
-
-  const childrenWithStyle = React.Children.map(children, (child) => {
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child, {
-        style: { ...child.props.style, marginTop: '30px' }
-      });
-    }
-    return child;
-  });
-
   return (
     <Flex
-      w="150%"
+      w="100%"
       flex="1"
       flexDirection="column"
       alignItems="center"
       justifyContent="start"
       pb="8"
-
     >
-
-      {childrenWithStyle}
+      <NavigationTabs />
+      {children}
 
       {user?.firstLogin &&
         user?.email &&
