@@ -72,6 +72,7 @@ declare global {
     idUnit: number;
     effectiveDate: string;
     status: string;
+    dueDate?: string;
     progress?: Progress[];
     isNextSage?: boolean;
     nameStage?: string;

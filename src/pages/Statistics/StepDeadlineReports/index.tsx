@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useToast, Box, Flex, Button, Text, Input } from "@chakra-ui/react";
 import CustomAccordion from "components/CustomAccordion";
 import { DataTable } from "components/DataTable";
@@ -11,6 +11,7 @@ import { ViewIcon } from "@chakra-ui/icons";
 import { Pagination } from "components/Pagination";
 import { getProcessesByDueDate } from "services/processManagement/statistics";
 import { useLocation } from "react-router-dom";
+import { downloadProcessInDue } from "utils/pdf";
 
 export default function StepDeadlineReports() {
   const toast = useToast();
@@ -80,6 +81,29 @@ export default function StepDeadlineReports() {
     ],
     [isUserFetched, userData]
   );
+
+  const DownloadPDFProcess = useCallback(async () => {
+    const minDateConvert = new Date(minDate);
+    const maxDateConvert = new Date(maxDate);
+
+    const resAllProcess = await getProcessesByDueDate(minDate, maxDate);
+
+    if (resAllProcess.type === "success") {
+      await downloadProcessInDue(
+        minDateConvert,
+        maxDateConvert,
+        resAllProcess.value
+      );
+    } else {
+      toast({
+        id: "error-getting-stages",
+        title: "Erro ao baixar pdf",
+        description: "Houve um erro ao buscar processos.",
+        status: "error",
+        isClosable: true,
+      });
+    }
+  }, [minDate, maxDate]);
 
   const tableColumns = [
     tableColumnHelper.accessor("record", {
@@ -239,7 +263,11 @@ export default function StepDeadlineReports() {
                   >
                     {tableVisible && (
                       <>
-                        <Button colorScheme="facebook" w="10%">
+                        <Button
+                          colorScheme="facebook"
+                          w="10%"
+                          onClick={() => DownloadPDFProcess()}
+                        >
                           PDF
                         </Button>
                         <Button colorScheme="facebook" w="10%">
