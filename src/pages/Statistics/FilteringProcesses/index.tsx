@@ -66,31 +66,18 @@ export default function FilteringProcesses() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
+  const { state } = useLocation();
 
   const [flows, setFlows] = useState([] as Flow[]);
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [tableVisible, setTableVisible] = useState(true);
   const [selectedFlowValue, setSelectedFlowValue] = useState<string>("");
-
+  const [currentPage, setCurrentPage] = useState(0);
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
   const [key, setKey] = useState(Math.random());
-
   const [selectedStatus, setSelectedStatus] = useState("");
   const [filter] = useState<string | undefined>(undefined);
-  const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedStatus(event.target.value);
-  };
-  const { state } = useLocation();
-
-  const getDataFlows = async () => {
-    const dataFlows = await getFlows();
-    if (dataFlows.value) setFlows(dataFlows.value);
-  };
-
-  useEffect(() => {
-    if (flows.length === 0) getDataFlows();
-  }, []);
 
   const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
     queryKey: ["flows"],
@@ -243,21 +230,13 @@ export default function FilteringProcesses() {
     }),
   ];
 
+  const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedStatus(event.target.value);
+  };
+
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
     setSelectedFlowValue(selectedValue);
-  };
-
-  const getCurrentDate = () => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
-  };
-
-  const getTwoYearsAgoDate = () => {
-    const twoYearsAgo = new Date();
-    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-    twoYearsAgo.setDate(twoYearsAgo.getDate() + 1);
-    return twoYearsAgo.toISOString().split("T")[0];
   };
 
   const handleConfirmClick = () => {
@@ -281,18 +260,6 @@ export default function FilteringProcesses() {
       });
     }
   };
-  const [currentPage, setCurrentPage] = useState(0);
-  const handlePageChange = (selectedPage: { selected: number }) => {
-    setCurrentPage(selectedPage.selected);
-  };
-
-  useEffect(() => {
-    if (currentPage === -1) {
-      setCurrentPage(0);
-    } else {
-      refetchProcesses();
-    }
-  }, [currentPage, tableVisible]);
 
   const handleChartClick = async () => {
     const minDateValue = Date.parse(fromDate);
@@ -340,6 +307,39 @@ export default function FilteringProcesses() {
       });
     }
   };
+
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+
+  const getDataFlows = async () => {
+    const dataFlows = await getFlows();
+    if (dataFlows.value) setFlows(dataFlows.value);
+  };
+
+  const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  };
+
+  const getTwoYearsAgoDate = () => {
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+    twoYearsAgo.setDate(twoYearsAgo.getDate() + 1);
+    return twoYearsAgo.toISOString().split("T")[0];
+  };
+
+  useEffect(() => {
+    if (flows.length === 0) getDataFlows();
+  }, []);
+
+  useEffect(() => {
+    if (currentPage === -1) {
+      setCurrentPage(0);
+    } else {
+      refetchProcesses();
+    }
+  }, [currentPage, tableVisible]);
 
   const [months, archived, finished] = useChartData(
     filteredProcesses,
