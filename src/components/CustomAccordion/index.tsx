@@ -29,7 +29,7 @@ export default function CustomAccordion({
       backgroundColor="#FFF"
       borderRadius="8px"
     >
-      <AccordionItem>
+      <AccordionItem border="hidden">
         <h2>
           <AccordionButton>
             <AccordionIcon />

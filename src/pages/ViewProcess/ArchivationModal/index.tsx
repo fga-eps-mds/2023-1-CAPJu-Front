@@ -27,7 +27,7 @@ export function ArchivationModal({
   handleUpdateProcessStatus,
 }: ArchivationModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
+    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{getArchiveStatus(process?.status)} Processo</ModalHeader>

@@ -2,6 +2,7 @@ import JsPDF from "jspdf";
 import type { UserOptions } from "jspdf-autotable";
 import { formatDateTimeToBrazilian } from "./dates";
 import "jspdf-autotable";
+import assets from "./assets";
 
 interface jsPDFCustom extends JsPDF {
   // eslint-disable-next-line no-unused-vars
@@ -13,64 +14,68 @@ export const downloadProcess = async (
   flow: string,
   processes: Process[]
 ): Promise<void> => {
-  const container = document.createElement("div");
+  try {
+    const container = document.createElement("div");
 
-  const emitedAt = new Date();
+    const emitedAt = new Date();
 
-  const emissionDate = formatDateTimeToBrazilian(emitedAt);
+    const emissionDate = formatDateTimeToBrazilian(emitedAt);
 
-  const pdf = new JsPDF() as jsPDFCustom;
+    const pdf = new JsPDF() as jsPDFCustom;
+    pdf.setFontSize(12);
+    pdf.text("Processos por etapa", 105, 20, { align: "center" });
+    pdf.text(`Etapa: ${stage}`, 15, 30);
+    pdf.text(`Fluxo: ${flow}`, 15, 40);
+    pdf.text(`Data emissão: ${emissionDate}`, 15, 50);
 
-  pdf.setFontSize(12);
-  pdf.text("Processos por etapa", 105, 20, { align: "center" });
-  pdf.text(`Etapa: ${stage}`, 15, 30);
-  pdf.text(`Fluxo: ${flow}`, 15, 40);
-  pdf.text(`Data emissão: ${emissionDate}`, 15, 50);
+    const currentY = 70;
 
-  const currentY = 70;
+    pdf.text(`Processo da etapa ${stage}`, 15, 60);
+    const tableHTML = constructTableHTML(processes);
+    container.style.display = "none";
+    container.innerHTML = tableHTML;
+    document.body.appendChild(container);
 
-  pdf.text(`Processo da etapa ${stage}`, 15, 60);
-  const tableHTML = constructTableHTML(processes);
-  container.style.display = "none";
-  container.innerHTML = tableHTML;
-  document.body.appendChild(container);
+    pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
 
-  pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
+    const spacingBetweenImages = 60;
 
-  const spacingBetweenImages = 60;
+    let tableFinalY = (pdf as any).lastAutoTable.finalY;
 
-  let tableFinalY = (pdf as any).lastAutoTable.finalY;
+    if (tableFinalY > 267) {
+      pdf.addPage();
+      tableFinalY = 20;
+    }
 
-  if (tableFinalY > 267) {
-    pdf.addPage();
-    tableFinalY = 20;
+    pdf.addImage(
+      await imgToBase64(assets.logoUnB),
+      "png",
+      30 + spacingBetweenImages,
+      tableFinalY + 10,
+      20,
+      20
+    );
+
+    pdf.addImage(
+      await imgToBase64(assets.justicaFederal),
+      "png",
+      50 + 2 * spacingBetweenImages,
+      tableFinalY + 10,
+      20,
+      15
+    );
+
+    pdf.save(`quantidade_de_processos_no_fluxo_${flow}_na_etapa_${stage}`);
+
+    document.body.removeChild(container);
+  } catch (err) {
+    console.log(err);
   }
-
-  pdf.addImage(
-    await imgToBase64("/src/images/UnB.png"),
-    "png",
-    30 + spacingBetweenImages,
-    tableFinalY + 10,
-    20,
-    20
-  );
-  pdf.addImage(
-    await imgToBase64("/src/images/justica_federal.png"),
-    "png",
-    50 + 2 * spacingBetweenImages,
-    tableFinalY + 10,
-    20,
-    15
-  );
-
-  pdf.save(`quantidade_de_processos_no_fluxo_${flow}_na_etapa_${stage}`);
-
-  document.body.removeChild(container);
 };
 
 function constructTableHTML(processData: Process[]): string {
   let tableHTML = `
-      <div class="table-wrapper" style="display: none" hidden>
+        <div class="table-wrapper" style="display: none" hidden>
           <table class="fl-table" id="processData">
               <style>
                   * {
