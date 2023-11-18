@@ -285,6 +285,23 @@ function Processes() {
     refetchProcesses();
   }, [currentPage, showFinished, legalPriority]);
 
+  const [placeholder, setPlaceholder] = useState<string>(
+    "Pesquisar processos (por registro ou apelido)"
+  );
+  useEffect(() => {
+    switch (selectedFilter) {
+      case "process":
+        setPlaceholder("Pesquise o processo pelo nome ou apelido:");
+        break;
+      case "stage":
+        setPlaceholder("Pesquise a etapa pelo nome:");
+        break;
+      case "flow":
+        setPlaceholder("Pesquise o fluxo pelo nome:");
+        break;
+    }
+  }, [selectedFilter]);
+
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
@@ -325,8 +342,8 @@ function Processes() {
             </Button>
           </Flex>
         </Flex>
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Flex justifyContent="flex-start" w="100%">
+        <Flex w="100%" gap="2" flexWrap="wrap">
+          <Flex w="100%">
             <chakra.form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -340,29 +357,30 @@ function Processes() {
               <Flex
                 borderRadius="8px"
                 w="100%"
-                justifyContent="flex-start"
                 gap="2"
                 alignItems="center"
+                backgroundColor="white"
               >
                 <Input
-                  placeholder="Pesquisar processos (por registro ou apelido)"
+                  placeholder={placeholder}
                   value={filter?.value}
                   onChange={({ target }) =>
                     setFilter({ type: selectedFilter, value: target.value })
                   }
                   variant="filled"
-                  position="absolute"
-                  w="70%"
+                  w="100%"
                   css={{
                     "&, &:hover, &:focus": {
                       background: "white",
                     },
                   }}
+                  backgroundColor="red"
+                  border="30px"
                 />
                 <Image
                   zIndex="9999"
                   src="src/images/Line_52.svg"
-                  marginLeft="85%"
+                  marginLeft="0%"
                   width="3%"
                   height="27px"
                   border="30px"
@@ -374,13 +392,12 @@ function Processes() {
                     },
                   }}
                   borderWidth="0"
-                  // borderLeftColor="#898989"
-                  // borderLeftRadius="0px"
-                  // borderRightWidth="0"
                   marginRight="0%"
-                  w="40%"
+                  w="15%"
                   value={selectedFilter}
                   onChange={handleFilterChange}
+                  border="30px"
+                  outline="none"
                 >
                   <option value="stage">Etapa</option>
                   <option value="flow">Fluxo</option>
@@ -409,7 +426,7 @@ function Processes() {
             </Checkbox>
             <Checkbox
               colorScheme="green"
-              borderColor="gray.600"
+              borderColor="gray.6px00"
               checked={showFinished}
               onChange={() => setShowFinished(!showFinished)}
             >
