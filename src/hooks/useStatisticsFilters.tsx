@@ -12,7 +12,7 @@ type StatiticsFiltersContextType = {
   setContextMinDate: Dispatch<SetStateAction<string | undefined>>;
   isMaxDate?: string | undefined;
   setContextMaxDate: Dispatch<SetStateAction<string | undefined>>;
-  ContinuePage: boolean;
+  ContinuePage?: boolean;
   setContinuePage: Dispatch<SetStateAction<boolean>>;
   // eslint-disable-next-line no-unused-vars
 };
