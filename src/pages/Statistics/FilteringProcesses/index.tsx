@@ -12,10 +12,11 @@ import {
   Text,
   Input,
 } from "@chakra-ui/react";
+import ExportExcel from "components/ExportExcel";
 import { DataTable } from "components/DataTable";
 import { Pagination } from "components/Pagination";
 import { ProcessQuantifier } from "components/ProcessQuantifier";
-import { useEffect, useState, useMemo, ChangeEvent } from "react";
+import { ReactNode, useEffect, useState, useMemo, ChangeEvent } from "react";
 import { useLocation } from "react-router-dom";
 import { getFlows } from "services/processManagement/flows";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -99,6 +100,7 @@ export default function FilteringProcesses() {
       });
     },
   });
+
   const {
     data: processesData,
     isFetched: isProcessesFetched,
@@ -341,6 +343,62 @@ export default function FilteringProcesses() {
     }
   }, [currentPage, tableVisible]);
 
+  interface IFormatedProcess {
+    Registro: number | ReactNode;
+    Apelido: string;
+    Fluxo: string;
+    Status: string;
+  }
+
+  const [preparedProcessesDownload, setPreparedProcessesDownload] = useState(
+    [] as IFormatedProcess[]
+  );
+
+  function idFlowToFlowName(idFlow: number | number[]) {
+    const flowNames = flows
+      ?.filter((flow) =>
+        Array.isArray(idFlow)
+          ? idFlow.includes(flow.idFlow)
+          : idFlow === flow.idFlow
+      )
+      .map((flow) => flow.name);
+
+    return flowNames ? flowNames.join(", ") : "";
+  }
+
+  function formatDataTable(processes: Process[]) {
+    return processes.map((process) => {
+      return {
+        Registro: process.record,
+        Apelido: process.nickname,
+        Fluxo: idFlowToFlowName(process.idFlow),
+        // @ts-ignore
+        Status: labelByProcessStatus[process.status],
+      };
+    });
+  }
+
+  async function getProcessesForDownload() {
+    const processesForDownload = await getProcesses(
+      parseInt(selectedFlowValue, 10),
+      undefined,
+      filter,
+      false,
+      selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
+      fromDate === "" ? undefined : fromDate,
+      toDate === "" ? undefined : toDate
+    );
+
+    if (processesForDownload.value !== undefined) {
+      const formatedData = formatDataTable(processesForDownload.value);
+      setPreparedProcessesDownload(formatedData);
+    }
+  }
+
+  useEffect(() => {
+    getProcessesForDownload();
+  }, [currentPage]);
+
   const [months, archived, finished] = useChartData(
     filteredProcesses,
     fromDate,
@@ -452,7 +510,7 @@ export default function FilteringProcesses() {
                     numberColor="#AE3A33"
                   />
                 </Flex>
-                <Flex>
+                <Flex gap="5">
                   <Button
                     colorScheme="blue"
                     variant="outline"
@@ -462,6 +520,10 @@ export default function FilteringProcesses() {
                   >
                     {!tableVisible ? "Ver relatório" : "Ver Gráfico"}
                   </Button>
+                  <ExportExcel
+                    excelData={preparedProcessesDownload}
+                    fileName="Quantidade de Processos"
+                  />
                 </Flex>
               </Flex>
 
