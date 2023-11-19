@@ -74,8 +74,8 @@ export const downloadProcess = async (
 };
 
 export const downloadProcessInDue = async (
-  minDate: Date,
-  maxDate: Date,
+  minDate: String,
+  maxDate: String,
   processes: Process[]
 ): Promise<void> => {
   try {
@@ -85,38 +85,15 @@ export const downloadProcessInDue = async (
 
     const emissionDate = formatDateTimeToBrazilian(emitedAt);
 
-    const dayMin = minDate.getDate();
-    const monthMin = minDate.getMonth() + 1;
-    const yearMin = minDate.getFullYear();
-
-    const dayMax = maxDate.getDate();
-    const montMax = maxDate.getMonth() + 1;
-    const yearMax = maxDate.getFullYear();
-
-    const formattedMinDate = `${dayMin < 10 ? "0" : ""}${dayMin}/${
-      monthMin < 10 ? "0" : ""
-    }${monthMin}/${yearMin}`;
-    const formattedMaxDate = `${dayMax < 10 ? "0" : ""}${dayMax}/${
-      montMax < 10 ? "0" : ""
-    }${montMax}/${yearMax}`;
-
     const pdf = new JsPDF() as jsPDFCustom;
     pdf.setFontSize(12);
     pdf.text("Processos em vencimento", 105, 20, { align: "center" });
-    pdf.text(
-      `Intervalo de dias: ${formattedMinDate} à ${formattedMaxDate}`,
-      15,
-      30
-    );
+    pdf.text(`Intervalo de dias: ${minDate} à ${maxDate}`, 15, 30);
     pdf.text(`Data emissão: ${emissionDate}`, 15, 50);
 
     const currentY = 70;
 
-    pdf.text(
-      `Processos que vencem entre ${formattedMinDate} à ${formattedMaxDate}`,
-      15,
-      60
-    );
+    pdf.text(`Processos que vencem entre ${minDate} à ${maxDate}`, 15, 60);
     const tableHTML = constructTableHTMLDueDate(processes);
     container.style.display = "none";
     container.innerHTML = tableHTML;
@@ -151,9 +128,7 @@ export const downloadProcessInDue = async (
       15
     );
 
-    pdf.save(
-      `processos_em_validade_entre_${formattedMinDate}_a_${formattedMaxDate}`
-    );
+    pdf.save(`processos_em_validade_entre_${minDate}_a_${maxDate}`);
 
     document.body.removeChild(container);
   } catch (err) {

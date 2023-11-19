@@ -12,6 +12,7 @@ import { Pagination } from "components/Pagination";
 import { getProcessesByDueDate } from "services/processManagement/statistics";
 import { useLocation } from "react-router-dom";
 import { downloadProcessInDue } from "utils/pdf";
+import ExportExcel from "components/ExportExcel";
 
 export default function StepDeadlineReports() {
   const toast = useToast();
@@ -86,12 +87,27 @@ export default function StepDeadlineReports() {
     const minDateConvert = new Date(minDate);
     const maxDateConvert = new Date(maxDate);
 
+    const dayMin = minDateConvert.getDate();
+    const monthMin = minDateConvert.getMonth() + 1;
+    const yearMin = minDateConvert.getFullYear();
+
+    const dayMax = maxDateConvert.getDate();
+    const montMax = maxDateConvert.getMonth() + 1;
+    const yearMax = maxDateConvert.getFullYear();
+
+    const formattedMinDate = `${dayMin < 10 ? "0" : ""}${dayMin}/${
+      monthMin < 10 ? "0" : ""
+    }${monthMin}/${yearMin}`;
+    const formattedMaxDate = `${dayMax < 10 ? "0" : ""}${dayMax}/${
+      montMax < 10 ? "0" : ""
+    }${montMax}/${yearMax}`;
+
     const resAllProcess = await getProcessesByDueDate(minDate, maxDate);
 
     if (resAllProcess.type === "success") {
       await downloadProcessInDue(
-        minDateConvert,
-        maxDateConvert,
+        formattedMinDate,
+        formattedMaxDate,
         resAllProcess.value
       );
     } else {
@@ -259,26 +275,27 @@ export default function StepDeadlineReports() {
                     gap="2"
                     alignItems="flex-end"
                     alignSelf="end"
-                    marginEnd={-5}
+                    marginEnd={1}
                   >
                     {tableVisible && (
                       <>
+                        <ExportExcel
+                          excelData={processData}
+                          fileName="Processos_em_Vencimento"
+                        />
                         <Button
-                          colorScheme="facebook"
-                          w="10%"
+                          colorScheme="blue"
+                          size="md"
                           onClick={() => DownloadPDFProcess()}
                         >
                           PDF
-                        </Button>
-                        <Button colorScheme="facebook" w="10%">
-                          CSV
                         </Button>
                       </>
                     )}
                   </Flex>
                 </Flex>
               </Flex>
-              <Flex w="110%" marginTop="15">
+              <Flex w="100%" marginTop="15">
                 {tableVisible && (
                   <DataTable
                     data={filteredStepDeadlineReports}
