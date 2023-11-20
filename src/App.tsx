@@ -1,8 +1,8 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
-
 import { AuthProvider } from "hooks/useAuth";
 import { LoadingProvider } from "hooks/useLoading";
+import { StatiticsFiltersProvider } from "hooks/useStatisticsFilters";
 import { Router } from "routes";
 import { theme } from "styles/theme";
 
@@ -23,7 +23,9 @@ function App() {
       <LoadingProvider>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <Router />
+            <StatiticsFiltersProvider>
+              <Router />
+            </StatiticsFiltersProvider>
           </AuthProvider>
         </QueryClientProvider>
       </LoadingProvider>
