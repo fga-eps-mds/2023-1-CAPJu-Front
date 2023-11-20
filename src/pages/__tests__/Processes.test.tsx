@@ -151,7 +151,7 @@ describe("Processes page", () => {
   });
 
   // it("toggles 'archived/finished processes' checkbox correctly", async () => {
-  //   const button = screen.getByText("Mostrar processos arquivados/finalizados");
+  //   const button = screen.getByText("Mostrar processos interrompidos/concluídos");
 
   //   expect(button).not.toBe(null);
 
