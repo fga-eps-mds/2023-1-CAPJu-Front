@@ -5,6 +5,7 @@ import { IoReturnDownBackOutline } from "react-icons/io5";
 import { FiArchive, FiSkipBack, FiSkipForward } from "react-icons/fi";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
+import { useStatisticsFilters } from "hooks/useStatisticsFilters";
 
 import { PrivateLayout } from "layouts/Private";
 import { getFlowById } from "services/processManagement/flows";
@@ -27,6 +28,7 @@ import { ArchivationModal } from "./ArchivationModal";
 import { ReturnModal } from "./ReturnModal";
 
 function ViewProcess() {
+  const { setContinuePage } = useStatisticsFilters();
   const [action, setAction] = useState<Boolean | undefined>();
   const params = useParams();
   const navigate = useNavigate();
@@ -256,6 +258,7 @@ function ViewProcess() {
 
   useEffect(() => {
     refetchProcess();
+    setContinuePage(true);
     if (!process) navigate(-1);
   }, [process]);
 
@@ -376,7 +379,11 @@ function ViewProcess() {
                     <Button
                       size="xs"
                       fontSize="sm"
-                      colorScheme="blue"
+                      colorScheme={
+                        processData?.value?.status === "archived"
+                          ? "blue"
+                          : "red"
+                      }
                       onClick={onArchivationOpen}
                       isDisabled={
                         !isActionAllowedToUser(
@@ -388,8 +395,8 @@ function ViewProcess() {
                       ml="auto"
                     >
                       {processData?.value?.status === "archived"
-                        ? "Desarquivar"
-                        : "Arquivar"}{" "}
+                        ? "Reativar"
+                        : "Interromper"}{" "}
                       Processo
                       <Icon as={FiArchive} ml="2" boxSize={4} />
                     </Button>
@@ -418,7 +425,7 @@ function ViewProcess() {
                 <Button
                   size="xs"
                   fontSize="sm"
-                  colorScheme="red"
+                  colorScheme="blue"
                   onClick={onFinalizationOpen}
                   isDisabled={
                     !isActionAllowedToUser(
@@ -430,7 +437,7 @@ function ViewProcess() {
                   ml="auto"
                 >
                   <Icon as={FiSkipForward} mr="2" boxSize={4} />
-                  Finalizar Processo
+                  Concluir Processo
                 </Button>
               ) : null}
             </Flex>

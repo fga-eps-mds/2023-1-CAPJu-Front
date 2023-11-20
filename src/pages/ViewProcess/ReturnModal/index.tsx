@@ -24,7 +24,7 @@ export function ReturnModal({
   handleReturnProcess,
 }: ReturnModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
+    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Retroceder Processo</ModalHeader>
