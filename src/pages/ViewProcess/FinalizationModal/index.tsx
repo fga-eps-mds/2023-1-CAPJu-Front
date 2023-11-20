@@ -27,11 +27,11 @@ export function FinalizationModal({
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Finalizar Processo</ModalHeader>
+        <ModalHeader>Concluir Processo</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Text>
-            Tem certeza que deseja finalizar o processo{" "}
+            Tem certeza que deseja concluir o processo{" "}
             <strong>{process?.nickname}</strong>?
           </Text>
         </ModalBody>
@@ -40,7 +40,7 @@ export function FinalizationModal({
             Cancelar
           </Button>
           <Button colorScheme="red" onClick={handleFinishProcess} size="sm">
-            Finalizar
+            Concluir
           </Button>
         </ModalFooter>
       </ModalContent>

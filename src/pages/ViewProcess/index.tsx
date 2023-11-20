@@ -379,7 +379,11 @@ function ViewProcess() {
                     <Button
                       size="xs"
                       fontSize="sm"
-                      colorScheme="blue"
+                      colorScheme={
+                        processData?.value?.status === "archived"
+                          ? "blue"
+                          : "red"
+                      }
                       onClick={onArchivationOpen}
                       isDisabled={
                         !isActionAllowedToUser(
@@ -391,8 +395,8 @@ function ViewProcess() {
                       ml="auto"
                     >
                       {processData?.value?.status === "archived"
-                        ? "Desarquivar"
-                        : "Arquivar"}{" "}
+                        ? "Reativar"
+                        : "Interromper"}{" "}
                       Processo
                       <Icon as={FiArchive} ml="2" boxSize={4} />
                     </Button>
@@ -421,7 +425,7 @@ function ViewProcess() {
                 <Button
                   size="xs"
                   fontSize="sm"
-                  colorScheme="red"
+                  colorScheme="blue"
                   onClick={onFinalizationOpen}
                   isDisabled={
                     !isActionAllowedToUser(
@@ -433,7 +437,7 @@ function ViewProcess() {
                   ml="auto"
                 >
                   <Icon as={FiSkipForward} mr="2" boxSize={4} />
-                  Finalizar Processo
+                  Concluir Processo
                 </Button>
               ) : null}
             </Flex>
