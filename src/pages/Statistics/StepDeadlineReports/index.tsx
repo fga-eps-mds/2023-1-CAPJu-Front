@@ -11,6 +11,7 @@ import { ViewIcon } from "@chakra-ui/icons";
 import { Pagination } from "components/Pagination";
 import { getProcessesByDueDate } from "services/processManagement/statistics";
 import { useLocation } from "react-router-dom";
+import { useStatisticsFilters } from "hooks/useStatisticsFilters";
 import { downloadProcessInDue } from "utils/pdf";
 import ExportExcel from "components/ExportExcel";
 
@@ -24,6 +25,12 @@ export default function StepDeadlineReports() {
 
   const [flows, setFlows] = useState([] as Flow[]);
   const { state } = useLocation();
+  const { isMinDate } = useStatisticsFilters();
+  const { setContextMinDate } = useStatisticsFilters();
+  const { isMaxDate } = useStatisticsFilters();
+  const { setContextMaxDate } = useStatisticsFilters();
+  const { ContinuePage } = useStatisticsFilters();
+  const { setContinuePage } = useStatisticsFilters();
   const [tableVisible, setTableVisible] = useState(false);
   const [minDate, setMinDate] = useState<string>("");
   const [isFetching, setIsFetching] = useState<boolean>(true);
@@ -38,7 +45,7 @@ export default function StepDeadlineReports() {
   useEffect(() => {
     const handlePageChange = async () => {
       setLoading(true);
-      await handleProcessByDueDate();
+      await handleProcessByDueDate(minDate, maxDate, currentPage);
       setLoading(false);
     };
 
@@ -50,9 +57,13 @@ export default function StepDeadlineReports() {
     if (dataFlows.value) setFlows(dataFlows.value);
   };
 
-  const handleProcessByDueDate = async () => {
-    const res = await getProcessesByDueDate(minDate, maxDate, {
-      offset: currentPage * 5,
+  const handleProcessByDueDate = async (
+    paramMinDate: string,
+    paramMaxDate: string,
+    paramCurrentPage: number
+  ) => {
+    const res = await getProcessesByDueDate(paramMinDate, paramMaxDate, {
+      offset: paramCurrentPage * 5,
       limit: 5,
     });
 
@@ -64,6 +75,24 @@ export default function StepDeadlineReports() {
 
   useEffect(() => {
     if (flows.length === 0) getDataFlows();
+    setContinuePage(false);
+
+    const handlePageBack = async (
+      paramMinDate: string,
+      paramMaxDate: string
+    ) => {
+      setMinDate(paramMinDate);
+      setMaxDate(paramMaxDate);
+      setLoading(true);
+      setIsFetching(true);
+      await handleProcessByDueDate(paramMinDate, paramMaxDate, currentPage);
+      setTableVisible(true);
+      setIsFetching(false);
+      setLoading(false);
+    };
+
+    if (isMinDate !== undefined && isMaxDate !== undefined)
+      handlePageBack(isMinDate, isMaxDate);
   }, []);
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
@@ -150,6 +179,13 @@ export default function StepDeadlineReports() {
         isSortable: true,
       },
     }),
+    tableColumnHelper.accessor("dueDate", {
+      cell: (info) => info.getValue(),
+      header: "Prazo da etapa",
+      meta: {
+        isSortable: true,
+      },
+    }),
     tableColumnHelper.accessor("tableActions", {
       cell: (info) => info.getValue(),
       header: "Ações",
@@ -191,9 +227,12 @@ export default function StepDeadlineReports() {
     );
   }, [processData, tableActions]);
 
-  const handleConfirmClick = async () => {
-    const minDateValue = Date.parse(minDate);
-    const maxDateValue = Date.parse(maxDate);
+  const handleConfirmClick = async (
+    ParamMinDate: string,
+    paramMaxDate: string
+  ) => {
+    const minDateValue = Date.parse(ParamMinDate);
+    const maxDateValue = Date.parse(paramMaxDate);
 
     if (
       Number.isNaN(minDateValue) ||
@@ -209,10 +248,12 @@ export default function StepDeadlineReports() {
         isClosable: true,
       });
     } else {
+      setContextMinDate(minDate);
+      setContextMaxDate(maxDate);
       setTableVisible(true);
       try {
         setIsFetching(true);
-        await handleProcessByDueDate();
+        await handleProcessByDueDate(minDate, maxDate, currentPage);
         setIsFetching(false);
       } catch (error) {
         toast({
@@ -237,7 +278,10 @@ export default function StepDeadlineReports() {
     >
       <Box borderRadius="8px">
         <Flex justifyContent="flex-start" w="100%" flexDirection="column">
-          <CustomAccordion title="Visualizar processos filtrados por data de vencimento">
+          <CustomAccordion
+            defaultIndex={ContinuePage ? [0] : [4]}
+            title="Visualizar processos filtrados por data de vencimento"
+          >
             <>
               <Flex justifyContent="space-between">
                 <Flex w="70%" flexDirection="column">
@@ -246,6 +290,9 @@ export default function StepDeadlineReports() {
                       w="50%"
                       type="date"
                       color="gray.500"
+                      defaultValue={
+                        isMinDate !== undefined ? isMinDate : undefined
+                      }
                       onChange={(event) => {
                         const novoValor = event.target.value;
                         setMinDate(novoValor);
@@ -256,6 +303,9 @@ export default function StepDeadlineReports() {
                       w="50%"
                       type="date"
                       color="gray.500"
+                      defaultValue={
+                        isMaxDate !== undefined ? isMaxDate : undefined
+                      }
                       onChange={(event) => {
                         const novoValor = event.target.value;
                         setMaxDate(novoValor);
@@ -264,7 +314,7 @@ export default function StepDeadlineReports() {
                     <Button
                       colorScheme="whatsapp"
                       w="20%"
-                      onClick={() => handleConfirmClick()}
+                      onClick={() => handleConfirmClick(minDate, maxDate)}
                     >
                       Confirmar
                     </Button>
@@ -309,9 +359,9 @@ export default function StepDeadlineReports() {
                 {processDueTotalPages !== undefined ? (
                   <Pagination
                     pageCount={processDueTotalPages}
-                    onPageChange={(selectedPage) =>
-                      setCurrentPage(selectedPage.selected)
-                    }
+                    onPageChange={(selectedPage) => {
+                      setCurrentPage(selectedPage.selected);
+                    }}
                   />
                 ) : null}
               </Flex>

@@ -5,6 +5,7 @@ import { IoReturnDownBackOutline } from "react-icons/io5";
 import { FiArchive, FiSkipBack, FiSkipForward } from "react-icons/fi";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
+import { useStatisticsFilters } from "hooks/useStatisticsFilters";
 
 import { PrivateLayout } from "layouts/Private";
 import { getFlowById } from "services/processManagement/flows";
@@ -27,6 +28,7 @@ import { ArchivationModal } from "./ArchivationModal";
 import { ReturnModal } from "./ReturnModal";
 
 function ViewProcess() {
+  const { setContinuePage } = useStatisticsFilters();
   const [action, setAction] = useState<Boolean | undefined>();
   const params = useParams();
   const navigate = useNavigate();
@@ -256,6 +258,7 @@ function ViewProcess() {
 
   useEffect(() => {
     refetchProcess();
+    setContinuePage(true);
     if (!process) navigate(-1);
   }, [process]);
 

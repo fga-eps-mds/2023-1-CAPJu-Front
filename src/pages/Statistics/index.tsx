@@ -335,6 +335,7 @@ export default function Statistics() {
             <CustomAccordion
               title="Visualizar quantidade de processos em cada etapa"
               marginBottom={18}
+              defaultIndex={[4]}
             >
               <>
                 <Flex>

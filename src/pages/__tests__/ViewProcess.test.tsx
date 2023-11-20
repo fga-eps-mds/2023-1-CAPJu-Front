@@ -6,6 +6,7 @@ import { setupServer } from "msw/node";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ChakraProvider } from "@chakra-ui/react";
 import ResizeObserver from "resize-observer-polyfill";
+import { StatiticsFiltersProvider } from "hooks/useStatisticsFilters";
 
 import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
@@ -85,7 +86,9 @@ describe("ViewProcess page", async () => {
                     },
                   ]}
                 >
-                  <ViewProcess />
+                  <StatiticsFiltersProvider>
+                    <ViewProcess />
+                  </StatiticsFiltersProvider>
                 </MemoryRouter>
               </AuthProvider>
             </QueryClientProvider>
