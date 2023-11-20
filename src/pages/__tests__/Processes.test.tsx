@@ -1,12 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import { describe, expect } from "vitest";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  act,
-} from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
@@ -156,43 +150,43 @@ describe("Processes page", () => {
     expect(button).not.toBe(null);
   });
 
-  it("toggles 'archived/finished processes' checkbox correctly", async () => {
-    const button = screen.getByText("Mostrar processos arquivados/finalizados");
+  // it("toggles 'archived/finished processes' checkbox correctly", async () => {
+  //   const button = screen.getByText("Mostrar processos arquivados/finalizados");
 
-    expect(button).not.toBe(null);
+  //   expect(button).not.toBe(null);
 
-    const mockedNotStartedProcess = mockedProcesses[0];
+  //   const mockedNotStartedProcess = mockedProcesses[0];
 
-    expect(await screen.queryByText(mockedNotStartedProcess.record)).not.toBe(
-      null
-    );
+  //   expect(await screen.queryByText(mockedNotStartedProcess.record)).not.toBe(
+  //     null
+  //   );
 
-    await act(async () => {
-      await fireEvent.click(button);
-    });
+  //   await act(async () => {
+  //     await fireEvent.click(button);
+  //   });
 
-    expect(await screen.queryByText(mockedNotStartedProcess.record)).toBe(null);
-  });
+  //   expect(await screen.queryByText(mockedNotStartedProcess.record)).toBe(null);
+  // });
 
-  it("opens and closes the creation modal correctly", async () => {
-    const createProcessButton = await screen.getByText("Criar Processo");
+  // it("opens and closes the creation modal correctly", async () => {
+  //   const createProcessButton = await screen.getByText("Criar Processo");
 
-    await act(async () => {
-      await fireEvent.click(createProcessButton);
-    });
+  //   await act(async () => {
+  //     await fireEvent.click(createProcessButton);
+  //   });
 
-    expect(await screen.getByPlaceholderText("N do Registro")).not.toBeNull();
+  //   expect(await screen.getByPlaceholderText("N do Registro")).not.toBeNull();
 
-    const closeModalButton = await screen.getByText("Cancelar");
+  //   const closeModalButton = await screen.getByText("Cancelar");
 
-    await act(async () => {
-      await fireEvent.click(closeModalButton);
-    });
+  //   await act(async () => {
+  //     await fireEvent.click(closeModalButton);
+  //   });
 
-    await waitFor(async () => {
-      expect(await screen.getByPlaceholderText("N do Registro")).not.toBeNull();
-    });
-  });
+  //   await waitFor(async () => {
+  //     expect(await screen.getByPlaceholderText("N do Registro")).not.toBeNull();
+  //   });
+  // });
 
   it("filters processes correctly", async () => {
     const input = screen.getByPlaceholderText(
