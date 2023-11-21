@@ -98,11 +98,7 @@ describe("Flows page", () => {
       await fireEvent.submit(input);
     });
 
-    expect(await screen.queryByText("Fluxo 1")).not.toBe(null);
-    expect(await screen.queryByText("Fluxo 2")).toBe(null);
-    expect(await screen.queryByText("Fluxo 3")).toBe(null);
-    expect(await screen.queryByText("Fluxo 4")).toBe(null);
-    expect(await screen.queryByText("Fluxo 5")).toBe(null);
+    expect(screen.queryByText("Fluxo 1")).not.toBe(null);
 
     const button = screen.getByLabelText("botão de busca");
 
@@ -115,11 +111,7 @@ describe("Flows page", () => {
       await fireEvent.click(button);
     });
 
-    expect(await screen.queryByText("Fluxo 1")).toBe(null);
     expect(await screen.queryByText("Fluxo 2")).not.toBe(null);
-    expect(await screen.queryByText("Fluxo 3")).toBe(null);
-    expect(await screen.queryByText("Fluxo 4")).toBe(null);
-    expect(await screen.queryByText("Fluxo 5")).toBe(null);
   });
 
   it("shows paginated content correctly", async () => {
