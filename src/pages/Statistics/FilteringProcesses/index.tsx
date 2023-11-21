@@ -16,7 +16,14 @@ import ExportExcel from "components/ExportExcel";
 import { DataTable } from "components/DataTable";
 import { Pagination } from "components/Pagination";
 import { ProcessQuantifier } from "components/ProcessQuantifier";
-import { ReactNode, useEffect, useState, useMemo, ChangeEvent } from "react";
+import {
+  ReactNode,
+  useEffect,
+  useState,
+  useMemo,
+  ChangeEvent,
+  useCallback,
+} from "react";
 import { useLocation } from "react-router-dom";
 import { getFlows } from "services/processManagement/flows";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -25,6 +32,7 @@ import { useQuery } from "react-query";
 import { useAuth } from "hooks/useAuth";
 import { isActionAllowedToUser } from "utils/permissions";
 import { ViewIcon } from "@chakra-ui/icons";
+import { downloadPDFQuantityProcesses } from "utils/pdf";
 import { labelByProcessStatus } from "utils/constants";
 import {
   Chart as ChartJS,
@@ -331,6 +339,10 @@ export default function FilteringProcesses() {
     return twoYearsAgo.toISOString().split("T")[0];
   };
 
+  const handleDownloadPDFQuantityProcesses = useCallback(async () => {
+    await downloadPDFQuantityProcesses(/* preparedProcessesDownload */);
+  }, [selectedFlowValue, selectedStatus, toDate, fromDate]);
+
   useEffect(() => {
     if (flows.length === 0) getDataFlows();
   }, []);
@@ -519,6 +531,13 @@ export default function FilteringProcesses() {
                     }}
                   >
                     {!tableVisible ? "Ver relatório" : "Ver Gráfico"}
+                  </Button>
+                  <Button
+                    colorScheme="blue"
+                    size="md"
+                    onClick={() => handleDownloadPDFQuantityProcesses()}
+                  >
+                    PDF
                   </Button>
                   <ExportExcel
                     excelData={preparedProcessesDownload}

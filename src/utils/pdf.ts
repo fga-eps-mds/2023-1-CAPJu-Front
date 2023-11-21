@@ -136,6 +136,68 @@ export const downloadProcessInDue = async (
   }
 };
 
+export const downloadPDFQuantityProcesses = async (): Promise<void> => {
+  try {
+    const container = document.createElement("div");
+
+    const emitedAt = new Date();
+
+    const emissionDate = formatDateTimeToBrazilian(emitedAt);
+
+    const pdf = new JsPDF() as jsPDFCustom;
+    pdf.setFontSize(12);
+    pdf.text("Quantidade de Processos Concluidos / Interrompidos", 105, 20, {
+      align: "center",
+    });
+    pdf.text(`Fluxo: `, 15, 30);
+    pdf.text(`Status: `, 15, 40);
+    pdf.text(`Período:  à `, 15, 50);
+    pdf.text(`Data emissão: ${emissionDate}`, 15, 60);
+
+    const currentY = 70;
+
+    const tableHTML = constructTableHTMLQuantityProcess();
+    container.style.display = "none";
+    container.innerHTML = tableHTML;
+    document.body.appendChild(container);
+
+    pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
+
+    const spacingBetweenImages = 60;
+
+    let tableFinalY = (pdf as any).lastAutoTable.finalY;
+
+    if (tableFinalY > 267) {
+      pdf.addPage();
+      tableFinalY = 20;
+    }
+
+    pdf.addImage(
+      await imgToBase64(assets.logoUnB),
+      "png",
+      30 + spacingBetweenImages,
+      tableFinalY + 10,
+      20,
+      20
+    );
+
+    pdf.addImage(
+      await imgToBase64(assets.justicaFederal),
+      "png",
+      50 + 2 * spacingBetweenImages,
+      tableFinalY + 10,
+      20,
+      15
+    );
+
+    pdf.save(`quantidade_de_processos`);
+
+    document.body.removeChild(container);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 function constructTableHTML(processData: Process[]): string {
   let tableHTML = `
         <div class="table-wrapper" style="display: none" hidden>
@@ -290,6 +352,72 @@ function constructTableHTMLDueDate(processData: Process[]): string {
       `;
   });
 
+  tableHTML += `
+              </tbody>
+          </table>
+      </div>
+  `;
+
+  return tableHTML;
+}
+
+function constructTableHTMLQuantityProcess(): string {
+  let tableHTML = `
+        <div class="table-wrapper" style="display: none" hidden>
+          <table class="fl-table" id="processData">
+              <style>
+                  * {
+                    box-sizing: border-box;
+                    -webkit-box-sizing: border-box;
+                    -moz-box-sizing: border-box;
+                  }
+                  body {
+                    font-family: Helvetica;
+                    -webkit-font-smoothing: antialiased;
+                  }
+                  h2 {
+                    text-align: center;
+                    font-size: 18px;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    color: white;
+                    padding: 30px 0;
+                  }
+                  .table-wrapper {
+                    margin: 10px 70px 70px;
+                    box-shadow: 0px 35px 50px rgba(0, 0, 0, 0.2);
+                  }
+                  .fl-table {
+                    border-radius: 5px;
+                    font-size: 12px;
+                    font-weight: normal;
+                    border: none;
+                    border-collapse: collapse;
+                    width: 70%;
+                    max-width: 100%;
+                    white-space: nowrap;
+                    background-color: #f8f8f8;
+                  }
+                  .fl-table td,
+                  .fl-table th {
+                    text-align: center;
+                    padding: 8px;
+                  }
+                  .fl-table td {
+                    border-right: 1px solid #f8f8f8;
+                    font-size: 12px;
+                  }
+              </style>
+              <thead>
+                  <tr>
+                      <th>Registro</th>
+                      <th>Apelido</th>
+                      <th>Fluxo</th>
+                      <th>Status</th>
+                  </tr>
+              </thead>
+              <tbody>
+  `;
   tableHTML += `
               </tbody>
           </table>
