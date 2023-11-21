@@ -11,23 +11,25 @@ interface CustomAccordionProps {
   title: String;
   children: JSX.Element;
   marginBottom?: number;
+  defaultIndex?: number[];
 }
 
 export default function CustomAccordion({
   title,
   children,
   marginBottom,
+  defaultIndex,
 }: CustomAccordionProps) {
   return (
     <Accordion
       marginBottom={marginBottom}
-      defaultIndex={[0]}
+      defaultIndex={defaultIndex}
       allowMultiple
       width="100%"
       backgroundColor="#FFF"
       borderRadius="8px"
     >
-      <AccordionItem>
+      <AccordionItem border="hidden">
         <h2>
           <AccordionButton>
             <AccordionIcon />

@@ -24,14 +24,14 @@ export function FinalizationModal({
   handleFinishProcess,
 }: FinalizationModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
+    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
       <ModalOverlay />
-      <ModalContent mx="auto" my="auto">
-        <ModalHeader fontSize="19px">Finalizar processo</ModalHeader>
+      <ModalContent>
+        <ModalHeader>Concluir Processo</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text fontSize="19px">
-            Tem certeza que deseja finalizar o processo{" "}
+          <Text>
+            Tem certeza que deseja concluir o processo{" "}
             <strong>{process?.nickname}</strong>?
           </Text>
         </ModalBody>
@@ -39,8 +39,8 @@ export function FinalizationModal({
           <Button variant="ghost" onClick={onClose}>
             Cancelar
           </Button>
-          <Button colorScheme="red" onClick={handleFinishProcess}>
-            Finalizar
+          <Button colorScheme="red" onClick={handleFinishProcess} size="sm">
+            Concluir
           </Button>
         </ModalFooter>
       </ModalContent>

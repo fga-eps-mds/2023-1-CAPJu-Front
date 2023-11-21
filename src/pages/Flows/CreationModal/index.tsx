@@ -137,6 +137,7 @@ export function CreationModal({
       isOpen={isOpen}
       onClose={onClose}
       size={["full", "md", "2xl", "4xl"]}
+      isCentered
     >
       <ModalOverlay />
       <ModalContent>

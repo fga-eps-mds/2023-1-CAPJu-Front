@@ -74,6 +74,7 @@ declare global {
     idUnit: number;
     effectiveDate: string;
     status: string;
+    dueDate?: string;
     progress?: Progress[];
     isNextSage?: boolean;
     nameStage?: string;
@@ -130,12 +131,22 @@ declare global {
   };
 
   type Result<T> = ResultSuccess<T> | ResultError;
-  type ResultSuccess<T> = { type: "success"; value: T; totalPages?: number };
+  type ResultSuccess<T> = {
+    type: "success";
+    value: T;
+    totalPages?: number;
+    totalProcesses?: number;
+    totalArchived?: number;
+    totalFinished?: number;
+  };
   type ResultError = {
     type: "error";
     error: Error;
     value: undefined;
     totalPages?: undefined;
+    totalProcesses?: undefined;
+    totalArchived?: undefined;
+    totalFinished?: undefined;
   };
 
   type RouteObject = import("react-router-dom").RouteObject;

@@ -393,7 +393,7 @@ function Processes() {
               checked={showFinished}
               onChange={() => setShowFinished(!showFinished)}
             >
-              Mostrar processos arquivados/finalizados
+              Mostrar processos interrompidos/concluídos
             </Checkbox>
           </Flex>
         </Flex>

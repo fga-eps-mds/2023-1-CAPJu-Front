@@ -1,17 +1,19 @@
-import {Button, Flex, Text, useDisclosure, useToast} from "@chakra-ui/react";
-import {Icon} from "@chakra-ui/icons";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {IoReturnDownBackOutline} from "react-icons/io5";
-import {FiArchive, FiSkipBack, FiSkipForward} from "react-icons/fi";
-import {useEffect, useMemo, useState} from "react";
-import {useQuery} from "react-query";
+import { Flex, Text, Button, useDisclosure, useToast } from "@chakra-ui/react";
+import { Icon } from "@chakra-ui/icons";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { IoReturnDownBackOutline } from "react-icons/io5";
+import { FiArchive, FiSkipBack, FiSkipForward } from "react-icons/fi";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "react-query";
+import { useStatisticsFilters } from "hooks/useStatisticsFilters";
 import {FaFilePdf, FaFileExcel} from "react-icons/fa";
-import {PrivateLayout} from "layouts/Private";
-import {getFlowById} from "services/processManagement/flows";
-import {Flow} from "components/Flow";
-import {getStages} from "services/processManagement/stage";
-import {useAuth} from "hooks/useAuth";
-import {useLoading} from "hooks/useLoading";
+
+import { PrivateLayout } from "layouts/Private";
+import { getFlowById } from "services/processManagement/flows";
+import { Flow } from "components/Flow";
+import { getStages } from "services/processManagement/stage";
+import { useAuth } from "hooks/useAuth";
+import { useLoading } from "hooks/useLoading";
 import {
   archiveProcess,
   finalizeProcess,
@@ -34,6 +36,7 @@ import {downloadEventsPdf, downloadEventsXlsx, findAllPaged} from "../../service
 import {formatDateTimeToBrazilian} from "../../utils/dates";
 
 function ViewProcess() {
+  const { setContinuePage } = useStatisticsFilters();
   const [action, setAction] = useState<Boolean | undefined>();
   const params = useParams();
   const navigate = useNavigate();
@@ -272,6 +275,7 @@ function ViewProcess() {
   useEffect(() => {
     refetchProcess();
     refetchEvents();
+    setContinuePage(true);
     if (!process) navigate(-1);
   }, [process]);
 
@@ -438,7 +442,13 @@ function ViewProcess() {
                 <>
                   {processData?.value?.status !== "finished" ? (
                     <Button
-                      colorScheme="blue"
+                      size="xs"
+                      fontSize="sm"
+                      colorScheme={
+                        processData?.value?.status === "archived"
+                          ? "blue"
+                          : "red"
+                      }
                       onClick={onArchivationOpen}
                       isDisabled={
                         !isActionAllowedToUser(
@@ -450,8 +460,8 @@ function ViewProcess() {
                       ml="auto"
                     >
                       {processData?.value?.status === "archived"
-                        ? "Desarquivar"
-                        : "Arquivar"}{" "}
+                        ? "Reativar"
+                        : "Interromper"}{" "}
                       Processo
                       <Icon as={FiArchive} ml="2" boxSize={4} />
                     </Button>
@@ -476,7 +486,9 @@ function ViewProcess() {
               ) : null}
               {isLastStage && processData?.value?.status !== "finished" ? (
                 <Button
-                  colorScheme="red"
+                  size="xs"
+                  fontSize="sm"
+                  colorScheme="blue"
                   onClick={onFinalizationOpen}
                   isDisabled={
                     !isActionAllowedToUser(
@@ -488,7 +500,7 @@ function ViewProcess() {
                   ml="auto"
                 >
                   <Icon as={FiSkipForward} mr="2" boxSize={4} />
-                  Finalizar Processo
+                  Concluir Processo
                 </Button>
               ) : null}
             </Flex>

@@ -3,22 +3,33 @@ import { api } from "services/api";
 export const getProcesses = async (
   flowId: number | undefined,
   pagination?: Pagination,
-  nicknameOrRecordFilter?: string,
+  filter?: string,
   filterByLegalPriority?: boolean,
-  showArchivedAndFinished?: boolean
+  status?: String[],
+  from?: string,
+  to?: string,
+  nicknameOrRecordFilter?: string,
+  showArchivedAndFinished?: boolean,
 ): Promise<Result<Process[]>> => {
 
   try {
     const res = await api.processManagement.get<{
       processes: Process[];
       totalPages: number;
-    }>(`/process${flowId ? `?flowId=${flowId}` : ""}`, {
+      totalProcesses: number;
+      totalArchived: number;
+      totalFinished: number;
+    }>(`/process${flowId ? `?idFlow=${flowId}` : ""}`, {
       params: {
         offset: pagination?.offset ?? 0,
         limit: pagination?.limit,
+        filter,
+        filterByLegalPriority,
+        status: status || undefined,
+        from,
+        to,
         nicknameOrRecordFilter,
         showArchivedAndFinished,
-        filterByLegalPriority,
       },
     });
 
@@ -26,6 +37,9 @@ export const getProcesses = async (
       type: "success",
       value: res.data.processes,
       totalPages: res.data.totalPages,
+      totalProcesses: res.data.totalProcesses,
+      totalArchived: res.data.totalArchived,
+      totalFinished: res.data.totalFinished,
     };
   } catch (error) {
     if (error instanceof Error)

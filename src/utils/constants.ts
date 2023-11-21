@@ -1,6 +1,6 @@
 export const labelByProcessStatus = {
   inProgress: "Em andamento",
-  archived: "Arquivado",
-  finished: "Finalizado",
+  archived: "Interrompido",
+  finished: "Concluído",
   notStarted: "Não iniciado",
 };
