@@ -299,6 +299,8 @@ function Processes() {
       case "flow":
         setPlaceholder("Pesquise o fluxo pelo nome:");
         break;
+      default:
+      // do nothing
     }
   }, [selectedFilter]);
 
