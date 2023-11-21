@@ -37,23 +37,49 @@ const useChartData = (
 };
 
 const getMonthRange = (start: string, end: string) => {
-  if (start === "" || end === "") return [];
+  // eslint-disable-next-line
+  let startData, endData;
 
-  const dateStart = new Date(start);
-  const dateEnd = new Date(end);
+  if (start === "" || end === "") {
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
 
-  const diff = monthDiff(dateStart, dateEnd);
-  const months = [];
-  months.push({
-    month: dateStart.getMonth() + 1,
-    year: dateStart.getFullYear(),
-  });
-  for (let i = 0; i < diff - 1; i += 1) {
-    const date = dateStart;
-    date.setMonth(date.getMonth() + 1);
-    months.push({ month: date.getMonth() + 1, year: date.getFullYear() });
+    startData = {
+      month: twoYearsAgo.getMonth() + 1,
+      year: twoYearsAgo.getFullYear(),
+    };
+
+    const currentDate = new Date();
+    endData = {
+      month: currentDate.getMonth() + 1,
+      year: currentDate.getFullYear(),
+    };
+  } else {
+    startData = {
+      // eslint-disable-next-line
+      month: new Date(start + " 00:00:01").getMonth() + 1,
+      year: new Date(start).getFullYear(),
+    };
+    endData = {
+      month: new Date(end).getMonth() + 1,
+      year: new Date(end).getFullYear(),
+    };
   }
 
+  const months = [];
+
+  let fromMonth = startData.month;
+  let fromYear = startData.year;
+
+  while (fromMonth !== endData.month + 1 || fromYear !== endData.year) {
+    months.push({ month: fromMonth, year: fromYear });
+
+    fromMonth += 1;
+    if (fromMonth === 13) {
+      fromMonth = 1;
+      fromYear += 1;
+    }
+  }
   return months;
 };
 
@@ -72,14 +98,6 @@ const getStatusMonthly = (
       );
     }).length;
   });
-};
-
-const monthDiff = (d1: Date, d2: Date) => {
-  let months;
-  months = (d2.getFullYear() - d1.getFullYear()) * 12;
-  months -= d1.getMonth();
-  months += d2.getMonth();
-  return months <= 0 ? 0 : months + 1;
 };
 
 export default useChartData;

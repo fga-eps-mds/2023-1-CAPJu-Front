@@ -13,6 +13,9 @@ export const getProcesses = async (
     const res = await api.processManagement.get<{
       processes: Process[];
       totalPages: number;
+      totalProcesses: number;
+      totalArchived: number;
+      totalFinished: number;
     }>(`/process${flowId ? `?idFlow=${flowId}` : ""}`, {
       params: {
         offset: pagination?.offset ?? 0,
@@ -29,6 +32,9 @@ export const getProcesses = async (
       type: "success",
       value: res.data.processes,
       totalPages: res.data.totalPages,
+      totalProcesses: res.data.totalProcesses,
+      totalArchived: res.data.totalArchived,
+      totalFinished: res.data.totalFinished,
     };
   } catch (error) {
     if (error instanceof Error)
