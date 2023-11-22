@@ -1,5 +1,6 @@
 import JsPDF from "jspdf";
 import type { UserOptions } from "jspdf-autotable";
+import html2canvas from "html2canvas";
 import { formatDateTimeToBrazilian } from "./dates";
 import "jspdf-autotable";
 import assets from "./assets";
@@ -143,65 +144,84 @@ export const downloadPDFQuantityProcesses = async (
   fromDate: string,
   processes: IFormatedProcess[]
 ): Promise<void> => {
-  try {
-    const container = document.createElement("div");
+  const elem = document.querySelector<HTMLElement>(
+    "#chart-quantidade-de-processos"
+  );
+  if (elem)
+    try {
+      const container = document.createElement("div");
 
-    const emitedAt = new Date();
+      const emitedAt = new Date();
 
-    const emissionDate = formatDateTimeToBrazilian(emitedAt);
+      const emissionDate = formatDateTimeToBrazilian(emitedAt);
 
-    const pdf = new JsPDF() as jsPDFCustom;
-    pdf.setFontSize(12);
-    pdf.text("Quantidade de Processos Concluidos / Interrompidos", 105, 20, {
-      align: "center",
-    });
-    pdf.text(`Fluxo: `, 15, 30);
-    pdf.text(`Status: ${status} `, 15, 40);
-    pdf.text(`Período: ${toDate}  à  ${fromDate}`, 15, 50);
-    pdf.text(`Data emissão: ${emissionDate}`, 15, 60);
+      const pdf = new JsPDF() as jsPDFCustom;
+      pdf.setFontSize(12);
+      pdf.text("Quantidade de Processos Concluidos / Interrompidos", 105, 20, {
+        align: "center",
+      });
+      pdf.text(`Fluxo: `, 15, 30);
+      pdf.text(`Status: ${status} `, 15, 40);
+      pdf.text(`Período: ${toDate}  à  ${fromDate}`, 15, 50);
+      pdf.text(`Data emissão: ${emissionDate}`, 15, 60);
 
-    const currentY = 70;
+      const currentY = 70;
 
-    const tableHTML = constructTableHTMLQuantityProcess(processes);
-    container.style.display = "none";
-    container.innerHTML = tableHTML;
-    document.body.appendChild(container);
+      const tableHTML = constructTableHTMLQuantityProcess(processes);
+      container.style.display = "none";
+      container.innerHTML = tableHTML;
+      document.body.appendChild(container);
 
-    pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
+      pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
 
-    const spacingBetweenImages = 60;
+      const spacingBetweenImages = 60;
 
-    let tableFinalY = (pdf as any).lastAutoTable.finalY;
+      let tableFinalY = (pdf as any).lastAutoTable.finalY;
 
-    if (tableFinalY > 267) {
-      pdf.addPage();
-      tableFinalY = 20;
+      if (tableFinalY > 267) {
+        pdf.addPage();
+        tableFinalY = 20;
+      }
+
+      await html2canvas(elem).then(async (canvas) => {
+        const dataURI = canvas.toDataURL("image/jpeg");
+
+        pdf.setFont("helvetica", "bold");
+        pdf.text(
+          "Tempo de Conclusão por Etapa de um Fluxo",
+          105,
+          tableFinalY + 8,
+          { align: "center" }
+        );
+        pdf.addImage(dataURI, "JPEG", 30, tableFinalY + 10, 150, 0);
+
+        canvas.remove();
+      });
+
+      pdf.addImage(
+        await imgToBase64(assets.logoUnB),
+        "png",
+        30 + spacingBetweenImages,
+        tableFinalY + 10,
+        20,
+        20
+      );
+
+      pdf.addImage(
+        await imgToBase64(assets.justicaFederal),
+        "png",
+        50 + 2 * spacingBetweenImages,
+        tableFinalY + 10,
+        20,
+        15
+      );
+
+      pdf.save(`quantidade_de_processos`);
+
+      document.body.removeChild(container);
+    } catch (err) {
+      console.log(err);
     }
-
-    pdf.addImage(
-      await imgToBase64(assets.logoUnB),
-      "png",
-      30 + spacingBetweenImages,
-      tableFinalY + 10,
-      20,
-      20
-    );
-
-    pdf.addImage(
-      await imgToBase64(assets.justicaFederal),
-      "png",
-      50 + 2 * spacingBetweenImages,
-      tableFinalY + 10,
-      20,
-      15
-    );
-
-    pdf.save(`quantidade_de_processos`);
-
-    document.body.removeChild(container);
-  } catch (err) {
-    console.log(err);
-  }
 };
 
 function constructTableHTML(processData: Process[]): string {
