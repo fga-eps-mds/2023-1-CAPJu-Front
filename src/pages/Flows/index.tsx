@@ -270,7 +270,7 @@ function Flows() {
           afterSubmission={refetchFlows}
         />
       ) : null}
-      {(userData?.value as any).unit.idUnit && isCreationOpen ? (
+      {(userData?.value as any)?.unit.idUnit && isCreationOpen ? (
         <CreationModal
           isOpen={isCreationOpen}
           onClose={onCreationClose}

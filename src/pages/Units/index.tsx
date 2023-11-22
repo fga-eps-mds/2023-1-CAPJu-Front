@@ -28,21 +28,25 @@ function Units() {
   const [selectedUnit, selectUnit] = useState<Unit | null>(null);
   const [filter, setFilter] = useState<string>("");
   const { getUserData } = useAuth();
+
   const {
     isOpen: isCreationOpen,
     onOpen: onCreationOpen,
     onClose: onCreationClose,
   } = useDisclosure();
+
   const {
     isOpen: isDeletionOpen,
     onOpen: onDeletionOpen,
     onClose: onDeletionClose,
   } = useDisclosure();
+
   const {
     isOpen: isEditionOpen,
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+
   const [currentPage, setCurrentPage] = useState(0);
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
@@ -162,12 +166,12 @@ function Units() {
             Unidades
           </Text>
           <Button
+            aria-label="criar unidade"
             colorScheme="green"
             isDisabled={
               !isActionAllowedToUser(
                 userData?.value?.allowedActions || [],
-                "create-unit",
-                // @ts-ignore
+                "create-unit", // @ts-ignore
                 userData
               )
             }

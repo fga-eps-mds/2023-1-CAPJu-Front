@@ -503,6 +503,7 @@ export const mockedPriorities = [
 ];
 
 export const mockedNotStartedProcess = {
+  idProcess: 1,
   effectiveDate: null,
   idFlow: 1,
   idPriority: 0,

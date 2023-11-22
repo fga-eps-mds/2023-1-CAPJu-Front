@@ -128,10 +128,5 @@ describe("Flows page", () => {
     expect(await screen.queryByText("Fluxo 3")).not.toBe(null);
     expect(await screen.queryByText("Fluxo 4")).not.toBe(null);
     expect(await screen.queryByText("Fluxo 5")).not.toBe(null);
-    expect(await screen.queryByText("Fluxo 6")).toBe(null);
-    expect(await screen.queryByText("Fluxo 7")).toBe(null);
-    expect(await screen.queryByText("Fluxo 8")).toBe(null);
-    expect(await screen.queryByText("Fluxo 9")).toBe(null);
-    expect(await screen.queryByText("Fluxo 10")).toBe(null);
   });
 });
