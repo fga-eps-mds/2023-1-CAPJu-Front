@@ -79,6 +79,13 @@ declare global {
     nameFlow?: string;
   };
 
+  type IFormatedProcess = {
+    Registro: number | ReactNode;
+    Apelido: string;
+    Fluxo: string;
+    Status: string;
+  };
+
   type Note = {
     idNote?: number;
     commentary: string;

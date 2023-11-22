@@ -17,7 +17,7 @@ import { DataTable } from "components/DataTable";
 import { Pagination } from "components/Pagination";
 import { ProcessQuantifier } from "components/ProcessQuantifier";
 import {
-  ReactNode,
+  //ReactNode,
   useEffect,
   useState,
   useMemo,
@@ -340,7 +340,64 @@ export default function FilteringProcesses() {
   };
 
   const handleDownloadPDFQuantityProcesses = useCallback(async () => {
-    await downloadPDFQuantityProcesses(/* preparedProcessesDownload */);
+    const toDateConvert = new Date(toDate);
+    const fromDateConvert = new Date(fromDate);
+
+    const dayMin = toDateConvert.getDate();
+    const monthMin = toDateConvert.getMonth() + 1;
+    const yearMin = toDateConvert.getFullYear();
+
+    const dayMax = fromDateConvert.getDate();
+    const montMax = fromDateConvert.getMonth() + 1;
+    const yearMax = fromDateConvert.getFullYear();
+
+    const formattedtoDate = `${dayMin < 10 ? "0" : ""}${dayMin}/${
+      monthMin < 10 ? "0" : ""
+    }${monthMin}/${yearMin}`;
+    const formattedfromDate = `${dayMax < 10 ? "0" : ""}${dayMax}/${
+      montMax < 10 ? "0" : ""
+    }${montMax}/${yearMax}`;
+
+    const resAllProcess = await getProcesses(
+      parseInt(selectedFlowValue, 10),
+      undefined,
+      filter,
+      false,
+      selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
+      fromDate === "" ? undefined : fromDate,
+      toDate === "" ? undefined : toDate
+    );
+
+    if (resAllProcess.value !== undefined) {
+      const formatedData = formatDataTable(resAllProcess.value);
+      setPreparedProcessesDownload(formatedData);
+    }
+
+    if (resAllProcess.type === "success") {
+      if (selectedStatus === "archived") {
+        await downloadPDFQuantityProcesses(
+          "Interrompido",
+          formattedtoDate,
+          formattedfromDate,
+          preparedProcessesDownload
+        );
+      } else {
+        await downloadPDFQuantityProcesses(
+          "Concluído",
+          formattedtoDate,
+          formattedfromDate,
+          preparedProcessesDownload
+        );
+      }
+    } else {
+      toast({
+        id: "error-getting-stages",
+        title: "Erro ao baixar pdf",
+        description: "Houve um erro ao buscar processos.",
+        status: "error",
+        isClosable: true,
+      });
+    }
   }, [selectedFlowValue, selectedStatus, toDate, fromDate]);
 
   useEffect(() => {
@@ -354,13 +411,6 @@ export default function FilteringProcesses() {
       refetchProcesses();
     }
   }, [currentPage, tableVisible]);
-
-  interface IFormatedProcess {
-    Registro: number | ReactNode;
-    Apelido: string;
-    Fluxo: string;
-    Status: string;
-  }
 
   const [preparedProcessesDownload, setPreparedProcessesDownload] = useState(
     [] as IFormatedProcess[]

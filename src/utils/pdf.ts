@@ -136,7 +136,13 @@ export const downloadProcessInDue = async (
   }
 };
 
-export const downloadPDFQuantityProcesses = async (): Promise<void> => {
+export const downloadPDFQuantityProcesses = async (
+  // fluxo: string,
+  status: string,
+  toDate: string,
+  fromDate: string,
+  processes: IFormatedProcess[]
+): Promise<void> => {
   try {
     const container = document.createElement("div");
 
@@ -150,13 +156,13 @@ export const downloadPDFQuantityProcesses = async (): Promise<void> => {
       align: "center",
     });
     pdf.text(`Fluxo: `, 15, 30);
-    pdf.text(`Status: `, 15, 40);
-    pdf.text(`Período:  à `, 15, 50);
+    pdf.text(`Status: ${status} `, 15, 40);
+    pdf.text(`Período: ${toDate}  à  ${fromDate}`, 15, 50);
     pdf.text(`Data emissão: ${emissionDate}`, 15, 60);
 
     const currentY = 70;
 
-    const tableHTML = constructTableHTMLQuantityProcess();
+    const tableHTML = constructTableHTMLQuantityProcess(processes);
     container.style.display = "none";
     container.innerHTML = tableHTML;
     document.body.appendChild(container);
@@ -361,7 +367,9 @@ function constructTableHTMLDueDate(processData: Process[]): string {
   return tableHTML;
 }
 
-function constructTableHTMLQuantityProcess(): string {
+function constructTableHTMLQuantityProcess(
+  processData: IFormatedProcess[]
+): string {
   let tableHTML = `
         <div class="table-wrapper" style="display: none" hidden>
           <table class="fl-table" id="processData">
@@ -418,6 +426,19 @@ function constructTableHTMLQuantityProcess(): string {
               </thead>
               <tbody>
   `;
+
+  processData.forEach((event) => {
+    const { Registro, Apelido, Fluxo, Status } = event;
+    tableHTML += `
+          <tr>
+              <td>${Registro}</td>
+              <td>${Apelido}</td>
+              <td>${Fluxo}</td>
+              <td>${Status}</td>
+          </tr>
+      `;
+  });
+
   tableHTML += `
               </tbody>
           </table>
