@@ -251,7 +251,7 @@ export default function Statistics() {
 
       if (processResult.type === "success") {
         const { value, totalPages: total } = processResult;
-        console.log(value)
+        console.log(value);
         setFilteredProcess(value);
         setTotalPages(total ?? 0);
       } else {

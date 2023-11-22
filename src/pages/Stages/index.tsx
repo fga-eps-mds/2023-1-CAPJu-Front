@@ -106,7 +106,8 @@ function Stages() {
         disabled: !isActionAllowedToUser(
           userData?.value?.allowedActions || [],
           "delete-stage",
-            userData
+          // @ts-ignore
+          userData
         ),
       },
     ],
@@ -225,10 +226,11 @@ function Stages() {
         emptyTableMessage="Não foram encontradas etapas."
       />
       {![undefined, 0, null].includes(stagesData?.totalPages) ? (
-          <Pagination
-              pageCount={stagesData?.totalPages}
-              onPageChange={handlePageChange}
-          />
+        <Pagination
+          // @ts-ignore
+          pageCount={stagesData?.totalPages}
+          onPageChange={handlePageChange}
+        />
       ) : null}
       <CreationModal
         user={userData?.value!}

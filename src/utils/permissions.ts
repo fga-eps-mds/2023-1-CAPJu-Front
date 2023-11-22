@@ -2,7 +2,8 @@ import { tabs } from "./tabs";
 
 export function isActionAllowedToUser(
   allowedActions: string[],
-  actionName: string): boolean {
+  actionName: string
+): boolean {
   return allowedActions.some((item) => item === actionName);
 }
 

@@ -3,7 +3,6 @@ import { api } from "services/api";
 export const getPriorities = async (
   id?: number
 ): Promise<Result<Priority[] | Priority>> => {
-
   try {
     const res = await api.processManagement.get<Priority[]>("/priority");
     const priorityById = id

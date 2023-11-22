@@ -119,7 +119,7 @@ export function EditionModal({
                 const { value } = e.target;
                 const numValue = parseFloat(value);
                 if (value && (numValue < 1 || !Number.isInteger(numValue))) {
-                  e.target.value = '';
+                  e.target.value = "";
                 }
               }}
             />

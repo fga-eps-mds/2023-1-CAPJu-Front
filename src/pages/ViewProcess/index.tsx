@@ -6,7 +6,7 @@ import { FiArchive, FiSkipBack, FiSkipForward } from "react-icons/fi";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useStatisticsFilters } from "hooks/useStatisticsFilters";
-import {FaFilePdf, FaFileExcel} from "react-icons/fa";
+import { FaFilePdf, FaFileExcel } from "react-icons/fa";
 
 import { PrivateLayout } from "layouts/Private";
 import { getFlowById } from "services/processManagement/flows";
@@ -21,19 +21,23 @@ import {
   updateProcessStatus,
   updateStage,
 } from "services/processManagement/processes";
-import {getNotesByProcessId} from "services/note";
-import {getPriorities} from "services/processManagement/priority";
-import {isActionAllowedToUser} from "utils/permissions";
-import {sortFlowStages} from "utils/sorting";
-import {labelByProcessStatus} from "utils/constants";
-import {createColumnHelper} from "@tanstack/react-table";
+import { getNotesByProcessId } from "services/note";
+import { getPriorities } from "services/processManagement/priority";
+import { isActionAllowedToUser } from "utils/permissions";
+import { sortFlowStages } from "utils/sorting";
+import { labelByProcessStatus } from "utils/constants";
+import { createColumnHelper } from "@tanstack/react-table";
 import { Pagination } from "components/Pagination";
-import {FinalizationModal} from "./FinalizationModal";
-import {ArchivationModal} from "./ArchivationModal";
-import {ReturnModal} from "./ReturnModal";
-import {DataTable} from "../../components/DataTable";
-import {downloadEventsPdf, downloadEventsXlsx, findAllPaged} from "../../services/processManagement/processAud";
-import {formatDateTimeToBrazilian} from "../../utils/dates";
+import { FinalizationModal } from "./FinalizationModal";
+import { ArchivationModal } from "./ArchivationModal";
+import { ReturnModal } from "./ReturnModal";
+import { DataTable } from "../../components/DataTable";
+import {
+  downloadEventsPdf,
+  downloadEventsXlsx,
+  findAllPaged,
+} from "../../services/processManagement/processAud";
+import { formatDateTimeToBrazilian } from "../../utils/dates";
 
 function ViewProcess() {
   const { setContinuePage } = useStatisticsFilters();
@@ -43,7 +47,8 @@ function ViewProcess() {
   const location = useLocation();
   const toast = useToast();
   const { handleLoading } = useLoading();
-  const { process, flow }: { process: Process; flow: Flow | undefined } = location.state;
+  const { process, flow }: { process: Process; flow: Flow | undefined } =
+    location.state;
   const { getUserData } = useAuth();
   const {
     data: processData,
@@ -53,9 +58,7 @@ function ViewProcess() {
   } = useQuery({
     queryKey: ["process", params.idProcess],
     queryFn: async () => {
-      return getProcessById(
-          params.idProcess || (process.idProcess as number)
-      );
+      return getProcessById(params.idProcess || (process.idProcess as number));
     },
     refetchOnWindowFocus: false,
   });
@@ -93,9 +96,9 @@ function ViewProcess() {
     queryKey: ["notes", processData?.value?.idProcess],
     // eslint-disable-next-line consistent-return
     queryFn: async () => {
-      if(processData?.value?.idProcess) {
+      if (processData?.value?.idProcess) {
         const res = await getNotesByProcessId(
-            processData?.value?.idProcess as number
+          processData?.value?.idProcess as number
         );
 
         if (res.type === "error") throw new Error(res.error.message);
@@ -285,28 +288,39 @@ function ViewProcess() {
 
   const [isLoadingEvents, setIsLoadingEvents] = useState<boolean>(false);
   const [tableRows, setTableRows] = useState<TableRow<ProcessEvent>[]>([]);
-  const [eventsTablePaginationInfo, setEventsTablePaginationInfo] = useState<{ currentPage: number, totalPages: number, totalRecords: number }>();
+  const [eventsTablePaginationInfo, setEventsTablePaginationInfo] = useState<{
+    currentPage: number;
+    totalPages: number;
+    totalRecords: number;
+  }>();
   const refetchEvents = async (selectedPage?: { selected: number }) => {
     const offset = selectedPage ? selectedPage.selected * 10 : 0;
     setIsLoadingEvents(true);
-    const result = await findAllPaged(process.idProcess as number, { offset, limit: 10 });
+    const result = await findAllPaged(process.idProcess as number, {
+      offset,
+      limit: 10,
+    });
     const value = result.value as any;
-    if (result && result.type === 'success') {
+    if (result && result.type === "success") {
       const { data, pagination } = value;
       setEventsTablePaginationInfo(pagination);
       const mappedData = data.map((item: any) => ({
-        messages: item.messages.slice().reverse().map((message: string, index: number) => (
+        messages: item.messages
+          .slice()
+          .reverse()
+          .map((message: string, index: number) => (
             // eslint-disable-next-line react/no-array-index-key
-            <p key={index} style={{ margin: "10px 0" }}>{message}</p>
-        )),
+            <p key={index} style={{ margin: "10px 0" }}>
+              {message}
+            </p>
+          )),
         changedBy: item.changedBy,
         changedAt: formatDateTimeToBrazilian(item.changedAt as any),
-        actions: '-',
+        actions: "-",
       }));
       setTableRows(mappedData);
       setIsLoadingEvents(false);
-    }
-    else console.log('Erro ao recuperar eventos');
+    } else console.log("Erro ao recuperar eventos");
   };
   useEffect(() => {
     if (!process.record) return;
@@ -359,10 +373,7 @@ function ViewProcess() {
               ({processData?.value?.record})
             </Text>
           </Text>
-          <Button
-            colorScheme="blue"
-            onClick={() => navigate(-1)}
-          >
+          <Button colorScheme="blue" onClick={() => navigate(-1)}>
             <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar{" "}
             {flow ? ` do Fluxo ${flow?.name}` : ""}
           </Button>
@@ -558,84 +569,89 @@ function ViewProcess() {
           isOpen={isArchivationOpen}
           onClose={onArchivationClose}
           handleUpdateProcessStatus={() => {
-            archiveProcess(processData?.value).then(() => { refetchProcess(); refetchEvents(); });
+            archiveProcess(processData?.value).then(() => {
+              refetchProcess();
+              refetchEvents();
+            });
             onArchivationClose();
           }}
         />
       )}
       <Flex w="50%" flexDir="column" gap="3" mb="5">
         <Flex
-            w="100%"
-            justifyContent="space-between"
-            alignItems="center"
-            gap="2"
-            flexWrap="wrap"
+          w="100%"
+          justifyContent="space-between"
+          alignItems="center"
+          gap="2"
+          flexWrap="wrap"
         >
           <Text
-              fontSize="30px"
-              fontWeight="semibold"
-              display="flex"
-              alignItems="center"
-              gap="1"
+            fontSize="30px"
+            fontWeight="semibold"
+            display="flex"
+            alignItems="center"
+            gap="1"
           >
             Eventos
           </Text>
-          <Flex
-              flexDir="row"
-              alignItems="center"
-              gap="2"
-          >
+          <Flex flexDir="row" alignItems="center" gap="2">
             <Button
-                title="Baixar excel"
-                colorScheme="green"
-                onClick={(event) => {
-                  event.preventDefault();
-                  downloadEventsXlsx(process.record as string, process.idProcess).finally();
-                }}
+              title="Baixar excel"
+              colorScheme="green"
+              onClick={(event) => {
+                event.preventDefault();
+                downloadEventsXlsx(
+                  process.record as string,
+                  process.idProcess
+                ).finally();
+              }}
             >
               <Icon as={FaFileExcel} boxSize={4} />
             </Button>
             <Button
-                colorScheme="green"
-                onClick={(event) => {
-                  event.preventDefault();
-                  downloadEventsPdf({ idProcess: process.idProcess, record: process.record }).catch(r => toast({
+              colorScheme="green"
+              onClick={(event) => {
+                event.preventDefault();
+                downloadEventsPdf({
+                  idProcess: process.idProcess,
+                  record: process.record,
+                }).catch((r) =>
+                  toast({
                     description: r.message,
                     status: "error",
                     isClosable: true,
-                  }));
-                }}
+                  })
+                );
+              }}
             >
               <Icon as={FaFilePdf} boxSize={4} />
             </Button>
           </Flex>
         </Flex>
         <Flex
-            w="100%"
-            flexDirection="column"
-            justifyContent="space-between"
-            alignItems="center"
-            gap="1"
-            flexWrap="wrap"
-            position="relative"
+          w="100%"
+          flexDirection="column"
+          justifyContent="space-between"
+          alignItems="center"
+          gap="1"
+          flexWrap="wrap"
+          position="relative"
         >
           <DataTable
-              maxWidth='unset'
-              width='100%'
-              size="md"
-              data={tableRows}
-              columns={tableProcessEventsColumns}
-              isDataFetching={isLoadingEvents}
-              emptyTableMessage="Não foram encontrados eventos para o processo"
+            maxWidth="unset"
+            width="100%"
+            size="md"
+            data={tableRows}
+            columns={tableProcessEventsColumns}
+            isDataFetching={isLoadingEvents}
+            emptyTableMessage="Não foram encontrados eventos para o processo"
           />
           <Pagination
-              pageCount={eventsTablePaginationInfo?.totalPages as number}
-              onPageChange={refetchEvents}
+            pageCount={eventsTablePaginationInfo?.totalPages as number}
+            onPageChange={refetchEvents}
           />
         </Flex>
-
       </Flex>
-
     </PrivateLayout>
   );
 }

@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import {number} from "yup";
 
 /* eslint-disable no-unused-vars */
 export {};
@@ -65,7 +64,7 @@ declare global {
   };
 
   type Process = {
-    idProcess: number,
+    idProcess: number;
     record: string | ReactNode;
     nickname: string;
     idFlow: number[] | number;
@@ -83,7 +82,7 @@ declare global {
 
   type ProcessesFile = {
     idProcessesFile: number;
-    status: 'waiting' | 'inProgress' | 'imported' | 'error';
+    status: "waiting" | "inProgress" | "imported" | "error";
     items?: ProcessesFileItem[];
     name?: string;
     fileName: string;
@@ -91,19 +90,19 @@ declare global {
     createdAt: Date;
     dataOriginalFile?: Blob;
     dataResultingFile?: Blob;
-  }
+  };
 
   type ProcessesFileItem = {
     idProcessesFileItem: number;
     idProcessesFile: number;
-    status: 'error' | 'imported' | 'manuallyImported';
+    status: "error" | "imported" | "manuallyImported";
     record: string;
     priority: string;
     flow: string;
     nickname: string;
     message?: string;
     idProcess?: number;
-  }
+  };
 
   type Note = {
     idNote?: number;
@@ -114,10 +113,10 @@ declare global {
   };
 
   type ProcessEvent = {
-    messages: string[],
-    changedBy: string,
-    changedAt: Date,
-  }
+    messages: string[];
+    changedBy: string;
+    changedAt: Date;
+  };
 
   type SelectOption = {
     label: string;
@@ -165,16 +164,16 @@ declare global {
     actionName: string;
     action?: (actionProps?: any) => any;
     disabled?: boolean;
-    disabledOn?: (data?: any) => boolean,
-    labelOnDisable?: string,
+    disabledOn?: (data?: any) => boolean;
+    labelOnDisable?: string;
     isNavigate?: boolean;
   };
 
   type DocumentAudInput = {
-    emitedAt: Date,
-    emitedBy: string,
-    type: string,
-    uuid?: string
+    emitedAt: Date;
+    emitedBy: string;
+    type: string;
+    uuid?: string;
   };
 
   type TableRow<T> = T & {

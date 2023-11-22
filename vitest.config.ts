@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     globals: true,
+    // @ts-ignore
     coverage: { reporter: ["lcov"] },
     environment: "jsdom",
     reporters: process.env.VITEST_REPORTERS,

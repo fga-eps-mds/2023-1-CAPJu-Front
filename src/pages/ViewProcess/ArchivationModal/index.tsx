@@ -30,7 +30,9 @@ export function ArchivationModal({
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
       <ModalOverlay />
       <ModalContent mx="auto" my="auto">
-        <ModalHeader fontSize="19px">{getArchiveStatus(process?.status)} processo</ModalHeader>
+        <ModalHeader fontSize="19px">
+          {getArchiveStatus(process?.status)} processo
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody fontSize="19px">
           <Text>
@@ -43,9 +45,7 @@ export function ArchivationModal({
           <Button variant="ghost" onClick={onClose}>
             Cancelar
           </Button>
-          <Button
-            colorScheme="red"
-            onClick={handleUpdateProcessStatus}>
+          <Button colorScheme="red" onClick={handleUpdateProcessStatus}>
             {getArchiveStatus(process?.status)}
           </Button>
         </ModalFooter>

@@ -1,29 +1,25 @@
-
 export const downloadFileFromBuffer = (bytes: Buffer, fileName: string) => {
+  console.log(bytes);
 
-    console.log(bytes)
+  const ab = new ArrayBuffer(bytes.length);
+  const ia = new Uint8Array(ab);
 
-    const ab = new ArrayBuffer(bytes.length);
-    const ia = new Uint8Array(ab);
+  for (let i = 0; i < bytes.length; i += 1) {
+    ia[i] = bytes[i];
+  }
 
+  const blob = new Blob([ia], { type: "application/octet-stream" });
+  const url = window.URL.createObjectURL(blob);
 
-    for (let i = 0; i < bytes.length; i += 1) {
-        ia[i] = bytes[i];
-    }
+  const a = document.createElement("a");
 
-    const blob = new Blob([ia], { type: 'application/octet-stream' });
-    const url = window.URL.createObjectURL(blob);
+  a.style.display = "none";
+  a.href = url;
+  a.download = fileName;
 
-    const a = document.createElement('a');
+  document.body.appendChild(a);
+  a.click();
 
-    a.style.display = 'none';
-    a.href = url;
-    a.download = fileName;
-
-    document.body.appendChild(a);
-    a.click();
-
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-
-}
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+};

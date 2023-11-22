@@ -7,10 +7,10 @@ import {
   useCallback,
 } from "react";
 
-import jwtDecode from 'jwt-decode'
+import jwtDecode from "jwt-decode";
 
 import { signIn } from "services/user";
-import {useToast} from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -28,24 +28,28 @@ type AuthContextType = {
 const AuthContext = createContext({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-
   const toast = useToast();
 
   const localUser = getUserFromLocalStorageDecoded();
 
-  const [user, setUser] = useState<User | null>(localUser?.cpf ? localUser : null);
+  const [user, setUser] = useState<User | null>(
+    localUser?.cpf ? localUser : null
+  );
 
   const handleLogin = useCallback(
-    async (credentials: {cpf: string; password: string; }): Promise<Result<User>> => {
+    async (credentials: {
+      cpf: string;
+      password: string;
+    }): Promise<Result<User>> => {
       const res = await signIn(credentials);
       if (res.type === "success") {
-        localStorage.setItem(
-          "@CAPJu:jwt_user",
-          JSON.stringify(res.value)
-        );
+        localStorage.setItem("@CAPJu:jwt_user", JSON.stringify(res.value));
         setUser(getUserFromLocalStorageDecoded());
       }
-      return { type: res.type, value: getUserFromLocalStorageDecoded() } as Result<User>;
+      return {
+        type: res.type,
+        value: getUserFromLocalStorageDecoded(),
+      } as Result<User>;
     },
     []
   );
@@ -55,8 +59,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   }
 
-  const getUserData = async (): Promise<Result<User & { allowedActions: string[] }>> => {
-
+  const getUserData = async (): Promise<
+    Result<User & { allowedActions: string[] }>
+  > => {
     if (!user?.cpf) {
       handleLogout();
       return {
@@ -66,12 +71,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       };
     }
 
-    return { value: {...user, allowedActions: (user as any).role.allowedActions } } as any;
-
+    return {
+      value: { ...user, allowedActions: (user as any).role.allowedActions },
+    } as any;
   };
 
   function validateAuthentication() {
-
     const localStorageUser = getUserFromLocalStorageDecoded();
 
     if (!localStorageUser.cpf) {
@@ -80,18 +85,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     setUser(localStorageUser);
-
   }
 
   function getUserFromLocalStorageDecoded() {
-
     const jwtToken = localStorage.getItem("@CAPJu:jwt_user") as string;
 
-    if(!jwtToken) return {} as User;
+    if (!jwtToken) return {} as User;
 
     const currentTimeInSeconds = Math.floor(Date.now() / 1000);
 
-    if(getJwtFromLocalStorageDecoded().exp < currentTimeInSeconds) {
+    if (getJwtFromLocalStorageDecoded().exp < currentTimeInSeconds) {
       localStorage.removeItem("@CAPJu:jwt_user");
       toast({
         id: "token-expired",
@@ -101,24 +104,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
     }
 
-    return getJwtFromLocalStorageDecoded().id as User
-
+    return getJwtFromLocalStorageDecoded().id as User;
   }
 
   function getJwtFromLocalStorageDecoded() {
-
     const jwtToken = localStorage.getItem("@CAPJu:jwt_user") as string;
 
-    if(!jwtToken) return '';
+    if (!jwtToken) return "";
 
     return jwtDecode(JSON.stringify(jwtToken)) as any;
-
   }
 
   useEffect(() => {
     validateAuthentication();
   }, []);
-
 
   return (
     <AuthContext.Provider

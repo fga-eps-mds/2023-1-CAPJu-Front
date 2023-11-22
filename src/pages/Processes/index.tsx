@@ -22,7 +22,7 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
-import {FaEye} from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 
 import { getProcesses } from "services/processManagement/processes";
 import { getFlows } from "services/processManagement/flows";
@@ -36,7 +36,7 @@ import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
-import {VisualizationFilesModal} from "./ProcessesFile/VisualizationFilesModal";
+import { VisualizationFilesModal } from "./ProcessesFile/VisualizationFilesModal";
 
 function Processes() {
   const { getUserData } = useAuth();
@@ -336,12 +336,18 @@ function Processes() {
               <AddIcon mr="2" boxSize={4} /> Criar Processo
             </Button>
             <Button
-                size="md"
-                fontSize="md"
-                colorScheme="green"
-                onClick={onProcessesFileModalOpen}
+              size="md"
+              fontSize="md"
+              colorScheme="green"
+              onClick={onProcessesFileModalOpen}
             >
-              <Icon as={FaEye} mr="2" boxSize={4} style={{ marginRight: '8px' }}/> Visualizar lotes
+              <Icon
+                as={FaEye}
+                mr="2"
+                boxSize={4}
+                style={{ marginRight: "8px" }}
+              />{" "}
+              Visualizar lotes
             </Button>
           </Flex>
         </Flex>
@@ -415,6 +421,7 @@ function Processes() {
       <CreationModal
         isOpen={isCreationOpen}
         onClose={onCreationClose}
+        // @ts-ignore
         afterSubmission={refetchProcesses}
       />
       {selectedProcess && (
@@ -433,7 +440,10 @@ function Processes() {
           refetchStages={refetchProcesses}
         />
       )}
-      <VisualizationFilesModal isOpen={isProcessesFileModalOpen} onClose={onProcessesFileModalClose} />
+      <VisualizationFilesModal
+        isOpen={isProcessesFileModalOpen}
+        onClose={onProcessesFileModalClose}
+      />
     </PrivateLayout>
   );
 }

@@ -167,7 +167,8 @@ function Units() {
               !isActionAllowedToUser(
                 userData?.value?.allowedActions || [],
                 "create-unit",
-                  userData
+                // @ts-ignore
+                userData
               )
             }
             onClick={onCreationOpen}

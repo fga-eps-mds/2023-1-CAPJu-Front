@@ -1,7 +1,8 @@
-import {AxiosError, InternalAxiosRequestConfig} from 'axios';
+import { AxiosError, InternalAxiosRequestConfig } from "axios";
 
-export function authorization(config: InternalAxiosRequestConfig<any>): InternalAxiosRequestConfig<any> {
-
+export function authorization(
+  config: InternalAxiosRequestConfig<any>
+): InternalAxiosRequestConfig<any> {
   const bearerTokenWithQuotes = localStorage.getItem("@CAPJu:jwt_user");
 
   if (!bearerTokenWithQuotes) return config;
@@ -15,7 +16,9 @@ export function authorization(config: InternalAxiosRequestConfig<any>): Internal
   return authConfig;
 }
 
-export const errorResponseHandler = (error: AxiosError<ApiResponse<string>>) => {
+export const errorResponseHandler = (
+  error: AxiosError<ApiResponse<string>>
+) => {
   if (error?.response) {
     console.log("AXIOS INTERCEPTED ERROR: ", error.response);
 

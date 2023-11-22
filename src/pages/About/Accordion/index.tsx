@@ -50,11 +50,17 @@ function AboutAccordion() {
             <TabPanels>
               <TabPanel>
                 {epsStudents20232.map((student) => {
-                  return <Badge mr={1}>
-                    <a href={student.profile} target="_blank" rel="noopener noreferrer">
-                      {student.name}
-                    </a>
-                  </Badge>
+                  return (
+                    <Badge mr={1}>
+                      <a
+                        href={student.profile}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {student.name}
+                      </a>
+                    </Badge>
+                  );
                 })}
               </TabPanel>
               <TabPanel>

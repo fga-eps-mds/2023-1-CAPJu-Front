@@ -9,9 +9,8 @@ export const getProcesses = async (
   from?: string,
   to?: string,
   nicknameOrRecordFilter?: string,
-  showArchivedAndFinished?: boolean,
+  showArchivedAndFinished?: boolean
 ): Promise<Result<Process[]>> => {
-
   try {
     const res = await api.processManagement.get<{
       processes: Process[];
@@ -54,7 +53,7 @@ export const getProcesses = async (
 };
 
 export const deleteProcess = async (
-    idProcess: number
+  idProcess: number
 ): Promise<Result<Process>> => {
   try {
     const res = await api.processManagement.delete<Process>(
@@ -106,7 +105,7 @@ export const createProcess = async (data: {
 };
 
 export const updateProcess = async (data: {
-  idProcess: number,
+  idProcess: number;
   nickname: string;
   idFlow: number | number[];
   priority: number;
@@ -161,11 +160,11 @@ export const getProcessByRecord = async (
 };
 
 export const getProcessById = async (
-    idProcess: string | number
+  idProcess: string | number
 ): Promise<Result<Process>> => {
   try {
     const res = await api.processManagement.get<Process>(
-        `/process/${idProcess}`
+      `/process/${idProcess}`
     );
 
     return {
@@ -217,10 +216,9 @@ export const updateStage = async (data: {
 export const updateProcessStatus = async (data: {
   priority: number;
   idFlow: number;
-  idProcess: number,
+  idProcess: number;
   status: string;
 }): Promise<Result<Process>> => {
-
   try {
     const res = await api.processManagement.put<Process>(
       `/process/updateProcess/${data.idProcess}`,
@@ -243,9 +241,13 @@ export const updateProcessStatus = async (data: {
   }
 };
 
-export const finalizeProcess = async (process: Process): Promise<Result<Process>> => {
+export const finalizeProcess = async (
+  process: Process
+): Promise<Result<Process>> => {
   try {
-    const res = await api.processManagement.put<Process>(`/process/finalizeProcess/${process.idProcess}`);
+    const res = await api.processManagement.put<Process>(
+      `/process/finalizeProcess/${process.idProcess}`
+    );
 
     return {
       type: "success",
@@ -263,10 +265,15 @@ export const finalizeProcess = async (process: Process): Promise<Result<Process>
   }
 };
 
-export const archiveProcess = async (process: Process): Promise<Result<Process>> => {
+export const archiveProcess = async (
+  process: Process
+): Promise<Result<Process>> => {
   try {
-
-    const res = await api.processManagement.put<Process>(`/process/archiveProcess/${process.idProcess}/${process.status !== 'archived'}`);
+    const res = await api.processManagement.put<Process>(
+      `/process/archiveProcess/${process.idProcess}/${
+        process.status !== "archived"
+      }`
+    );
 
     return {
       type: "success",
@@ -283,6 +290,3 @@ export const archiveProcess = async (process: Process): Promise<Result<Process>>
     };
   }
 };
-
-
-

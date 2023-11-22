@@ -23,9 +23,8 @@ export const getNotesByProcessRecord = async (
 };
 
 export const getNotesByProcessId = async (
-    idProcess: number
+  idProcess: number
 ): Promise<Result<Note[]>> => {
-
   try {
     const res = await api.note.get<Note[]>(`/${idProcess}`);
 
@@ -46,7 +45,7 @@ export const getNotesByProcessId = async (
 };
 
 export const addNoteToProcess = async (data: {
-  idProcess: number,
+  idProcess: number;
   idStageA: string;
   idStageB: string;
   commentary: string;

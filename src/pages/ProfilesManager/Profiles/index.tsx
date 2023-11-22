@@ -130,7 +130,9 @@ export function Profiles() {
     if (!isUsersFetched || !isUnitsFetched || !isRolesFetched) return [];
 
     return (
+      // @ts-ignore
       (usersData?.value?.reduce(
+        // @ts-ignore
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
           const role =
             rolesData?.value?.find((i) => i.idRole === curr.idRole)?.name ||

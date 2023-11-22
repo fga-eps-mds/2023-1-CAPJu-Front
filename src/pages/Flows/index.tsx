@@ -53,7 +53,10 @@ function Flows() {
   } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
-      const res = await getFlows({ offset: currentPage * 10, limit: 10 }, filter);
+      const res = await getFlows(
+        { offset: currentPage * 10, limit: 10 },
+        filter
+      );
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -63,7 +66,8 @@ function Flows() {
       toast({
         id: "flows-error",
         title: "Erro ao carregar fluxos",
-        description: "Houve um erro ao carregar fluxos, favor tentar novamente.",
+        description:
+          "Houve um erro ao carregar fluxos, favor tentar novamente.",
         status: "error",
         isClosable: true,
       });

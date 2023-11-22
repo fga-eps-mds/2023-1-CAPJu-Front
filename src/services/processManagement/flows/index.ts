@@ -76,8 +76,10 @@ export const createFlow = async (data: {
 
 export const getHistoricFlow = async (idFlow: number) => {
   try {
-    const res = await api.processManagement.get<Array<number>>(`/flow/historicFlow/${idFlow}`);
-    
+    const res = await api.processManagement.get<Array<number>>(
+      `/flow/historicFlow/${idFlow}`
+    );
+
     return { type: "success", value: res.data };
   } catch (error) {
     if (error instanceof Error)
@@ -93,7 +95,9 @@ export const getHistoricFlow = async (idFlow: number) => {
 
 export const getExpectedFlow = async (idFlow: number) => {
   try {
-    const res = await api.processManagement.get<Array<{ idStage: number, name: string, duration: number }>>(`/flowStage/${idFlow}`);
+    const res = await api.processManagement.get<
+      Array<{ idStage: number; name: string; duration: number }>
+    >(`/flowStage/${idFlow}`);
 
     return { type: "success", value: res.data };
   } catch (error) {
@@ -106,7 +110,7 @@ export const getExpectedFlow = async (idFlow: number) => {
       value: undefined,
     };
   }
-}
+};
 
 export const updateFlow = async (data: {
   name: string;

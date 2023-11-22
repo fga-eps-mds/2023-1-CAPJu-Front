@@ -67,7 +67,7 @@ export function EditionModal({
     formState: { errors },
     reset,
     watch,
-    setValue
+    setValue,
   } = useForm<FormValues>({
     // @ts-ignore
     resolver: yupResolver(validationSchema),
@@ -78,7 +78,7 @@ export function EditionModal({
   const { data: prioritiesData } = useQuery({
     queryKey: ["priorities"],
     queryFn: async () => {
-      if(!isOpen) return {};
+      if (!isOpen) return {};
       const res = await getPriorities();
       return res;
     },
@@ -160,7 +160,6 @@ export function EditionModal({
     }
   }, [isOpen, selectedProcess, setValue]);
 
-
   useEffect(() => {
     reset();
   }, [isOpen]);
@@ -226,7 +225,7 @@ export function EditionModal({
               isChecked={hasLegalPriority}
               {...register("hasLegalPriority")}
             >
-              Com prioridade legal {hasLegalPriority ? 'true' : 'false'}
+              Com prioridade legal {hasLegalPriority ? "true" : "false"}
             </Checkbox>
             {hasLegalPriority ? (
               <Select
@@ -234,8 +233,10 @@ export function EditionModal({
                 placeholder="Selecionar prioridade"
                 color="gray.500"
                 options={
+                  // @ts-ignore
                   prioritiesData?.value
-                    ? (prioritiesData.value as Priority[]).map(
+                    ? // @ts-ignore
+                      (prioritiesData.value as Priority[]).map(
                         (priority: Priority) => {
                           return {
                             value: priority.idPriority,

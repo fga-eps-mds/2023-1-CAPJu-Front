@@ -5,7 +5,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default ({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
   return defineConfig({
-    publicDir: 'public',
+    publicDir: "public",
     plugins: [react(), tsconfigPaths()],
     server: {
       host: true,

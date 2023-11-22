@@ -1,4 +1,4 @@
-import {useEffect} from "react";
+import { useEffect } from "react";
 import {
   Button,
   chakra,
@@ -14,15 +14,15 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import * as yup from "yup";
-import {useQuery} from "react-query";
-import {useForm} from "react-hook-form";
-import {yupResolver} from "@hookform/resolvers/yup";
+import { useQuery } from "react-query";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
-import {Input, Select} from "components/FormFields";
-import {useLoading} from "hooks/useLoading";
-import {getPriorities} from "services/processManagement/priority";
-import {getFlows} from "services/processManagement/flows";
-import {createProcess} from "services/processManagement/processes";
+import { Input, Select } from "components/FormFields";
+import { useLoading } from "hooks/useLoading";
+import { getPriorities } from "services/processManagement/priority";
+import { getFlows } from "services/processManagement/flows";
+import { createProcess } from "services/processManagement/processes";
 
 type FormValues = {
   record: string;
@@ -31,6 +31,15 @@ type FormValues = {
   hasLegalPriority: boolean;
   idPriority: number;
 };
+
+interface CreationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
+  afterSubmission: (createdProcess: Result<Process>) => void;
+  recordParam?: string;
+  nicknameParam?: string;
+}
 
 const validationSchema = yup.object({
   record: yup.string().required("Digite o registro do processo."),
@@ -46,15 +55,6 @@ const validationSchema = yup.object({
       : yup.string().notRequired();
   }),
 });
-
-interface CreationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  // eslint-disable-next-line no-unused-vars
-  afterSubmission: (createdProcess: Result<Process>) => void;
-  recordParam?: string;
-  nicknameParam?: string;
-}
 
 export function CreationModal({
   isOpen,
@@ -83,7 +83,7 @@ export function CreationModal({
   const { data: prioritiesData } = useQuery({
     queryKey: ["priorities"],
     queryFn: async () => {
-      if(!isOpen || !hasLegalPriority) return {};
+      if (!isOpen || !hasLegalPriority) return {};
       return getPriorities();
     },
     onError: () => {
@@ -122,7 +122,6 @@ export function CreationModal({
     refetchOnWindowFocus: false,
     enabled: isOpen,
   });
-
 
   const onSubmit = handleSubmit(async (formData) => {
     handleLoading(true);
@@ -165,10 +164,8 @@ export function CreationModal({
 
   useEffect(() => {
     if (isOpen) {
-      if(recordParam)
-        setValue('record', recordParam);
-      if(nicknameParam)
-        setValue('nickname', nicknameParam);
+      if (recordParam) setValue("record", recordParam);
+      if (nicknameParam) setValue("nickname", nicknameParam);
     }
   }, [isOpen]);
 
@@ -225,8 +222,10 @@ export function CreationModal({
                 placeholder="Selecionar prioridade"
                 color="gray.500"
                 options={
+                  // @ts-ignore
                   prioritiesData?.value
-                    ? (prioritiesData.value as Priority[]).map(
+                    ? // @ts-ignore
+                      (prioritiesData.value as Priority[]).map(
                         (priority: Priority) => {
                           return {
                             value: priority.idPriority,

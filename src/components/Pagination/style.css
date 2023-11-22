@@ -6,7 +6,6 @@ ul.pagination {
   margin-top: 10px;
 }
 
-
 .pagination__link--disabled {
   pointer-events: none;
   opacity: 0.6;

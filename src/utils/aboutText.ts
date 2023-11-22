@@ -13,11 +13,23 @@ export const epsName = "Engenharia de Produto de Software - EPS";
 export const mdsName = "Métodos de Desenvolvimento de Software - MDS";
 
 export const epsStudents20232 = [
-  { name: "Brenda Vitória dos Santos", profile: 'https://github.com/brendavsantos' },
-  { name: "Denniel William Roriz Lima", profile: 'https://github.com/Denniel-sudo' },
-  { name: "João Gabriel de Campos de Matos", profile: 'https://github.com/JongaMatos' },
-  { name: "Nícolas Georgeos Mantzos", profile: 'https://github.com/ngm1450' },
-  { name: "Washington Bispo Arishita Júnior", profile: 'https://github.com/WashingtonBispo' },
+  {
+    name: "Brenda Vitória dos Santos",
+    profile: "https://github.com/brendavsantos",
+  },
+  {
+    name: "Denniel William Roriz Lima",
+    profile: "https://github.com/Denniel-sudo",
+  },
+  {
+    name: "João Gabriel de Campos de Matos",
+    profile: "https://github.com/JongaMatos",
+  },
+  { name: "Nícolas Georgeos Mantzos", profile: "https://github.com/ngm1450" },
+  {
+    name: "Washington Bispo Arishita Júnior",
+    profile: "https://github.com/WashingtonBispo",
+  },
 ];
 
 export const epsStudents20231 = [

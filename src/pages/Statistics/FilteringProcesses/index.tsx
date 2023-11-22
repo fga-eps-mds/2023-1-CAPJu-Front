@@ -148,7 +148,7 @@ export default function FilteringProcesses() {
         label: "Visualizar Processo",
         icon: <ViewIcon boxSize={4} />,
         isNavigate: true,
-        actionName: 'see-process',
+        actionName: "see-process",
         disabled: !isActionAllowedToUser(
           userData?.value?.allowedActions || [],
           "see-process"
