@@ -87,6 +87,15 @@ export default function FilteringProcesses() {
   const [key, setKey] = useState(Math.random());
   const [selectedStatus, setSelectedStatus] = useState("");
   const [filter] = useState<string | undefined>(undefined);
+  const [preparedProcessesDownload, setPreparedProcessesDownload] = useState(
+    [] as IFormatedProcess[]
+  );
+  const [formattedtoDate, setFormattedtoDate] = useState<string | undefined>(
+    undefined
+  );
+  const [formattedfromDate, setFormattedfromDate] = useState<
+    string | undefined
+  >(undefined);
 
   const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
     queryKey: ["flows"],
@@ -340,23 +349,44 @@ export default function FilteringProcesses() {
   };
 
   const handleDownloadPDFQuantityProcesses = useCallback(async () => {
-    const toDateConvert = new Date(toDate);
-    const fromDateConvert = new Date(fromDate);
+    const flowName =
+      selectedFlowValue === ""
+        ? "Não Definido"
+        : idFlowToFlowName(parseInt(selectedFlowValue, 10));
 
-    const dayMin = toDateConvert.getDate();
-    const monthMin = toDateConvert.getMonth() + 1;
-    const yearMin = toDateConvert.getFullYear();
+    if (toDate === undefined || fromDate === undefined) {
+      const toDateConvert = new Date(toDate);
+      const fromDateConvert = new Date(fromDate);
 
-    const dayMax = fromDateConvert.getDate();
-    const montMax = fromDateConvert.getMonth() + 1;
-    const yearMax = fromDateConvert.getFullYear();
+      const dayMin = toDateConvert.getDate();
+      const monthMin = toDateConvert.getMonth() + 1;
+      const yearMin = toDateConvert.getFullYear();
 
-    const formattedtoDate = `${dayMin < 10 ? "0" : ""}${dayMin}/${
-      monthMin < 10 ? "0" : ""
-    }${monthMin}/${yearMin}`;
-    const formattedfromDate = `${dayMax < 10 ? "0" : ""}${dayMax}/${
-      montMax < 10 ? "0" : ""
-    }${montMax}/${yearMax}`;
+      const dayMax = fromDateConvert.getDate();
+      const montMax = fromDateConvert.getMonth() + 1;
+      const yearMax = fromDateConvert.getFullYear();
+
+      setFormattedtoDate(
+        `${dayMin < 10 ? "0" : ""}${dayMin}/${
+          monthMin < 10 ? "0" : ""
+        }${monthMin}/${yearMin}`
+      );
+      setFormattedfromDate(
+        `${dayMax < 10 ? "0" : ""}${dayMax}/${
+          montMax < 10 ? "0" : ""
+        }${montMax}/${yearMax}`
+      );
+    }
+
+    let statusLabel;
+
+    if (selectedStatus === "") {
+      statusLabel = "Não Definido";
+    } else if (selectedStatus === "archived") {
+      statusLabel = "Interrompido";
+    } else {
+      statusLabel = "Concluído";
+    }
 
     const resAllProcess = await getProcesses(
       parseInt(selectedFlowValue, 10),
@@ -368,33 +398,17 @@ export default function FilteringProcesses() {
       toDate === "" ? undefined : toDate
     );
 
-    if (resAllProcess.value !== undefined) {
-      const formatedData = formatDataTable(resAllProcess.value);
-      setPreparedProcessesDownload(formatedData);
-    }
-
     if (resAllProcess.type === "success") {
-      if (selectedStatus === "archived") {
-        await downloadPDFQuantityProcesses(
-          "Interrompido",
-          formattedtoDate,
-          formattedfromDate,
-          preparedProcessesDownload,
-          processesData?.totalProcesses,
-          processesData?.totalArchived,
-          processesData?.totalFinished
-        );
-      } else {
-        await downloadPDFQuantityProcesses(
-          "Concluído",
-          formattedtoDate,
-          formattedfromDate,
-          preparedProcessesDownload,
-          processesData?.totalProcesses,
-          processesData?.totalArchived,
-          processesData?.totalFinished
-        );
-      }
+      await downloadPDFQuantityProcesses(
+        flowName,
+        statusLabel,
+        formattedtoDate === undefined ? "--" : formattedtoDate,
+        formattedfromDate === undefined ? "--" : formattedfromDate,
+        resAllProcess.value,
+        processesData?.totalProcesses,
+        processesData?.totalArchived,
+        processesData?.totalFinished
+      );
     } else {
       toast({
         id: "error-getting-stages",
@@ -404,7 +418,7 @@ export default function FilteringProcesses() {
         isClosable: true,
       });
     }
-  }, [selectedFlowValue, selectedStatus, toDate, fromDate]);
+  }, [selectedFlowValue, selectedStatus, toDate, fromDate, processesData]);
 
   useEffect(() => {
     if (flows.length === 0) getDataFlows();
@@ -417,10 +431,6 @@ export default function FilteringProcesses() {
       refetchProcesses();
     }
   }, [currentPage, tableVisible]);
-
-  const [preparedProcessesDownload, setPreparedProcessesDownload] = useState(
-    [] as IFormatedProcess[]
-  );
 
   function idFlowToFlowName(idFlow: number | number[]) {
     const flowNames = flows

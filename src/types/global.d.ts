@@ -73,6 +73,7 @@ declare global {
     effectiveDate: string;
     status: string;
     dueDate?: string;
+    flow?: { idFlow: number; name: string; idUnit: number };
     progress?: Progress[];
     isNextSage?: boolean;
     nameStage?: string;

@@ -138,11 +138,11 @@ export const downloadProcessInDue = async (
 };
 
 export const downloadPDFQuantityProcesses = async (
-  // fluxo: string,
+  fluxo: string,
   status: string,
   toDate: string,
   fromDate: string,
-  processes: IFormatedProcess[],
+  processes: Process[],
   totalProcesses: number | undefined,
   totalArchived: number | undefined,
   totalFinished: number | undefined
@@ -163,7 +163,7 @@ export const downloadPDFQuantityProcesses = async (
     pdf.text("Quantidade de Processos Concluidos / Interrompidos", 105, 20, {
       align: "center",
     });
-    pdf.text(`Fluxo: `, 15, 35);
+    pdf.text(`Fluxo: ${fluxo}`, 15, 35);
     pdf.text(`Status: ${status} `, 15, 40);
     pdf.text(`Período: ${toDate}  à  ${fromDate}`, 15, 45);
     pdf.text(`Data emissão: ${emissionDate}`, 15, 50);
@@ -397,9 +397,7 @@ function constructTableHTMLDueDate(processData: Process[]): string {
   return tableHTML;
 }
 
-function constructTableHTMLQuantityProcess(
-  processData: IFormatedProcess[]
-): string {
+function constructTableHTMLQuantityProcess(processData: Process[]): string {
   let tableHTML = `
         <div class="table-wrapper" style="display: none" hidden>
           <table class="fl-table" id="processData">
@@ -458,13 +456,13 @@ function constructTableHTMLQuantityProcess(
   `;
 
   processData.forEach((event) => {
-    const { Registro, Apelido, Fluxo, Status } = event;
+    const { record, nickname, flow, status } = event;
     tableHTML += `
           <tr>
-              <td>${Registro}</td>
-              <td>${Apelido}</td>
-              <td>${Fluxo}</td>
-              <td>${Status}</td>
+              <td>${record}</td>
+              <td>${nickname}</td>
+              <td>${flow?.name}</td>
+              <td>${status === "archived" ? "Interrompido" : "Concluído"}</td>
           </tr>
       `;
   });
