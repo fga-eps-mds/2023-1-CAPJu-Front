@@ -147,8 +147,10 @@ export const downloadPDFQuantityProcesses = async (
   const elem = document.querySelector<HTMLElement>(
     "#chart-quantidade-de-processos"
   );
-  if (elem)
+  
     try {
+      
+      
       const container = document.createElement("div");
 
       const emitedAt = new Date();
@@ -182,36 +184,36 @@ export const downloadPDFQuantityProcesses = async (
         pdf.addPage();
         tableFinalY = 20;
       }
-
+      
+      if (elem){
       await html2canvas(elem).then(async (canvas) => {
-        const dataURI = canvas.toDataURL("image/jpeg");
+            const dataURI = canvas.toDataURL("image/jpeg");
 
-        pdf.setFont("helvetica", "bold");
-        pdf.text(
-          "Tempo de Conclusão por Etapa de um Fluxo",
-          105,
-          tableFinalY + 8,
-          { align: "center" }
-        );
-        pdf.addImage(dataURI, "JPEG", 30, tableFinalY + 10, 150, 0);
+            pdf.setFont("helvetica", "bold");
+            if (tableFinalY > 230) {
+              pdf.addPage();
+              tableFinalY = 20;
+            }
+            pdf.addImage(dataURI, "JPEG", 30, tableFinalY + 10, 150, 0);
 
-        canvas.remove();
-      });
+            canvas.remove();
+          });
+        }
 
       pdf.addImage(
-        await imgToBase64(assets.logoUnB),
+        await imgToBase64("/src/images/UnB.png"),
         "png",
-        30 + spacingBetweenImages,
-        tableFinalY + 10,
+        spacingBetweenImages - 50,
+        270,
         20,
         20
       );
 
       pdf.addImage(
-        await imgToBase64(assets.justicaFederal),
+        await imgToBase64("/src/images/justica_federal.png"),
         "png",
-        50 + 2 * spacingBetweenImages,
-        tableFinalY + 10,
+        60 + 2 * spacingBetweenImages,
+        270,
         20,
         15
       );
@@ -221,8 +223,8 @@ export const downloadPDFQuantityProcesses = async (
       document.body.removeChild(container);
     } catch (err) {
       console.log(err);
-    }
-};
+    }}
+/* } */;
 
 function constructTableHTML(processData: Process[]): string {
   let tableHTML = `

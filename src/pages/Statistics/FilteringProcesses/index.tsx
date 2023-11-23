@@ -17,7 +17,7 @@ import { DataTable } from "components/DataTable";
 import { Pagination } from "components/Pagination";
 import { ProcessQuantifier } from "components/ProcessQuantifier";
 import {
-  // ReactNode,
+  //ReactNode,
   useEffect,
   useState,
   useMemo,
@@ -619,7 +619,7 @@ export default function FilteringProcesses() {
                     />
                   )}
                 </Flex>
-                <Flex w="70%" alignSelf="center" className="BarChart">
+                <Flex w="70%" alignSelf="center">
                   {!tableVisible && (
                     <Bar
                       id="chart-quantidade-de-processos"
