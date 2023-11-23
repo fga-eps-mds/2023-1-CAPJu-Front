@@ -13,7 +13,7 @@
     "check-format": "prettier --check .",
     "check-lint": "eslint . --ext ts --ext tsx --ext js",
     "format": "prettier --write .",
-    "test": "vitest --silent"
+    "test": "vitest"
   },
   "dependencies": {
     "@chakra-ui/form-control": "^2.0.0",

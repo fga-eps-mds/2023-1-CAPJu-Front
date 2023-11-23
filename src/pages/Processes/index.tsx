@@ -407,7 +407,7 @@ function Processes() {
                 </Select>
               </Flex>
               <Button
-                aria-label="botão de busca"
+                aria-label="botao-busca-processes"
                 colorScheme="green"
                 marginLeft="2"
                 justifyContent="center"
