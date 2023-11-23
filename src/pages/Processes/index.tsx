@@ -30,6 +30,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
 
+
 import { getProcesses } from "services/processManagement/processes";
 import { isActionAllowedToUser } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
@@ -41,6 +42,7 @@ import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
+import line52 from "../../images/Line_52.svg";
 
 function Processes() {
   const { getUserData } = useAuth();
@@ -381,7 +383,7 @@ function Processes() {
                 />
                 <Image
                   zIndex="9999"
-                  src="src/images/Line_52.svg"
+                  src={line52}
                   marginLeft="0%"
                   width="3%"
                   height="27px"
