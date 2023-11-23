@@ -17,7 +17,7 @@ import { DataTable } from "components/DataTable";
 import { Pagination } from "components/Pagination";
 import { ProcessQuantifier } from "components/ProcessQuantifier";
 import {
-  //ReactNode,
+  // ReactNode,
   useEffect,
   useState,
   useMemo,
@@ -379,14 +379,20 @@ export default function FilteringProcesses() {
           "Interrompido",
           formattedtoDate,
           formattedfromDate,
-          preparedProcessesDownload
+          preparedProcessesDownload,
+          processesData?.totalProcesses,
+          processesData?.totalArchived,
+          processesData?.totalFinished
         );
       } else {
         await downloadPDFQuantityProcesses(
           "Concluído",
           formattedtoDate,
           formattedfromDate,
-          preparedProcessesDownload
+          preparedProcessesDownload,
+          processesData?.totalProcesses,
+          processesData?.totalArchived,
+          processesData?.totalFinished
         );
       }
     } else {

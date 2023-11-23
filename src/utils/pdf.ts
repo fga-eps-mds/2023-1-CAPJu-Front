@@ -142,89 +142,97 @@ export const downloadPDFQuantityProcesses = async (
   status: string,
   toDate: string,
   fromDate: string,
-  processes: IFormatedProcess[]
+  processes: IFormatedProcess[],
+  totalProcesses: number | undefined,
+  totalArchived: number | undefined,
+  totalFinished: number | undefined
 ): Promise<void> => {
   const elem = document.querySelector<HTMLElement>(
     "#chart-quantidade-de-processos"
   );
-  
-    try {
-      
-      
-      const container = document.createElement("div");
 
-      const emitedAt = new Date();
+  try {
+    const container = document.createElement("div");
 
-      const emissionDate = formatDateTimeToBrazilian(emitedAt);
+    const emitedAt = new Date();
 
-      const pdf = new JsPDF() as jsPDFCustom;
-      pdf.setFontSize(12);
-      pdf.text("Quantidade de Processos Concluidos / Interrompidos", 105, 20, {
-        align: "center",
-      });
-      pdf.text(`Fluxo: `, 15, 30);
-      pdf.text(`Status: ${status} `, 15, 40);
-      pdf.text(`Período: ${toDate}  à  ${fromDate}`, 15, 50);
-      pdf.text(`Data emissão: ${emissionDate}`, 15, 60);
+    const emissionDate = formatDateTimeToBrazilian(emitedAt);
 
-      const currentY = 70;
+    const pdf = new JsPDF() as jsPDFCustom;
+    pdf.setFontSize(12);
+    pdf.text("Quantidade de Processos Concluidos / Interrompidos", 105, 20, {
+      align: "center",
+    });
+    pdf.text(`Fluxo: `, 15, 35);
+    pdf.text(`Status: ${status} `, 15, 40);
+    pdf.text(`Período: ${toDate}  à  ${fromDate}`, 15, 45);
+    pdf.text(`Data emissão: ${emissionDate}`, 15, 50);
 
+    pdf.text(`Total de Processos: ${totalProcesses}`, 15, 60);
+    pdf.text(`Processos Concluídos: ${totalFinished}`, 15, 65);
+    pdf.text(`Processos Interrompidos: ${totalArchived}`, 15, 70);
+
+    const currentY = 80;
+
+    if (!elem) {
       const tableHTML = constructTableHTMLQuantityProcess(processes);
       container.style.display = "none";
       container.innerHTML = tableHTML;
       document.body.appendChild(container);
+    }
 
-      pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
+    pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
 
-      const spacingBetweenImages = 60;
+    const spacingBetweenImages = 60;
 
-      let tableFinalY = (pdf as any).lastAutoTable.finalY;
+    let tableFinalY = (pdf as any).lastAutoTable.finalY;
 
-      if (tableFinalY > 267) {
-        pdf.addPage();
-        tableFinalY = 20;
-      }
-      
-      if (elem){
+    if (tableFinalY > 267) {
+      pdf.addPage();
+      tableFinalY = 20;
+    }
+
+    if (elem) {
       await html2canvas(elem).then(async (canvas) => {
-            const dataURI = canvas.toDataURL("image/jpeg");
+        const dataURI = canvas.toDataURL("image/jpeg");
 
-            pdf.setFont("helvetica", "bold");
-            if (tableFinalY > 230) {
-              pdf.addPage();
-              tableFinalY = 20;
-            }
-            pdf.addImage(dataURI, "JPEG", 30, tableFinalY + 10, 150, 0);
-
-            canvas.remove();
-          });
+        pdf.setFont("helvetica", "bold");
+        if (tableFinalY > 230) {
+          pdf.addPage();
+          tableFinalY = 20;
         }
+        pdf.addImage(dataURI, "JPEG", 30, tableFinalY + 10, 150, 0);
 
-      pdf.addImage(
-        await imgToBase64("/src/images/UnB.png"),
-        "png",
-        spacingBetweenImages - 50,
-        270,
-        20,
-        20
-      );
+        canvas.remove();
+      });
+    }
 
-      pdf.addImage(
-        await imgToBase64("/src/images/justica_federal.png"),
-        "png",
-        60 + 2 * spacingBetweenImages,
-        270,
-        20,
-        15
-      );
+    pdf.addImage(
+      await imgToBase64("/src/images/UnB.png"),
+      "png",
+      spacingBetweenImages - 50,
+      270,
+      20,
+      20
+    );
 
-      pdf.save(`quantidade_de_processos`);
+    pdf.addImage(
+      await imgToBase64("/src/images/justica_federal.png"),
+      "png",
+      60 + 2 * spacingBetweenImages,
+      270,
+      20,
+      15
+    );
 
-      document.body.removeChild(container);
-    } catch (err) {
-      console.log(err);
-    }}
-/* } */;
+    pdf.save(`quantidade_de_processos`);
+
+    document.body.removeChild(container);
+  } catch (err) {
+    console.log(err);
+  }
+};
+/* } */
 
 function constructTableHTML(processData: Process[]): string {
   let tableHTML = `
