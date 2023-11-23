@@ -1,4 +1,11 @@
-import { Button, Flex, Image, Progress } from "@chakra-ui/react";
+import {
+  Avatar,
+  AvatarGroup,
+  Button,
+  Flex,
+  Image,
+  Progress,
+} from "@chakra-ui/react";
 
 import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
@@ -28,6 +35,9 @@ export function Header() {
         {isAuthenticated ? (
           <Flex alignItems="center" ml="auto" gap="5">
             <HeaderLink href="/contribuidores">Sobre</HeaderLink>
+            <AvatarGroup spacing="1rem">
+              <Avatar bg="black" />
+            </AvatarGroup>
             <Button
               size={["xs", "sm"]}
               colorScheme="red"
