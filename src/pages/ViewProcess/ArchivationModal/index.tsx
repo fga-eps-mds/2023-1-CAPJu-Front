@@ -18,7 +18,7 @@ interface ArchivationModalProps {
 }
 
 const getArchiveStatus = (status: string) =>
-  status === "archived" ? "Desarquivar" : "Arquivar";
+  status === "archived" ? "Reativar" : "Interromper";
 
 export function ArchivationModal({
   process,
@@ -35,7 +35,7 @@ export function ArchivationModal({
         <ModalBody>
           <Text>
             Tem certeza que deseja{" "}
-            {process?.status === "archived" ? "desarquivar" : "arquivar"} o
+            {process?.status === "archived" ? "reativar" : "interromper"} o
             processo <strong>{process?.nickname}</strong>?
           </Text>
         </ModalBody>

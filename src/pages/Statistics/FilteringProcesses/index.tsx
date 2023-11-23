@@ -12,8 +12,11 @@ import {
   Text,
   Input,
 } from "@chakra-ui/react";
+import ExportExcel from "components/ExportExcel";
 import { DataTable } from "components/DataTable";
-import { useEffect, useState, useMemo, ChangeEvent } from "react";
+import { Pagination } from "components/Pagination";
+import { ProcessQuantifier } from "components/ProcessQuantifier";
+import { ReactNode, useEffect, useState, useMemo, ChangeEvent } from "react";
 import { useLocation } from "react-router-dom";
 import { getFlows } from "services/processManagement/flows";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -22,6 +25,7 @@ import { useQuery } from "react-query";
 import { useAuth } from "hooks/useAuth";
 import { isActionAllowedToUser } from "utils/permissions";
 import { ViewIcon } from "@chakra-ui/icons";
+import { labelByProcessStatus } from "utils/constants";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -32,7 +36,6 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { Pagination } from "components/Pagination";
 import useChartData from "./chartUtils";
 
 ChartJS.register(
@@ -52,7 +55,7 @@ export const options = {
     },
     title: {
       display: true,
-      text: "Comparativo de Processos Concluídos e Interrompidos por Mês",
+      text: "Gráfico de Processos Concluídos / Interrompidos por Mês",
     },
   },
 };
@@ -64,16 +67,16 @@ export default function FilteringProcesses() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
+  const { state } = useLocation();
 
   const [flows, setFlows] = useState([] as Flow[]);
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [tableVisible, setTableVisible] = useState(true);
   const [selectedFlowValue, setSelectedFlowValue] = useState<string>("");
-
+  const [currentPage, setCurrentPage] = useState(0);
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
   const [key, setKey] = useState(Math.random());
-
   const [selectedStatus, setSelectedStatus] = useState("");
   const [filter] = useState<{ type: string; value: string } | undefined>(
     undefined
@@ -81,16 +84,27 @@ export default function FilteringProcesses() {
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedStatus(event.target.value);
   };
-  const { state } = useLocation();
 
-  const getDataFlows = async () => {
-    const dataFlows = await getFlows();
-    if (dataFlows.value) setFlows(dataFlows.value);
-  };
+  const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
+    queryKey: ["flows"],
+    queryFn: async () => {
+      const res = await getFlows();
 
-  useEffect(() => {
-    if (flows.length === 0) getDataFlows();
-  }, []);
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
+    onError: () => {
+      toast({
+        id: "flows-error",
+        title: "Erro ao carregar fluxos",
+        description:
+          "Houve um erro ao carregar fluxos, favor tentar novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    },
+  });
 
   const {
     data: processesData,
@@ -110,15 +124,13 @@ export default function FilteringProcesses() {
             },
         filter,
         false,
-        selectedStatus === "" || !tableVisible
-          ? ["archived", "finished"]
-          : [selectedStatus],
+        selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
         fromDate === "" ? undefined : fromDate,
         toDate === "" ? undefined : toDate
       );
       setIsFetching(false);
-
       if (res.type === "error") throw new Error(res.error.message);
+      console.log(res);
       return res;
     },
     onError: () => {
@@ -151,33 +163,45 @@ export default function FilteringProcesses() {
 
   const filteredProcesses = useMemo<TableRow<Process>[]>(() => {
     if (isFetching) return [];
-
-    const value = replacer(processesData?.value);
     return (
-      (value?.reduce(
+      (processesData?.value?.reduce(
         (
           acc: TableRow<Process>[] | Process[],
           curr: TableRow<Process> | Process
-        ) => [
-          ...acc,
-          {
-            ...curr,
-            tableActions,
-            actionsProps: {
-              process: curr,
-              pathname: `/processos/${curr.record}`,
-              state: { process: curr, ...(state || {}) },
+        ) => {
+          const currFlow = flowsData?.value?.find(
+            (item) =>
+              item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
+          ) as Flow;
+          return [
+            ...acc,
+            {
+              ...curr,
+              tableActions,
+              actionsProps: {
+                process: curr,
+                pathname: `/processos/${curr.record}`,
+                state: {
+                  process: curr,
+                  ...(state || {}),
+                },
+              },
+              flowName: currFlow?.name,
+              // @ts-ignore
+              status: labelByProcessStatus[curr.status],
             },
-            record: curr.record,
-          },
-        ],
+          ];
+        },
         []
       ) as TableRow<Process>[]) || []
     );
   }, [
     processesData,
     isProcessesFetched,
+    userData,
     isUserFetched,
+    flowsData,
+    isFlowsFetched,
     tableActions,
     isFetching,
   ]);
@@ -204,12 +228,11 @@ export default function FilteringProcesses() {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("tableActions", {
+    tableColumnHelper.accessor("flowName", {
       cell: (info) => info.getValue(),
-      header: "Ações",
+      header: "Fluxo",
       meta: {
-        isTableActions: true,
-        isSortable: false,
+        isSortable: true,
       },
     }),
   ];
@@ -229,15 +252,6 @@ export default function FilteringProcesses() {
     ) {
       setCurrentPage(-1);
       setKey(Math.random());
-    } else if (fromDate.length === 0 || toDate.length === 0) {
-      toast({
-        id: "date-error",
-        title: "Datas não preenchidas",
-        description:
-          "Por favor, preencha ambas as datas (início e fim) para filtrar por período.",
-        status: "error",
-        isClosable: true,
-      });
     } else {
       toast({
         id: "date-order-error",
@@ -249,10 +263,78 @@ export default function FilteringProcesses() {
       });
     }
   };
-  const [currentPage, setCurrentPage] = useState(0);
+
+  const handleChartClick = async () => {
+    const minDateValue = Date.parse(fromDate);
+    const maxDateValue = Date.parse(toDate);
+    const currentDateValue = Date.now();
+
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+    const twoYearsAgoValue = Date.parse(twoYearsAgo.toISOString());
+
+    if (fromDate.length === 0 || toDate.length === 0) {
+      if (tableVisible) {
+        toast({
+          id: "date-info",
+          title: "Datas não esepcificadas",
+          description:
+            "Buscando todos os processos dentro do intervalo de 2 anos a partir da data atual.",
+          status: "info",
+          isClosable: true,
+        });
+      }
+
+      setTableVisible((current) => !current);
+      setCurrentPage(0);
+    }
+    if (
+      fromDate.length > 0 &&
+      toDate.length > 0 &&
+      maxDateValue > minDateValue &&
+      maxDateValue <= currentDateValue &&
+      minDateValue >= twoYearsAgoValue
+    ) {
+      setTableVisible((current) => !current);
+      setCurrentPage(0);
+    }
+
+    if (maxDateValue <= minDateValue) {
+      toast({
+        id: "date-order-error",
+        title: "Ordem das datas incorreta",
+        description:
+          "A data de início deve ser anterior à data de fim. Por favor, ajuste as datas e tente novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    }
+  };
+
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
   };
+
+  const getDataFlows = async () => {
+    const dataFlows = await getFlows();
+    if (dataFlows.value) setFlows(dataFlows.value);
+  };
+
+  const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  };
+
+  const getTwoYearsAgoDate = () => {
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+    twoYearsAgo.setDate(twoYearsAgo.getDate() + 1);
+    return twoYearsAgo.toISOString().split("T")[0];
+  };
+
+  useEffect(() => {
+    if (flows.length === 0) getDataFlows();
+  }, []);
 
   useEffect(() => {
     if (currentPage === -1) {
@@ -262,39 +344,61 @@ export default function FilteringProcesses() {
     }
   }, [currentPage, tableVisible]);
 
-  const handleChartClick = async () => {
-    const minDateValue = Date.parse(fromDate);
-    const maxDateValue = Date.parse(toDate);
+  interface IFormatedProcess {
+    Registro: number | ReactNode;
+    Apelido: string;
+    Fluxo: string;
+    Status: string;
+  }
 
-    if (
-      fromDate.length > 0 &&
-      toDate.length > 0 &&
-      maxDateValue > minDateValue
-    ) {
-      setTableVisible((current) => !current);
-      setCurrentPage(0);
-    } else if (tableVisible) {
-      if (fromDate.length === 0 || toDate.length === 0) {
-        toast({
-          id: "date-error",
-          title: "Datas não preenchidas",
-          description:
-            "Por favor, preencha ambas as datas (início e fim) para ver o gráfico.",
-          status: "error",
-          isClosable: true,
-        });
-      } else if (maxDateValue <= minDateValue) {
-        toast({
-          id: "date-order-error",
-          title: "Ordem das datas incorreta",
-          description:
-            "A data de início deve ser anterior à data de fim. Por favor, ajuste as datas e tente novamente.",
-          status: "error",
-          isClosable: true,
-        });
-      }
+  const [preparedProcessesDownload, setPreparedProcessesDownload] = useState(
+    [] as IFormatedProcess[]
+  );
+
+  function idFlowToFlowName(idFlow: number | number[]) {
+    const flowNames = flows
+      ?.filter((flow) =>
+        Array.isArray(idFlow)
+          ? idFlow.includes(flow.idFlow)
+          : idFlow === flow.idFlow
+      )
+      .map((flow) => flow.name);
+
+    return flowNames ? flowNames.join(", ") : "";
+  }
+
+  function formatDataTable(processes: Process[]) {
+    return processes.map((process) => {
+      return {
+        Registro: process.record,
+        Apelido: process.nickname,
+        Fluxo: idFlowToFlowName(process.idFlow),
+        // @ts-ignore
+        Status: labelByProcessStatus[process.status],
+      };
+    });
+  }
+
+  async function getProcessesForDownload() {
+    const processesForDownload = await getProcesses(
+      parseInt(selectedFlowValue, 10),
+      undefined,
+      filter,
+      false,
+      selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
+      fromDate === "" ? undefined : fromDate,
+      toDate === "" ? undefined : toDate
+    );
+
+    if (processesForDownload.value !== undefined) {
+      const formatedData = formatDataTable(processesForDownload.value);
+      setPreparedProcessesDownload(formatedData);
     }
-  };
+  }
+
+  useEffect(() => {
+    getProcessesForDownload();
+  }, [currentPage]);
 
   const [months, archived, finished] = useChartData(
     filteredProcesses,
@@ -320,82 +424,110 @@ export default function FilteringProcesses() {
                   fontStyle="normal"
                   lineHeight="24px"
                 >
-                  Visualizar quantidade de processos concluídos e/ou
-                  interrompidos em cada etapa
+                  Visualizar quantidade de processos concluídos / interrompidos
                 </Box>
               </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-              <Flex justifyContent="space-between">
-                <Flex w="70%" flexDirection="column">
-                  <Flex gap="5">
-                    <Select
-                      placeholder="Selecione o Fluxo"
-                      color="gray.500"
-                      value={selectedFlowValue}
-                      onChange={handleSelectChange}
-                    >
-                      {flows?.map((flow) => {
-                        return <option value={flow.idFlow}>{flow.name}</option>;
-                      })}
-                    </Select>
-                    {tableVisible && (
-                      <Select
-                        value={selectedStatus}
-                        onChange={handleStatusChange}
-                        placeholder="Status"
-                        w="35%"
-                        color="gray.500"
-                      >
-                        <option value="finished">Concluído</option>;
-                        <option value="archived">Interrompido</option>
-                      </Select>
-                    )}
-                  </Flex>
-                  <Flex alignItems="center" gap="5" marginTop="15">
-                    <Input
-                      w="50%"
-                      type="date"
-                      color="gray.500"
-                      value={fromDate}
-                      onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                        setFromDate(event.target.value);
-                      }}
-                    />
-                    <Text>à</Text>
-                    <Input
-                      w="50%"
-                      type="date"
-                      color="gray.500"
-                      value={toDate}
-                      onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                        setToDate(event.target.value);
-                      }}
-                    />
-                    <Button
-                      colorScheme="whatsapp"
-                      w="20%"
-                      onClick={handleConfirmClick}
-                    >
-                      Confirmar
-                    </Button>
-                  </Flex>
+              <Flex w="70%" flexDirection="column" marginBottom="4">
+                <Flex gap="5">
+                  <Select
+                    placeholder="Selecione o Fluxo"
+                    color="gray.500"
+                    value={selectedFlowValue}
+                    onChange={handleSelectChange}
+                  >
+                    {flows?.map((flow) => {
+                      return <option value={flow.idFlow}>{flow.name}</option>;
+                    })}
+                  </Select>
+
+                  <Select
+                    value={selectedStatus}
+                    onChange={handleStatusChange}
+                    placeholder="Status"
+                    w="35%"
+                    color="gray.500"
+                  >
+                    <option value="finished">Concluído</option>;
+                    <option value="archived">Interrompido</option>
+                  </Select>
                 </Flex>
-                <Flex>
-                  <Flex gap="2" alignItems="flex-end" alignSelf="end">
-                    <Button
-                      colorScheme="blue"
-                      variant="outline"
-                      onClick={() => {
-                        handleChartClick();
-                        // reload();
-                      }}
-                    >
-                      {!tableVisible ? "Ver relatório" : "Ver Gráfico"}
-                    </Button>
-                  </Flex>
+                <Flex alignItems="center" gap="5" marginTop="15">
+                  <Input
+                    w="50%"
+                    type="date"
+                    color="gray.500"
+                    value={fromDate}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      setFromDate(event.target.value);
+                    }}
+                    max={getCurrentDate()} // Define a data máxima como a data atual
+                    min={getTwoYearsAgoDate()} // Define a data mínima como a data há dois anos
+                  />
+                  <Text>à</Text>
+                  <Input
+                    w="50%"
+                    type="date"
+                    color="gray.500"
+                    value={toDate}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                      setToDate(event.target.value);
+                    }}
+                    max={getCurrentDate()} // Define a data máxima como a data atual
+                    min={getTwoYearsAgoDate()} // Define a data mínima como a data há dois anos
+                  />
+                  <Button
+                    colorScheme="whatsapp"
+                    w="20%"
+                    onClick={handleConfirmClick}
+                  >
+                    Confirmar
+                  </Button>
                 </Flex>
               </Flex>
+
+              <Flex alignItems="flex-end" justifyContent="space-between">
+                <Flex w="100%" gap="5">
+                  <ProcessQuantifier
+                    processQuantity={(
+                      processesData?.totalProcesses || "--"
+                    ).toString()}
+                    description="Total de Processos"
+                    numberColor="#44536D"
+                  />
+                  <ProcessQuantifier
+                    processQuantity={(
+                      processesData?.totalFinished || "--"
+                    ).toString()}
+                    description="Processos Concluídos"
+                    numberColor="#208F5C"
+                  />
+                  <ProcessQuantifier
+                    processQuantity={(processesData?.totalArchived || "--")
+                      .toString()
+                      .toString()}
+                    description="Processos Interrompidos"
+                    numberColor="#AE3A33"
+                  />
+                </Flex>
+                <Flex gap="5">
+                  <Button
+                    colorScheme="blue"
+                    variant="outline"
+                    onClick={() => {
+                      handleChartClick();
+                    }}
+                  >
+                    {!tableVisible ? "Ver relatório" : "Ver Gráfico"}
+                  </Button>
+                  <ExportExcel
+                    excelData={preparedProcessesDownload}
+                    fileName="Quantidade de Processos"
+                  />
+                </Flex>
+              </Flex>
+
               <Flex flexDirection="column">
                 <Flex
                   w="100%"
@@ -429,12 +561,14 @@ export default function FilteringProcesses() {
                           {
                             label: "Processos Concluídos",
                             data: archived,
-                            backgroundColor: "rgba(255, 99, 132, 0.5)",
+                            backgroundColor: "rgba(32, 143, 92, 0.9)",
+                            hidden: selectedStatus === "archived",
                           },
                           {
                             label: "Processos Interrompidos",
                             data: finished,
-                            backgroundColor: "rgba(53, 162, 235, 0.5)",
+                            backgroundColor: "rgba(174, 58, 51, 0.9)",
+                            hidden: selectedStatus === "finished",
                           },
                         ],
                       }}
@@ -449,14 +583,3 @@ export default function FilteringProcesses() {
     </Box>
   );
 }
-
-const replacer = (processes: Process[] | undefined) => {
-  if (!processes) return undefined;
-
-  return processes.map((process) => {
-    return {
-      ...process,
-      status: process.status === "archived" ? "Interrompido" : "Concluído",
-    };
-  });
-};
