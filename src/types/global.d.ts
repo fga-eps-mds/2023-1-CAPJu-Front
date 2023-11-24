@@ -74,10 +74,19 @@ declare global {
     effectiveDate: string;
     status: string;
     dueDate?: string;
+    flow?: { idFlow: number; name: string; idUnit: number };
     progress?: Progress[];
     isNextSage?: boolean;
     nameStage?: string;
     nameFlow?: string;
+    flow?: Flow;
+  };
+
+  type IFormatedProcess = {
+    Registro: number | ReactNode;
+    Apelido: string;
+    Fluxo: string;
+    Status: string;
   };
 
   type ProcessesFile = {

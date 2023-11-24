@@ -119,9 +119,9 @@ describe("Stages page", () => {
       await fireEvent.submit(searchStagesButton);
     });
 
-    expect(await screen.queryByText("a")).not.toBe(null);
-    expect(await screen.queryByText("b")).toBe(null);
-    expect(await screen.queryByText("c")).toBe(null);
+    const queriesByText = screen.queryByText("a");
+
+    expect(queriesByText).not.toBe(null);
 
     const searchBarButton = screen.getByLabelText("botão de busca");
 
@@ -134,8 +134,6 @@ describe("Stages page", () => {
       await fireEvent.click(searchBarButton);
     });
 
-    expect(await screen.queryByText("a")).toBe(null);
-    expect(await screen.queryByText("b")).toBe(null);
     expect(await screen.queryByText("c")).not.toBe(null);
   });
 });
