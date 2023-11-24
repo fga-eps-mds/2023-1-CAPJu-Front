@@ -208,7 +208,7 @@ export const downloadPDFQuantityProcesses = async (
     }
 
     pdf.addImage(
-      await imgToBase64("/src/images/UnB.png"),
+      await imgToBase64(assets.logoUnB),
       "png",
       spacingBetweenImages - 50,
       270,
@@ -217,7 +217,7 @@ export const downloadPDFQuantityProcesses = async (
     );
 
     pdf.addImage(
-      await imgToBase64("/src/images/justica_federal.png"),
+      await imgToBase64(assets.justicaFederal),
       "png",
       60 + 2 * spacingBetweenImages,
       270,
