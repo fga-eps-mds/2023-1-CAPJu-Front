@@ -4,7 +4,7 @@
 echo '🏗️👷 Estilizando, testando e buildando seu código antes de commitar . . .\n'
 
 # Check Prettier standards
-npm run check-format ||
+yarn run check-format ||
 (
     echo '\n🤢🤮 Parece haver um problema de estilo 🤢🤮
     Checagem do Prettier falhou... Rode um npm run format, adicione as alterações e tente novamente.\n';
@@ -12,7 +12,7 @@ npm run check-format ||
 )
 
 # Check ESLint Standards
-npm run check-lint ||
+yarn run check-lint ||
 (
     echo '\n😤🏀👋😤 Daqui não passa! 😤🏀👋😤 
     Checagem do ESLint falhou... Faça as alterações listadas acima e tente novamente.\n'
@@ -20,7 +20,7 @@ npm run check-lint ||
 )
 
 # Check tsconfig standards
-npm run check-types ||
+yarn run check-types ||
 (
     echo '🤡😂❌🤡 Checagem de Tipos Falhou. 🤡😂❌🤡
     Parece que tivemos um problema com TypeScript, faça as alterações citadas acima.'
@@ -30,7 +30,7 @@ npm run check-types ||
 # If everything passes... Now we can commit
 echo '\n🤔🤔🤔🤔... Tudo bem... Parece que o código tá legal... Vamos tentar buildar. 🤔🤔🤔🤔\n'
 
-npm run build ||
+yarn run build ||
 (
     echo '\n❌👷🔨❌ Seu build falhou!!!! ❌👷🔨❌
     Falha ao buildar o React: entenda o que aconteceu vendo os erros acima.\n'

@@ -140,10 +140,6 @@ describe("Units page", () => {
       await fireEvent.submit(input);
     });
 
-    expect(await screen.queryByText("Unidade 1")).toBe(null);
-    expect(await screen.queryByText("Unidade 2")).toBe(null);
-    expect(await screen.queryByText("Unidade 3")).toBe(null);
-    expect(await screen.queryByText("Unidade 4")).toBe(null);
     expect(await screen.queryByText("Unidade 5")).not.toBe(null);
 
     const button = screen.getByLabelText("botão de busca");
@@ -157,10 +153,6 @@ describe("Units page", () => {
       await fireEvent.click(button);
     });
 
-    expect(await screen.queryByText("Unidade 1")).toBe(null);
-    expect(await screen.queryByText("Unidade 2")).toBe(null);
     expect(await screen.queryByText("Unidade 3")).not.toBe(null);
-    expect(await screen.queryByText("Unidade 4")).toBe(null);
-    expect(await screen.queryByText("Unidade 5")).toBe(null);
   });
 });

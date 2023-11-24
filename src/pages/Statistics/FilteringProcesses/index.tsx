@@ -86,7 +86,9 @@ export default function FilteringProcesses() {
   const [toDate, setToDate] = useState<string>("");
   const [key, setKey] = useState(Math.random());
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [filter] = useState<string | undefined>(undefined);
+  const [filter] = useState<{ type: string; value: string } | undefined>(
+    undefined
+  );
   const [preparedProcessesDownload, setPreparedProcessesDownload] = useState(
     [] as IFormatedProcess[]
   );
@@ -96,6 +98,10 @@ export default function FilteringProcesses() {
   const [formattedfromDate, setFormattedfromDate] = useState<
     string | undefined
   >(undefined);
+
+  const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedStatus(event.target.value);
+  };
 
   const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
     queryKey: ["flows"],
@@ -248,10 +254,6 @@ export default function FilteringProcesses() {
       },
     }),
   ];
-
-  const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedStatus(event.target.value);
-  };
 
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;

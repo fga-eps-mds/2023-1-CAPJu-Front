@@ -30,9 +30,9 @@ export function getSequencesSortedStagesIds(
   // @ts-ignore
   return sortedSequences.reduce((acc, curr, index) => {
     if (index === sortedSequences?.length - 1)
-      return [...acc, curr.from, curr.to];
+      return [...acc, curr?.from, curr?.to];
 
-    return [...acc, curr.from];
+    return [...acc, curr?.from];
   }, []);
 }
 
