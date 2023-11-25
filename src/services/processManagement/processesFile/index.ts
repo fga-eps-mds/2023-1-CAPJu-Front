@@ -26,14 +26,8 @@ export const importFile = async (data: {
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -53,14 +47,8 @@ export const findFileById = async (
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -81,13 +69,8 @@ export const findAllPaged = async (
     );
     return { type: "success", value: res.data as any };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -107,13 +90,8 @@ export const findAllItemsPaged = async (
     );
     return { type: "success", value: res.data as any };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -130,14 +108,8 @@ export const deleteById = async (
       value: undefined,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -156,13 +128,7 @@ export const updateFileItemById = async (
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };

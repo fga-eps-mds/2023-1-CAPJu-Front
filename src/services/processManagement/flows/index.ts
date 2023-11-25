@@ -22,14 +22,8 @@ export const getFlows = async (
       totalPages: res.data.totalPages,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -41,14 +35,8 @@ export const getFlowById = async (
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -63,14 +51,8 @@ export const createFlow = async (data: {
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -82,14 +64,8 @@ export const getHistoricFlow = async (idFlow: number) => {
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -101,14 +77,8 @@ export const getExpectedFlow = async (idFlow: number) => {
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -123,14 +93,8 @@ export const updateFlow = async (data: {
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -140,13 +104,7 @@ export const deleteFlow = async (id: number) => {
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };

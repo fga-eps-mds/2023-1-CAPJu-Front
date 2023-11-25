@@ -80,7 +80,7 @@ function EmailEdition() {
     toast({
       id: "login-error",
       title: "Erro na edição de email",
-      description: res.error?.message,
+      description: res.error?.message || "",
       status: "error",
       isClosable: true,
     });

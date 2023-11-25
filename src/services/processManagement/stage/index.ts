@@ -22,14 +22,8 @@ export const getStages = async (
       totalPages: res.data.totalPages,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -48,14 +42,8 @@ export const createStage = async (data: {
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -74,14 +62,8 @@ export const updateStage = async (data: {
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -96,13 +78,7 @@ export const deleteStage = async (idStage: number): Promise<Result<Stage>> => {
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
