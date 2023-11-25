@@ -1,6 +1,6 @@
 import MockAdapter from "axios-mock-adapter";
 import { api } from "../api";
-import { signIn, signUp, getUserById } from "../user";
+import { signIn, signUp, getUserById, updateUser } from "../user";
 
 const apiMockUser = new MockAdapter(api.user);
 const apiMockRole = new MockAdapter(api.role);
@@ -142,6 +142,36 @@ describe("Testes para a função getUserById", () => {
       type: "error",
       value: undefined,
       error: new Error("Usuario não encontrado"),
+    });
+  });
+});
+
+describe("Testes para a função updateUser", () => {
+  afterEach(() => {
+    apiMockUser.reset();
+  });
+
+  it("updateUser: sucesso", async () => {
+    const cpf = "11111111111";
+    const data = { email: "email@email" };
+    apiMockUser.onPut(`/updateUser/${cpf}`, data).reply(200, { ...data });
+
+    const result = await updateUser(data, cpf);
+
+    expect(result).toEqual({ type: "success", value: data });
+  });
+
+  it("updateUser: erro", async () => {
+    const cpf = "11111111111";
+    const data = { email: "email@email" };
+    apiMockUser.onPut(`/updateUser/${cpf}`, data).reply(500, "Ocorreu um erro");
+
+    const result = await updateUser(data, cpf);
+
+    expect(result).toEqual({
+      type: "error",
+      error: new Error("Ocorreu um erro"),
+      value: undefined,
     });
   });
 });
