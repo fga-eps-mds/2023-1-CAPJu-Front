@@ -65,6 +65,7 @@ export function EditionModal({
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const roles = useMemo(() => {
     return (
@@ -129,7 +130,7 @@ export function EditionModal({
             <Button variant="ghost" onClick={onClose} size="sm">
               Cancelar
             </Button>
-            <Button colorScheme="blue" type="submit" size="sm">
+            <Button colorScheme="blue" type="submit">
               Salvar
             </Button>
           </ModalFooter>

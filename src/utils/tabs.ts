@@ -36,7 +36,7 @@ export const tabs = [
     action: "see-request",
   },
   {
-    label: "Perfis e Permissões",
+    label: "Perfis e permissões",
     pathIndex: "/perfis",
     path: "/perfis",
     action: "manage-profiles",

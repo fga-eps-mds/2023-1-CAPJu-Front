@@ -43,6 +43,7 @@ export function Requests() {
 
       return res;
     },
+    refetchOnWindowFocus: false,
   });
   const {
     isOpen: isAcceptOpen,
@@ -57,6 +58,7 @@ export function Requests() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const {
     isOpen: isViewOpen,
@@ -76,6 +78,7 @@ export function Requests() {
 
       return res;
     },
+    refetchOnWindowFocus: false,
   });
 
   const tableActions = useMemo(
@@ -125,7 +128,9 @@ export function Requests() {
     if (!isRequestsFetched || !isUnitsFetched) return [];
 
     return (
+      // @ts-ignore
       (requestsData?.value?.reduce(
+        // @ts-ignore
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
           return [
             ...acc,
@@ -193,7 +198,14 @@ export function Requests() {
 
   return (
     <>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
+      <Flex
+        w="90%"
+        maxW={1120}
+        flexDir="column"
+        gap="3"
+        mb="4"
+        style={{ marginTop: "30px " }}
+      >
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Text fontSize="lg" fontWeight="semibold">
             Solicitações

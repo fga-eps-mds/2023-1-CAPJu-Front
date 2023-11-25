@@ -139,7 +139,7 @@ export function DataUpdateModal({ user }: ModalProps) {
             />
           </ModalBody>
           <ModalFooter gap="2">
-            <Button colorScheme="blue" type="submit" size="sm">
+            <Button colorScheme="blue" type="submit">
               Salvar
             </Button>
           </ModalFooter>

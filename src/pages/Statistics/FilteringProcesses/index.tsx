@@ -74,6 +74,7 @@ export default function FilteringProcesses() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const { state } = useLocation();
 
@@ -161,6 +162,7 @@ export default function FilteringProcesses() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
 
   const tableActions = useMemo<TableAction[]>(
@@ -198,11 +200,8 @@ export default function FilteringProcesses() {
               tableActions,
               actionsProps: {
                 process: curr,
-                pathname: `/processos/${curr.record}`,
-                state: {
-                  process: curr,
-                  ...(state || {}),
-                },
+                pathname: `/processos/${curr.idProcess}`,
+                state: { process: curr, ...(state || {}) },
               },
               flowName: currFlow?.name,
               // @ts-ignore

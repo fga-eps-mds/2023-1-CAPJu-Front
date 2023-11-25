@@ -31,6 +31,7 @@ export type DataTableProps<Data extends object> = {
   maxWidth?: string | number;
   size?: string | string[];
   emptyTableMessage?: string;
+  rawData?: any;
 };
 
 export function DataTable<Data extends object>({
@@ -42,6 +43,7 @@ export function DataTable<Data extends object>({
   maxWidth = 1120,
   size = ["sm", "md"],
   emptyTableMessage = "Esta tabela está vazia no momento.",
+  rawData,
 }: DataTableProps<Data>) {
   const navigate = useNavigate();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -131,9 +133,18 @@ export function DataTable<Data extends object>({
                     >
                       {(value as TableAction[])?.map(
                         (actionItem: TableAction) => {
+                          const disabled =
+                            actionItem.disabled ||
+                            (actionItem.disabledOn &&
+                              actionItem.disabledOn(rawData[index]));
+                          const label = disabled
+                            ? actionItem.labelOnDisable || actionItem.label
+                            : actionItem.label;
+                          actionItem = { ...actionItem, label };
                           return (
                             <ActionButton
                               key={actionItem.label}
+                              disabled={disabled}
                               {...actionItem}
                               action={() => {
                                 if (actionItem.action)

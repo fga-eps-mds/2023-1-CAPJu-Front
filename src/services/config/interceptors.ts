@@ -3,15 +3,15 @@ import { AxiosError, InternalAxiosRequestConfig } from "axios";
 export function authorization(
   config: InternalAxiosRequestConfig<any>
 ): InternalAxiosRequestConfig<any> {
-  const localStorageUser = localStorage.getItem("@CAPJu:user");
+  const bearerTokenWithQuotes = localStorage.getItem("@CAPJu:jwt_user");
 
-  if (!localStorageUser) return config;
+  if (!bearerTokenWithQuotes) return config;
 
-  const user = JSON.parse(localStorageUser);
+  const bearerToken = JSON.parse(bearerTokenWithQuotes);
 
   const authConfig = config;
 
-  authConfig.headers.Authorization = user?.token ? `Bearer ${user?.token}` : "";
+  authConfig.headers.Authorization = `Bearer ${bearerToken}`;
 
   return authConfig;
 }

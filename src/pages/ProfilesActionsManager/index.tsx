@@ -45,6 +45,7 @@ function ProfilesActionsManager() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const currentAllowedActions = useMemo<{
     [key: string]: string[];
@@ -119,8 +120,6 @@ function ProfilesActionsManager() {
         queryClient.invalidateQueries({ queryKey: "user-data" });
       }}
       colorScheme="green"
-      size="xs"
-      fontSize="sm"
       ml="auto"
     >
       Salvar
@@ -131,16 +130,16 @@ function ProfilesActionsManager() {
     <PrivateLayout>
       <Flex flexDir="column" gap="5" width="90%" maxWidth={1120} mb="10">
         {SaveButton}
-        <Table bgColor="white" w="100%" borderRadius="4">
+        <Table bgColor="white" w="100%" borderRadius="4" size="lg">
           <Thead>
             <Tr>
               <Td>
-                <Text fontSize="sm">Ações</Text>
+                <Text fontSize="md">Ações</Text>
               </Td>
               {rolesData?.value.map((role) => {
                 return (
                   <Td key={role.name}>
-                    <Text fontSize="sm">{role.name}</Text>
+                    <Text fontSize="md">{role.name}</Text>
                   </Td>
                 );
               })}
@@ -151,7 +150,7 @@ function ProfilesActionsManager() {
               return (
                 <Tr key={action.label}>
                   <Td>
-                    <Text fontSize="xs">{action.label}</Text>
+                    <Text fontSize="md">{action.label}</Text>
                   </Td>
                   {rolesData?.value.map((role) => {
                     const roleFormValues = formValues[role.idRole] || [];
@@ -159,7 +158,7 @@ function ProfilesActionsManager() {
                     return (
                       <Td key={`${action.label}-${role.name}`}>
                         <Checkbox
-                          size="sm"
+                          size="md"
                           colorScheme="green"
                           isChecked={roleFormValues.some(
                             (i) => i === action.value

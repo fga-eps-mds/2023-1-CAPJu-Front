@@ -29,6 +29,7 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
+import { FaEye } from "react-icons/fa";
 
 import { getProcesses } from "services/processManagement/processes";
 import { isActionAllowedToUser } from "utils/permissions";
@@ -41,6 +42,7 @@ import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
+import { VisualizationFilesModal } from "./ProcessesFile/VisualizationFilesModal";
 import line52 from "../../images/Line_52.svg";
 
 function Processes() {
@@ -73,6 +75,11 @@ function Processes() {
     isOpen: isEditionOpen,
     onOpen: onEditionOpen,
     onClose: onEditionClose,
+  } = useDisclosure();
+  const {
+    isOpen: isProcessesFileModalOpen,
+    onOpen: onProcessesFileModalOpen,
+    onClose: onProcessesFileModalClose,
   } = useDisclosure();
   const [currentPage, setCurrentPage] = useState(0);
   const handlePageChange = (selectedPage: { selected: number }) => {
@@ -330,8 +337,8 @@ function Processes() {
               </Button>
             ) : null}
             <Button
-              size="xs"
-              fontSize="sm"
+              size="md"
+              fontSize="md"
               colorScheme="green"
               isDisabled={
                 !isActionAllowedToUser(
@@ -341,7 +348,21 @@ function Processes() {
               }
               onClick={onCreationOpen}
             >
-              <AddIcon mr="2" boxSize={3} /> Criar Processo
+              <AddIcon mr="2" boxSize={4} /> Criar Processo
+            </Button>
+            <Button
+              size="md"
+              fontSize="md"
+              colorScheme="green"
+              onClick={onProcessesFileModalOpen}
+            >
+              <Icon
+                as={FaEye}
+                mr="2"
+                boxSize={4}
+                style={{ marginRight: "8px" }}
+              />{" "}
+              Visualizar lotes
             </Button>
           </Flex>
         </Flex>
@@ -455,6 +476,7 @@ function Processes() {
       <CreationModal
         isOpen={isCreationOpen}
         onClose={onCreationClose}
+        // @ts-ignore
         afterSubmission={refetchProcesses}
       />
       {selectedProcess && (
@@ -473,6 +495,10 @@ function Processes() {
           refetchStages={refetchProcesses}
         />
       )}
+      <VisualizationFilesModal
+        isOpen={isProcessesFileModalOpen}
+        onClose={onProcessesFileModalClose}
+      />
     </PrivateLayout>
   );
 }

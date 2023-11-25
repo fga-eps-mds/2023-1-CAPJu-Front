@@ -9,7 +9,7 @@ import {
 } from "utils/aboutText";
 import { colors } from "styles/colors";
 import logoJusticaFederal from "images/justica_federal.png";
-import logoUnB from "images/UnB.png";
+import logoUnB from "images/unb.png";
 import { useAuth } from "hooks/useAuth";
 import AboutAccordion from "./Accordion";
 

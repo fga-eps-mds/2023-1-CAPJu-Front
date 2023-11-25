@@ -72,6 +72,7 @@ export function Router() {
   const { data: rolesData } = useQuery({
     queryKey: ["roles"],
     queryFn: getAllRoles,
+    refetchOnWindowFocus: false,
   });
 
   const router = createBrowserRouter([

@@ -51,6 +51,7 @@ function Stages() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const {
     data: stagesData,
@@ -78,12 +79,13 @@ function Stages() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
 
   const tableActions = useMemo(
     () => [
       {
-        label: "Editar Etapa",
+        label: "Editar etapa",
         icon: <Icon as={MdEdit} boxSize={4} />,
         action: ({ stage }: { stage: Stage }) => {
           selectStage(stage);
@@ -105,7 +107,9 @@ function Stages() {
         actionName: "delete-stage",
         disabled: !isActionAllowedToUser(
           userData?.value?.allowedActions || [],
-          "delete-stage"
+          "delete-stage",
+          // @ts-ignore
+          userData
         ),
       },
     ],
@@ -172,8 +176,6 @@ function Stages() {
             Etapas
           </Text>
           <Button
-            size="xs"
-            fontSize="sm"
             colorScheme="green"
             isDisabled={
               !isActionAllowedToUser(
@@ -227,8 +229,9 @@ function Stages() {
         isDataFetching={!isStagesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas etapas."
       />
-      {stagesData?.totalPages !== undefined ? (
+      {![undefined, 0, null].includes(stagesData?.totalPages) ? (
         <Pagination
+          // @ts-ignore
           pageCount={stagesData?.totalPages}
           onPageChange={handlePageChange}
         />

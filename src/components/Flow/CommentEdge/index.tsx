@@ -52,7 +52,7 @@ export function CommentEdge({
     onOpen: onViewOpen,
     onClose: onViewClose,
   } = useDisclosure();
-  const { from, to, processRecord, commentary, refetch, idNote } = data;
+  const { from, to, commentary, refetch, idNote, idProcess } = data;
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -67,7 +67,7 @@ export function CommentEdge({
 
     try {
       const res = await addNoteToProcess({
-        record: processRecord,
+        idProcess,
         idStageA: from,
         idStageB: to,
         commentary: comment,
@@ -148,7 +148,7 @@ export function CommentEdge({
           {!commentary ? (
             <Button
               colorScheme="blue"
-              size="xs"
+              size="md"
               fontSize="10"
               onClick={() => onAddOpen()}
             >

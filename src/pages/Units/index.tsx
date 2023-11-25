@@ -30,21 +30,25 @@ function Units() {
     { type: string; value: string } | undefined
   >(undefined);
   const { getUserData } = useAuth();
+
   const {
     isOpen: isCreationOpen,
     onOpen: onCreationOpen,
     onClose: onCreationClose,
   } = useDisclosure();
+
   const {
     isOpen: isDeletionOpen,
     onOpen: onDeletionOpen,
     onClose: onDeletionClose,
   } = useDisclosure();
+
   const {
     isOpen: isEditionOpen,
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+
   const [currentPage, setCurrentPage] = useState(0);
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
@@ -72,10 +76,12 @@ function Units() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const tableActions = useMemo(
     () => [
@@ -162,13 +168,13 @@ function Units() {
             Unidades
           </Text>
           <Button
-            size="xs"
-            fontSize="sm"
+            aria-label="criar unidade"
             colorScheme="green"
             isDisabled={
               !isActionAllowedToUser(
                 userData?.value?.allowedActions || [],
-                "create-unit"
+                "create-unit", // @ts-ignore
+                userData
               )
             }
             onClick={onCreationOpen}

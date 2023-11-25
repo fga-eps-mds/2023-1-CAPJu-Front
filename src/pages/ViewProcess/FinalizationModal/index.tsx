@@ -36,7 +36,7 @@ export function FinalizationModal({
           </Text>
         </ModalBody>
         <ModalFooter gap="2">
-          <Button variant="ghost" onClick={onClose} size="sm">
+          <Button variant="ghost" onClick={onClose}>
             Cancelar
           </Button>
           <Button colorScheme="red" onClick={handleFinishProcess} size="sm">

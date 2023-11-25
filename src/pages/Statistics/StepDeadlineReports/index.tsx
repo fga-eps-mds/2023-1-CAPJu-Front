@@ -212,7 +212,7 @@ export default function StepDeadlineReports() {
               tableActions,
               actionsProps: {
                 process: curr,
-                pathname: `/processos/${curr.record}`,
+                pathname: `/processos/${curr.idProcess}`,
                 state: {
                   process: curr,
                   ...(state || {}),

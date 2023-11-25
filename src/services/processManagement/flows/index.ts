@@ -74,6 +74,44 @@ export const createFlow = async (data: {
   }
 };
 
+export const getHistoricFlow = async (idFlow: number) => {
+  try {
+    const res = await api.processManagement.get<Array<number>>(
+      `/flow/historicFlow/${idFlow}`
+    );
+
+    return { type: "success", value: res.data };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const getExpectedFlow = async (idFlow: number) => {
+  try {
+    const res = await api.processManagement.get<
+      Array<{ idStage: number; name: string; duration: number }>
+    >(`/flowStage/${idFlow}`);
+
+    return { type: "success", value: res.data };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
 export const updateFlow = async (data: {
   name: string;
   sequences: FlowSequence[];
