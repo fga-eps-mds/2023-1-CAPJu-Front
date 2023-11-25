@@ -1,4 +1,9 @@
-import { useState, useMemo, useEffect } from "react";
+import {
+  useState,
+  useMemo,
+  useEffect,
+  ChangeEvent /* ChangeEvent */,
+} from "react";
 import { useQuery } from "react-query";
 import {
   Flex,
@@ -10,6 +15,8 @@ import {
   useToast,
   Tooltip,
   chakra,
+  Select,
+  Image,
 } from "@chakra-ui/react";
 import {
   AddIcon,
@@ -25,7 +32,6 @@ import { IoReturnDownBackOutline } from "react-icons/io5";
 import { FaEye } from "react-icons/fa";
 
 import { getProcesses } from "services/processManagement/processes";
-import { getFlows } from "services/processManagement/flows";
 import { isActionAllowedToUser } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
@@ -37,6 +43,7 @@ import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
 import { VisualizationFilesModal } from "./ProcessesFile/VisualizationFilesModal";
+import line52 from "../../images/Line_52.svg";
 
 function Processes() {
   const { getUserData } = useAuth();
@@ -49,7 +56,9 @@ function Processes() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const [filter, setFilter] = useState<string | undefined>(undefined);
+  const [filter, setFilter] = useState<
+    { type: string; value: string } | undefined
+  >(undefined);
   const [legalPriority, setLegalPriority] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
   const {
@@ -76,26 +85,10 @@ function Processes() {
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
   };
-  const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
-    queryKey: ["flows"],
-    queryFn: async () => {
-      const res = await getFlows();
-
-      if (res.type === "error") throw new Error(res.error.message);
-
-      return res;
-    },
-    onError: () => {
-      toast({
-        id: "flows-error",
-        title: "Erro ao carregar fluxos",
-        description:
-          "Houve um erro ao carregar fluxos, favor tentar novamente.",
-        status: "error",
-        isClosable: true,
-      });
-    },
-  });
+  const [selectedFilter, setSelectedFilter] = useState("process");
+  const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedFilter(event.target.value);
+  };
   const {
     data: processesData,
     isFetched: isProcessesFetched,
@@ -171,7 +164,7 @@ function Processes() {
     [isProcessesFetched, isUserFetched, userData]
   );
   const processesTableRows = useMemo<TableRow<Process>[]>(() => {
-    if (!isProcessesFetched || !isFlowsFetched) return [];
+    if (!isProcessesFetched) return [];
 
     return (
       (processesData?.value?.reduce(
@@ -179,10 +172,8 @@ function Processes() {
           acc: TableRow<Process>[] | Process[],
           curr: TableRow<Process> | Process
         ) => {
-          const currFlow = flowsData?.value?.find(
-            (item) =>
-              item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
-          ) as Flow;
+          const currFlow = curr?.flow as Flow;
+
           const sortedStagesIds = getSequencesSortedStagesIds(
             currFlow?.sequences
           );
@@ -241,8 +232,6 @@ function Processes() {
     isProcessesFetched,
     userData,
     isUserFetched,
-    flowsData,
-    isFlowsFetched,
     tableActions,
   ]);
 
@@ -276,6 +265,13 @@ function Processes() {
         isSortable: true,
       },
     }),
+    tableColumnHelper.accessor("stageName", {
+      cell: (info) => info.getValue(),
+      header: "Etapa Atual",
+      meta: {
+        isSortable: true,
+      },
+    }),
     tableColumnHelper.accessor("status", {
       cell: (info) => info.getValue(),
       header: "Status",
@@ -295,7 +291,26 @@ function Processes() {
 
   useEffect(() => {
     refetchProcesses();
-  }, [flowsData, isFlowsFetched, currentPage, showFinished, legalPriority]);
+  }, [currentPage, showFinished, legalPriority]);
+
+  const [placeholder, setPlaceholder] = useState<string>(
+    "Pesquisar processos (por registro ou apelido)"
+  );
+  useEffect(() => {
+    switch (selectedFilter) {
+      case "process":
+        setPlaceholder("Pesquise o processo pelo nome ou apelido:");
+        break;
+      case "stage":
+        setPlaceholder("Pesquise a etapa pelo nome:");
+        break;
+      case "flow":
+        setPlaceholder("Pesquise o fluxo pelo nome:");
+        break;
+      default:
+      // do nothing
+    }
+  }, [selectedFilter]);
 
   return (
     <PrivateLayout>
@@ -351,8 +366,8 @@ function Processes() {
             </Button>
           </Flex>
         </Flex>
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Flex justifyContent="flex-start" w="100%">
+        <Flex w="100%" gap="2" flexWrap="wrap">
+          <Flex w="100%">
             <chakra.form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -361,20 +376,60 @@ function Processes() {
               w="100%"
               display="flex"
               flexDirection="row"
+              color="gray.500"
             >
-              <Input
-                placeholder="Pesquisar processos (por registro ou apelido)"
-                value={filter}
-                onChange={({ target }) => setFilter(target.value)}
-                variant="filled"
-                css={{
-                  "&, &:hover, &:focus": {
-                    background: "white",
-                  },
-                }}
-              />
+              <Flex
+                borderRadius="8px"
+                w="100%"
+                gap="2"
+                alignItems="center"
+                backgroundColor="white"
+              >
+                <Input
+                  placeholder={placeholder}
+                  value={filter?.value}
+                  onChange={({ target }) =>
+                    setFilter({ type: selectedFilter, value: target.value })
+                  }
+                  variant="filled"
+                  w="100%"
+                  css={{
+                    "&, &:hover, &:focus": {
+                      background: "white",
+                    },
+                  }}
+                  backgroundColor="red"
+                  border="30px"
+                />
+                <Image
+                  zIndex="9999"
+                  src={line52}
+                  marginLeft="0%"
+                  width="3%"
+                  height="27px"
+                  border="30px"
+                />
+                <Select
+                  css={{
+                    "&, &:hover, &:focus": {
+                      background: "white",
+                    },
+                  }}
+                  borderWidth="0"
+                  marginRight="0%"
+                  w="15%"
+                  value={selectedFilter}
+                  onChange={handleFilterChange}
+                  border="30px"
+                  outline="none"
+                >
+                  <option value="stage">Etapa</option>
+                  <option value="flow">Fluxo</option>
+                  <option value="process">Processo</option>
+                </Select>
+              </Flex>
               <Button
-                aria-label="botão de busca"
+                aria-label="botao-busca-processes"
                 colorScheme="green"
                 marginLeft="2"
                 justifyContent="center"
@@ -395,7 +450,7 @@ function Processes() {
             </Checkbox>
             <Checkbox
               colorScheme="green"
-              borderColor="gray.600"
+              borderColor="gray.6px00"
               checked={showFinished}
               onChange={() => setShowFinished(!showFinished)}
             >

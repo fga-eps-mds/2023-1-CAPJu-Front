@@ -16,7 +16,14 @@ import ExportExcel from "components/ExportExcel";
 import { DataTable } from "components/DataTable";
 import { Pagination } from "components/Pagination";
 import { ProcessQuantifier } from "components/ProcessQuantifier";
-import { ReactNode, useEffect, useState, useMemo, ChangeEvent } from "react";
+import {
+  // ReactNode,
+  useEffect,
+  useState,
+  useMemo,
+  ChangeEvent,
+  useCallback,
+} from "react";
 import { useLocation } from "react-router-dom";
 import { getFlows } from "services/processManagement/flows";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -25,6 +32,7 @@ import { useQuery } from "react-query";
 import { useAuth } from "hooks/useAuth";
 import { isActionAllowedToUser } from "utils/permissions";
 import { ViewIcon } from "@chakra-ui/icons";
+import { downloadPDFQuantityProcesses } from "utils/pdf";
 import { labelByProcessStatus } from "utils/constants";
 import {
   Chart as ChartJS,
@@ -79,7 +87,22 @@ export default function FilteringProcesses() {
   const [toDate, setToDate] = useState<string>("");
   const [key, setKey] = useState(Math.random());
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [filter] = useState<string | undefined>(undefined);
+  const [filter] = useState<{ type: string; value: string } | undefined>(
+    undefined
+  );
+  const [preparedProcessesDownload, setPreparedProcessesDownload] = useState(
+    [] as IFormatedProcess[]
+  );
+  const [formattedtoDate, setFormattedtoDate] = useState<string | undefined>(
+    undefined
+  );
+  const [formattedfromDate, setFormattedfromDate] = useState<
+    string | undefined
+  >(undefined);
+
+  const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedStatus(event.target.value);
+  };
 
   const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
     queryKey: ["flows"],
@@ -231,10 +254,6 @@ export default function FilteringProcesses() {
     }),
   ];
 
-  const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedStatus(event.target.value);
-  };
-
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
     setSelectedFlowValue(selectedValue);
@@ -330,6 +349,78 @@ export default function FilteringProcesses() {
     return twoYearsAgo.toISOString().split("T")[0];
   };
 
+  const handleDownloadPDFQuantityProcesses = useCallback(async () => {
+    const flowName =
+      selectedFlowValue === ""
+        ? "Não Definido"
+        : idFlowToFlowName(parseInt(selectedFlowValue, 10));
+
+    if (toDate === undefined || fromDate === undefined) {
+      const toDateConvert = new Date(toDate);
+      const fromDateConvert = new Date(fromDate);
+
+      const dayMin = toDateConvert.getDate();
+      const monthMin = toDateConvert.getMonth() + 1;
+      const yearMin = toDateConvert.getFullYear();
+
+      const dayMax = fromDateConvert.getDate();
+      const montMax = fromDateConvert.getMonth() + 1;
+      const yearMax = fromDateConvert.getFullYear();
+
+      setFormattedtoDate(
+        `${dayMin < 10 ? "0" : ""}${dayMin}/${
+          monthMin < 10 ? "0" : ""
+        }${monthMin}/${yearMin}`
+      );
+      setFormattedfromDate(
+        `${dayMax < 10 ? "0" : ""}${dayMax}/${
+          montMax < 10 ? "0" : ""
+        }${montMax}/${yearMax}`
+      );
+    }
+
+    let statusLabel;
+
+    if (selectedStatus === "") {
+      statusLabel = "Não Definido";
+    } else if (selectedStatus === "archived") {
+      statusLabel = "Interrompido";
+    } else {
+      statusLabel = "Concluído";
+    }
+
+    const resAllProcess = await getProcesses(
+      parseInt(selectedFlowValue, 10),
+      undefined,
+      filter,
+      false,
+      selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
+      fromDate === "" ? undefined : fromDate,
+      toDate === "" ? undefined : toDate
+    );
+
+    if (resAllProcess.type === "success") {
+      await downloadPDFQuantityProcesses(
+        flowName,
+        statusLabel,
+        formattedtoDate === undefined ? "--" : formattedtoDate,
+        formattedfromDate === undefined ? "--" : formattedfromDate,
+        resAllProcess.value,
+        processesData?.totalProcesses,
+        processesData?.totalArchived,
+        processesData?.totalFinished
+      );
+    } else {
+      toast({
+        id: "error-getting-stages",
+        title: "Erro ao baixar pdf",
+        description: "Houve um erro ao buscar processos.",
+        status: "error",
+        isClosable: true,
+      });
+    }
+  }, [selectedFlowValue, selectedStatus, toDate, fromDate, processesData]);
+
   useEffect(() => {
     if (flows.length === 0) getDataFlows();
   }, []);
@@ -341,17 +432,6 @@ export default function FilteringProcesses() {
       refetchProcesses();
     }
   }, [currentPage, tableVisible]);
-
-  interface IFormatedProcess {
-    Registro: number | ReactNode;
-    Apelido: string;
-    Fluxo: string;
-    Status: string;
-  }
-
-  const [preparedProcessesDownload, setPreparedProcessesDownload] = useState(
-    [] as IFormatedProcess[]
-  );
 
   function idFlowToFlowName(idFlow: number | number[]) {
     const flowNames = flows
@@ -519,6 +599,13 @@ export default function FilteringProcesses() {
                   >
                     {!tableVisible ? "Ver relatório" : "Ver Gráfico"}
                   </Button>
+                  <Button
+                    colorScheme="blue"
+                    size="md"
+                    onClick={() => handleDownloadPDFQuantityProcesses()}
+                  >
+                    PDF
+                  </Button>
                   <ExportExcel
                     excelData={preparedProcessesDownload}
                     fileName="Quantidade de Processos"
@@ -552,6 +639,7 @@ export default function FilteringProcesses() {
                 <Flex w="70%" alignSelf="center">
                   {!tableVisible && (
                     <Bar
+                      id="chart-quantidade-de-processos"
                       options={options}
                       data={{
                         labels: months,
