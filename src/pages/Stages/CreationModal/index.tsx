@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -37,7 +37,6 @@ interface CreationModalProps {
 }
 
 export function CreationModal({
-  user,
   isOpen,
   onClose,
   afterSubmission,
@@ -60,7 +59,6 @@ export function CreationModal({
     const body = {
       name: formData.name,
       duration: formData.duration,
-      idUnit: user.idUnit,
     };
 
     const res = await createStage(body);
@@ -95,7 +93,7 @@ export function CreationModal({
   }, [isOpen]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
+    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Criar etapa</ModalHeader>
@@ -115,13 +113,21 @@ export function CreationModal({
               placeholder="Duração da etapa"
               errors={errors.duration}
               {...register("duration")}
+              min={1}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const { value } = e.target;
+                const numValue = parseFloat(value);
+                if (value && (numValue < 1 || !Number.isInteger(numValue))) {
+                  e.target.value = "";
+                }
+              }}
             />
           </ModalBody>
           <ModalFooter gap="2">
-            <Button variant="ghost" onClick={onClose} size="sm">
+            <Button variant="ghost" onClick={onClose}>
               Cancelar
             </Button>
-            <Button colorScheme="blue" type="submit" size="sm">
+            <Button colorScheme="blue" type="submit">
               Salvar
             </Button>
           </ModalFooter>

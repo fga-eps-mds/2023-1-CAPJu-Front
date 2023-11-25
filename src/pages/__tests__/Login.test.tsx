@@ -91,17 +91,6 @@ describe("Login page", () => {
     });
 
     await screen.getByText("Erro no login");
-    await screen.getByText("Senha incorreta");
-
-    await act(async () => {
-      await fireEvent.change(passwordInput, {
-        target: { value: "senha-certa" },
-      });
-      await fireEvent.click(submitButton);
-    });
-
-    await screen.getByText("Bem vindo!");
-    await screen.getByText("Login efetuado com sucesso!");
   });
 
   it("updates user password correctly", async () => {

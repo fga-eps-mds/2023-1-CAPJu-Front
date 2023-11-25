@@ -1,17 +1,17 @@
 import { useEffect } from "react";
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  chakra,
   Button,
-  useToast,
-  Text,
+  chakra,
   Checkbox,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  useToast,
 } from "@chakra-ui/react";
 import * as yup from "yup";
 import { useQuery } from "react-query";
@@ -32,6 +32,15 @@ type FormValues = {
   idPriority: number;
 };
 
+interface CreationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
+  afterSubmission: (createdProcess: Result<Process>) => void;
+  recordParam?: string;
+  nicknameParam?: string;
+}
+
 const validationSchema = yup.object({
   record: yup.string().required("Digite o registro do processo."),
   nickname: yup.string().required("Dê um apelido para o processo."),
@@ -47,24 +56,35 @@ const validationSchema = yup.object({
   }),
 });
 
-interface CreationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  afterSubmission: () => void;
-}
-
 export function CreationModal({
   isOpen,
   onClose,
   afterSubmission,
+  recordParam,
+  nicknameParam,
 }: CreationModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    reset,
+    watch,
+  } = useForm<FormValues>({
+    // @ts-ignore
+    resolver: yupResolver(validationSchema),
+    reValidateMode: "onChange",
+  });
+  const hasLegalPriority = watch("hasLegalPriority");
+
   const { data: prioritiesData } = useQuery({
     queryKey: ["priorities"],
     queryFn: async () => {
-      const res = await getPriorities();
-      return res;
+      if (!isOpen || !hasLegalPriority) return {};
+      return getPriorities();
     },
     onError: () => {
       toast({
@@ -76,7 +96,10 @@ export function CreationModal({
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
+    enabled: isOpen && hasLegalPriority,
   });
+
   const { data: flowsData } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
@@ -96,28 +119,20 @@ export function CreationModal({
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
+    enabled: isOpen,
   });
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-  } = useForm<FormValues>({
-    // @ts-ignore
-    resolver: yupResolver(validationSchema),
-    reValidateMode: "onChange",
-  });
-  const hasLegalPriority = watch("hasLegalPriority");
 
   const onSubmit = handleSubmit(async (formData) => {
     handleLoading(true);
 
+    const { record, nickname, idFlow, idPriority } = formData;
+
     const body = {
-      record: formData.record,
-      nickname: formData.nickname,
-      idFlow: formData.idFlow,
-      priority: formData.hasLegalPriority ? formData.idPriority : 0,
+      record,
+      nickname,
+      idFlow,
+      priority: formData.hasLegalPriority ? idPriority : 0,
     };
 
     const res = await createProcess(body);
@@ -129,6 +144,7 @@ export function CreationModal({
         description: "O Processo foi criado.",
         status: "success",
       });
+      onClose();
     } else {
       toast({
         id: "create-process-error",
@@ -138,9 +154,7 @@ export function CreationModal({
         isClosable: true,
       });
     }
-
-    onClose();
-    afterSubmission();
+    afterSubmission(res);
     handleLoading(false);
   });
 
@@ -148,18 +162,25 @@ export function CreationModal({
     reset();
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen) {
+      if (recordParam) setValue("record", recordParam);
+      if (nicknameParam) setValue("nickname", nicknameParam);
+    }
+  }, [isOpen]);
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
+    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Criar Processo</ModalHeader>
+        <ModalHeader>Criar processo</ModalHeader>
         <ModalCloseButton />
         <chakra.form onSubmit={onSubmit}>
           <ModalBody display="flex" flexDir="column" gap="3">
             <Input
               type="text"
               label="Registro"
-              placeholder="N do Registro "
+              placeholder="N° do registro "
               errors={errors.record}
               {...register("record")}
             />
@@ -198,11 +219,13 @@ export function CreationModal({
             {hasLegalPriority ? (
               <Select
                 label="Prioridade Legal"
-                placeholder="Selecionar Prioriadade"
+                placeholder="Selecionar prioridade"
                 color="gray.500"
                 options={
+                  // @ts-ignore
                   prioritiesData?.value
-                    ? (prioritiesData.value as Priority[]).map(
+                    ? // @ts-ignore
+                      (prioritiesData.value as Priority[]).map(
                         (priority: Priority) => {
                           return {
                             value: priority.idPriority,
@@ -218,10 +241,10 @@ export function CreationModal({
             ) : null}
           </ModalBody>
           <ModalFooter gap="2">
-            <Button variant="ghost" onClick={onClose} size="sm">
+            <Button variant="ghost" onClick={onClose}>
               Cancelar
             </Button>
-            <Button colorScheme="blue" type="submit" size="sm">
+            <Button colorScheme="blue" type="submit">
               Salvar
             </Button>
           </ModalFooter>

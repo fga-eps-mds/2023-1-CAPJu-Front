@@ -53,6 +53,7 @@ export function EditionModal({
       const res = await getStages();
       return res;
     },
+    refetchOnWindowFocus: false,
   });
   const { data: usersData } = useQuery({
     queryKey: ["accepted-users"],
@@ -60,6 +61,7 @@ export function EditionModal({
       const res = await getAcceptedUsers();
       return res;
     },
+    refetchOnWindowFocus: false,
   });
   const [selectedStages, setSelectedStages] = useState<Stage[]>(
     stagesData?.value?.filter((item) =>
@@ -142,6 +144,7 @@ export function EditionModal({
       isOpen={isOpen}
       onClose={onClose}
       size={["full", "md", "2xl", "4xl"]}
+      isCentered
     >
       <ModalOverlay />
       <ModalContent>
@@ -209,10 +212,10 @@ export function EditionModal({
             <Flow stages={selectedStages} sequences={sequences} />
           </ModalBody>
           <ModalFooter gap="2">
-            <Button variant="ghost" onClick={onClose} size="sm">
+            <Button variant="ghost" onClick={onClose}>
               Cancelar
             </Button>
-            <Button colorScheme="blue" type="submit" size="sm">
+            <Button colorScheme="blue" type="submit">
               Salvar
             </Button>
           </ModalFooter>

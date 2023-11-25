@@ -25,7 +25,9 @@ import { EditionModal } from "./EditionModal";
 function Stages() {
   const toast = useToast();
   const [selectedStage, selectStage] = useState<Stage>();
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<
+    { type: string; value: string } | undefined
+  >(undefined);
   const { getUserData } = useAuth();
   const {
     isOpen: isCreationOpen,
@@ -49,6 +51,7 @@ function Stages() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const {
     data: stagesData,
@@ -76,12 +79,13 @@ function Stages() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
 
   const tableActions = useMemo(
     () => [
       {
-        label: "Editar Etapa",
+        label: "Editar etapa",
         icon: <Icon as={MdEdit} boxSize={4} />,
         action: ({ stage }: { stage: Stage }) => {
           selectStage(stage);
@@ -103,7 +107,9 @@ function Stages() {
         actionName: "delete-stage",
         disabled: !isActionAllowedToUser(
           userData?.value?.allowedActions || [],
-          "delete-stage"
+          "delete-stage",
+          // @ts-ignore
+          userData
         ),
       },
     ],
@@ -170,8 +176,6 @@ function Stages() {
             Etapas
           </Text>
           <Button
-            size="xs"
-            fontSize="sm"
             colorScheme="green"
             isDisabled={
               !isActionAllowedToUser(
@@ -196,8 +200,10 @@ function Stages() {
           >
             <Input
               placeholder="Pesquisar etapas"
-              value={filter}
-              onChange={({ target }) => setFilter(target.value)}
+              value={filter?.value}
+              onChange={({ target }) =>
+                setFilter({ type: "stage", value: target.value })
+              }
               variant="filled"
               css={{
                 "&, &:hover, &:focus": {
@@ -223,8 +229,9 @@ function Stages() {
         isDataFetching={!isStagesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas etapas."
       />
-      {stagesData?.totalPages !== undefined ? (
+      {![undefined, 0, null].includes(stagesData?.totalPages) ? (
         <Pagination
+          // @ts-ignore
           pageCount={stagesData?.totalPages}
           onPageChange={handlePageChange}
         />

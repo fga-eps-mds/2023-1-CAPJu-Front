@@ -22,8 +22,30 @@ export const getNotesByProcessRecord = async (
   }
 };
 
+export const getNotesByProcessId = async (
+  idProcess: number
+): Promise<Result<Note[]>> => {
+  try {
+    const res = await api.note.get<Note[]>(`/${idProcess}`);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
 export const addNoteToProcess = async (data: {
-  record: string;
+  idProcess: number;
   idStageA: string;
   idStageB: string;
   commentary: string;

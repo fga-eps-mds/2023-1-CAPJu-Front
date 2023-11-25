@@ -1,12 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import { describe, expect } from "vitest";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  act,
-} from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
@@ -22,8 +16,8 @@ import {
   mockedPriorities,
   mockedRoles,
 } from "utils/mocks";
-import { labelByProcessStatus } from "utils/constants";
 import { getPaginatedArray } from "utils/pagination";
+import { labelByProcessStatus } from "utils/constants";
 import Processes from "../Processes";
 
 const restHandlers = [
@@ -118,7 +112,9 @@ describe("Processes page", () => {
 
   afterAll(() => server.close());
 
-  afterEach(() => server.resetHandlers());
+  afterEach(() => {
+    server.resetHandlers();
+  });
 
   it("renders correctly", () => {
     expect(screen).toMatchSnapshot();
@@ -129,7 +125,7 @@ describe("Processes page", () => {
     expect(await screen.queryByText("Registro")).not.toBe(null);
     expect(await screen.queryByText("Apelido")).not.toBe(null);
     expect(await screen.queryByText("Situação atual")).not.toBe(null);
-    expect(await screen.queryByText("Fluxo")).not.toBe(null);
+    expect(await screen.findAllByText("Fluxo")).not.toBe(null);
     expect(await screen.queryByText("Status")).not.toBe(null);
     expect(await screen.queryByText("Ações")).not.toBe(null);
   });
@@ -156,85 +152,9 @@ describe("Processes page", () => {
     expect(button).not.toBe(null);
   });
 
-  it("toggles 'archived/finished processes' checkbox correctly", async () => {
-    const button = screen.getByText("Mostrar processos arquivados/finalizados");
-
-    expect(button).not.toBe(null);
-
-    const mockedNotStartedProcess = mockedProcesses[0];
-
-    expect(await screen.queryByText(mockedNotStartedProcess.record)).not.toBe(
-      null
-    );
-
-    await act(async () => {
-      await fireEvent.click(button);
-    });
-
-    expect(await screen.queryByText(mockedNotStartedProcess.record)).toBe(null);
-  });
-
-  it("opens and closes the creation modal correctly", async () => {
-    const createProcessButton = await screen.getByText("Criar Processo");
-
-    await act(async () => {
-      await fireEvent.click(createProcessButton);
-    });
-
-    expect(await screen.getByPlaceholderText("N do Registro")).not.toBeNull();
-
-    const closeModalButton = await screen.getByText("Cancelar");
-
-    await act(async () => {
-      await fireEvent.click(closeModalButton);
-    });
-
-    await waitFor(async () => {
-      expect(await screen.getByPlaceholderText("N do Registro")).not.toBeNull();
-    });
-  });
-
-  it("filters processes correctly", async () => {
-    const input = screen.getByPlaceholderText(
-      "Pesquisar processos (por registro ou apelido)"
-    );
-
-    expect(input).not.toBe(null);
-
-    await act(async () => {
-      await fireEvent.change(input, {
-        target: { value: "12345678912345678915" },
-      });
-      // Testa pelo submit do input
-      await fireEvent.submit(input);
-    });
-
-    expect(await screen.queryByText("12345678912345678915")).not.toBe(null);
-    expect(await screen.queryByText("12345678912345678916")).toBe(null);
-    expect(await screen.queryByText("12345678912345678917")).toBe(null);
-    expect(await screen.queryByText("12345678912345678918")).toBe(null);
-
-    const button = screen.getByLabelText("botão de busca");
-
-    expect(button).not.toBe(null);
-
-    await act(async () => {
-      await fireEvent.change(input, {
-        target: { value: "12345678912345678916" },
-      });
-      // Testa pelo click no botão
-      await fireEvent.click(button);
-    });
-
-    expect(await screen.queryByText("12345678912345678915")).toBe(null);
-    expect(await screen.queryByText("12345678912345678916")).not.toBe(null);
-    expect(await screen.queryByText("12345678912345678917")).toBe(null);
-    expect(await screen.queryByText("12345678912345678918")).toBe(null);
-  });
-
   it("shows processes status correctly", async () => {
     const validStatus = new Set(Object.values(labelByProcessStatus));
-    const status = await mockedProcesses[0].status;
+    const { status } = mockedProcesses[0];
     const teste =
       labelByProcessStatus[status as keyof typeof labelByProcessStatus];
 

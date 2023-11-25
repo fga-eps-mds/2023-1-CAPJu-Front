@@ -3,25 +3,32 @@ import { api } from "services/api";
 export const getProcesses = async (
   flowId: number | undefined,
   pagination?: Pagination,
-  filter?: string,
+  filter?: { type: string; value: string },
   filterByLegalPriority?: boolean,
   status?: String[],
   from?: string,
-  to?: string
+  to?: string,
+  nicknameOrRecordFilter?: string,
+  showArchivedAndFinished?: boolean
 ): Promise<Result<Process[]>> => {
   try {
     const res = await api.processManagement.get<{
       processes: Process[];
       totalPages: number;
+      totalProcesses: number;
+      totalArchived: number;
+      totalFinished: number;
     }>(`/process${flowId ? `?idFlow=${flowId}` : ""}`, {
       params: {
         offset: pagination?.offset ?? 0,
         limit: pagination?.limit,
         filter,
-        status: status || undefined,
         filterByLegalPriority,
+        status: status || undefined,
         from,
         to,
+        nicknameOrRecordFilter,
+        showArchivedAndFinished,
       },
     });
 
@@ -29,6 +36,9 @@ export const getProcesses = async (
       type: "success",
       value: res.data.processes,
       totalPages: res.data.totalPages,
+      totalProcesses: res.data.totalProcesses,
+      totalArchived: res.data.totalArchived,
+      totalFinished: res.data.totalFinished,
     };
   } catch (error) {
     if (error instanceof Error)
@@ -43,11 +53,11 @@ export const getProcesses = async (
 };
 
 export const deleteProcess = async (
-  registro: string
+  idProcess: number
 ): Promise<Result<Process>> => {
   try {
     const res = await api.processManagement.delete<Process>(
-      `/process/deleteProcess/${registro}`
+      `/process/deleteProcess/${idProcess}`
     );
 
     return {
@@ -95,7 +105,7 @@ export const createProcess = async (data: {
 };
 
 export const updateProcess = async (data: {
-  record: string;
+  idProcess: number;
   nickname: string;
   idFlow: number | number[];
   priority: number;
@@ -105,7 +115,7 @@ export const updateProcess = async (data: {
 }): Promise<Result<Process>> => {
   try {
     const res = await api.processManagement.put<Process>(
-      `/process/updateProcess/${data.record}`,
+      `/process/updateProcess/${data.idProcess}`,
       data
     );
 
@@ -149,8 +159,32 @@ export const getProcessByRecord = async (
   }
 };
 
+export const getProcessById = async (
+  idProcess: string | number
+): Promise<Result<Process>> => {
+  try {
+    const res = await api.processManagement.get<Process>(
+      `/process/${idProcess}`
+    );
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
 export const updateStage = async (data: {
-  record: string;
+  idProcess: number;
   from: number;
   to: number;
   commentary: string;
@@ -182,13 +216,63 @@ export const updateStage = async (data: {
 export const updateProcessStatus = async (data: {
   priority: number;
   idFlow: number;
-  record: string;
+  idProcess: number;
   status: string;
 }): Promise<Result<Process>> => {
   try {
     const res = await api.processManagement.put<Process>(
-      `/process/updateProcess/${data.record}`,
+      `/process/updateProcess/${data.idProcess}`,
       data
+    );
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const finalizeProcess = async (
+  process: Process
+): Promise<Result<Process>> => {
+  try {
+    const res = await api.processManagement.put<Process>(
+      `/process/finalizeProcess/${process.idProcess}`
+    );
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
+export const archiveProcess = async (
+  process: Process
+): Promise<Result<Process>> => {
+  try {
+    const res = await api.processManagement.put<Process>(
+      `/process/archiveProcess/${process.idProcess}/${
+        process.status !== "archived"
+      }`
     );
 
     return {

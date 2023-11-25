@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useToast, Box, Flex, Button, Text, Input } from "@chakra-ui/react";
 import CustomAccordion from "components/CustomAccordion";
 import { DataTable } from "components/DataTable";
@@ -11,6 +11,9 @@ import { ViewIcon } from "@chakra-ui/icons";
 import { Pagination } from "components/Pagination";
 import { getProcessesByDueDate } from "services/processManagement/statistics";
 import { useLocation } from "react-router-dom";
+import { useStatisticsFilters } from "hooks/useStatisticsFilters";
+import { downloadProcessInDue } from "utils/pdf";
+import ExportExcel from "components/ExportExcel";
 
 export default function StepDeadlineReports() {
   const toast = useToast();
@@ -22,6 +25,12 @@ export default function StepDeadlineReports() {
 
   const [flows, setFlows] = useState([] as Flow[]);
   const { state } = useLocation();
+  const { isMinDate } = useStatisticsFilters();
+  const { setContextMinDate } = useStatisticsFilters();
+  const { isMaxDate } = useStatisticsFilters();
+  const { setContextMaxDate } = useStatisticsFilters();
+  const { ContinuePage } = useStatisticsFilters();
+  const { setContinuePage } = useStatisticsFilters();
   const [tableVisible, setTableVisible] = useState(false);
   const [minDate, setMinDate] = useState<string>("");
   const [isFetching, setIsFetching] = useState<boolean>(true);
@@ -36,7 +45,7 @@ export default function StepDeadlineReports() {
   useEffect(() => {
     const handlePageChange = async () => {
       setLoading(true);
-      await handleProcessByDueDate();
+      await handleProcessByDueDate(minDate, maxDate, currentPage);
       setLoading(false);
     };
 
@@ -48,9 +57,13 @@ export default function StepDeadlineReports() {
     if (dataFlows.value) setFlows(dataFlows.value);
   };
 
-  const handleProcessByDueDate = async () => {
-    const res = await getProcessesByDueDate(minDate, maxDate, {
-      offset: currentPage * 5,
+  const handleProcessByDueDate = async (
+    paramMinDate: string,
+    paramMaxDate: string,
+    paramCurrentPage: number
+  ) => {
+    const res = await getProcessesByDueDate(paramMinDate, paramMaxDate, {
+      offset: paramCurrentPage * 5,
       limit: 5,
     });
 
@@ -62,6 +75,24 @@ export default function StepDeadlineReports() {
 
   useEffect(() => {
     if (flows.length === 0) getDataFlows();
+    setContinuePage(false);
+
+    const handlePageBack = async (
+      paramMinDate: string,
+      paramMaxDate: string
+    ) => {
+      setMinDate(paramMinDate);
+      setMaxDate(paramMaxDate);
+      setLoading(true);
+      setIsFetching(true);
+      await handleProcessByDueDate(paramMinDate, paramMaxDate, currentPage);
+      setTableVisible(true);
+      setIsFetching(false);
+      setLoading(false);
+    };
+
+    if (isMinDate !== undefined && isMaxDate !== undefined)
+      handlePageBack(isMinDate, isMaxDate);
   }, []);
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
@@ -80,6 +111,44 @@ export default function StepDeadlineReports() {
     ],
     [isUserFetched, userData]
   );
+
+  const DownloadPDFProcess = useCallback(async () => {
+    const minDateConvert = new Date(minDate);
+    const maxDateConvert = new Date(maxDate);
+
+    const dayMin = minDateConvert.getDate();
+    const monthMin = minDateConvert.getMonth() + 1;
+    const yearMin = minDateConvert.getFullYear();
+
+    const dayMax = maxDateConvert.getDate();
+    const montMax = maxDateConvert.getMonth() + 1;
+    const yearMax = maxDateConvert.getFullYear();
+
+    const formattedMinDate = `${dayMin < 10 ? "0" : ""}${dayMin}/${
+      monthMin < 10 ? "0" : ""
+    }${monthMin}/${yearMin}`;
+    const formattedMaxDate = `${dayMax < 10 ? "0" : ""}${dayMax}/${
+      montMax < 10 ? "0" : ""
+    }${montMax}/${yearMax}`;
+
+    const resAllProcess = await getProcessesByDueDate(minDate, maxDate);
+
+    if (resAllProcess.type === "success") {
+      await downloadProcessInDue(
+        formattedMinDate,
+        formattedMaxDate,
+        resAllProcess.value
+      );
+    } else {
+      toast({
+        id: "error-getting-stages",
+        title: "Erro ao baixar pdf",
+        description: "Houve um erro ao buscar processos.",
+        status: "error",
+        isClosable: true,
+      });
+    }
+  }, [minDate, maxDate]);
 
   const tableColumns = [
     tableColumnHelper.accessor("record", {
@@ -110,6 +179,13 @@ export default function StepDeadlineReports() {
         isSortable: true,
       },
     }),
+    tableColumnHelper.accessor("dueDate", {
+      cell: (info) => info.getValue(),
+      header: "Prazo da etapa",
+      meta: {
+        isSortable: true,
+      },
+    }),
     tableColumnHelper.accessor("tableActions", {
       cell: (info) => info.getValue(),
       header: "Ações",
@@ -136,7 +212,7 @@ export default function StepDeadlineReports() {
               tableActions,
               actionsProps: {
                 process: curr,
-                pathname: `/processos/${curr.record}`,
+                pathname: `/processos/${curr.idProcess}`,
                 state: {
                   process: curr,
                   ...(state || {}),
@@ -151,9 +227,12 @@ export default function StepDeadlineReports() {
     );
   }, [processData, tableActions]);
 
-  const handleConfirmClick = async () => {
-    const minDateValue = Date.parse(minDate);
-    const maxDateValue = Date.parse(maxDate);
+  const handleConfirmClick = async (
+    ParamMinDate: string,
+    paramMaxDate: string
+  ) => {
+    const minDateValue = Date.parse(ParamMinDate);
+    const maxDateValue = Date.parse(paramMaxDate);
 
     if (
       Number.isNaN(minDateValue) ||
@@ -169,10 +248,12 @@ export default function StepDeadlineReports() {
         isClosable: true,
       });
     } else {
+      setContextMinDate(minDate);
+      setContextMaxDate(maxDate);
       setTableVisible(true);
       try {
         setIsFetching(true);
-        await handleProcessByDueDate();
+        await handleProcessByDueDate(minDate, maxDate, currentPage);
         setIsFetching(false);
       } catch (error) {
         toast({
@@ -197,7 +278,10 @@ export default function StepDeadlineReports() {
     >
       <Box borderRadius="8px">
         <Flex justifyContent="flex-start" w="100%" flexDirection="column">
-          <CustomAccordion title="Visualizar processos filtrados por data de vencimento">
+          <CustomAccordion
+            defaultIndex={ContinuePage ? [0] : [4]}
+            title="Visualizar processos filtrados por data de vencimento"
+          >
             <>
               <Flex justifyContent="space-between">
                 <Flex w="70%" flexDirection="column">
@@ -206,6 +290,9 @@ export default function StepDeadlineReports() {
                       w="50%"
                       type="date"
                       color="gray.500"
+                      defaultValue={
+                        isMinDate !== undefined ? isMinDate : undefined
+                      }
                       onChange={(event) => {
                         const novoValor = event.target.value;
                         setMinDate(novoValor);
@@ -216,6 +303,9 @@ export default function StepDeadlineReports() {
                       w="50%"
                       type="date"
                       color="gray.500"
+                      defaultValue={
+                        isMaxDate !== undefined ? isMaxDate : undefined
+                      }
                       onChange={(event) => {
                         const novoValor = event.target.value;
                         setMaxDate(novoValor);
@@ -224,7 +314,7 @@ export default function StepDeadlineReports() {
                     <Button
                       colorScheme="whatsapp"
                       w="20%"
-                      onClick={() => handleConfirmClick()}
+                      onClick={() => handleConfirmClick(minDate, maxDate)}
                     >
                       Confirmar
                     </Button>
@@ -235,22 +325,27 @@ export default function StepDeadlineReports() {
                     gap="2"
                     alignItems="flex-end"
                     alignSelf="end"
-                    marginEnd={-5}
+                    marginEnd={1}
                   >
                     {tableVisible && (
                       <>
-                        <Button colorScheme="facebook" w="10%">
+                        <ExportExcel
+                          excelData={processData}
+                          fileName="Processos_em_Vencimento"
+                        />
+                        <Button
+                          colorScheme="blue"
+                          size="md"
+                          onClick={() => DownloadPDFProcess()}
+                        >
                           PDF
-                        </Button>
-                        <Button colorScheme="facebook" w="10%">
-                          CSV
                         </Button>
                       </>
                     )}
                   </Flex>
                 </Flex>
               </Flex>
-              <Flex w="110%" marginTop="15">
+              <Flex w="100%" marginTop="15">
                 {tableVisible && (
                   <DataTable
                     data={filteredStepDeadlineReports}
@@ -264,9 +359,9 @@ export default function StepDeadlineReports() {
                 {processDueTotalPages !== undefined ? (
                   <Pagination
                     pageCount={processDueTotalPages}
-                    onPageChange={(selectedPage) =>
-                      setCurrentPage(selectedPage.selected)
-                    }
+                    onPageChange={(selectedPage) => {
+                      setCurrentPage(selectedPage.selected);
+                    }}
                   />
                 ) : null}
               </Flex>

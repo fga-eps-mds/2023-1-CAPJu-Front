@@ -85,6 +85,7 @@ function Signup() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const { data: rolesData } = useQuery({
     queryKey: ["roles"],
@@ -98,6 +99,7 @@ function Signup() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const units = useMemo(() => {
     return (

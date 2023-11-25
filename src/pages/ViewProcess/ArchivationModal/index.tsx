@@ -18,7 +18,7 @@ interface ArchivationModalProps {
 }
 
 const getArchiveStatus = (status: string) =>
-  status === "archived" ? "Desarquivar" : "Arquivar";
+  status === "archived" ? "Reativar" : "Interromper";
 
 export function ArchivationModal({
   process,
@@ -27,27 +27,25 @@ export function ArchivationModal({
   handleUpdateProcessStatus,
 }: ArchivationModalProps) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
+    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
       <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{getArchiveStatus(process?.status)} Processo</ModalHeader>
+      <ModalContent mx="auto" my="auto">
+        <ModalHeader fontSize="19px">
+          {getArchiveStatus(process?.status)} processo
+        </ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
+        <ModalBody fontSize="19px">
           <Text>
             Tem certeza que deseja{" "}
-            {process?.status === "archived" ? "desarquivar" : "arquivar"} o
+            {process?.status === "archived" ? "reativar" : "interromper"} o
             processo <strong>{process?.nickname}</strong>?
           </Text>
         </ModalBody>
         <ModalFooter gap="2">
-          <Button variant="ghost" onClick={onClose} size="sm">
+          <Button variant="ghost" onClick={onClose}>
             Cancelar
           </Button>
-          <Button
-            colorScheme="red"
-            onClick={handleUpdateProcessStatus}
-            size="sm"
-          >
+          <Button colorScheme="red" onClick={handleUpdateProcessStatus}>
             {getArchiveStatus(process?.status)}
           </Button>
         </ModalFooter>
