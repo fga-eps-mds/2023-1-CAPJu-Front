@@ -1,6 +1,14 @@
 import MockAdapter from "axios-mock-adapter";
 import { api } from "../api";
-import { signIn, signUp, getUserById, updateUser } from "../user";
+import {
+  signIn,
+  signUp,
+  getUserById,
+  updateUser,
+  updateUserPassword,
+  forgotPassword,
+  getAcceptedUsers,
+} from "../user";
 
 const apiMockUser = new MockAdapter(api.user);
 const apiMockRole = new MockAdapter(api.role);
@@ -172,6 +180,145 @@ describe("Testes para a função updateUser", () => {
       type: "error",
       error: new Error("Ocorreu um erro"),
       value: undefined,
+    });
+  });
+});
+
+describe("Testes para a função updateUserPassword", () => {
+  afterEach(() => {
+    apiMockUser.reset();
+  });
+
+  it("updateUserPassword: erro", async () => {
+    const cpf = "11111111111";
+    apiMockUser
+      .onPost(`/updateUserPassword/${cpf}`, {
+        oldPassword: "senha1",
+        newPassword: "senha2",
+      })
+      .reply(400, "Ocorreu um erro");
+    const result = await updateUserPassword(
+      { oldPassword: "senha1", newPassword: "senha2" },
+      cpf
+    );
+
+    expect(result).toEqual({
+      type: "error",
+      error: new Error("Ocorreu um erro"),
+      value: undefined,
+    });
+  });
+});
+
+// describe("Testes para a função updateUserPassword", () => {
+
+//   afterEach(() => {
+//     apiMockUser.reset();
+//   });
+// })
+
+describe("Testes para a função forgotPassword", () => {
+  afterEach(() => {
+    apiMockUser.reset();
+  });
+
+  it("forgotPassword: sucesso", async () => {
+    apiMockUser
+      .onPost("/requestRecovery", { email: "email@email.com" })
+      .reply(200, { dados: "" });
+
+    const result = await forgotPassword({ email: "email@email.com" });
+
+    expect(result).toEqual({
+      type: "success",
+      value: { dados: "" },
+    });
+  });
+
+  it("forgotPassword: erro", async () => {
+    apiMockUser
+      .onPost("/requestRecovery", { email: "email@email.com" })
+      .reply(400, "Ocorreu um erro");
+
+    const result = await forgotPassword({ email: "email@email.com" });
+
+    expect(result).toEqual({
+      type: "error",
+      error: new Error("Ocorreu um erro"),
+      value: undefined,
+    });
+  });
+});
+
+describe("Testes para a função getAcceptedUsers", () => {
+  afterEach(() => {
+    apiMockUser.reset();
+  });
+
+  it("getAcceptedUsers: sucesso, sem paginação", async () => {
+    apiMockUser.onGet("/allUser?accepted=true").reply(200, {
+      users: [
+        { name: "1", idRole: 1 },
+        { name: "2", idRole: 2 },
+        { name: "5", idRole: 5 },
+      ],
+    });
+
+    const result = await getAcceptedUsers();
+    expect(result).toEqual({
+      type: "success",
+      value: [
+        { name: "1", idRole: 1 },
+        { name: "2", idRole: 2 },
+      ],
+    });
+  });
+
+  it("getAcceptedUsers: sucesso, com paginação sem offset", async () => {
+    apiMockUser.onGet("/allUser?accepted=true", { limit: 2 }).reply(200, {
+      users: [
+        { name: "1", idRole: 1 },
+        { name: "2", idRole: 2 },
+        { name: "5", idRole: 5 },
+      ],
+    });
+
+    const result = await getAcceptedUsers();
+    expect(result).toEqual({
+      type: "success",
+      value: [
+        { name: "1", idRole: 1 },
+        { name: "2", idRole: 2 },
+      ],
+    });
+  });
+  it("getAcceptedUsers: sucesso, com paginação e offset", async () => {
+    apiMockUser
+      .onGet("/allUser?accepted=true", { limit: 1, offset: 1 })
+      .reply(200, {
+        users: [
+          { name: "2", idRole: 2 },
+          { name: "5", idRole: 5 },
+        ],
+      });
+
+    const result = await getAcceptedUsers();
+    expect(result).toEqual({
+      type: "success",
+      value: [{ name: "2", idRole: 2 }],
+    });
+  });
+
+  it("getAcceptedUsers: erro", async () => {
+    apiMockUser
+      .onGet("/allUser?accepted=true", { limit: 1, offset: 1 })
+      .reply(400, "Ocorreu um erro");
+
+    const result = await getAcceptedUsers();
+    expect(result).toEqual({
+      type: "error",
+      value: undefined,
+      error: new Error("Ocorreu um erro"),
     });
   });
 });
