@@ -17,7 +17,7 @@ const ExportExcel = ({ excelData, fileName }: ExportExcelProps) => {
   };
 
   return (
-    <Flex marginRight="1em">
+    <Flex marginRight="1em" hidden={excelData.length === 0}>
       <Button onClick={exportToExcel} colorScheme="blue" size="md">
         <Text> XLSX </Text>
       </Button>

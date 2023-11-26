@@ -32,6 +32,7 @@ import JsPDF from "jspdf";
 import { downloadProcess } from "utils/pdf";
 import ExportExcel from "components/ExportExcel";
 import { Pagination } from "components/Pagination";
+import StatsTimeStage from "components/StatsTimeStage";
 import BarChart from "./Graphic/BarChart";
 import StepDeadlineReports from "./StepDeadlineReports";
 import FilteringProcesses from "./FilteringProcesses";
@@ -332,6 +333,7 @@ export default function Statistics() {
             Estatísticas
           </Text>
         </Flex>
+        <StatsTimeStage />
         <Box borderRadius="8px">
           <Flex justifyContent="flex-start" w="100%" flexDirection="column">
             <CustomAccordion
