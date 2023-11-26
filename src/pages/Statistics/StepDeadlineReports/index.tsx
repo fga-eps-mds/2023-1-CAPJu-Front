@@ -41,6 +41,60 @@ export default function StepDeadlineReports() {
   >();
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [preparedProcessesDownloadinDue, setPreparedProcessesDownloadInDue] =
+    useState([] as IIFormatedProcess[]);
+
+  function idFlowToFlowName(idFlow: number | number[]) {
+    const flowNames = flows
+      ?.filter((flow) =>
+        Array.isArray(idFlow)
+          ? idFlow.includes(flow.idFlow)
+          : idFlow === flow.idFlow
+      )
+      .map((flow) => flow.name);
+
+    return flowNames ? flowNames.join(", ") : "";
+  }
+
+  function formatDataTable(processes: Process[]) {
+    return processes.map((process) => {
+      return {
+        Registro: process.record,
+        Apelido: process.nickname,
+        Fluxo: idFlowToFlowName(process.idFlow),
+        EtapaAtual: process.nameStage,
+        DataDeVencimentoDaEtapa: process.dueDate,
+      };
+    });
+  }
+
+  async function getProcessesForDownload() {
+    const processesForDownload = await getProcessesByDueDate(minDate, maxDate);
+
+    if (processesForDownload.value !== undefined) {
+      const formatedData = formatDataTable(processesForDownload.value);
+      setPreparedProcessesDownloadInDue(formatedData);
+    }
+  }
+
+  async function getContinueProcessesForDownload() {
+    if (isMinDate && isMaxDate) {
+      const ContinueprocessesForDownload = await getProcessesByDueDate(
+        isMinDate,
+        isMaxDate
+      );
+      if (ContinueprocessesForDownload.value !== undefined) {
+        const formatedData = formatDataTable(
+          ContinueprocessesForDownload.value
+        );
+        setPreparedProcessesDownloadInDue(formatedData);
+      }
+    }
+  }
+
+  useEffect(() => {
+    getContinueProcessesForDownload();
+  }, [isMinDate, isMaxDate]);
 
   useEffect(() => {
     const handlePageChange = async () => {
@@ -314,7 +368,9 @@ export default function StepDeadlineReports() {
                     <Button
                       colorScheme="whatsapp"
                       w="20%"
-                      onClick={() => handleConfirmClick(minDate, maxDate)}
+                      onClick={() => {
+                        handleConfirmClick(minDate, maxDate);
+                      }}
                     >
                       Confirmar
                     </Button>
@@ -330,13 +386,16 @@ export default function StepDeadlineReports() {
                     {tableVisible && (
                       <>
                         <ExportExcel
-                          excelData={processData}
+                          excelData={preparedProcessesDownloadinDue}
                           fileName="Processos_em_Vencimento"
                         />
                         <Button
                           colorScheme="blue"
                           size="md"
-                          onClick={() => DownloadPDFProcess()}
+                          onClick={() => {
+                            DownloadPDFProcess();
+                            getProcessesForDownload();
+                          }}
                         >
                           PDF
                         </Button>
