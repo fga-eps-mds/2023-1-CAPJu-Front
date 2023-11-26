@@ -22,6 +22,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { formatDateTimeToBrazilian } from "utils/dates";
 import { constructTableHTMLData, imgToBase64 } from "utils/pdf";
+import assets from "utils/assets";
 import { Select } from "../FormFields";
 import {
   getFlows,
@@ -174,7 +175,7 @@ export default function StatsTimeStage() {
       });
 
       pdf.addImage(
-        await imgToBase64("/src/images/UnB.png"),
+        await imgToBase64(assets.logoUnB),
         "png",
         spacingBetweenImages - 50,
         270,
@@ -182,7 +183,7 @@ export default function StatsTimeStage() {
         20
       );
       pdf.addImage(
-        await imgToBase64("/src/images/justica_federal.png"),
+        await imgToBase64(assets.justicaFederal),
         "png",
         60 + 2 * spacingBetweenImages,
         270,
