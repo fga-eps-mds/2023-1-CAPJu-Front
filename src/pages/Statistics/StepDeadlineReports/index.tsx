@@ -174,7 +174,7 @@ export default function StepDeadlineReports() {
     const monthMin = minDateConvert.getMonth() + 1;
     const yearMin = minDateConvert.getFullYear();
 
-    const dayMax = maxDateConvert.getDate();
+    const dayMax = maxDateConvert.getDate() + 1;
     const montMax = maxDateConvert.getMonth() + 1;
     const yearMax = maxDateConvert.getFullYear();
 
