@@ -170,7 +170,7 @@ export default function StepDeadlineReports() {
     const minDateConvert = new Date(minDate);
     const maxDateConvert = new Date(maxDate);
 
-    const dayMin = minDateConvert.getDate();
+    const dayMin = minDateConvert.getDate() + 1;
     const monthMin = minDateConvert.getMonth() + 1;
     const yearMin = minDateConvert.getFullYear();
 
@@ -266,7 +266,7 @@ export default function StepDeadlineReports() {
               tableActions,
               actionsProps: {
                 process: curr,
-                pathname: `/processos/${curr.record}`,
+                pathname: `/processos/${curr.idProcess}`,
                 state: {
                   process: curr,
                   ...(state || {}),

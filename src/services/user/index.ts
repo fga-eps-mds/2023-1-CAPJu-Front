@@ -4,9 +4,9 @@ import { getRoleById, getAllRoles } from "services/role";
 export const signIn = async (credentials: {
   cpf: string;
   password: string;
-}): Promise<Result<User>> => {
+}): Promise<Result<string>> => {
   try {
-    const res = await api.user.post<User>("/login", credentials);
+    const res = await api.user.post<string>("/login", credentials);
 
     return { type: "success", value: res.data };
   } catch (error) {

@@ -12,6 +12,7 @@ export function NavigationTabs() {
   const { data: userData } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const navigate = useNavigate();
   const location = useLocation();

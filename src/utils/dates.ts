@@ -10,14 +10,6 @@ export const handleDateFormating = (date: Date | string) => {
   });
 };
 
-export const handleExpiration = (vencimento: Date) => {
-  const currentDate = new Date();
-  const processDate = new Date(vencimento);
-  currentDate.setDate(currentDate.getDate());
-  if (processDate < currentDate) return true;
-  return false;
-};
-
 export function formatDateTimeToBrazilian(date: Date | string) {
   const datePart = new Date(date).toLocaleDateString("pt-BR", {
     day: "2-digit",
@@ -33,3 +25,11 @@ export function formatDateTimeToBrazilian(date: Date | string) {
 
   return `${datePart} ${timePart}`;
 }
+
+export const handleExpiration = (vencimento: Date) => {
+  const currentDate = new Date();
+  const processDate = new Date(vencimento);
+  currentDate.setDate(currentDate.getDate());
+  if (processDate < currentDate) return true;
+  return false;
+};

@@ -1,4 +1,6 @@
+/* eslint-disable import/no-duplicates */
 import JsPDF from "jspdf";
+import { Data } from "components/DropTempoEtapa";
 import type { UserOptions } from "jspdf-autotable";
 import html2canvas from "html2canvas";
 import { formatDateTimeToBrazilian } from "./dates";
@@ -236,9 +238,85 @@ export const downloadPDFQuantityProcesses = async (
     console.log(err);
   }
 };
-/* } */
 
-function constructTableHTML(processData: Process[]): string {
+export function constructTableHTML(processData: Process[]): string {
+  let tableHTML = `
+        <div class="table-wrapper" style="display: none" hidden>
+          <table class="fl-table" id="processData">
+              <style>
+                  * {
+                    box-sizing: border-box;
+                    -webkit-box-sizing: border-box;
+                    -moz-box-sizing: border-box;
+                  }
+                  body {
+                    font-family: Helvetica;
+                    -webkit-font-smoothing: antialiased;
+                  }
+                  h2 {
+                    text-align: center;
+                    font-size: 18px;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    color: white;
+                    padding: 30px 0;
+                  }
+                  .table-wrapper {
+                    margin: 10px 70px 70px;
+                    box-shadow: 0px 35px 50px rgba(0, 0, 0, 0.2);
+                  }
+                  .fl-table {
+                    border-radius: 5px;
+                    font-size: 12px;
+                    font-weight: normal;
+                    border: none;
+                    border-collapse: collapse;
+                    width: 70%;
+                    max-width: 100%;
+                    white-space: nowrap;
+                    background-color: #f8f8f8;
+                  }
+                  .fl-table td,
+                  .fl-table th {
+                    text-align: center;
+                    padding: 8px;
+                  }
+                  .fl-table td {
+                    border-right: 1px solid #f8f8f8;
+                    font-size: 12px;
+                  }
+              </style>
+              <thead>
+                  <tr>
+                      <th>Registro</th>
+                      <th>Apelido</th>
+                      <th>Etapa</th>
+                  </tr>
+              </thead>
+              <tbody>
+  `;
+
+  processData.forEach((event) => {
+    const { record, nickname, idStage: etapa } = event;
+    tableHTML += `
+          <tr>
+              <td>${record}</td>
+              <td>${nickname}</td>
+              <td>${etapa}</td>
+          </tr>
+      `;
+  });
+
+  tableHTML += `
+              </tbody>
+          </table>
+      </div>
+  `;
+
+  return tableHTML;
+}
+
+export function constructTableHTMLData(processData: Data[]): string {
   let tableHTML = `
         <div class="table-wrapper" style="display: none" hidden>
           <table class="fl-table" id="processData">
@@ -298,13 +376,11 @@ function constructTableHTML(processData: Process[]): string {
   console.log(processData);
 
   processData.forEach((event) => {
-    const { record, nickname } = event;
-    const etapa = event.idStage;
     tableHTML += `
           <tr>
-              <td>${record}</td>
-              <td>${nickname}</td>
-              <td>${etapa}</td>
+              <td>${event.Etapa}</td>
+              <td>${event["Tempo Médio"]}</td>
+              <td>${event["Tempo Previsto"]}</td>
           </tr>
       `;
   });
@@ -480,7 +556,7 @@ function constructTableHTMLQuantityProcess(processData: Process[]): string {
   return tableHTML;
 }
 
-function imgToBase64(src: string): Promise<string> {
+export function imgToBase64(src: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "Anonymous";

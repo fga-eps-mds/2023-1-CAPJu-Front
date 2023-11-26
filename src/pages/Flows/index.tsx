@@ -25,7 +25,9 @@ import { EditionModal } from "./EditionModal";
 function Flows() {
   const toast = useToast();
   const [selectedFlow, selectFlow] = useState<Flow | null>(null);
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<
+    { type: string; value: string } | undefined
+  >(undefined);
   const { getUserData } = useAuth();
   const {
     isOpen: isCreationOpen,
@@ -53,7 +55,10 @@ function Flows() {
   } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
-      const res = await getFlows({ offset: currentPage * 5, limit: 5 }, filter);
+      const res = await getFlows(
+        { offset: currentPage * 10, limit: 10 },
+        filter
+      );
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -69,10 +74,12 @@ function Flows() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
 
   const tableActions = useMemo<TableAction[]>(
@@ -198,8 +205,8 @@ function Flows() {
             Fluxos
           </Text>
           <Button
-            size="xs"
-            fontSize="sm"
+            size="md"
+            fontSize="md"
             colorScheme="green"
             isDisabled={
               !isActionAllowedToUser(
@@ -209,7 +216,7 @@ function Flows() {
             }
             onClick={onCreationOpen}
           >
-            <AddIcon mr="2" boxSize={3} /> Criar Fluxo
+            <AddIcon mr="2" boxSize={3} /> Criar fluxo
           </Button>
         </Flex>
         <Flex justifyContent="flex-start" w="100%">
@@ -224,8 +231,10 @@ function Flows() {
           >
             <Input
               placeholder="Pesquisar fluxos"
-              value={filter}
-              onChange={({ target }) => setFilter(target.value)}
+              value={filter?.value}
+              onChange={({ target }) =>
+                setFilter({ type: "flow", value: target.value })
+              }
               variant="filled"
               css={{
                 "&, &:hover, &:focus": {
@@ -265,11 +274,11 @@ function Flows() {
           afterSubmission={refetchFlows}
         />
       ) : null}
-      {userData?.value?.idUnit && isCreationOpen ? (
+      {(userData?.value as any)?.unit.idUnit && isCreationOpen ? (
         <CreationModal
           isOpen={isCreationOpen}
           onClose={onCreationClose}
-          idUnit={userData?.value?.idUnit}
+          idUnit={(userData?.value as any).unit.idUnit}
           afterSubmission={refetchFlows}
         />
       ) : null}

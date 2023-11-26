@@ -9,10 +9,8 @@ ul.pagination {
 .pagination__link--disabled {
   pointer-events: none;
   opacity: 0.6;
-  color: gray;
 }
 
 .active {
-  color: #1b9454;
   font-weight: 700;
 }

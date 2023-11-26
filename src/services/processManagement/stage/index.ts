@@ -2,7 +2,7 @@ import { api } from "services/api";
 
 export const getStages = async (
   pagination?: Pagination,
-  filter?: string
+  filter?: { type: string; value: string }
 ): Promise<Result<Stage[]>> => {
   try {
     const res = await api.processManagement.get<{
@@ -36,7 +36,6 @@ export const getStages = async (
 export const createStage = async (data: {
   name: string;
   duration: number;
-  idUnit: number;
 }): Promise<Result<Stage>> => {
   try {
     const res = await api.processManagement.post<Stage>(
