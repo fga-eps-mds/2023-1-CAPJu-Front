@@ -2,8 +2,8 @@ import axios, { AxiosInstance } from "axios";
 
 import { Services } from "services";
 import {
-  errorResponseHandler,
   authorization,
+  errorResponseHandler,
 } from "services/config/interceptors";
 
 type ServiceName = keyof typeof Services;
@@ -17,9 +17,7 @@ Object.entries(Services).forEach(([serviceName, { baseURL }]) => {
       `A baseURL do ${serviceName} é '${baseURL}'.`
     );
 
-  api[serviceName as ServiceName] = axios.create({
-    baseURL,
-  });
+  api[serviceName as ServiceName] = axios.create({ baseURL });
 
   api[serviceName as ServiceName].interceptors.request.use(authorization);
 

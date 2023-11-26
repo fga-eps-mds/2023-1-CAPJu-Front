@@ -60,9 +60,25 @@ export function EditionModal({
 }: EditionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue,
+  } = useForm<FormValues>({
+    // @ts-ignore
+    resolver: yupResolver(validationSchema),
+    reValidateMode: "onChange",
+  });
+  const hasLegalPriority = watch("hasLegalPriority");
+
   const { data: prioritiesData } = useQuery({
     queryKey: ["priorities"],
     queryFn: async () => {
+      if (!isOpen) return {};
       const res = await getPriorities();
       return res;
     },
@@ -76,7 +92,10 @@ export function EditionModal({
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
+    enabled: isOpen,
   });
+
   const { data: flowsData } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
@@ -96,26 +115,15 @@ export function EditionModal({
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
+    enabled: isOpen,
   });
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-  } = useForm<FormValues>({
-    // @ts-ignore
-    resolver: yupResolver(validationSchema),
-    reValidateMode: "onChange",
-  });
-  const hasLegalPriority = watch("hasLegalPriority");
 
   const onSubmit = handleSubmit(async (formData) => {
     handleLoading(true);
 
     const body = {
       ...selectedProcess,
-      record: selectedProcess?.record as string,
       nickname: formData.nickname,
       idFlow: formData.idFlow,
       priority: formData.hasLegalPriority ? formData.idPriority : 0,
@@ -147,6 +155,12 @@ export function EditionModal({
   });
 
   useEffect(() => {
+    if (isOpen && selectedProcess?.idPriority !== undefined) {
+      setValue("hasLegalPriority", true);
+    }
+  }, [isOpen, selectedProcess, setValue]);
+
+  useEffect(() => {
     reset();
   }, [isOpen]);
 
@@ -161,7 +175,7 @@ export function EditionModal({
             <Input
               type="text"
               label="Registro"
-              placeholder="N do Registro "
+              placeholder="N° do registro "
               errors={errors.record}
               backgroundColor="gray.200"
               value={selectedProcess?.record as string}
@@ -211,16 +225,18 @@ export function EditionModal({
               isChecked={hasLegalPriority}
               {...register("hasLegalPriority")}
             >
-              Com prioridade legal
+              Com prioridade legal {hasLegalPriority ? "true" : "false"}
             </Checkbox>
             {hasLegalPriority ? (
               <Select
                 label="Prioridade Legal"
-                placeholder="Selecionar Prioriadade"
+                placeholder="Selecionar prioridade"
                 color="gray.500"
                 options={
+                  // @ts-ignore
                   prioritiesData?.value
-                    ? (prioritiesData.value as Priority[]).map(
+                    ? // @ts-ignore
+                      (prioritiesData.value as Priority[]).map(
                         (priority: Priority) => {
                           return {
                             value: priority.idPriority,
@@ -239,10 +255,10 @@ export function EditionModal({
             )}
           </ModalBody>
           <ModalFooter gap="2">
-            <Button variant="ghost" onClick={onClose} size="sm">
+            <Button variant="ghost" onClick={onClose}>
               Cancelar
             </Button>
-            <Button colorScheme="blue" type="submit" size="sm">
+            <Button colorScheme="blue" type="submit">
               Salvar
             </Button>
           </ModalFooter>

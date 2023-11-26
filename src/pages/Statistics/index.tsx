@@ -74,6 +74,7 @@ export default function Statistics() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
 
   const [openSelectStage, setOpenSelectStage] = useState(false);
@@ -200,7 +201,7 @@ export default function Statistics() {
               tableActions,
               actionsProps: {
                 process: curr,
-                pathname: `/processos/${curr.record}`,
+                pathname: `/processos/${curr.idProcess}`,
                 state: {
                   process: curr,
                   ...(state || {}),
@@ -250,6 +251,7 @@ export default function Statistics() {
 
       if (processResult.type === "success") {
         const { value, totalPages: total } = processResult;
+        console.log(value);
         setFilteredProcess(value);
         setTotalPages(total ?? 0);
       } else {
