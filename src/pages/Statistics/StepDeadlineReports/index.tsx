@@ -287,17 +287,37 @@ export default function StepDeadlineReports() {
   ) => {
     const minDateValue = Date.parse(ParamMinDate);
     const maxDateValue = Date.parse(paramMaxDate);
+    const today = new Date();
 
-    if (
-      Number.isNaN(minDateValue) ||
-      Number.isNaN(maxDateValue) ||
-      minDateValue > maxDateValue
-    ) {
+    const ano = today.getFullYear();
+    const mes = String(today.getMonth() + 1).padStart(2, "0");
+    const dia = String(today.getDate()).padStart(2, "0");
+
+    const todayFormatted = `${ano}-${mes}-${dia}`;
+    const todayParsed = Date.parse(todayFormatted);
+
+    if (Number.isNaN(minDateValue) || Number.isNaN(maxDateValue)) {
       toast({
         id: "date-validation-error",
         title: "Erro",
+        description: "Por favor, preencha todos os campos",
+        status: "error",
+        isClosable: true,
+      });
+    } else if (maxDateValue < minDateValue) {
+      toast({
+        id: "date-selected-error",
+        title: "Erro",
+        description: "Por favor, insira uma data maior que a outra",
+        status: "error",
+        isClosable: true,
+      });
+    } else if (minDateValue < todayParsed) {
+      toast({
+        id: "date-today-validation-error",
+        title: "Erro",
         description:
-          "Por favor, insira datas válidas e data da direita menor que a da esquerda",
+          "Por favor, inicie com uma data igual ou posteior à de hoje",
         status: "error",
         isClosable: true,
       });
