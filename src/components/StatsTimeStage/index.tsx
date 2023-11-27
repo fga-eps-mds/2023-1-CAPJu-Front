@@ -9,7 +9,6 @@ import {
   AccordionPanel,
   Box,
   Flex,
-  Image,
   Text,
   Button,
   useToast,
@@ -23,6 +22,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { formatDateTimeToBrazilian } from "utils/dates";
 import { constructTableHTMLData, imgToBase64 } from "utils/pdf";
+import assets from "utils/assets";
 import { Select } from "../FormFields";
 import {
   getFlows,
@@ -42,7 +42,7 @@ interface jsPDFCustom extends jsPDF {
   autoTable: (options: UserOptions) => void;
 }
 
-export default function Statistics() {
+export default function StatsTimeStage() {
   const toast = useToast();
   const [idFlow, setIdFlow] = useState<number>();
   const [nameFlow, setNameFlow] = useState<string>("");
@@ -175,7 +175,7 @@ export default function Statistics() {
       });
 
       pdf.addImage(
-        await imgToBase64("/src/images/UnB.png"),
+        await imgToBase64(assets.logoUnB),
         "png",
         spacingBetweenImages - 50,
         270,
@@ -183,7 +183,7 @@ export default function Statistics() {
         20
       );
       pdf.addImage(
-        await imgToBase64("/src/images/justica_federal.png"),
+        await imgToBase64(assets.justicaFederal),
         "png",
         60 + 2 * spacingBetweenImages,
         270,
@@ -200,7 +200,7 @@ export default function Statistics() {
   };
 
   return (
-    <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
+    <Flex w="100%" flexDir="column" gap="3" mb="4">
       <Box backgroundColor="#ffffff" borderRadius="8px">
         <Flex w="100%">
           <Accordion
@@ -229,7 +229,7 @@ export default function Statistics() {
               </h2>
               <AccordionPanel pb={4}>
                 <Box display="flex" flexDirection="row">
-                  <Flex width="100%" justifyContent="space-around">
+                  <Flex width="100%" justifyContent="space-between">
                     <Flex width="80%">
                       <Select
                         id="flowSelect"
@@ -255,18 +255,19 @@ export default function Statistics() {
                       />
 
                       <Button
-                        aria-label="Pesquisar"
+                        aria-label="Confirmar"
                         colorScheme="green"
                         marginLeft="2"
                         justifyContent="center"
                         type="submit"
                         onClick={getDataChart}
                       >
-                        Pesquisar
+                        Confirmar
                       </Button>
                     </Flex>
                     <Flex justifyContent="end">
                       <Button
+                        hidden={!chartData}
                         colorScheme="blue"
                         size="md"
                         gap={8}
@@ -274,7 +275,7 @@ export default function Statistics() {
                         marginRight="8px"
                         onClick={downloadPDF}
                       >
-                        <Image width="20px" src="src/images/pdf.svg" />
+                        PDF
                       </Button>
                       <ExportExcel
                         fileName={nameFlow}

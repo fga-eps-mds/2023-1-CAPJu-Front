@@ -1,6 +1,6 @@
 /* eslint-disable import/no-duplicates */
 import JsPDF from "jspdf";
-import { Data } from "components/DropTempoEtapa";
+import { Data } from "components/StatsTimeStage";
 import type { UserOptions } from "jspdf-autotable";
 import html2canvas from "html2canvas";
 import { formatDateTimeToBrazilian } from "./dates";
@@ -368,8 +368,6 @@ export function constructTableHTMLData(processData: Data[]): string {
               </thead>
               <tbody>
   `;
-
-  console.log(processData);
 
   processData.forEach((event) => {
     tableHTML += `
