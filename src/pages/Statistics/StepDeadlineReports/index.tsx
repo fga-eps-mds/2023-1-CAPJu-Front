@@ -57,7 +57,7 @@ export default function StepDeadlineReports() {
   }
 
   function formatDataTable(processes: Process[]) {
-    return processes.map((process) => {
+    return processes?.map((process) => {
       return {
         Registro: process.record,
         Apelido: process.nickname,
@@ -83,7 +83,7 @@ export default function StepDeadlineReports() {
         isMinDate,
         isMaxDate
       );
-      if (ContinueprocessesForDownload.value !== undefined) {
+      if (ContinueprocessesForDownload?.value !== undefined) {
         const formatedData = formatDataTable(
           ContinueprocessesForDownload.value
         );
