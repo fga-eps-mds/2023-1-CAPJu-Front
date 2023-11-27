@@ -10,14 +10,9 @@ export const signIn = async (credentials: {
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
 
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -35,14 +30,9 @@ export const signUp = async (credentials: {
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
 
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -58,14 +48,9 @@ export const getUserById = async (
       value: { ...res.data, allowedActions: role?.allowedActions || [] },
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
 
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -75,14 +60,8 @@ export const updateUser = async (data: { email: string }, cpf: string) => {
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -95,14 +74,9 @@ export const updateUserPassword = async (
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
 
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -115,14 +89,9 @@ export const updateUserEmailAndPassword = async (
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
 
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -132,14 +101,9 @@ export const forgotPassword = async (data: { email: string }) => {
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
 
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -165,14 +129,8 @@ export const getAcceptedUsers = async (
       totalPages: res?.data?.totalPages,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -201,14 +159,9 @@ export const getUsersRequests = async (
 
     return { type: "success", value, totalPages: res?.data?.totalPages };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
 
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -218,14 +171,9 @@ export const acceptRequest = async (userId: string): Promise<Result<null>> => {
 
     return { type: "success", value: null };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
 
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -235,14 +183,9 @@ export const denyRequest = async (userId: string): Promise<Result<null>> => {
 
     return { type: "success", value: null };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
 
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -252,14 +195,9 @@ export const deleteUser = async (userId: string): Promise<Result<null>> => {
 
     return { type: "success", value: null };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
 
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -275,13 +213,8 @@ export const updateUserRole = async (
 
     return { type: "success", value: null };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
 
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    return { type: "error", error: E, value: undefined };
   }
 };

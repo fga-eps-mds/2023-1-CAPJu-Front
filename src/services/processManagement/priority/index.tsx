@@ -13,13 +13,7 @@ export const getPriorities = async (
       ? { type: "success", value: priorityById }
       : { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
