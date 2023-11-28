@@ -41,6 +41,60 @@ export default function StepDeadlineReports() {
   >();
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [preparedProcessesDownloadinDue, setPreparedProcessesDownloadInDue] =
+    useState([] as IIFormatedProcess[]);
+
+  function idFlowToFlowName(idFlow: number | number[]) {
+    const flowNames = flows
+      ?.filter((flow) =>
+        Array.isArray(idFlow)
+          ? idFlow.includes(flow.idFlow)
+          : idFlow === flow.idFlow
+      )
+      .map((flow) => flow.name);
+
+    return flowNames ? flowNames.join(", ") : "";
+  }
+
+  function formatDataTable(processes: Process[]) {
+    return processes?.map((process) => {
+      return {
+        Registro: process.record,
+        Apelido: process.nickname,
+        Fluxo: idFlowToFlowName(process.idFlow),
+        EtapaAtual: process.nameStage,
+        DataDeVencimentoDaEtapa: process.dueDate,
+      };
+    });
+  }
+
+  async function getProcessesForDownload() {
+    const processesForDownload = await getProcessesByDueDate(minDate, maxDate);
+
+    if (processesForDownload.value !== undefined) {
+      const formatedData = formatDataTable(processesForDownload.value);
+      setPreparedProcessesDownloadInDue(formatedData);
+    }
+  }
+
+  async function getContinueProcessesForDownload() {
+    if (isMinDate && isMaxDate) {
+      const ContinueprocessesForDownload = await getProcessesByDueDate(
+        isMinDate,
+        isMaxDate
+      );
+      if (ContinueprocessesForDownload?.value !== undefined) {
+        const formatedData = formatDataTable(
+          ContinueprocessesForDownload.value
+        );
+        setPreparedProcessesDownloadInDue(formatedData);
+      }
+    }
+  }
+
+  useEffect(() => {
+    getContinueProcessesForDownload();
+  }, [isMinDate, isMaxDate]);
 
   useEffect(() => {
     const handlePageChange = async () => {
@@ -116,11 +170,11 @@ export default function StepDeadlineReports() {
     const minDateConvert = new Date(minDate);
     const maxDateConvert = new Date(maxDate);
 
-    const dayMin = minDateConvert.getDate();
+    const dayMin = minDateConvert.getDate() + 1;
     const monthMin = minDateConvert.getMonth() + 1;
     const yearMin = minDateConvert.getFullYear();
 
-    const dayMax = maxDateConvert.getDate();
+    const dayMax = maxDateConvert.getDate() + 1;
     const montMax = maxDateConvert.getMonth() + 1;
     const yearMax = maxDateConvert.getFullYear();
 
@@ -181,7 +235,7 @@ export default function StepDeadlineReports() {
     }),
     tableColumnHelper.accessor("dueDate", {
       cell: (info) => info.getValue(),
-      header: "Prazo da etapa",
+      header: "Data de Vencimento na Etapa",
       meta: {
         isSortable: true,
       },
@@ -233,17 +287,37 @@ export default function StepDeadlineReports() {
   ) => {
     const minDateValue = Date.parse(ParamMinDate);
     const maxDateValue = Date.parse(paramMaxDate);
+    const today = new Date();
 
-    if (
-      Number.isNaN(minDateValue) ||
-      Number.isNaN(maxDateValue) ||
-      minDateValue > maxDateValue
-    ) {
+    const ano = today.getFullYear();
+    const mes = String(today.getMonth() + 1).padStart(2, "0");
+    const dia = String(today.getDate()).padStart(2, "0");
+
+    const todayFormatted = `${ano}-${mes}-${dia}`;
+    const todayParsed = Date.parse(todayFormatted);
+
+    if (Number.isNaN(minDateValue) || Number.isNaN(maxDateValue)) {
       toast({
         id: "date-validation-error",
         title: "Erro",
+        description: "Por favor, preencha todos os campos",
+        status: "error",
+        isClosable: true,
+      });
+    } else if (maxDateValue < minDateValue) {
+      toast({
+        id: "date-selected-error",
+        title: "Erro",
+        description: "Por favor, insira uma data maior que a outra",
+        status: "error",
+        isClosable: true,
+      });
+    } else if (minDateValue < todayParsed) {
+      toast({
+        id: "date-today-validation-error",
+        title: "Erro",
         description:
-          "Por favor, insira datas válidas e data da direita menor que a da esquerda",
+          "Por favor, inicie com uma data igual ou posteior à de hoje",
         status: "error",
         isClosable: true,
       });
@@ -314,7 +388,9 @@ export default function StepDeadlineReports() {
                     <Button
                       colorScheme="whatsapp"
                       w="20%"
-                      onClick={() => handleConfirmClick(minDate, maxDate)}
+                      onClick={() => {
+                        handleConfirmClick(minDate, maxDate);
+                      }}
                     >
                       Confirmar
                     </Button>
@@ -330,13 +406,16 @@ export default function StepDeadlineReports() {
                     {tableVisible && (
                       <>
                         <ExportExcel
-                          excelData={processData}
+                          excelData={preparedProcessesDownloadinDue}
                           fileName="Processos_em_Vencimento"
                         />
                         <Button
                           colorScheme="blue"
                           size="md"
-                          onClick={() => DownloadPDFProcess()}
+                          onClick={() => {
+                            DownloadPDFProcess();
+                            getProcessesForDownload();
+                          }}
                         >
                           PDF
                         </Button>
