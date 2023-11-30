@@ -1,5 +1,5 @@
 import { Flex, Box, Text, Image, Button } from "@chakra-ui/react";
-
+import { useAuth } from "hooks/useAuth";
 import {
   aboutCapju,
   creatorsEmail,
@@ -9,8 +9,7 @@ import {
 } from "utils/aboutText";
 import { colors } from "styles/colors";
 import logoJusticaFederal from "images/justica_federal.png";
-import logoUnB from "images/unb.png";
-import { useAuth } from "hooks/useAuth";
+import logoUnB from "../../images/UnB.png";
 import AboutAccordion from "./Accordion";
 
 function About() {

@@ -8,12 +8,12 @@ import {
   useDisclosure,
   chakra,
 } from "@chakra-ui/react";
+import { FlowAccordion } from "components/FlowAccordion";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { AddIcon, Icon, ViewIcon, SearchIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
 import { PrivateLayout } from "layouts/Private";
 import { getFlows } from "services/processManagement/flows";
-import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { isActionAllowedToUser } from "utils/permissions";
@@ -254,7 +254,7 @@ function Flows() {
           </chakra.form>
         </Flex>
       </Flex>
-      <DataTable
+      <FlowAccordion
         data={filteredFlows}
         columns={tableColumns}
         isDataFetching={!isFlowsFetched || !isUserFetched}
