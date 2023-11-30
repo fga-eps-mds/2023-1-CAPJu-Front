@@ -222,6 +222,7 @@ export default function FilteringProcesses() {
     tableActions,
     isFetching,
   ]);
+
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableColumns = [
     tableColumnHelper.accessor("record", {
@@ -433,17 +434,17 @@ export default function FilteringProcesses() {
     }
   }, [currentPage, tableVisible]);
 
-  function idFlowToFlowName(idFlow: number | number[]) {
-    const flowNames = flows
-      ?.filter((flow) =>
+  const idFlowToFlowName = useCallback(
+    (idFlow: number | number[]) => {
+      const flowNames = flows?.filter((flow) =>
         Array.isArray(idFlow)
           ? idFlow.includes(flow.idFlow)
           : idFlow === flow.idFlow
-      )
-      .map((flow) => flow.name);
-
-    return flowNames ? flowNames.join(", ") : "";
-  }
+      );
+      return flowNames[0]?.name;
+    },
+    [flows]
+  );
 
   function formatDataTable(processes: Process[]) {
     return processes.map((process) => {
@@ -476,7 +477,7 @@ export default function FilteringProcesses() {
 
   useEffect(() => {
     getProcessesForDownload();
-  }, [currentPage]);
+  }, [currentPage, flows]);
 
   const [months, archived, finished] = useChartData(
     filteredProcesses,
