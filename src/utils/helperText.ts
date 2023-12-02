@@ -20,15 +20,15 @@ export const helperText = [
   {
     title: "Fluxos",
     subtitle:
-      "Fluxos representam a sequência de Etapas seguida por um processo.",
+      "Fluxos representam a sequência de Etapas seguida por um Processo.",
     content: [
-      "Na página de fluxos é possível visualizar os fluxos cadastrados com a informação de nome.",
+      "Na página de Fluxos é possível visualizar os Fluxos cadastrados com a informação de nome.",
       "A criação de um Fluxo exige pelo menos 2 etapas e um usuário a ser notificado sobre atraso nas Etapas.",
       "A sequência das Etapas no Fluxo é definida pela ordem de escolha (inserção) da Etapa",
       "Para alguns perfis é possível criar, visualizar, editar ou excluir um Fluxo.",
-      "A opção visualizar redireciona o usuário para a página com a lista de processos em andamento no fluxo selecionado",
-      "Interrompido é a situação do processo que precisou ser retirado do fluxo antes de percorrer todas as Etapas",
-      "Concluído é a situação do processo que percorreu todas as Etapas do Fluxo.",
+      "A opção visualizar redireciona o usuário para a página com a lista de Processos em andamento no Fluxo selecionado",
+      "Arquivado é a situação do Processo que precisou ser retirado do Fluxo antes de percorrer todas as Etapas",
+      "Finalizado é a situação do Processo que percorreu todas as Etapas do Fluxo.",
     ],
   },
   {

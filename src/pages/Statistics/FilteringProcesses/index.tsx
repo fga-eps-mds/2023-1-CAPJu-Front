@@ -12,9 +12,6 @@ import {
   Text,
   Input,
 } from "@chakra-ui/react";
-import ExportExcel from "components/ExportExcel";
-import { DataTable } from "components/DataTable";
-import { Pagination } from "components/Pagination";
 import { ProcessQuantifier } from "components/ProcessQuantifier";
 import {
   // ReactNode,
@@ -26,14 +23,9 @@ import {
 } from "react";
 import { useLocation } from "react-router-dom";
 import { getFlows } from "services/processManagement/flows";
-import { createColumnHelper } from "@tanstack/react-table";
 import { getProcesses } from "services/processManagement/processes";
 import { useQuery } from "react-query";
 import { useAuth } from "hooks/useAuth";
-import { isActionAllowedToUser } from "utils/permissions";
-import { ViewIcon } from "@chakra-ui/icons";
-import { downloadPDFQuantityProcesses } from "utils/pdf";
-import { labelByProcessStatus } from "utils/constants";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -43,8 +35,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Bar } from "react-chartjs-2";
-import useChartData from "./chartUtils";
+import BarChart from "./components/BarChart";
+import ProcessTable from "./components/ProcessTable";
+import ExportButtons from "./components/ExportButtons";
 
 ChartJS.register(
   CategoryScale,
@@ -71,40 +64,44 @@ export const options = {
 export default function FilteringProcesses() {
   const toast = useToast();
   const { getUserData } = useAuth();
-  const { data: userData, isFetched: isUserFetched } = useQuery({
-    queryKey: ["user-data"],
-    queryFn: getUserData,
-    refetchOnWindowFocus: false,
-  });
   const { state } = useLocation();
 
-  const [flows, setFlows] = useState([] as Flow[]);
-  const [isFetching, setIsFetching] = useState<boolean>(true);
-  const [tableVisible, setTableVisible] = useState(true);
+  const today = new Date().toISOString().split("T")[0];
+
+  const twoYearsAgoDate = useMemo(() => {
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+    twoYearsAgo.setDate(twoYearsAgo.getDate() + 1);
+    return twoYearsAgo.toISOString().split("T")[0];
+  }, []);
+
   const [selectedFlowValue, setSelectedFlowValue] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState(0);
-  const [fromDate, setFromDate] = useState<string>("");
-  const [toDate, setToDate] = useState<string>("");
-  const [key, setKey] = useState(Math.random());
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [processData, setProcessData] = useState<ResultSuccess<
+    Process[]
+  > | null>(null);
+
+  const [isFetching, setIsFetching] = useState<boolean>(true);
   const [filter] = useState<{ type: string; value: string } | undefined>(
     undefined
   );
-  const [preparedProcessesDownload, setPreparedProcessesDownload] = useState(
-    [] as IFormatedProcess[]
-  );
-  const [formattedtoDate, setFormattedtoDate] = useState<string | undefined>(
-    undefined
-  );
-  const [formattedfromDate, setFormattedfromDate] = useState<
-    string | undefined
-  >(undefined);
+
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+  const [tableVisible, setTableVisible] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [key, setKey] = useState(Math.random());
 
   const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSelectedStatus(event.target.value);
   };
 
-  const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
+  const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = event.target.value;
+    setSelectedFlowValue(selectedValue);
+  };
+
+  const { data: flowsData } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
       const res = await getFlows();
@@ -123,144 +120,18 @@ export default function FilteringProcesses() {
         isClosable: true,
       });
     },
-  });
-
-  const {
-    data: processesData,
-    isFetched: isProcessesFetched,
-    refetch: refetchProcesses,
-  } = useQuery({
-    queryKey: ["processes"],
-    queryFn: async () => {
-      setIsFetching(true);
-      const res = await getProcesses(
-        parseInt(selectedFlowValue, 10),
-        !tableVisible
-          ? undefined
-          : {
-              offset: currentPage * 5,
-              limit: 5,
-            },
-        filter,
-        false,
-        selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
-        fromDate === "" ? undefined : fromDate,
-        toDate === "" ? undefined : toDate
-      );
-      setIsFetching(false);
-      if (res.type === "error") throw new Error(res.error.message);
-      console.log(res);
-      return res;
-    },
-    onError: () => {
-      toast({
-        id: "processes-error",
-        title: "Erro ao carregar processos",
-        description:
-          "Houve um erro ao carregar processos, favor tentar novamente.",
-        status: "error",
-        isClosable: true,
-      });
-    },
     refetchOnWindowFocus: false,
   });
 
-  const tableActions = useMemo<TableAction[]>(
-    () => [
-      {
-        label: "Visualizar Processo",
-        icon: <ViewIcon boxSize={4} />,
-        isNavigate: true,
-        actionName: "see-process",
-        disabled: !isActionAllowedToUser(
-          userData?.value?.allowedActions || [],
-          "see-process"
-        ),
-      },
-    ],
-    [isProcessesFetched, isUserFetched, userData]
-  );
+  const flows = flowsData?.value;
 
-  const filteredProcesses = useMemo<TableRow<Process>[]>(() => {
-    if (isFetching) return [];
-    return (
-      (processesData?.value?.reduce(
-        (
-          acc: TableRow<Process>[] | Process[],
-          curr: TableRow<Process> | Process
-        ) => {
-          const currFlow = flowsData?.value?.find(
-            (item) =>
-              item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
-          ) as Flow;
-          return [
-            ...acc,
-            {
-              ...curr,
-              tableActions,
-              actionsProps: {
-                process: curr,
-                pathname: `/processos/${curr.idProcess}`,
-                state: { process: curr, ...(state || {}) },
-              },
-              flowName: currFlow?.name,
-              // @ts-ignore
-              status: labelByProcessStatus[curr.status],
-            },
-          ];
-        },
-        []
-      ) as TableRow<Process>[]) || []
-    );
-  }, [
-    processesData,
-    isProcessesFetched,
-    userData,
-    isUserFetched,
-    flowsData,
-    isFlowsFetched,
-    tableActions,
-    isFetching,
-  ]);
+  // HOOKS
+  const { data: userData, isFetched: isUserFetched } = useQuery({
+    queryKey: ["user-data"],
+    queryFn: getUserData,
+  });
 
-  const tableColumnHelper = createColumnHelper<TableRow<any>>();
-  const tableColumns = [
-    tableColumnHelper.accessor("record", {
-      cell: (info) => info.getValue(),
-      header: "Registro",
-      meta: {
-        isSortable: true,
-      },
-    }),
-    tableColumnHelper.accessor("nickname", {
-      cell: (info) => info.getValue(),
-      header: "Apelido",
-      meta: {
-        isSortable: true,
-      },
-    }),
-    tableColumnHelper.accessor("status", {
-      cell: (info) => info.getValue(),
-      header: "Status",
-      meta: {
-        isSortable: true,
-      },
-    }),
-    tableColumnHelper.accessor("flowName", {
-      cell: (info) => info.getValue(),
-      header: "Fluxo",
-      meta: {
-        isSortable: true,
-      },
-    }),
-  ];
-
-  const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = event.target.value;
-    setSelectedFlowValue(selectedValue);
-  };
-
-  const handleConfirmClick = () => {
+  const handleConfirmClick = async () => {
     const minDateValue = Date.parse(fromDate);
     const maxDateValue = Date.parse(toDate);
 
@@ -270,6 +141,7 @@ export default function FilteringProcesses() {
     ) {
       setCurrentPage(-1);
       setKey(Math.random());
+      fetchProcesses();
     } else {
       toast({
         id: "date-order-error",
@@ -281,6 +153,50 @@ export default function FilteringProcesses() {
       });
     }
   };
+
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+
+  const fetchProcesses = useCallback(async () => {
+    setIsFetching(true);
+    const response = await getProcesses(
+      parseInt(selectedFlowValue, 10),
+      !tableVisible
+        ? {
+            offset: 0,
+            limit: 0,
+          }
+        : {
+            offset: currentPage * 5,
+            limit: 5,
+          },
+      filter,
+      false,
+      selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
+      fromDate === "" ? undefined : fromDate,
+      toDate === "" ? undefined : toDate
+    );
+
+    if (response.type === "success") {
+      setProcessData(response);
+    } else {
+      setProcessData(null);
+    }
+    setIsFetching(false);
+  }, [
+    setIsFetching,
+    setProcessData,
+    filter,
+    selectedStatus,
+    fromDate,
+    toDate,
+    currentPage,
+  ]);
+
+  useEffect(() => {
+    fetchProcesses();
+  }, [currentPage]);
 
   const handleChartClick = async () => {
     const minDateValue = Date.parse(fromDate);
@@ -329,162 +245,6 @@ export default function FilteringProcesses() {
     }
   };
 
-  const handlePageChange = (selectedPage: { selected: number }) => {
-    setCurrentPage(selectedPage.selected);
-  };
-
-  const getDataFlows = async () => {
-    const dataFlows = await getFlows();
-    if (dataFlows.value) setFlows(dataFlows.value);
-  };
-
-  const getCurrentDate = () => {
-    const today = new Date();
-    return today.toISOString().split("T")[0];
-  };
-
-  const getTwoYearsAgoDate = () => {
-    const twoYearsAgo = new Date();
-    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-    twoYearsAgo.setDate(twoYearsAgo.getDate() + 1);
-    return twoYearsAgo.toISOString().split("T")[0];
-  };
-
-  const handleDownloadPDFQuantityProcesses = useCallback(async () => {
-    const flowName =
-      selectedFlowValue === ""
-        ? "Não Definido"
-        : idFlowToFlowName(parseInt(selectedFlowValue, 10));
-
-    if (toDate === undefined || fromDate === undefined) {
-      const toDateConvert = new Date(toDate);
-      const fromDateConvert = new Date(fromDate);
-
-      const dayMin = toDateConvert.getDate();
-      const monthMin = toDateConvert.getMonth() + 1;
-      const yearMin = toDateConvert.getFullYear();
-
-      const dayMax = fromDateConvert.getDate();
-      const montMax = fromDateConvert.getMonth() + 1;
-      const yearMax = fromDateConvert.getFullYear();
-
-      setFormattedtoDate(
-        `${dayMin < 10 ? "0" : ""}${dayMin}/${
-          monthMin < 10 ? "0" : ""
-        }${monthMin}/${yearMin}`
-      );
-      setFormattedfromDate(
-        `${dayMax < 10 ? "0" : ""}${dayMax}/${
-          montMax < 10 ? "0" : ""
-        }${montMax}/${yearMax}`
-      );
-    }
-
-    let statusLabel;
-
-    if (selectedStatus === "") {
-      statusLabel = "Não Definido";
-    } else if (selectedStatus === "archived") {
-      statusLabel = "Interrompido";
-    } else {
-      statusLabel = "Concluído";
-    }
-
-    const resAllProcess = await getProcesses(
-      parseInt(selectedFlowValue, 10),
-      undefined,
-      filter,
-      false,
-      selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
-      fromDate === "" ? undefined : fromDate,
-      toDate === "" ? undefined : toDate
-    );
-
-    if (resAllProcess.type === "success") {
-      await downloadPDFQuantityProcesses(
-        flowName,
-        statusLabel,
-        formattedtoDate === undefined ? "--" : formattedtoDate,
-        formattedfromDate === undefined ? "--" : formattedfromDate,
-        resAllProcess.value,
-        processesData?.totalProcesses,
-        processesData?.totalArchived,
-        processesData?.totalFinished
-      );
-    } else {
-      toast({
-        id: "error-getting-stages",
-        title: "Erro ao baixar pdf",
-        description: "Houve um erro ao buscar processos.",
-        status: "error",
-        isClosable: true,
-      });
-    }
-  }, [selectedFlowValue, selectedStatus, toDate, fromDate, processesData]);
-
-  useEffect(() => {
-    if (flows.length === 0) getDataFlows();
-  }, []);
-
-  useEffect(() => {
-    if (currentPage === -1) {
-      setCurrentPage(0);
-    } else {
-      refetchProcesses();
-    }
-  }, [currentPage, tableVisible]);
-
-  const idFlowToFlowName = useCallback(
-    (idFlow: number | number[]) => {
-      const flowNames = flows?.filter((flow) =>
-        Array.isArray(idFlow)
-          ? idFlow.includes(flow.idFlow)
-          : idFlow === flow.idFlow
-      );
-      return flowNames[0]?.name;
-    },
-    [flows]
-  );
-
-  function formatDataTable(processes: Process[]) {
-    return processes.map((process) => {
-      return {
-        Registro: process.record,
-        Apelido: process.nickname,
-        Fluxo: idFlowToFlowName(process.idFlow),
-        // @ts-ignore
-        Status: labelByProcessStatus[process.status],
-      };
-    });
-  }
-
-  async function getProcessesForDownload() {
-    const processesForDownload = await getProcesses(
-      parseInt(selectedFlowValue, 10),
-      undefined,
-      filter,
-      false,
-      selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
-      fromDate === "" ? undefined : fromDate,
-      toDate === "" ? undefined : toDate
-    );
-
-    if (processesForDownload.value !== undefined) {
-      const formatedData = formatDataTable(processesForDownload.value);
-      setPreparedProcessesDownload(formatedData);
-    }
-  }
-
-  useEffect(() => {
-    getProcessesForDownload();
-  }, [currentPage, flows]);
-
-  const [months, archived, finished] = useChartData(
-    filteredProcesses,
-    fromDate,
-    toDate
-  );
-
   return (
     <Box backgroundColor="#FFF" borderRadius="8px">
       <Flex justifyContent="flex-start" w="100%">
@@ -520,7 +280,6 @@ export default function FilteringProcesses() {
                       return <option value={flow.idFlow}>{flow.name}</option>;
                     })}
                   </Select>
-
                   <Select
                     value={selectedStatus}
                     onChange={handleStatusChange}
@@ -532,6 +291,7 @@ export default function FilteringProcesses() {
                     <option value="archived">Interrompido</option>
                   </Select>
                 </Flex>
+
                 <Flex alignItems="center" gap="5" marginTop="15">
                   <Input
                     w="50%"
@@ -541,8 +301,8 @@ export default function FilteringProcesses() {
                     onChange={(event: ChangeEvent<HTMLInputElement>) => {
                       setFromDate(event.target.value);
                     }}
-                    max={getCurrentDate()} // Define a data máxima como a data atual
-                    min={getTwoYearsAgoDate()} // Define a data mínima como a data há dois anos
+                    max={today} // Define a data máxima como a data atual
+                    min={twoYearsAgoDate} // Define a data mínima como a data há dois anos
                   />
                   <Text>à</Text>
                   <Input
@@ -553,8 +313,8 @@ export default function FilteringProcesses() {
                     onChange={(event: ChangeEvent<HTMLInputElement>) => {
                       setToDate(event.target.value);
                     }}
-                    max={getCurrentDate()} // Define a data máxima como a data atual
-                    min={getTwoYearsAgoDate()} // Define a data mínima como a data há dois anos
+                    max={today} // Define a data máxima como a data atual
+                    min={twoYearsAgoDate} // Define a data mínima como a data há dois anos
                   />
                   <Button
                     colorScheme="whatsapp"
@@ -565,25 +325,24 @@ export default function FilteringProcesses() {
                   </Button>
                 </Flex>
               </Flex>
-
               <Flex alignItems="flex-end" justifyContent="space-between">
                 <Flex w="100%" gap="5">
                   <ProcessQuantifier
                     processQuantity={(
-                      processesData?.totalProcesses || "--"
+                      processData?.totalProcesses || "--"
                     ).toString()}
                     description="Total de Processos"
                     numberColor="#44536D"
                   />
                   <ProcessQuantifier
                     processQuantity={(
-                      processesData?.totalFinished || "--"
+                      processData?.totalFinished || "--"
                     ).toString()}
                     description="Processos Concluídos"
                     numberColor="#208F5C"
                   />
                   <ProcessQuantifier
-                    processQuantity={(processesData?.totalArchived || "--")
+                    processQuantity={(processData?.totalArchived || "--")
                       .toString()
                       .toString()}
                     description="Processos Interrompidos"
@@ -600,68 +359,44 @@ export default function FilteringProcesses() {
                   >
                     {!tableVisible ? "Ver relatório" : "Ver Gráfico"}
                   </Button>
-                  <Button
-                    colorScheme="blue"
-                    size="md"
-                    onClick={() => handleDownloadPDFQuantityProcesses()}
-                  >
-                    PDF
-                  </Button>
-                  <ExportExcel
-                    excelData={preparedProcessesDownload}
-                    fileName="Quantidade de Processos"
-                  />
+                  {processData?.value && flows && flows?.length > 0 && (
+                    <ExportButtons
+                      today={today}
+                      twoYearsAgo={twoYearsAgoDate}
+                      selectedFlowValue={selectedFlowValue}
+                      toDate={toDate}
+                      fromDate={fromDate}
+                      processesData={processData}
+                      selectedStatus={selectedStatus}
+                      toast={toast}
+                      flows={flows}
+                      filter={filter}
+                    />
+                  )}
                 </Flex>
               </Flex>
 
               <Flex flexDirection="column">
-                <Flex
-                  w="100%"
-                  marginTop="15"
-                  alignItems="center"
-                  flexDirection="column"
-                >
-                  {tableVisible && (
-                    <DataTable
-                      data={filteredProcesses}
-                      columns={tableColumns}
-                      isDataFetching={!isProcessesFetched || !isUserFetched}
-                      emptyTableMessage="Não foram encontrados processos"
-                    />
-                  )}
-                  {processesData?.totalPages !== undefined && tableVisible && (
-                    <Pagination
-                      key={key}
-                      pageCount={processesData?.totalPages}
-                      onPageChange={handlePageChange}
-                    />
-                  )}
-                </Flex>
-                <Flex w="70%" alignSelf="center">
-                  {!tableVisible && (
-                    <Bar
-                      id="chart-quantidade-de-processos"
-                      options={options}
-                      data={{
-                        labels: months,
-                        datasets: [
-                          {
-                            label: "Processos Concluídos",
-                            data: archived,
-                            backgroundColor: "rgba(32, 143, 92, 0.9)",
-                            hidden: selectedStatus === "archived",
-                          },
-                          {
-                            label: "Processos Interrompidos",
-                            data: finished,
-                            backgroundColor: "rgba(174, 58, 51, 0.9)",
-                            hidden: selectedStatus === "finished",
-                          },
-                        ],
-                      }}
-                    />
-                  )}
-                </Flex>
+                <ProcessTable
+                  key={key}
+                  userData={userData}
+                  isUserFetched={isUserFetched}
+                  isFetching={isFetching}
+                  processData={processData}
+                  flows={flows}
+                  state={state}
+                  handlePageChange={handlePageChange}
+                  tableVisible={tableVisible}
+                />
+                {processData?.value && (
+                  <BarChart
+                    tableVisible={tableVisible}
+                    selectedStatus={selectedStatus}
+                    processes={processData.value}
+                    start={fromDate}
+                    end={toDate}
+                  />
+                )}
               </Flex>
             </AccordionPanel>
           </AccordionItem>
