@@ -129,7 +129,6 @@ describe("Testes para a função getUserById", () => {
     apiMockRole.onGet(`/roleAdmins/${userData.idRole}`).reply(200, { ...role });
 
     const result = await getUserById(id);
-    console.log({ result });
     expect(result).toEqual({
       type: "success",
       value: {

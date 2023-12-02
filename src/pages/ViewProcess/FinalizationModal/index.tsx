@@ -39,7 +39,14 @@ export function FinalizationModal({
           <Button variant="ghost" onClick={onClose}>
             Cancelar
           </Button>
-          <Button colorScheme="red" onClick={handleFinishProcess} size="sm">
+          <Button
+            colorScheme="red"
+            onClick={() => {
+              handleFinishProcess();
+              onClose();
+            }}
+            size="sm"
+          >
             Concluir
           </Button>
         </ModalFooter>
