@@ -13,9 +13,15 @@ import {
   chakra,
   Text,
   Box,
+  useToast,
+  Flex,
+  Tooltip,
 } from "@chakra-ui/react";
+import { DataTable } from "components/DataTable";
 
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, useEffect } from "react";
+import { useQuery } from "react-query";
+import { Pagination } from "components/Pagination";
 
 import {
   useReactTable,
@@ -24,10 +30,14 @@ import {
   SortingState,
   getSortedRowModel,
   flexRender,
+  createColumnHelper,
 } from "@tanstack/react-table";
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
-import { useNavigate } from "react-router-dom";
-
+import { ArrowUpIcon, ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "hooks/useAuth";
+import { getSequencesSortedStagesIds } from "utils/sorting";
+import { labelByProcessStatus } from "utils/constants";
+import { getProcesses } from "../../services/processManagement/processes";
 import { ActionButton } from "../DataTable/ActionButton";
 
 export type DataFlowProps<DataFlow extends object> = {
@@ -65,6 +75,158 @@ export function FlowAccordion<DataFlow extends object>({
       sorting,
     },
   });
+  const { state } = useLocation();
+  const flow = state?.flow;
+  const legalPriority = useState(0);
+  const showFinished = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const toast = useToast();
+  const { getUserData } = useAuth();
+  const { /* data: userData, */ isFetched: isUserFetched } = useQuery({
+    queryKey: ["user-data"],
+    queryFn: getUserData,
+  });
+  const handlePageChange = (selectedPage: { selected: number }) => {
+    setCurrentPage(selectedPage.selected);
+  };
+
+  const {
+    data: processesData,
+    isFetched: isProcessesFetched,
+    refetch: refetchProcesses,
+  } = useQuery({
+    queryKey: ["processes"],
+    queryFn: async () => {
+      const res = await getProcesses(
+        flow?.idFlow,
+        {
+          offset: currentPage * 5,
+          limit: 5,
+        },
+        undefined,
+        false,
+        showFinished ? ["archived", "finished"] : ["inProgress", "notStarted"]
+      );
+
+      if (res.type === "error") throw new Error(res.error.message);
+
+      return res;
+    },
+    onError: () => {
+      toast({
+        id: "processes-error",
+        title: "Erro ao carregar processos",
+        description:
+          "Houve um erro ao carregar processos, favor tentar novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    },
+  });
+
+  const processesTableRows = (
+    dataFlow: DataFlow & { actionsProps: any }
+  ): TableRow<Process>[] => {
+    if (!isProcessesFetched || processesData?.value === undefined) {
+      return [];
+    }
+
+    const { idFlow } = dataFlow.actionsProps.flow;
+    const processes = processesData?.value?.filter(
+      (process) => process.idFlow === idFlow
+    );
+    console.log(processes);
+
+    return (
+      (processes?.reduce(
+        (
+          acc: TableRow<Process>[] | Process[],
+          curr: TableRow<Process> | Process
+        ) => {
+          const currFlow = curr?.flow as Flow;
+
+          const sortedStagesIds = getSequencesSortedStagesIds(
+            currFlow?.sequences
+          );
+          const currIndexInFlow = sortedStagesIds?.indexOf(curr?.idStage) || -1;
+          const currentState =
+            (currFlow?.stages && currIndexInFlow !== -1) ||
+            curr.status === "notStarted"
+              ? `${currIndexInFlow + 1}/${sortedStagesIds?.length}`
+              : `${currIndexInFlow + 2}/${sortedStagesIds?.length}`;
+
+          return [
+            ...acc,
+            {
+              ...curr,
+              actionsProps: {
+                process: curr,
+                pathname: `/processos/${curr.record}`,
+                state: {
+                  process: curr,
+                  ...(state || {}),
+                },
+              },
+              // @ts-ignore
+              record: curr.idPriority ? (
+                <Flex flex="1" alignItems="center" gap="1">
+                  {curr.record}
+                  <Tooltip
+                    label="Prioridade legal"
+                    hasArrow
+                    background="blackAlpha.900"
+                    placement="right"
+                  >
+                    <ArrowUpIcon boxSize={3.5} />
+                  </Tooltip>
+                </Flex>
+              ) : (
+                curr.record
+              ),
+              currentState: `${
+                curr.status === "finished"
+                  ? `${currFlow?.stages?.length}/${currFlow?.stages?.length}`
+                  : currentState
+              }`,
+              flowName: currFlow?.name,
+              // @ts-ignore
+              status: labelByProcessStatus[curr.status],
+            },
+          ];
+        },
+        []
+      ) as TableRow<Process>[]) || []
+    );
+  };
+
+  const tableColumnHelper = createColumnHelper<TableRow<any>>();
+  const tableColumns = [
+    tableColumnHelper.accessor("record", {
+      cell: (info) => info.getValue(),
+      header: "Registro",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("nickname", {
+      cell: (info) => info.getValue(),
+      header: "Apelido",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("status", {
+      cell: (info) => info.getValue(),
+      header: "Status",
+      meta: {
+        isSortable: true,
+      },
+    }),
+  ];
+
+  useEffect(() => {
+    refetchProcesses();
+  }, [currentPage, showFinished, legalPriority]);
 
   return isDataFetching ? (
     <Skeleton w={width} maxW={maxWidth} h={skeletonHeight} />
@@ -125,22 +287,22 @@ export function FlowAccordion<DataFlow extends object>({
         ) : (
           <>
             {table.getRowModel().rows.map((row, index) => (
-              <Tr key={row.id} w={maxWidth}>
-                <Accordion allowMultiple>
-                  <AccordionItem w="132.7%">
-                    <AccordionButton justifyContent="space-between">
+              <Tr key={row.id}>
+                <Accordion allowMultiple maxWidth="132.7%">
+                  <AccordionItem w="132.7%" maxWidth="132.7%">
+                    <AccordionButton justifyContent="space-between" w="100%">
                       <AccordionIcon marginLeft="0%" />
                       {row.getVisibleCells().map(({ id, column, getValue }) => {
                         const { meta } = column.columnDef;
                         const isLastRow =
                           table.getRowModel().rows?.length - 1 === index;
                         const value = getValue();
-                        console.log(value);
                         return meta?.isTableActions ? (
                           <Box
                             key={id}
                             display="flex"
                             borderBottomWidth={isLastRow ? 0 : 0}
+                            maxW="20%"
                           >
                             {(value as TableAction[])?.map(
                               (actionItem: TableAction) => {
@@ -186,16 +348,32 @@ export function FlowAccordion<DataFlow extends object>({
                             key={id}
                             borderBottomWidth={isLastRow ? 0 : 0}
                             boxSize="50%"
-                            marginRight="75%"
+                            marginRight="70%"
                             alignItems="start"
+                            maxW="20%"
                           >
                             {value as ReactNode}
                           </Td>
                         );
                       })}
                     </AccordionButton>
-                    <AccordionPanel pb={4} width="100%">
-                      INFO DOS PROCESSOS DENTRO DESTE FLUXO
+                    <AccordionPanel maxWidth="132.7%" overflow="hidden">
+                      <Flex flexDir="column" alignItems="center" marginTop="2%">
+                        <DataTable
+                          data={processesTableRows(data[Number(row.id)])}
+                          columns={tableColumns}
+                          isDataFetching={!isProcessesFetched || !isUserFetched}
+                          emptyTableMessage={`Não foram encontrados processos${
+                            flow ? ` no fluxo ${flow.name}` : ""
+                          }.`}
+                        />
+                        {processesData?.totalPages !== undefined ? (
+                          <Pagination
+                            pageCount={processesData?.totalPages}
+                            onPageChange={handlePageChange}
+                          />
+                        ) : null}
+                      </Flex>
                     </AccordionPanel>
                   </AccordionItem>
                 </Accordion>
