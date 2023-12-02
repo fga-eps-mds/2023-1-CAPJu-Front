@@ -29,7 +29,6 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
-import { FaEye } from "react-icons/fa";
 
 import { getProcesses } from "services/processManagement/processes";
 import { isActionAllowedToUser } from "utils/permissions";

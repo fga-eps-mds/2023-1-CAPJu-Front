@@ -9,7 +9,6 @@ import {
   ModalFooter,
   chakra,
   Button,
-  Spacer,
   Flex,
   useToast,
 } from "@chakra-ui/react";
@@ -19,8 +18,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
-import { Icon } from "@chakra-ui/icons";
-import { FaFileDownload } from "react-icons/fa";
 import InputFile from "../../../components/FormFields/InputFile/InputFile";
 import { importFile } from "../../../services/processManagement/processesFile";
 

@@ -294,9 +294,9 @@ export default function ProcessesFileComponent() {
                 Importar lote
               </Button>
               <a
-              href="public/files/modeloImportacaoCapju.xlsx"
-              download
-              style={{ textDecoration: "none" }}
+                href="public/files/modeloImportacaoCapju.xlsx"
+                download
+                style={{ textDecoration: "none" }}
               >
                 <Button variant="outline" colorScheme="black">
                   <Icon
