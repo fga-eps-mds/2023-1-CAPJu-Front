@@ -35,6 +35,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import moment from "moment";
 import BarChart from "./components/BarChart";
 import ProcessTable from "./components/ProcessTable";
 import ExportButtons from "./components/ExportButtons";
@@ -66,13 +67,13 @@ export default function FilteringProcesses() {
   const { getUserData } = useAuth();
   const { state } = useLocation();
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = moment(new Date()).format("YYYY-MM-DD");
 
   const twoYearsAgoDate = useMemo(() => {
     const twoYearsAgo = new Date();
     twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
     twoYearsAgo.setDate(twoYearsAgo.getDate() + 1);
-    return twoYearsAgo.toISOString().split("T")[0];
+    return moment(twoYearsAgo).format("YYYY-MM-DD");
   }, []);
 
   const [selectedFlowValue, setSelectedFlowValue] = useState<string>("");
@@ -88,7 +89,7 @@ export default function FilteringProcesses() {
 
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
-  const [tableVisible, setTableVisible] = useState(false);
+  const [tableVisible, setTableVisible] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [key, setKey] = useState(Math.random());
 
@@ -139,7 +140,7 @@ export default function FilteringProcesses() {
       (fromDate.length === 0 && toDate.length === 0) ||
       (fromDate.length > 0 && toDate.length > 0 && maxDateValue > minDateValue)
     ) {
-      setCurrentPage(-1);
+      setCurrentPage(0);
       setKey(Math.random());
       fetchProcesses();
     } else {
@@ -160,17 +161,19 @@ export default function FilteringProcesses() {
 
   const fetchProcesses = useCallback(async () => {
     setIsFetching(true);
+
+    const pagination = tableVisible
+      ? {
+          offset: currentPage * 5,
+          limit: 5,
+        }
+      : {
+          offset: 0,
+          limit: 0,
+        };
     const response = await getProcesses(
       parseInt(selectedFlowValue, 10),
-      !tableVisible
-        ? {
-            offset: 0,
-            limit: 0,
-          }
-        : {
-            offset: currentPage * 5,
-            limit: 5,
-          },
+      pagination,
       filter,
       false,
       selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
@@ -192,13 +195,16 @@ export default function FilteringProcesses() {
     fromDate,
     toDate,
     currentPage,
+    tableVisible,
   ]);
 
   useEffect(() => {
-    fetchProcesses();
-  }, [currentPage]);
+    if (currentPage !== -1) {
+      fetchProcesses();
+    }
+  }, [currentPage, tableVisible]);
 
-  const handleChartClick = async () => {
+  const handleChartClick = useCallback(async () => {
     const minDateValue = Date.parse(fromDate);
     const maxDateValue = Date.parse(toDate);
     const currentDateValue = Date.now();
@@ -243,7 +249,7 @@ export default function FilteringProcesses() {
         isClosable: true,
       });
     }
-  };
+  }, [toDate, fromDate, tableVisible, toast]);
 
   return (
     <Box backgroundColor="#FFF" borderRadius="8px">
@@ -353,11 +359,9 @@ export default function FilteringProcesses() {
                   <Button
                     colorScheme="blue"
                     variant="outline"
-                    onClick={() => {
-                      handleChartClick();
-                    }}
+                    onClick={handleChartClick}
                   >
-                    {!tableVisible ? "Ver relatório" : "Ver Gráfico"}
+                    {tableVisible ? "Ver Gráfico" : "Ver relatório"}
                   </Button>
                   {processData?.value && flows && flows?.length > 0 && (
                     <ExportButtons
@@ -377,6 +381,7 @@ export default function FilteringProcesses() {
               </Flex>
 
               <Flex flexDirection="column">
+                {/* {currentPage !== -1 && ( */}
                 <ProcessTable
                   key={key}
                   userData={userData}
@@ -388,6 +393,7 @@ export default function FilteringProcesses() {
                   handlePageChange={handlePageChange}
                   tableVisible={tableVisible}
                 />
+                {/* )} */}
                 {processData?.value && (
                   <BarChart
                     tableVisible={tableVisible}

@@ -12,8 +12,6 @@ const useChartData = (
   start: string,
   end: string
 ): useChartDataReturn => {
-  console.log({ processes, start, end });
-
   const [months, setMonths] = useState([] as string[]);
   const [archived, setArchived] = useState([] as number[]);
   const [finished, setFinished] = useState([] as number[]);

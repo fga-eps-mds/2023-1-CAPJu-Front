@@ -44,7 +44,6 @@ export default function ProcessesFileComponent() {
     }),
     tableColumnHelper.accessor("status", {
       cell: (info) => {
-        console.log(info);
         return info;
       },
       header: "Status",

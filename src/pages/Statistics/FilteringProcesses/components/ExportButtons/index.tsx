@@ -39,12 +39,6 @@ const ExportButtons = ({
   const [resAllProcess, setResAllProcess] = useState<Result<Process[]> | null>(
     null
   );
-  const [formattedtoDate, setFormattedtoDate] = useState<string | undefined>(
-    undefined
-  );
-  const [formattedfromDate, setFormattedfromDate] = useState<
-    string | undefined
-  >(undefined);
 
   function formatDataTable(processes: Process[]) {
     return processes.map((process) => {
@@ -76,7 +70,6 @@ const ExportButtons = ({
     if (processesForDownload.value !== undefined) {
       const formatedData = formatDataTable(processesForDownload.value);
       setPreparedProcessesDownload(formatedData);
-      console.log(formatedData);
     }
   }
 
@@ -102,29 +95,9 @@ const ExportButtons = ({
         ? "Não Definido"
         : idFlowToFlowName(parseInt(selectedFlowValue, 10));
 
-    if (toDate === undefined || fromDate === undefined) {
-      const toDateConvert = new Date(toDate);
-      const fromDateConvert = new Date(fromDate);
-
-      const dayMin = toDateConvert.getDate();
-      const monthMin = toDateConvert.getMonth() + 1;
-      const yearMin = toDateConvert.getFullYear();
-
-      const dayMax = fromDateConvert.getDate();
-      const montMax = fromDateConvert.getMonth() + 1;
-      const yearMax = fromDateConvert.getFullYear();
-
-      setFormattedtoDate(
-        `${dayMin < 10 ? "0" : ""}${dayMin}/${
-          monthMin < 10 ? "0" : ""
-        }${monthMin}/${yearMin}`
-      );
-      setFormattedfromDate(
-        `${dayMax < 10 ? "0" : ""}${dayMax}/${
-          montMax < 10 ? "0" : ""
-        }${montMax}/${yearMax}`
-      );
-    }
+    const toDateConvert = toDate.length > 0 ? moment(toDate) : moment(today);
+    const fromDateConvert =
+      fromDate.length > 0 ? moment(fromDate) : moment(twoYearsAgo);
 
     let statusLabel;
 
@@ -140,12 +113,8 @@ const ExportButtons = ({
       await downloadPDFQuantityProcesses(
         flowName,
         statusLabel,
-        formattedtoDate === undefined
-          ? moment(twoYearsAgo).format("DD/MM/YYYY")
-          : formattedtoDate,
-        formattedfromDate === undefined
-          ? moment(today).format("DD/MM/YYYY")
-          : formattedfromDate,
+        fromDateConvert.format("DD/MM/YYYY"),
+        toDateConvert.format("DD/MM/YYYY"),
         resAllProcess.value,
         processesData?.totalProcesses,
         processesData?.totalArchived,
