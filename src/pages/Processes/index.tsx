@@ -29,7 +29,6 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
-import { FaEye } from "react-icons/fa";
 
 import { getProcesses } from "services/processManagement/processes";
 import { isActionAllowedToUser } from "utils/permissions";
@@ -356,13 +355,8 @@ function Processes() {
               colorScheme="green"
               onClick={onProcessesFileModalOpen}
             >
-              <Icon
-                as={FaEye}
-                mr="2"
-                boxSize={4}
-                style={{ marginRight: "8px" }}
-              />{" "}
-              Visualizar lotes
+              <AddIcon mr="2" boxSize={4} />
+              Importar Processos
             </Button>
           </Flex>
         </Flex>

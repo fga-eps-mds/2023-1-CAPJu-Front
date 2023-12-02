@@ -9,7 +9,6 @@ import {
   ModalFooter,
   chakra,
   Button,
-  Spacer,
   Flex,
   useToast,
 } from "@chakra-ui/react";
@@ -19,8 +18,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
-import { Icon } from "@chakra-ui/icons";
-import { FaFileDownload } from "react-icons/fa";
 import InputFile from "../../../components/FormFields/InputFile/InputFile";
 import { importFile } from "../../../services/processManagement/processesFile";
 
@@ -138,26 +135,8 @@ export function ImportProcessesModal({
             />
           </ModalBody>
           <ModalFooter>
-            <a
-              href="public/files/modeloImportacaoCapju.xlsx"
-              download
-              style={{ textDecoration: "none" }}
-            >
-              <Button variant="outline" colorScheme="black">
-                <Icon
-                  as={FaFileDownload}
-                  boxSize={4}
-                  style={{ marginRight: "8px" }}
-                />{" "}
-                Baixar modelo
-              </Button>
-            </a>
-            <Spacer />
             <Flex gap="2">
-              <Button variant="ghost" onClick={onClose}>
-                Cancelar
-              </Button>
-              <Button colorScheme="blue" type="submit">
+              <Button colorScheme="green" type="submit">
                 Importar
               </Button>
             </Flex>
