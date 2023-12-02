@@ -53,7 +53,7 @@ describe("Flow components", async () => {
 
     expect(
       await screen.getByText(
-        "Fluxos representam a sequência de Etapas seguida por um Processo."
+        "Fluxos representam a sequência de Eqtapas seguida por um Processo."
       )
     ).not.toBe(null);
 
