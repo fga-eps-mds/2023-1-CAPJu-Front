@@ -295,7 +295,7 @@ export default function FilteringProcesses() {
       if (tableVisible) {
         toast({
           id: "date-info",
-          title: "Datas não esepcificadas",
+          title: "Datas não especificadas",
           description:
             "Buscando todos os processos dentro do intervalo de 2 anos a partir da data atual.",
           status: "info",
