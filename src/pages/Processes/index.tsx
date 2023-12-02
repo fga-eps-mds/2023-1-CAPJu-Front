@@ -356,13 +356,8 @@ function Processes() {
               colorScheme="green"
               onClick={onProcessesFileModalOpen}
             >
-              <Icon
-                as={FaEye}
-                mr="2"
-                boxSize={4}
-                style={{ marginRight: "8px" }}
-              />{" "}
-              Visualizar lotes
+              <AddIcon mr="2" boxSize={4} />
+              Importar Processos
             </Button>
           </Flex>
         </Flex>

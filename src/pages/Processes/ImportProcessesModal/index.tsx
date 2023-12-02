@@ -138,26 +138,8 @@ export function ImportProcessesModal({
             />
           </ModalBody>
           <ModalFooter>
-            <a
-              href="public/files/modeloImportacaoCapju.xlsx"
-              download
-              style={{ textDecoration: "none" }}
-            >
-              <Button variant="outline" colorScheme="black">
-                <Icon
-                  as={FaFileDownload}
-                  boxSize={4}
-                  style={{ marginRight: "8px" }}
-                />{" "}
-                Baixar modelo
-              </Button>
-            </a>
-            <Spacer />
             <Flex gap="2">
-              <Button variant="ghost" onClick={onClose}>
-                Cancelar
-              </Button>
-              <Button colorScheme="blue" type="submit">
+              <Button colorScheme="green" type="submit">
                 Importar
               </Button>
             </Flex>
