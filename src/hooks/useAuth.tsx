@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   }
 
-  const getUserData = async (): Promise<
+  const getUserData = useCallback(async (): Promise<
     Result<User & { allowedActions: string[] }>
   > => {
     if (!user?.cpf) {
@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return {
       value: { ...user, allowedActions: (user as any).role.allowedActions },
     } as any;
-  };
+  }, [user]);
 
   function validateAuthentication() {
     const localStorageUser = getUserFromLocalStorageDecoded();
