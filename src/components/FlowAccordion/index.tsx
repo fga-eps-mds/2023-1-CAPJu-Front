@@ -98,14 +98,14 @@ export function FlowAccordion<DataFlow extends object>({
     queryKey: ["processes"],
     queryFn: async () => {
       const res = await getProcesses(
-        flow?.idFlow,
+        undefined,
         {
           offset: currentPage * 5,
           limit: 5,
         },
         undefined,
         false,
-        showFinished ? ["archived", "finished"] : ["inProgress", "notStarted"]
+        ["inProgress", "notStarted"]
       );
 
       if (res.type === "error") throw new Error(res.error.message);
@@ -231,7 +231,14 @@ export function FlowAccordion<DataFlow extends object>({
   return isDataFetching ? (
     <Skeleton w={width} maxW={maxWidth} h={skeletonHeight} />
   ) : (
-    <Table bg="white" w={width} maxW={maxWidth} borderRadius="4" size={size}>
+    <Table
+      bg="white"
+      w={width}
+      maxW={maxWidth}
+      borderRadius="4"
+      size={size}
+      border="hidden"
+    >
       <Thead width={maxWidth}>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>
@@ -288,95 +295,110 @@ export function FlowAccordion<DataFlow extends object>({
           <>
             {table.getRowModel().rows.map((row, index) => (
               <Tr key={row.id}>
-                <Accordion allowMultiple maxWidth="132.7%">
-                  <AccordionItem w="132.7%" maxWidth="132.7%">
-                    <AccordionButton justifyContent="space-between" w="100%">
-                      <AccordionIcon marginLeft="0%" />
-                      {row.getVisibleCells().map(({ id, column, getValue }) => {
-                        const { meta } = column.columnDef;
-                        const isLastRow =
-                          table.getRowModel().rows?.length - 1 === index;
-                        const value = getValue();
-                        return meta?.isTableActions ? (
-                          <Box
-                            key={id}
-                            display="flex"
-                            borderBottomWidth={isLastRow ? 0 : 0}
-                            maxW="20%"
-                          >
-                            {(value as TableAction[])?.map(
-                              (actionItem: TableAction) => {
-                                const disabled =
-                                  actionItem.disabled ||
-                                  (actionItem.disabledOn &&
-                                    actionItem.disabledOn(rawData[index]));
-                                const label = disabled
-                                  ? actionItem.labelOnDisable ||
-                                    actionItem.label
-                                  : actionItem.label;
-                                actionItem = { ...actionItem, label };
-                                return (
-                                  <ActionButton
-                                    key={actionItem.label}
-                                    disabled={disabled}
-                                    {...actionItem}
-                                    action={() => {
-                                      if (actionItem.action)
-                                        actionItem.action(
-                                          row.original.actionsProps
-                                        );
+                <Td colSpan={2} padding="5px !important" w={maxWidth}>
+                  <Accordion allowMultiple maxWidth="100%">
+                    <AccordionItem w="100%" maxWidth="100%" border="hidden">
+                      <AccordionButton
+                        justifyContent="flex-start"
+                        borderRadius="8px"
+                        w="100%"
+                      >
+                        <AccordionIcon marginLeft="0%" mr="1%" />
+                        {row
+                          .getVisibleCells()
+                          .map(({ id, column, getValue }) => {
+                            const { meta } = column.columnDef;
+                            const isLastRow =
+                              table.getRowModel().rows?.length - 1 === index;
+                            const value = getValue();
+                            return meta?.isTableActions ? (
+                              <Box
+                                key={id}
+                                display="flex"
+                                borderBottomWidth={isLastRow ? 0 : 0}
+                                maxW="20%"
+                              >
+                                {(value as TableAction[])?.map(
+                                  (actionItem: TableAction) => {
+                                    const disabled =
+                                      actionItem.disabled ||
+                                      (actionItem.disabledOn &&
+                                        actionItem.disabledOn(rawData[index]));
+                                    const label = disabled
+                                      ? actionItem.labelOnDisable ||
+                                        actionItem.label
+                                      : actionItem.label;
+                                    actionItem = { ...actionItem, label };
+                                    return (
+                                      <ActionButton
+                                        key={actionItem.label}
+                                        disabled={disabled}
+                                        {...actionItem}
+                                        action={() => {
+                                          if (actionItem.action)
+                                            actionItem.action(
+                                              row.original.actionsProps
+                                            );
 
-                                      if (
-                                        row.original.actionsProps.pathname &&
-                                        actionItem.isNavigate
-                                      )
-                                        navigate(
-                                          row.original.actionsProps.pathname,
-                                          {
-                                            state:
-                                              row.original.actionsProps.state,
-                                          }
-                                        );
-                                    }}
-                                  />
-                                );
-                              }
-                            )}
-                          </Box>
-                        ) : (
-                          <Td
-                            key={id}
-                            borderBottomWidth={isLastRow ? 0 : 0}
-                            boxSize="50%"
-                            marginRight="70%"
-                            alignItems="start"
-                            maxW="20%"
-                          >
-                            {value as ReactNode}
-                          </Td>
-                        );
-                      })}
-                    </AccordionButton>
-                    <AccordionPanel maxWidth="132.7%" overflow="hidden">
-                      <Flex flexDir="column" alignItems="center" marginTop="2%">
-                        <DataTable
-                          data={processesTableRows(data[Number(row.id)])}
-                          columns={tableColumns}
-                          isDataFetching={!isProcessesFetched || !isUserFetched}
-                          emptyTableMessage={`Não foram encontrados processos${
-                            flow ? ` no fluxo ${flow.name}` : ""
-                          }.`}
-                        />
-                        {processesData?.totalPages !== undefined ? (
-                          <Pagination
-                            pageCount={processesData?.totalPages}
-                            onPageChange={handlePageChange}
+                                          if (
+                                            row.original.actionsProps
+                                              .pathname &&
+                                            actionItem.isNavigate
+                                          )
+                                            navigate(
+                                              row.original.actionsProps
+                                                .pathname,
+                                              {
+                                                state:
+                                                  row.original.actionsProps
+                                                    .state,
+                                              }
+                                            );
+                                        }}
+                                      />
+                                    );
+                                  }
+                                )}
+                              </Box>
+                            ) : (
+                              <Flex
+                                key={id}
+                                borderBottomWidth={isLastRow ? 0 : 0}
+                                w="100%"
+                                justifyContent="start"
+                              >
+                                {value as ReactNode}
+                              </Flex>
+                            );
+                          })}
+                      </AccordionButton>
+                      <AccordionPanel maxWidth="100%">
+                        <Flex
+                          flexDir="column"
+                          alignItems="center"
+                          marginTop="2%"
+                        >
+                          <DataTable
+                            data={processesTableRows(data[Number(row.id)])}
+                            columns={tableColumns}
+                            isDataFetching={
+                              !isProcessesFetched || !isUserFetched
+                            }
+                            emptyTableMessage={`Não foram encontrados processos${
+                              flow ? ` no fluxo ${flow.name}` : ""
+                            }.`}
                           />
-                        ) : null}
-                      </Flex>
-                    </AccordionPanel>
-                  </AccordionItem>
-                </Accordion>
+                          {processesData?.totalPages !== undefined ? (
+                            <Pagination
+                              pageCount={processesData?.totalPages}
+                              onPageChange={handlePageChange}
+                            />
+                          ) : null}
+                        </Flex>
+                      </AccordionPanel>
+                    </AccordionItem>
+                  </Accordion>
+                </Td>
               </Tr>
             ))}
           </>
