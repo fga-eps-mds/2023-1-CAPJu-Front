@@ -321,7 +321,7 @@ export default function Statistics() {
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
+      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4" mt="50px">
         <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
           <Text
             fontSize="22px"

@@ -205,9 +205,9 @@ export function Profiles() {
 
   return (
     <>
-      <Flex mt="4" w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text fontSize="lg" fontWeight="semibold">
+      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4" mt="50px">
+        <Flex w="50%" mb="3" justifyContent="start">
+          <Text fontSize="25px" fontWeight="semibold">
             Perfil de acesso
           </Text>
         </Flex>
