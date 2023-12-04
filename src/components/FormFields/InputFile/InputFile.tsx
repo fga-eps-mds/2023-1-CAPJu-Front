@@ -36,7 +36,6 @@ const InputFile = ({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setError("");
     const file = event.target.files && event.target.files[0];
-    console.log(file);
     if (
       file &&
       allowedFileTypes?.length &&

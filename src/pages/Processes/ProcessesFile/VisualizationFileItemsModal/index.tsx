@@ -78,10 +78,7 @@ export function VisualizationItemsModal({
       },
     }),
     tableColumnHelper.accessor("nickname", {
-      cell: (info) => {
-        console.log(info);
-        return info;
-      },
+      cell: (info) => info,
       header: "Apelido",
       meta: {
         isSortable: true,

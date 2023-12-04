@@ -609,7 +609,6 @@ function ViewProcess() {
               title="Baixar pdf"
               colorScheme="green"
               onClick={(event) => {
-                console.log(process)
                 event.preventDefault();
                 downloadEventsPdf({
                   idProcess: process.idProcess,

@@ -43,10 +43,7 @@ export default function ProcessesFileComponent() {
       },
     }),
     tableColumnHelper.accessor("status", {
-      cell: (info) => {
-        console.log(info);
-        return info;
-      },
+      cell: (info) => info,
       header: "Status",
       meta: {
         isSortable: true,

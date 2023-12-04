@@ -53,10 +53,7 @@ function UserSessions() {
             },
         }),
         tableColumnHelper.accessor("stationIp", {
-            cell: (info) => {
-                console.log(info);
-                return info;
-            },
+            cell: (info) => info,
             header: "Estação",
             meta: {
                 isSortable: true,

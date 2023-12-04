@@ -247,8 +247,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }}>
       <SessionExpirationModal
           isOpen={isInactivityModalOpen}
-          initialCountdown={inactivityModalCounter}
-          onClose={() => { console.log( 'ola mundo'); }}  />
+          initialCountdown={inactivityModalCounter}  />
       {children}
     </AuthContext.Provider>
   );

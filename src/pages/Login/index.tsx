@@ -62,8 +62,6 @@ function Login() {
         return;
       }
 
-      console.log(res)
-
       handleLoading(false);
       toast({
         title: 'Erro no login',

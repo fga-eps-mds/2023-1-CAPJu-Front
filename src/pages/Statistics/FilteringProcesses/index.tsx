@@ -149,7 +149,6 @@ export default function FilteringProcesses() {
       );
       setIsFetching(false);
       if (res.type === "error") throw new Error(res.error.message);
-      console.log(res);
       return res;
     },
     onError: () => {
