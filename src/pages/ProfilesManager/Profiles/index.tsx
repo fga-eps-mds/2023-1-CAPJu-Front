@@ -34,8 +34,8 @@ export function Profiles() {
     queryFn: async () => {
       const res = await getAcceptedUsers(
         {
-          offset: currentPage * 5,
-          limit: 5,
+          offset: currentPage * 10,
+          limit: 10,
         },
         filter
       );

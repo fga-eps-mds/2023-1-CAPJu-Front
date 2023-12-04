@@ -9,6 +9,9 @@ interface ExportExcelProps {
 const ExportExcel = ({ excelData, fileName }: ExportExcelProps) => {
   const fileExtension = ".xlsx";
 
+  /* This operation is too resource-intensive to be handled by the frontend.
+    It is advisable to move this logic to the server-side for better performance and efficiency.
+    If any experienced (or, at least, competent) developers are reviewing this, please consider refactoring accordingly. */
   const exportToExcel = async () => {
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();

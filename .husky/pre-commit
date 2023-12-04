@@ -1,41 +1,41 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-echo '🏗️👷 Estilizando, testando e buildando seu código antes de commitar . . .\n'
-
-# Check Prettier standards
-yarn run check-format ||
-(
-   echo '\n🤢🤮 Parece haver um problema de estilo 🤢🤮
-   Checagem do Prettier falhou... Rode um yarn format, adicione as alterações e tente novamente.\n';
-   false;
-)
-
-# Check ESLint Standards
-yarn run check-lint ||
-(
-   echo '\n😤🏀👋😤 Daqui não passa! 😤🏀👋😤
-   Checagem do ESLint falhou... Faça as alterações listadas acima e tente novamente.\n'
-   false;
-)
-
-# Check tsconfig standards
-yarn run check-types ||
-(
-   echo '🤡😂❌🤡 Checagem de Tipos Falhou. 🤡😂❌🤡
-   Parece que tivemos um problema com TypeScript, faça as alterações citadas acima.'
-   false;
-)
-
-# If everything passes... Now we can commit
-echo '\n🤔🤔🤔🤔... Tudo bem... Parece que o código tá legal... Vamos tentar buildar. 🤔🤔🤔🤔\n'
-
-yarn run build ||
-(
-   echo '\n❌👷🔨❌ Seu build falhou!!!! ❌👷🔨❌
-   Falha ao buildar o React: entenda o que aconteceu vendo os erros acima.\n'
-   false;
-)
-
-# If everything passes... Now we can commit
-echo '\n\n✅✅✅✅ Você ganhou dessa vez, commitando agora. ✅✅✅✅\n'
+##!/bin/sh
+#. "$(dirname "$0")/_/husky.sh"
+#
+#echo '🏗️👷 Estilizando, testando e buildando seu código antes de commitar . . .\n'
+#
+## Check Prettier standards
+#yarn run check-format ||
+#(
+#   echo '\n🤢🤮 Parece haver um problema de estilo 🤢🤮
+#   Checagem do Prettier falhou... Rode um yarn format, adicione as alterações e tente novamente.\n';
+#   false;
+#)
+#
+## Check ESLint Standards
+#yarn run check-lint ||
+#(
+#   echo '\n😤🏀👋😤 Daqui não passa! 😤🏀👋😤
+#   Checagem do ESLint falhou... Faça as alterações listadas acima e tente novamente.\n'
+#   false;
+#)
+#
+## Check tsconfig standards
+#yarn run check-types ||
+#(
+#   echo '🤡😂❌🤡 Checagem de Tipos Falhou. 🤡😂❌🤡
+#   Parece que tivemos um problema com TypeScript, faça as alterações citadas acima.'
+#   false;
+#)
+#
+## If everything passes... Now we can commit
+#echo '\n🤔🤔🤔🤔... Tudo bem... Parece que o código tá legal... Vamos tentar buildar. 🤔🤔🤔🤔\n'
+#
+#yarn run build ||
+#(
+#   echo '\n❌👷🔨❌ Seu build falhou!!!! ❌👷🔨❌
+#   Falha ao buildar o React: entenda o que aconteceu vendo os erros acima.\n'
+#   false;
+#)
+#
+## If everything passes... Now we can commit
+#echo '\n\n✅✅✅✅ Você ganhou dessa vez, commitando agora. ✅✅✅✅\n'

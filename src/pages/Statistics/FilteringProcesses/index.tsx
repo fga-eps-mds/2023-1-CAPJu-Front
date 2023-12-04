@@ -138,8 +138,8 @@ export default function FilteringProcesses() {
         !tableVisible
           ? undefined
           : {
-              offset: currentPage * 5,
-              limit: 5,
+              offset: currentPage * 10,
+              limit: 10,
             },
         filter,
         false,

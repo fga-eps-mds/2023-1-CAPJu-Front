@@ -10,7 +10,7 @@ import { tabs } from "utils/tabs";
 export function NavigationTabs() {
   const { getUserData } = useAuth();
   const { data: userData } = useQuery({
-    queryKey: ["user-data"],
+    queryKey: ['user-data'],
     queryFn: getUserData,
     refetchOnWindowFocus: false,
   });

@@ -1,4 +1,4 @@
-import { api } from "services/api";
+import { api } from 'services/api';
 import { getRoleById, getAllRoles } from "services/role";
 
 export const signIn = async (credentials: {
@@ -6,12 +6,12 @@ export const signIn = async (credentials: {
   password: string;
 }): Promise<Result<string>> => {
   try {
-    const res = await api.user.post<string>("/login", credentials);
+    const res = await api.user.post<string>('/login', credentials);
 
     return { type: "success", value: res.data };
   } catch (error) {
     const E: Error = error as Error;
-
+    console.log(error)
     return { type: "error", error: E, value: undefined };
   }
 };
@@ -32,6 +32,46 @@ export const signUp = async (credentials: {
   } catch (error) {
     const E: Error = error as Error;
 
+    return { type: "error", error: E, value: undefined };
+  }
+};
+
+export const signOut = async (logoutInitiator: string): Promise<Result<string>> => {
+  try {
+    await api.user.post(`/logout/${logoutInitiator}`);
+    return { type: "success", value: '' };
+  } catch (error) {
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
+  }
+};
+
+export const signOutExpiredSession = async (): Promise<Result<string>> => {
+  try {
+    await api.user.post(`/logoutExpiredSession`);
+    return { type: "success", value: '' };
+  } catch (error) {
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
+  }
+};
+
+export const checkSessionStatus = async (sessionId: string): Promise<Result<{ active: boolean, message: string }>> => {
+  try {
+    const { active, message } = (await api.user.get<{ active: boolean, message: string }>(`/sessionStatus/${sessionId}`)).data;
+    return { type: "success", value: { active, message } };
+  } catch (error) {
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
+  }
+};
+
+export const logoutAsAdmin = async (sessionId: string): Promise<Result<string>> => {
+  try {
+    await api.user.patch(`/logoutAsAdmin/${sessionId}`);
+    return { type: "success", value: '' };
+  } catch (error) {
+    const E: Error = error as Error;
     return { type: "error", error: E, value: undefined };
   }
 };
@@ -215,6 +255,31 @@ export const updateUserRole = async (
   } catch (error) {
     const E: Error = error as Error;
 
+    return { type: "error", error: E, value: undefined };
+  }
+};
+
+// Sessions endpoints:
+
+export const findAllSessionsPaged = async (
+    pagination?: Pagination,
+    nameOrEmailOrCpf?: string
+): Promise<Result<any>> => {
+  try {
+    const res = await api.user.get<UserSession[]>(
+        `sessions/findAllPaged`,
+        {
+          params: {
+            offset: nameOrEmailOrCpf?.trim() ? 0 : pagination?.offset ?? 0,
+            limit: pagination?.limit,
+            ...(nameOrEmailOrCpf?.trim() && { nameOrEmailOrCpf: nameOrEmailOrCpf.trim() }),
+            active: true,
+          },
+        }
+    );
+    return { type: "success", value: res.data as any };
+  } catch (error) {
+    const E: Error = error as Error;
     return { type: "error", error: E, value: undefined };
   }
 };

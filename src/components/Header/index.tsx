@@ -24,7 +24,7 @@ export function Header() {
           <>
             <Flex alignItems="center" ml="auto" gap="5">
               <HeaderLink href="/contribuidores">Sobre</HeaderLink>
-              <Button colorScheme="red" onClick={handleLogout}>
+              <Button colorScheme="red" onClick={() => handleLogout()}>
                 Sair
               </Button>
             </Flex>

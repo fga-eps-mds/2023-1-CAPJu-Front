@@ -47,28 +47,34 @@ function Login() {
 
   const onSubmit = handleSubmit(async (data) => {
     handleLoading(true);
-    const res = await handleLogin(data);
+    try {
+      const res = await handleLogin(data) as any;
 
-    if (res.type === "success") {
+      if (res.type === "success") {
+        handleLoading(false);
+        navigate("/", { replace: true });
+        toast({
+          id: 'login-success',
+          title: 'Bem-vindo(a)!',
+          description: 'Login efetuado com sucesso!',
+          status: 'success',
+        });
+        return;
+      }
+
+      console.log(res)
+
       handleLoading(false);
-      navigate("/", { replace: true });
       toast({
-        id: "login-success",
-        title: "Bem vindo!",
-        description: "Login efetuado com sucesso!",
-        status: "success",
+        title: 'Erro no login',
+        description: res.error?.message || res?.data?.message,
+        status: 'error',
+        isClosable: true,
       });
-      return;
+    }catch (e) {
+      console.log(e)
     }
 
-    handleLoading(false);
-    toast({
-      id: "login-error",
-      title: "Erro no login",
-      description: res.error?.message,
-      status: "error",
-      isClosable: true,
-    });
   });
 
   return (

@@ -117,8 +117,8 @@ export default function StepDeadlineReports() {
     paramCurrentPage: number
   ) => {
     const res = await getProcessesByDueDate(paramMinDate, paramMaxDate, {
-      offset: paramCurrentPage * 5,
-      limit: 5,
+      offset: paramCurrentPage * 10,
+      limit: 10,
     });
 
     if (res.type === "error") throw new Error(res.error.message);

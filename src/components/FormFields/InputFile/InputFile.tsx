@@ -36,12 +36,13 @@ const InputFile = ({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setError("");
     const file = event.target.files && event.target.files[0];
+    console.log(file);
     if (
       file &&
       allowedFileTypes?.length &&
       !allowedFileTypes.includes(file.type)
     ) {
-      setError("Formato inválido. Insira um .xlsx ou .xls");
+      setError("Formato inválido. Insira um .xls, .xlsx ou .csv");
     }
 
     if (file) {

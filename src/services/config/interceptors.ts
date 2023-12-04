@@ -20,8 +20,6 @@ export const errorResponseHandler = (
   error: AxiosError<ApiResponse<string>>
 ) => {
   if (error?.response) {
-    console.log("AXIOS INTERCEPTED ERROR: ", error.response);
-
     if (typeof error?.response?.data === "string") {
       return Promise.reject(new Error(error.response.data));
     }

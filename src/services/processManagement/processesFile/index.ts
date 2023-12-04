@@ -32,15 +32,16 @@ export const importFile = async (data: {
 };
 
 export const findFileById = async (
-  idProcessesFile: number,
-  resulting?: boolean
+    idProcessesFile: number,
+    resulting: boolean = false,
+    format: string = 'xlsx'
 ): Promise<Result<ProcessesFile>> => {
   try {
-    const res = await api.processManagement.get<ProcessesFile>(
-      `/processesFile/findFileById/${idProcessesFile}/${
-        resulting ? "resulting" : "original"
-      }`
-    );
+    const originalQueryParam = resulting ? 'false' : 'true';
+
+    const url = `/processesFile/findFileById/${idProcessesFile}?original=${originalQueryParam}&format=${format}`;
+
+    const res = await api.processManagement.get<ProcessesFile>(url);
 
     return {
       type: "success",

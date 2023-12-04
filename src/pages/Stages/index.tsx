@@ -61,7 +61,7 @@ function Stages() {
     queryKey: ["stages"],
     queryFn: async () => {
       const res = await getStages(
-        { offset: currentPage * 5, limit: 5 },
+        { offset: currentPage * 10, limit: 10 },
         filter
       );
 

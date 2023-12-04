@@ -3,9 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Icon, SearchIcon, ViewIcon } from "@chakra-ui/icons";
 import {
   FaEraser,
-  FaDownload,
   FaFileDownload,
   FaFileUpload,
+  FaFileExcel,
 } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import {
@@ -109,7 +109,7 @@ export default function ProcessesFileComponent() {
     () => [
       {
         label: "Visualizar Itens",
-        icon: <ViewIcon boxSize={6} />,
+        icon: <ViewIcon boxSize={6} style={{ marginRight: "10px" }} />,
         actionName: "see-items",
         labelOnDisable: "Arquivo não importado ",
         disabledOn: (file: ProcessesFile) => file.status !== "imported",
@@ -121,7 +121,7 @@ export default function ProcessesFileComponent() {
       {
         label: "Download Arquivo Original",
         icon: (
-          <Icon as={FaFileDownload} boxSize={6} style={{ marginLeft: "8px" }} />
+          <Icon as={FaFileDownload} boxSize={6} style={{ marginRight: "10px" }} />
         ),
         actionName: "download-original-file",
         disabled: false,
@@ -132,14 +132,13 @@ export default function ProcessesFileComponent() {
           ),
       },
       {
-        label: "Download Arquivo Resultado",
+        label: "Download Arquivo Resultado ",
         icon: (
-          <Icon as={FaDownload} boxSize={6} style={{ marginLeft: "8px" }} />
+          <Icon as={FaFileExcel} boxSize={6} style={{ marginRight: "5px" }} />
         ),
         actionName: "download-resulting-file",
-        labelOnDisable: "Arquivo não importado",
-        disabledOn: (file: ProcessesFile) =>
-          ["waiting", "inProgress", "error"].includes(file.status),
+        labelOnDisable: " Arquivo não importado",
+        disabledOn: (file: ProcessesFile) => ['waiting', 'inProgress', 'error'].includes(file.status),
         action: async ({ processesFile }) =>
           downloadProcessesFile(
             processesFile.idProcessesFile,
@@ -147,6 +146,24 @@ export default function ProcessesFileComponent() {
             true
           ),
       },
+        // This is not working
+      // {
+      //   label: "Download .CSV Resultado",
+      //   icon: (
+      //       <Icon as={FaFileCsv} boxSize={6} style={{ marginLeft: "8px" }} />
+      //   ),
+      //   actionName: "download-resulting-file",
+      //   labelOnDisable: " Arquivo não importado ",
+      //   disabledOn: (file: ProcessesFile) =>
+      //       ["waiting", "inProgress", "error"].includes(file.status),
+      //   action: async ({ processesFile }) =>
+      //       downloadProcessesFile(
+      //           processesFile.idProcessesFile,
+      //           "dataResultingFile",
+      //           true,
+      //           'csv'
+      //       ),
+      // },
       {
         label: "Excluir",
         icon: <Icon as={MdDelete} boxSize={6} style={{ marginLeft: "8px" }} />,
@@ -168,14 +185,14 @@ export default function ProcessesFileComponent() {
 
   const [nameOrRecordFilter, setNameOrRecordFilter] = useState<string>("");
 
-  const downloadProcessesFile = async (
-    idProcessesFile: number,
-    fileKey: string,
-    resulting?: boolean
-  ) => {
-    const result = (await findFileById(idProcessesFile, resulting)) as any;
+  const downloadProcessesFile = async (idProcessesFile: number, fileKey: string, resulting?: boolean, format: string = 'xlsx') => {
+    const result = (await findFileById(idProcessesFile, resulting, format)) as any;
     const bytes = result.value[fileKey].data;
-
+    // console.log(bytes)
+    // if(format === 'csv') {
+    //   downloadCsv(bytes);
+    //   return;
+    // }
     const ab = new ArrayBuffer(bytes.length);
     const ia = new Uint8Array(ab);
 
@@ -190,7 +207,8 @@ export default function ProcessesFileComponent() {
 
     a.style.display = "none";
     a.href = url;
-    a.download = result.value.fileName;
+
+    a.download = resulting ? replaceFileExtension(result.value.fileName, format) : result.value.fileName;
 
     document.body.appendChild(a);
     a.click();
@@ -257,6 +275,13 @@ export default function ProcessesFileComponent() {
       imported: { text: "Importado", color: "green" },
       canceled: { text: "Cancelado", color: "gray" },
     }[fileStatus] as { text: string; color: string };
+  };
+
+  const replaceFileExtension = (fileName: string, newExtension: string) => {
+    const fileNameParts = fileName.split('.');
+    fileNameParts.pop();
+    fileNameParts.push(newExtension);
+    return fileNameParts.join('.');
   };
 
   return (

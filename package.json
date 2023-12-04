@@ -64,6 +64,7 @@
     "react-table": "^7.8.0",
     "reactflow": "^11.7.2",
     "resize-observer-polyfill": "^1.5.1",
+    "set-interval-async": "^3.0.3",
     "sheetjs-style": "^0.15.8",
     "uuid": "^9.0.1",
     "vite": "^4.3.0",

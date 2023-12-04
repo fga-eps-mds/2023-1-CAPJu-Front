@@ -89,7 +89,7 @@ export const updateFlow = async (data: {
   idFlow: number;
 }) => {
   try {
-    const res = await api.processManagement.put<Flow>(`/flow/`, data);
+    const res = await api.processManagement.put<Flow>(`/flow`, data);
 
     return { type: "success", value: res.data };
   } catch (error) {

@@ -12,8 +12,9 @@ const Flows = lazy(() => import("pages/Flows"));
 const Processes = lazy(() => import("pages/Processes"));
 const ViewProcess = lazy(() => import("pages/ViewProcess"));
 const About = lazy(() => import("pages/About"));
-const ActionsManager = lazy(() => import("pages/ProfilesActionsManager"));
-const Statistics = lazy(() => import("pages/Statistics"));
+const ActionsManager = lazy(() => import('pages/ProfilesActionsManager'));
+const Statistics = lazy(() => import('pages/Statistics'));
+const UserSessions = lazy(() => import('pages/User/Sessions/index'));
 
 export const PrivateRoutes: MenuItem[] = [
   {
@@ -78,6 +79,11 @@ export const PrivateRoutes: MenuItem[] = [
     path: "editar-conta/senha",
     name: "PasswordEdition",
     element: <PasswordEdition />,
+  },
+  {
+    path: "sesssoes-usuarios",
+    name: "UserSessions",
+    element: <UserSessions />,
   },
   {
     path: "/contribuidores",

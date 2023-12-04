@@ -1,5 +1,4 @@
 export const downloadFileFromBuffer = (bytes: Buffer, fileName: string) => {
-  console.log(bytes);
 
   const ab = new ArrayBuffer(bytes.length);
   const ia = new Uint8Array(ab);

@@ -144,7 +144,7 @@ export function DataTable<Data extends object>({
                           return (
                             <ActionButton
                               key={actionItem.label}
-                              disabled={disabled}
+                              disabled={!!disabled}
                               {...actionItem}
                               action={() => {
                                 if (actionItem.action)

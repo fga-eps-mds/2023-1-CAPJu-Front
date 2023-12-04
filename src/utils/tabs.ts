@@ -42,6 +42,12 @@ export const tabs = [
     action: "manage-profiles",
   },
   {
+    label: "Sessões",
+    pathIndex: "/sesssoes-usuarios",
+    path: "/sesssoes-usuarios",
+    action: "manage-user-sessions",
+  },
+  {
     label: "Editar Conta",
     pathIndex: "/editar-conta",
     path: "/editar-conta",

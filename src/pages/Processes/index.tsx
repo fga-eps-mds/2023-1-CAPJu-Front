@@ -99,8 +99,8 @@ function Processes() {
       const res = await getProcesses(
         flow?.idFlow,
         {
-          offset: currentPage * 5,
-          limit: 5,
+          offset: currentPage * 10,
+          limit: 10,
         },
         filter,
         legalPriority,
@@ -121,6 +121,7 @@ function Processes() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const tableActions = useMemo<TableAction[]>(
     () => [
@@ -308,7 +309,6 @@ function Processes() {
         setPlaceholder("Pesquise o fluxo pelo nome:");
         break;
       default:
-      // do nothing
     }
   }, [selectedFilter]);
 
@@ -402,7 +402,7 @@ function Processes() {
                   border="30px"
                 />
                 <Image
-                  zIndex="9999"
+                  zIndex="3"
                   src={line52}
                   marginLeft="0%"
                   width="3%"

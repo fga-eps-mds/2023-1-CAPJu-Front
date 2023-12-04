@@ -20,7 +20,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
 import { Icon } from "@chakra-ui/icons";
-import { FaFileDownload } from "react-icons/fa";
+import {FaFileCsv, FaFileExcel} from "react-icons/fa";
 import InputFile from "../../../components/FormFields/InputFile/InputFile";
 import { importFile } from "../../../services/processManagement/processesFile";
 
@@ -39,13 +39,15 @@ const validationSchema = yup.object({
       (value: any) => {
         if (!value) return false;
         const allowedTypes = [
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          "application/vnd.ms-excel",
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'application/vnd.ms-excel',
+          'text/csv',
+          'application/csv',
         ];
         return allowedTypes.includes(value.type);
       }
     )
-    .required("Insira a planilha"),
+    .required("Insira o arquivo"),
 });
 
 interface ImportProcessesModalProps {
@@ -139,17 +141,27 @@ export function ImportProcessesModal({
           </ModalBody>
           <ModalFooter>
             <a
-              href="public/files/modeloImportacaoCapju.xlsx"
+              href="/files/modeloImportacaoCapju.xlsx"
               download
               style={{ textDecoration: "none" }}
             >
-              <Button variant="outline" colorScheme="black">
+              <Button variant="outline" colorScheme="black" title="Baixar modelo excel">
                 <Icon
-                  as={FaFileDownload}
-                  boxSize={4}
-                  style={{ marginRight: "8px" }}
+                  as={FaFileExcel}
+                  boxSize={5}
                 />{" "}
-                Baixar modelo
+              </Button>
+            </a>
+            <a
+                href="/files/modeloImportacaoCapju.csv"
+                download
+                style={{ textDecoration: "none", marginLeft: '10px' }}
+            >
+              <Button variant="outline" colorScheme="black" title="Baixar modelo csv">
+                <Icon
+                    as={FaFileCsv}
+                    boxSize={5}
+                />{" "}
               </Button>
             </a>
             <Spacer />
