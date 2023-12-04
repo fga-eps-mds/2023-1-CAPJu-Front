@@ -54,7 +54,10 @@ export const getUserById = async (
   }
 };
 
-export const updateUser = async (data: { email: string }, cpf: string) => {
+export const updateUser = async (
+  data: { email: string | null },
+  cpf: string
+) => {
   try {
     const res = await api.user.put(`/updateUser/${cpf}`, data);
 
@@ -62,6 +65,26 @@ export const updateUser = async (data: { email: string }, cpf: string) => {
   } catch (error) {
     const E: Error = error as Error;
     return { type: "error", error: E, value: undefined };
+  }
+};
+
+export const updateUserFullName = async (
+  data: { fullName: string },
+  cpf: string
+) => {
+  try {
+    const res = await api.user.put(`/updateUserFullName/${cpf}`, data);
+
+    return { type: "success", value: res.data };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
   }
 };
 
