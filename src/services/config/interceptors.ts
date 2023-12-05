@@ -1,11 +1,15 @@
-import { AxiosError, InternalAxiosRequestConfig } from "axios";
+import {AxiosError, InternalAxiosRequestConfig} from "axios";
 
 export function authorization(
-  config: InternalAxiosRequestConfig<any>
+    config: InternalAxiosRequestConfig<any>
 ): InternalAxiosRequestConfig<any> {
   const bearerTokenWithQuotes = localStorage.getItem("@CAPJu:jwt_user");
 
-  if (!bearerTokenWithQuotes) return config;
+  if (!bearerTokenWithQuotes)
+    return config;
+
+  if(config.url !== '/logout/userRequested')
+    localStorage.setItem("@CAPJu:check_session_flag", 'true');
 
   const bearerToken = JSON.parse(bearerTokenWithQuotes);
 

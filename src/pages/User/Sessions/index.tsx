@@ -197,7 +197,7 @@ function UserSessions() {
                 >
                   <Input
                     color="black"
-                    placeholder="Pesquise usuários por nome, email ou cpf"
+                    placeholder="Pesquise usuários por unidade, nome, cpf ou email"
                     variant="filled"
                     onChange={({ target }) => setFilter(target.value)}
                     value={filter}

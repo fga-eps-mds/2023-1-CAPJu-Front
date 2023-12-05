@@ -27,6 +27,7 @@ type AuthContextType = {
     password: string;
   }) => Promise<Result<User>>;
   handleLogout: () => void;
+  checkJwtExpiration: () => void;
   getUserData: () => Promise<Result<User & { allowedActions: string[] }>>;
   validateAuthentication: () => void;
 };
@@ -49,6 +50,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   let inactivityLogoutTimer: any;
 
   let sessionStatusInterval: any;
+
+  let sessionCheckInterval: any;
 
   const toast = useToast();
 
@@ -132,6 +135,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   function clearLocalUserInfo() {
     localStorage.removeItem("@CAPJu:jwt_user");
+    localStorage.removeItem("@CAPJu:check_session_flag");
     setUser(null);
   }
 
@@ -188,11 +192,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     jwtCheckInterval = setInterval(async () => {
       await checkJwtExpiration();
-    }, 10000); // Checked every 10s
+    }, 3000); // Checked every 3s
 
     sessionStatusInterval = setInterval(async () => {
       await checkSession();
-    }, 80000); // Checked every 1mim 30s
+    }, 60000); // Checked every 1mim
+
+    sessionCheckInterval = setInterval(async () => {
+      if(localStorage.getItem('@CAPJu:check_session_flag')) {
+        await checkSession();
+        await checkJwtExpiration();
+        localStorage.removeItem('@CAPJu:check_session_flag');
+      }
+    }, 50);
 
     document.addEventListener("mousemove", handleMouseMove);
   }
@@ -243,6 +255,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     clearTimeout(inactivityLogoutTimer);
     clearInterval(jwtCheckInterval);
     clearInterval(sessionStatusInterval);
+    clearInterval(sessionCheckInterval);
   };
 
   const removeMouseMoveListener = () =>
@@ -258,6 +271,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated: !!user,
         user,
         handleLogin,
+        checkJwtExpiration,
         handleLogout,
         getUserData,
         validateAuthentication,
