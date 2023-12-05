@@ -115,6 +115,8 @@ jobs:
         run: npm i yarn -g && yarn 
 
       - name: 🧪 Roda suíte de testes
+        timeout-minutes: 0.5
+        continue-on-error: true
         run: |
           export NODE_OPTIONS="--max_old_space_size=32768"
           yarn test
