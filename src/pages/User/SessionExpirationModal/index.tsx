@@ -24,7 +24,7 @@ export const SessionExpirationModal: React.FC<SessionExpirationModalProps> = ({
   const [countdown, setCountdown] = useState(initialCountdown);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) return () => {};
 
     setCountdown(initialCountdown);
 
