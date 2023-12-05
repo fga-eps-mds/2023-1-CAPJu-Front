@@ -341,80 +341,88 @@ export default function Statistics() {
               defaultIndex={[4]}
             >
               <>
-                <Flex>
-                  <Select
-                    placeholder="Selecione o fluxo"
-                    marginLeft="36px"
-                    width="302px"
-                    onChange={(e) => setSelectedFlow(Number(e.target.value))}
-                  >
-                    {flowsData?.value?.map((flow: any) => (
-                      <option value={flow.idFlow} key={flow.name}>
-                        {flow.name}
-                      </option>
-                    ))}
-                  </Select>
-                  <Button
-                    colorScheme="green"
-                    marginLeft="10px"
-                    onClick={() => {
-                      setOpenSelectStage(true);
-                      handleConfirmSelectionFlow();
-                      setShowProcesses(false);
-                      setOpenChart(true);
-                    }}
-                  >
-                    Confirmar
-                  </Button>
+                <Flex w="100%" gap="3">
+                  <Flex w="35%" gap="3">
+                    <Select
+                      placeholder="Fluxo"
+                      w="65%"
+                      color="gray.500"
+                      onChange={(e) => setSelectedFlow(Number(e.target.value))}
+                    >
+                      {flowsData?.value?.map((flow: any) => (
+                        <option value={flow.idFlow} key={flow.name}>
+                          {flow.name}
+                        </option>
+                      ))}
+                    </Select>
+                    <Button
+                      colorScheme="green"
+                      w="28%"
+                      onClick={() => {
+                        setOpenSelectStage(true);
+                        handleConfirmSelectionFlow();
+                        setShowProcesses(false);
+                        setOpenChart(true);
+                      }}
+                    >
+                      Confirmar
+                    </Button>
+                  </Flex>
+
                   {openSelectStage ? (
-                    <Flex alignItems="center">
-                      <Select
-                        placeholder="Selecione a etapa"
-                        marginLeft="36px"
-                        width="302px"
-                        onChange={(e) => {
-                          setSelectedStage(Number(e.target.value));
-                          setCurrentPage(0);
-                        }}
-                      >
-                        {Object.values(stages).map((stage) => (
-                          <option key={stage.idStage} value={stage.idStage}>
-                            {stage.name}
-                          </option>
-                        ))}
-                      </Select>
-                      <Button
-                        colorScheme="green"
-                        marginLeft="10px"
-                        marginRight="10%"
-                        onClick={() => {
-                          setOpenSelectStage(true);
-                          handleConfirmSelectionStages();
-                          setOpenChart(false);
-                        }}
-                      >
-                        Confirmar
-                      </Button>
-                      <Flex>
+                    <Flex
+                      alignItems="center"
+                      w="65%"
+                      gap="5"
+                      justifyContent="space-between"
+                    >
+                      <Flex w="53.85%" gap="5">
+                        <Select
+                          placeholder="Selecione a etapa"
+                          color="gray.500"
+                          width="65%"
+                          onChange={(e) => {
+                            setSelectedStage(Number(e.target.value));
+                            setCurrentPage(0);
+                          }}
+                        >
+                          {Object.values(stages).map((stage) => (
+                            <option key={stage.idStage} value={stage.idStage}>
+                              {stage.name}
+                            </option>
+                          ))}
+                        </Select>
+                        <Button
+                          colorScheme="green"
+                          w="28%"
+                          onClick={() => {
+                            setOpenSelectStage(true);
+                            handleConfirmSelectionStages();
+                            setOpenChart(false);
+                          }}
+                        >
+                          Confirmar
+                        </Button>
+                      </Flex>
+                      <Flex gap="5">
+                        <Button
+                          onClick={
+                            showProcesses
+                              ? () => DownloadPDFProcess()
+                              : DownloadPDFChart
+                          }
+                          colorScheme="blue"
+                          size="md"
+                        >
+                          <Text fontSize="16px"> PDF </Text>
+                        </Button>
+
                         {showProcesses && (
                           <ExportExcel
                             excelData={filteredProcess}
                             fileName={`Processos_do_fluxo_${selectedFlow}_na_etapa_${selectedStage}`}
                           />
                         )}
-                        <Flex marginRight="30%">
-                          <Button
-                            onClick={
-                              showProcesses
-                                ? () => DownloadPDFProcess()
-                                : DownloadPDFChart
-                            }
-                            colorScheme="blue"
-                            size="md"
-                          >
-                            <Text fontSize="16px"> PDF </Text>
-                          </Button>
-                        </Flex>
                       </Flex>
                     </Flex>
                   ) : (
