@@ -359,7 +359,7 @@ export default function StepDeadlineReports() {
             <>
               <Flex justifyContent="space-between">
                 <Flex w="70%" flexDirection="column">
-                  <Flex alignItems="center" gap="5" marginTop="15">
+                  <Flex alignItems="center" gap="5">
                     <Input
                       w="50%"
                       type="date"
@@ -386,7 +386,7 @@ export default function StepDeadlineReports() {
                       }}
                     />
                     <Button
-                      colorScheme="whatsapp"
+                      colorScheme="green"
                       w="20%"
                       onClick={() => {
                         handleConfirmClick(minDate, maxDate);
