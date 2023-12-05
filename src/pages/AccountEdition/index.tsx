@@ -16,6 +16,7 @@ import {
   updateUserPassword,
   updateUser,
   updateUserFullName,
+  showEmailByCpf,
 } from "services/user";
 import { PrivateLayout } from "layouts/Private";
 import { useAuth } from "hooks/useAuth";
@@ -23,7 +24,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLoading } from "hooks/useLoading";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 type FormValues = {
@@ -53,6 +54,9 @@ function AccountEdition() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordOld, setShowPasswordOld] = useState(false);
   const [showPasswordValidation, setShowPasswordValidation] = useState(false);
+  const [currentEmail, setCurrentEmail] = useState<string | undefined>(
+    undefined
+  );
   const { user, handleLogout } = useAuth();
   const toast = useToast();
   const { handleLoading } = useLoading();
@@ -65,7 +69,21 @@ function AccountEdition() {
     reValidateMode: "onChange",
   });
 
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      if (user) {
+        const emailResult = await showEmailByCpf(user.cpf);
+        if (emailResult.type === "success") {
+          setCurrentEmail(emailResult.value || ""); // Se o email for null, definimos como string vazia ''
+        }
+      }
+    };
+
+    fetchUserEmail();
+  }, [user]);
+
   const togglePasswordVisibility = () => {
+    console.log(user?.email);
     setShowPassword(!showPassword);
   };
   const togglePasswordVisibilityOld = () => {
@@ -84,8 +102,10 @@ function AccountEdition() {
       return;
     }
 
-    if (user?.email !== null) {
-      if (user?.email === data.newEmail) {
+    const email = await showEmailByCpf(user.cpf);
+
+    if (email.value !== null) {
+      if (email.value === data.newEmail) {
         handleLoading(false);
         toast({
           id: "login-error",
@@ -221,7 +241,7 @@ function AccountEdition() {
                 <Input
                   type="text"
                   label="Nome Completo"
-                  placeholder="Wellington José Barbosa Carlos"
+                  placeholder="Digite seu nome completo"
                   defaultValue={user?.fullName}
                   errors={errors.fullName}
                   {...register("fullName")}
@@ -230,7 +250,7 @@ function AccountEdition() {
                   type="text"
                   label="Email atual"
                   placeholder="exemplo@email.com"
-                  defaultValue={user?.email}
+                  defaultValue={currentEmail ?? ""}
                   errors={errors.email}
                   {...register("email")}
                 />
@@ -247,7 +267,7 @@ function AccountEdition() {
                   placeholder=""
                   disabled
                   backgroundColor="gray.400"
-                  value={user?.role}
+                  value={user?.role.name}
                   textColor="black"
                 />
               </Flex>

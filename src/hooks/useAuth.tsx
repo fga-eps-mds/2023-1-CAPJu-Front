@@ -119,6 +119,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     validateAuthentication();
   }, []);
 
+  useEffect(() => {
+    console.log("user", user);
+  }, [user]);
+
   return (
     <AuthContext.Provider
       value={{
