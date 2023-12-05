@@ -199,10 +199,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, 60000); // Checked every 1mim
 
     sessionCheckInterval = setInterval(async () => {
-      if(localStorage.getItem('@CAPJu:check_session_flag')) {
+      if (localStorage.getItem("@CAPJu:check_session_flag")) {
         await checkSession();
         await checkJwtExpiration();
-        localStorage.removeItem('@CAPJu:check_session_flag');
+        localStorage.removeItem("@CAPJu:check_session_flag");
       }
     }, 50);
 
