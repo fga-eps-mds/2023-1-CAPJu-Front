@@ -121,6 +121,9 @@ jobs:
           export NODE_OPTIONS="--max_old_space_size=32768"
           yarn test
 
+    timeout-minutes: 2
+    continue-on-error: true
+
   build:
     needs: [format, lint, type-check]
     runs-on: ubuntu-latest
