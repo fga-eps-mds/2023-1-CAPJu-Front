@@ -1,10 +1,17 @@
+
+/**
+ * My name is Nicholas and I was extorted to write this code. 
+ * I hope a developer who has been hired finds it and realizes how much blood is behind it.
+ * * */
+
 import { useQuery } from "react-query";
 import {
     Flex,
     Text,
     Button,
     Input,
-    chakra, useToast,
+    chakra,
+    useToast,
 } from "@chakra-ui/react";
 import {
     Icon,
@@ -166,13 +173,13 @@ function UserSessions() {
     return (
         <>
             <PrivateLayout>
-                <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-                    <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-                        <Text fontSize="lg" fontWeight="semibold">
-                            Sessões usuários
+                <Flex w="40%" flexDir="column" gap="3" mb="4" mt="50px">
+                    <Flex w="100%" mb="2" justifyContent="start" alignItems="baseline"> {/* Add alignItems here */}
+                        <Text fontSize="25px" fontWeight="semibold" width="25%">
+                            Sessões Usuários
                         </Text>
                         <Flex
-                            width="200%"
+                            width="100%"
                             justifyContent="space-between"
                             gap="2"
                             flexWrap="wrap"
@@ -190,7 +197,7 @@ function UserSessions() {
                                         e.preventDefault();
                                         refetchSessions().finally();
                                     }}
-                                    width="50%"
+                                    width="60%"
                                     display="flex"
                                     flexDirection="row"
                                     alignItems="center"
@@ -238,13 +245,13 @@ function UserSessions() {
                 </Flex>
                 <DataTable
                     maxWidth="unset"
-                    width="59%"
+                    width="40%"
                     size="lg"
                     data={processesFileTableRows}
                     rawData={rawSessions}
                     columns={sessionsTableColumns}
                     isDataFetching={!isUserFetched || isFetchingFiles}
-                    emptyTableMessage="Não foram encontrados lotes"
+                    emptyTableMessage="Não foram encontradas sessões"
                 />
                 {processesFileTablePaginationInfo?.totalPages ? (
                     <Pagination

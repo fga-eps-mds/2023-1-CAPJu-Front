@@ -345,7 +345,7 @@ export default function StepDeadlineReports() {
     <Flex
       justifyContent="flex-start"
       w="100%"
-      maxW={1120}
+      maxW={1140}
       flexDir="column"
       gap="3"
       mb="4"

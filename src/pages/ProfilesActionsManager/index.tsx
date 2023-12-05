@@ -128,7 +128,7 @@ function ProfilesActionsManager() {
 
   return (
     <PrivateLayout>
-      <Flex flexDir="column" gap="5" width="90%" maxWidth={1120} mb="10">
+      <Flex flexDir="column" gap="5" width="90%" maxWidth={1140} mb="10">
         {SaveButton}
         <Table bgColor="white" w="100%" borderRadius="4" size="lg">
           <Thead>

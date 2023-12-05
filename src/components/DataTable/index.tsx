@@ -40,7 +40,7 @@ export function DataTable<Data extends object>({
   isDataFetching = false,
   skeletonHeight = 272,
   width = "100%",
-  maxWidth = 1120,
+  maxWidth = 1140,
   size = ["sm", "md"],
   emptyTableMessage = "Esta tabela está vazia no momento.",
   rawData,

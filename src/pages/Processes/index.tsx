@@ -29,7 +29,6 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
-import { FaEye } from "react-icons/fa";
 
 import { getProcesses } from "services/processManagement/processes";
 import { isActionAllowedToUser } from "utils/permissions";
@@ -314,11 +313,13 @@ function Processes() {
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text fontSize="lg" fontWeight="semibold">
+      <Flex w="40%" flexDir="column" gap="3" mb="4" mt="50px">
+        <Flex w="50%" mb="2" justifyContent="start">
+          <Text fontSize="25px" fontWeight="semibold">
             Processos{flow ? ` - Fluxo ${flow?.name}` : ""}
           </Text>
+        </Flex>
+        <Flex justifyContent="space-between" gap="2" mb="15px">
           <Flex
             alignItems="center"
             justifyContent="start"
@@ -348,7 +349,7 @@ function Processes() {
               }
               onClick={onCreationOpen}
             >
-              <AddIcon mr="2" boxSize={4} /> Criar Processo
+              <AddIcon mr="2" boxSize={3} /> Criar Processo
             </Button>
             <Button
               size="md"
@@ -356,18 +357,11 @@ function Processes() {
               colorScheme="green"
               onClick={onProcessesFileModalOpen}
             >
-              <Icon
-                as={FaEye}
-                mr="2"
-                boxSize={4}
-                style={{ marginRight: "8px" }}
-              />{" "}
-              Visualizar lotes
+              <AddIcon mr="2" boxSize={4} />
+              Importar Processos
             </Button>
           </Flex>
-        </Flex>
-        <Flex w="100%" gap="2" flexWrap="wrap">
-          <Flex w="100%">
+          <Flex w="65%">
             <chakra.form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -417,7 +411,7 @@ function Processes() {
                   }}
                   borderWidth="0"
                   marginRight="0%"
-                  w="15%"
+                  w="25%"
                   value={selectedFilter}
                   onChange={handleFilterChange}
                   border="30px"
@@ -439,6 +433,8 @@ function Processes() {
               </Button>
             </chakra.form>
           </Flex>
+        </Flex>
+        <Flex w="100%" gap="2" flexWrap="wrap" justifyContent="end">
           <Flex flexDir="row" rowGap="1" columnGap="3" flexWrap="wrap">
             <Checkbox
               colorScheme="green"
@@ -450,7 +446,7 @@ function Processes() {
             </Checkbox>
             <Checkbox
               colorScheme="green"
-              borderColor="gray.6px00"
+              borderColor="gray.600"
               checked={showFinished}
               onChange={() => setShowFinished(!showFinished)}
             >

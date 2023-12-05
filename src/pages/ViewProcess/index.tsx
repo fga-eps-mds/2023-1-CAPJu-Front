@@ -450,7 +450,6 @@ function ViewProcess() {
                 <>
                   {processData?.value?.status !== "finished" ? (
                     <Button
-                      size="xs"
                       fontSize="sm"
                       colorScheme={
                         processData?.value?.status === "archived"
@@ -468,8 +467,8 @@ function ViewProcess() {
                       ml="auto"
                     >
                       {processData?.value?.status === "archived"
-                        ? "Reativar"
-                        : "Interromper"}{" "}
+                        ? "Reativar "
+                        : "Interromper "}
                       Processo
                       <Icon as={FiArchive} ml="2" boxSize={4} />
                     </Button>
@@ -494,7 +493,6 @@ function ViewProcess() {
               ) : null}
               {isLastStage && processData?.value?.status !== "finished" ? (
                 <Button
-                  size="xs"
                   fontSize="sm"
                   colorScheme="blue"
                   onClick={onFinalizationOpen}
