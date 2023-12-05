@@ -290,7 +290,12 @@ function Processes() {
 
   useEffect(() => {
     refetchProcesses();
-  }, [currentPage, showFinished, legalPriority]);
+  }, [currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(0);
+    refetchProcesses();
+  }, [legalPriority, showFinished]);
 
   const [placeholder, setPlaceholder] = useState<string>(
     "Pesquisar processos (por registro ou apelido)"
