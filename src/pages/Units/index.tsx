@@ -60,7 +60,10 @@ function Units() {
   } = useQuery({
     queryKey: ["units"],
     queryFn: async () => {
-      const res = await getUnits({ offset: currentPage * 10, limit: 10 }, filter);
+      const res = await getUnits(
+        { offset: currentPage * 10, limit: 10 },
+        filter
+      );
 
       if (res.type === "error") throw new Error(res.error.message);
 

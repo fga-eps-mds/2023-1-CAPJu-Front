@@ -32,12 +32,12 @@ export const importFile = async (data: {
 };
 
 export const findFileById = async (
-    idProcessesFile: number,
-    resulting: boolean = false,
-    format: string = 'xlsx'
+  idProcessesFile: number,
+  resulting: boolean = false,
+  format: string = "xlsx"
 ): Promise<Result<ProcessesFile>> => {
   try {
-    const originalQueryParam = resulting ? 'false' : 'true';
+    const originalQueryParam = resulting ? "false" : "true";
 
     const url = `/processesFile/findFileById/${idProcessesFile}?original=${originalQueryParam}&format=${format}`;
 

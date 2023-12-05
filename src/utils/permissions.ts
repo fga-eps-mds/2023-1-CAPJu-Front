@@ -129,6 +129,6 @@ export const actionsForm = [
   },
   {
     label: "Gerenciar Sessões Usuários",
-    value : 'manage-user-sessions',
-  }
+    value: "manage-user-sessions",
+  },
 ];

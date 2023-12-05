@@ -1,19 +1,19 @@
-import {Button, Flex, Text, useDisclosure, useToast} from "@chakra-ui/react";
-import {Icon} from "@chakra-ui/icons";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {IoReturnDownBackOutline} from "react-icons/io5";
-import {FiArchive, FiSkipBack, FiSkipForward} from "react-icons/fi";
-import {useEffect, useMemo, useState} from "react";
-import {useQuery} from "react-query";
-import {useStatisticsFilters} from "hooks/useStatisticsFilters";
-import {FaFileExcel, FaFilePdf} from "react-icons/fa";
+import { Button, Flex, Text, useDisclosure, useToast } from "@chakra-ui/react";
+import { Icon } from "@chakra-ui/icons";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { IoReturnDownBackOutline } from "react-icons/io5";
+import { FiArchive, FiSkipBack, FiSkipForward } from "react-icons/fi";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "react-query";
+import { useStatisticsFilters } from "hooks/useStatisticsFilters";
+import { FaFileExcel, FaFilePdf } from "react-icons/fa";
 
-import {PrivateLayout} from "layouts/Private";
-import {getFlowById} from "services/processManagement/flows";
-import {Flow} from "components/Flow";
-import {getStages} from "services/processManagement/stage";
-import {useAuth} from "hooks/useAuth";
-import {useLoading} from "hooks/useLoading";
+import { PrivateLayout } from "layouts/Private";
+import { getFlowById } from "services/processManagement/flows";
+import { Flow } from "components/Flow";
+import { getStages } from "services/processManagement/stage";
+import { useAuth } from "hooks/useAuth";
+import { useLoading } from "hooks/useLoading";
 import {
   archiveProcess,
   finalizeProcess,
@@ -21,19 +21,23 @@ import {
   updateProcessStatus,
   updateStage,
 } from "services/processManagement/processes";
-import {getNotesByProcessId} from "services/note";
-import {getPriorities} from "services/processManagement/priority";
-import {isActionAllowedToUser} from "utils/permissions";
-import {sortFlowStages} from "utils/sorting";
-import {labelByProcessStatus} from "utils/constants";
-import {createColumnHelper} from "@tanstack/react-table";
-import {Pagination} from "components/Pagination";
-import {FinalizationModal} from "./FinalizationModal";
-import {ArchivationModal} from "./ArchivationModal";
-import {ReturnModal} from "./ReturnModal";
-import {DataTable} from "../../components/DataTable";
-import {downloadEventsPdf, downloadEventsXlsx, findAllPaged,} from "../../services/processManagement/processAud";
-import {formatDateTimeToBrazilian} from "../../utils/dates";
+import { getNotesByProcessId } from "services/note";
+import { getPriorities } from "services/processManagement/priority";
+import { isActionAllowedToUser } from "utils/permissions";
+import { sortFlowStages } from "utils/sorting";
+import { labelByProcessStatus } from "utils/constants";
+import { createColumnHelper } from "@tanstack/react-table";
+import { Pagination } from "components/Pagination";
+import { FinalizationModal } from "./FinalizationModal";
+import { ArchivationModal } from "./ArchivationModal";
+import { ReturnModal } from "./ReturnModal";
+import { DataTable } from "../../components/DataTable";
+import {
+  downloadEventsPdf,
+  downloadEventsXlsx,
+  findAllPaged,
+} from "../../services/processManagement/processAud";
+import { formatDateTimeToBrazilian } from "../../utils/dates";
 
 function ViewProcess() {
   const { setContinuePage } = useStatisticsFilters();
@@ -44,7 +48,8 @@ function ViewProcess() {
   const location = useLocation();
   const toast = useToast();
   const { handleLoading } = useLoading();
-  const { process, flow }: { process: Process; flow: Flow | undefined } = location.state;
+  const { process, flow }: { process: Process; flow: Flow | undefined } =
+    location.state;
   const { getUserData } = useAuth();
   const {
     data: processData,
@@ -54,7 +59,9 @@ function ViewProcess() {
   } = useQuery({
     queryKey: ["process", params.idProcess],
     queryFn: async () => {
-      const p = await getProcessById(params.idProcess || (process.idProcess as number));
+      const p = await getProcessById(
+        params.idProcess || (process.idProcess as number)
+      );
       setProcessRaw(p.value);
       return p;
     },

@@ -1,10 +1,22 @@
-import {createContext, ReactNode, useCallback, useContext, useEffect, useState,} from 'react';
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-import jwtDecode from 'jwt-decode';
+import jwtDecode from "jwt-decode";
 
-import {checkSessionStatus, signIn, signOut, signOutExpiredSession} from 'services/user';
-import {useToast} from '@chakra-ui/react';
-import {SessionExpirationModal} from "../pages/User/SessionExpirationModal";
+import {
+  checkSessionStatus,
+  signIn,
+  signOut,
+  signOutExpiredSession,
+} from "services/user";
+import { useToast } from "@chakra-ui/react";
+import { SessionExpirationModal } from "../pages/User/SessionExpirationModal";
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -22,10 +34,11 @@ type AuthContextType = {
 const AuthContext = createContext({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [isInactivityModalOpen, setIsInactivityModalOpen] =
+    useState<boolean>(false);
 
-  const [isInactivityModalOpen, setIsInactivityModalOpen] = useState<boolean>(false);
-
-  const [inactivityModalCounter, setinactivityModalCounter] = useState<number>(0);
+  const [inactivityModalCounter, setinactivityModalCounter] =
+    useState<number>(0);
 
   const sessionLifespanInSeconds = 20;
 
@@ -57,8 +70,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       password: string;
     }): Promise<Result<User>> => {
       const res = await signIn(credentials);
-      if (res.type === 'success') {
-        localStorage.setItem('@CAPJu:jwt_user', JSON.stringify(res.value));
+      if (res.type === "success") {
+        localStorage.setItem("@CAPJu:jwt_user", JSON.stringify(res.value));
         setUser(getUserFromLocalStorageDecoded());
         return {
           type: res.type,
@@ -66,14 +79,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } as Result<User>;
       }
       return {
-        type: 'error',
+        type: "error",
         error: res.error,
       } as ResultError;
     },
     []
   );
 
-  async function handleLogout(logoutInitiator: string = 'userRequested', afterFnc = () => {}): Promise<void> {
+  async function handleLogout(
+    logoutInitiator: string = "userRequested",
+    afterFnc = () => {}
+  ): Promise<void> {
     const result = await signOut(logoutInitiator);
     reactToLogout(result, afterFnc);
   }
@@ -85,7 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       clearLocalUserInfo();
       return {
         type: "error",
-        error: new Error('Autenticação inválida.'),
+        error: new Error("Autenticação inválida."),
         value: undefined,
       };
     }
@@ -107,7 +123,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   function getUserFromLocalStorageDecoded() {
-    const jwtToken = localStorage.getItem('@CAPJu:jwt_user') as string;
+    const jwtToken = localStorage.getItem("@CAPJu:jwt_user") as string;
 
     if (!jwtToken) return {} as User;
 
@@ -115,7 +131,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   function clearLocalUserInfo() {
-    localStorage.removeItem('@CAPJu:jwt_user');
+    localStorage.removeItem("@CAPJu:jwt_user");
     setUser(null);
   }
 
@@ -135,9 +151,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const res = await signOutExpiredSession();
       reactToLogout(res, () => {
         toast({
-          id: 'token-expired',
-          description: 'Token expirado. Realize o login novamente.',
-          status: 'error',
+          id: "token-expired",
+          description: "Token expirado. Realize o login novamente.",
+          status: "error",
           isClosable: true,
         });
         removeMouseMoveListener();
@@ -147,22 +163,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   async function checkSession() {
-
     const sessionId = getJwtFromLocalStorageDecoded()?.id?.sessionId;
 
-    if(!sessionId)
-      return;
+    if (!sessionId) return;
 
     const data = (await checkSessionStatus(sessionId)).value as any;
 
-    if(!data.active) {
+    if (!data.active) {
       clearLocalUserInfo();
       clearTimeoutsAndIntervals();
       removeMouseMoveListener();
       toast({
         id: "token-expired",
-        description: data.message || 'Sessão encerrada',
-        status: 'error',
+        description: data.message || "Sessão encerrada",
+        status: "error",
         isClosable: true,
       });
       setTimeout(() => window.location.reload(), 500);
@@ -170,20 +184,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   function addIntervals() {
-
     clearTimeoutsAndIntervals();
 
-    jwtCheckInterval = setInterval(async () => { await checkJwtExpiration() }, 10000); // Checked every 10s
+    jwtCheckInterval = setInterval(async () => {
+      await checkJwtExpiration();
+    }, 10000); // Checked every 10s
 
-    sessionStatusInterval = setInterval(async () =>  { await checkSession() }, 80000); // Checked every 1mim 30s
+    sessionStatusInterval = setInterval(async () => {
+      await checkSession();
+    }, 80000); // Checked every 1mim 30s
 
-    document.addEventListener('mousemove', handleMouseMove);
-
+    document.addEventListener("mousemove", handleMouseMove);
   }
 
-  function reactToLogout(result: Result<string>, afterFnc = () =>{}) {
+  function reactToLogout(result: Result<string>, afterFnc = () => {}) {
     const { type } = result;
-    if (type === 'success') {
+    if (type === "success") {
       clearInterval(jwtCheckInterval);
       clearLocalUserInfo();
       clearTimeoutsAndIntervals();
@@ -207,11 +223,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setinactivityModalCounter(sessionLifespanInSeconds);
       setIsInactivityModalOpen(true);
       inactivityLogoutTimer = setTimeout(async () => {
-        await handleLogout('timeoutDueToInactivity', () => {
+        await handleLogout("timeoutDueToInactivity", () => {
           toast({
             id: "session-expired",
             description: "Sessão encerrada por inatividade.",
-            status: 'error',
+            status: "error",
             isClosable: true,
           });
         });
@@ -227,9 +243,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     clearTimeout(inactivityLogoutTimer);
     clearInterval(jwtCheckInterval);
     clearInterval(sessionStatusInterval);
-  }
+  };
 
-  const removeMouseMoveListener = () => document.removeEventListener('mousemove', handleMouseMove);
+  const removeMouseMoveListener = () =>
+    document.removeEventListener("mousemove", handleMouseMove);
 
   useEffect(() => {
     validateAuthentication();
@@ -244,10 +261,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         handleLogout,
         getUserData,
         validateAuthentication,
-      }}>
+      }}
+    >
       <SessionExpirationModal
-          isOpen={isInactivityModalOpen}
-          initialCountdown={inactivityModalCounter}  />
+        isOpen={isInactivityModalOpen}
+        initialCountdown={inactivityModalCounter}
+        onClose={() => {}}
+      />
       {children}
     </AuthContext.Provider>
   );

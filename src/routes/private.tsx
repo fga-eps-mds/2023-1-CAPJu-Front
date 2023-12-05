@@ -12,9 +12,9 @@ const Flows = lazy(() => import("pages/Flows"));
 const Processes = lazy(() => import("pages/Processes"));
 const ViewProcess = lazy(() => import("pages/ViewProcess"));
 const About = lazy(() => import("pages/About"));
-const ActionsManager = lazy(() => import('pages/ProfilesActionsManager'));
-const Statistics = lazy(() => import('pages/Statistics'));
-const UserSessions = lazy(() => import('pages/User/Sessions/index'));
+const ActionsManager = lazy(() => import("pages/ProfilesActionsManager"));
+const Statistics = lazy(() => import("pages/Statistics"));
+const UserSessions = lazy(() => import("pages/User/Sessions/index"));
 
 export const PrivateRoutes: MenuItem[] = [
   {

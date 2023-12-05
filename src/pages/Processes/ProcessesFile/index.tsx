@@ -118,7 +118,11 @@ export default function ProcessesFileComponent() {
       {
         label: "Download Arquivo Original",
         icon: (
-          <Icon as={FaFileDownload} boxSize={6} style={{ marginRight: "10px" }} />
+          <Icon
+            as={FaFileDownload}
+            boxSize={6}
+            style={{ marginRight: "10px" }}
+          />
         ),
         actionName: "download-original-file",
         disabled: false,
@@ -135,7 +139,8 @@ export default function ProcessesFileComponent() {
         ),
         actionName: "download-resulting-file",
         labelOnDisable: " Arquivo não importado",
-        disabledOn: (file: ProcessesFile) => ['waiting', 'inProgress', 'error'].includes(file.status),
+        disabledOn: (file: ProcessesFile) =>
+          ["waiting", "inProgress", "error"].includes(file.status),
         action: async ({ processesFile }) =>
           downloadProcessesFile(
             processesFile.idProcessesFile,
@@ -143,7 +148,7 @@ export default function ProcessesFileComponent() {
             true
           ),
       },
-        // This is not working
+      // This is not working
       // {
       //   label: "Download .CSV Resultado",
       //   icon: (
@@ -182,8 +187,17 @@ export default function ProcessesFileComponent() {
 
   const [nameOrRecordFilter, setNameOrRecordFilter] = useState<string>("");
 
-  const downloadProcessesFile = async (idProcessesFile: number, fileKey: string, resulting?: boolean, format: string = 'xlsx') => {
-    const result = (await findFileById(idProcessesFile, resulting, format)) as any;
+  const downloadProcessesFile = async (
+    idProcessesFile: number,
+    fileKey: string,
+    resulting?: boolean,
+    format: string = "xlsx"
+  ) => {
+    const result = (await findFileById(
+      idProcessesFile,
+      resulting,
+      format
+    )) as any;
     const bytes = result.value[fileKey].data;
     // console.log(bytes)
     // if(format === 'csv') {
@@ -205,7 +219,9 @@ export default function ProcessesFileComponent() {
     a.style.display = "none";
     a.href = url;
 
-    a.download = resulting ? replaceFileExtension(result.value.fileName, format) : result.value.fileName;
+    a.download = resulting
+      ? replaceFileExtension(result.value.fileName, format)
+      : result.value.fileName;
 
     document.body.appendChild(a);
     a.click();
@@ -275,10 +291,10 @@ export default function ProcessesFileComponent() {
   };
 
   const replaceFileExtension = (fileName: string, newExtension: string) => {
-    const fileNameParts = fileName.split('.');
+    const fileNameParts = fileName.split(".");
     fileNameParts.pop();
     fileNameParts.push(newExtension);
-    return fileNameParts.join('.');
+    return fileNameParts.join(".");
   };
 
   return (

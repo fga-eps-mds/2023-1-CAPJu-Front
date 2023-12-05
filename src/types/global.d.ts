@@ -115,7 +115,7 @@ declare global {
     loginTimestamp: Date;
     stationIp: string;
     userInfo?: User;
-  }
+  };
 
   type ProcessesFileItem = {
     idProcessesFileItem: number;
