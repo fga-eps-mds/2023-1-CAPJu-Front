@@ -451,8 +451,6 @@ function constructTableHTMLDueDate(processData: Process[]): string {
               <tbody>
   `;
 
-  console.log(processData);
-
   processData.forEach((event) => {
     const { record, nickname, nameFlow, nameStage, dueDate } = event;
     tableHTML += `

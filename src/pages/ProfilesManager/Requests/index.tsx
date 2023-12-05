@@ -205,9 +205,10 @@ export function Requests() {
         gap="3"
         mb="4"
         style={{ marginTop: "30px " }}
+        mt="50px"
       >
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text fontSize="lg" fontWeight="semibold">
+        <Flex w="50%" mb="3" justifyContent="start">
+          <Text fontSize="25px" fontWeight="semibold">
             Solicitações
           </Text>
         </Flex>

@@ -44,7 +44,6 @@ export default function ProcessesFileComponent() {
     }),
     tableColumnHelper.accessor("status", {
       cell: (info) => {
-        console.log(info);
         return info;
       },
       header: "Status",
@@ -293,6 +292,20 @@ export default function ProcessesFileComponent() {
                 />{" "}
                 Importar lote
               </Button>
+              <a
+                href="public/files/modeloImportacaoCapju.xlsx"
+                download
+                style={{ textDecoration: "none" }}
+              >
+                <Button variant="outline" colorScheme="black">
+                  <Icon
+                    as={FaFileDownload}
+                    boxSize={4}
+                    style={{ marginRight: "8px" }}
+                  />{" "}
+                  Baixar modelo
+                </Button>
+              </a>
               <chakra.form
                 onSubmit={(e) => {
                   e.preventDefault();

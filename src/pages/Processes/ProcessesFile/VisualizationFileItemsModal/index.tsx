@@ -79,7 +79,6 @@ export function VisualizationItemsModal({
     }),
     tableColumnHelper.accessor("nickname", {
       cell: (info) => {
-        console.log(info);
         return info;
       },
       header: "Apelido",
