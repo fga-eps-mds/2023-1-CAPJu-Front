@@ -93,8 +93,8 @@ declare global {
     Registro: number | ReactNode;
     Apelido: string;
     Fluxo: string;
-    EtapaAtual: string | undefined;
-    DataDeVencimentoDaEtapa: string | undefined;
+    "Etapa Atual": string | undefined;
+    "Data de Vencimento da Etapa": string | undefined;
   };
 
   type IIIFormatedProcess = {
