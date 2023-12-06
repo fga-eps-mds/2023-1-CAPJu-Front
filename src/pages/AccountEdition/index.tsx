@@ -16,7 +16,8 @@ import {
   updateUserPassword,
   updateUser,
   updateUserFullName,
-  showEmailByCpf,
+  signIn,
+  showUserByCpf,
 } from "services/user";
 import { PrivateLayout } from "layouts/Private";
 import { useAuth } from "hooks/useAuth";
@@ -24,7 +25,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLoading } from "hooks/useLoading";
 import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 type FormValues = {
@@ -54,9 +55,6 @@ function AccountEdition() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordOld, setShowPasswordOld] = useState(false);
   const [showPasswordValidation, setShowPasswordValidation] = useState(false);
-  const [currentEmail, setCurrentEmail] = useState<string | undefined>(
-    undefined
-  );
   const { user, handleLogout } = useAuth();
   const toast = useToast();
   const { handleLoading } = useLoading();
@@ -68,19 +66,6 @@ function AccountEdition() {
     resolver: yupResolver(validationSchema) as any,
     reValidateMode: "onChange",
   });
-
-  useEffect(() => {
-    const fetchUserEmail = async () => {
-      if (user) {
-        const emailResult = await showEmailByCpf(user.cpf);
-        if (emailResult.type === "success") {
-          setCurrentEmail(emailResult.value || ""); // Se o email for null, definimos como string vazia ''
-        }
-      }
-    };
-
-    fetchUserEmail();
-  }, [user]);
 
   const togglePasswordVisibility = () => {
     console.log(user?.email);
@@ -102,10 +87,10 @@ function AccountEdition() {
       return;
     }
 
-    const email = await showEmailByCpf(user.cpf);
+    const email = await showUserByCpf(user.cpf);
 
     if (email.value !== null) {
-      if (email.value === data.newEmail) {
+      if (email.value?.email === data.newEmail) {
         handleLoading(false);
         toast({
           id: "login-error",
@@ -116,6 +101,25 @@ function AccountEdition() {
         });
         return;
       }
+    }
+
+    const isOldPasswordCorrect = await signIn({
+      cpf: user.cpf,
+      password: data.oldPassword,
+    });
+
+    if (isOldPasswordCorrect.type === "error") {
+      handleLoading(false);
+      console.log(isOldPasswordCorrect);
+      toast({
+        id: "login-error",
+        title: "Senha atual incorreta",
+        description:
+          "A senha fornecida para confirmar as alterações está incorreta.",
+        status: "error",
+        isClosable: true,
+      });
+      return;
     }
 
     if (data.fullName !== user?.fullName) {
@@ -144,6 +148,31 @@ function AccountEdition() {
       }
     } else {
       handleLoading(false);
+    }
+
+    if (data.newEmail !== "") {
+      const emailUpdateResponse = await updateUser(
+        { email: data.newEmail },
+        user.cpf
+      );
+      if (emailUpdateResponse.type === "success") {
+        handleLoading(false);
+        toast({
+          id: "login-success",
+          title: "Sucesso!",
+          description: "Seu email foi atualizado",
+          status: "success",
+        });
+      } else {
+        handleLoading(false);
+        toast({
+          id: "login-error",
+          title: "Erro na edição do email",
+          description: emailUpdateResponse.error?.message,
+          status: "error",
+          isClosable: true,
+        });
+      }
     }
 
     const newPasswordProvided = data.newPassword.trim() !== "";
@@ -176,30 +205,7 @@ function AccountEdition() {
       }
     }
 
-    if (data.newEmail !== "") {
-      const emailUpdateResponse = await updateUser(
-        { email: data.newEmail },
-        user.cpf
-      );
-      if (emailUpdateResponse.type === "success") {
-        handleLoading(false);
-        toast({
-          id: "login-success",
-          title: "Sucesso!",
-          description: "Seu email foi atualizado",
-          status: "success",
-        });
-      } else {
-        handleLoading(false);
-        toast({
-          id: "login-error",
-          title: "Erro na edição do email",
-          description: emailUpdateResponse.error?.message,
-          status: "error",
-          isClosable: true,
-        });
-      }
-    }
+    handleLogout();
   });
 
   return (
@@ -250,7 +256,7 @@ function AccountEdition() {
                   type="text"
                   label="Email atual"
                   placeholder="exemplo@email.com"
-                  defaultValue={currentEmail ?? ""}
+                  defaultValue={user?.email}
                   errors={errors.email}
                   {...register("email")}
                 />

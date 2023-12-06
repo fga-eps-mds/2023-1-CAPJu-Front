@@ -113,7 +113,7 @@ export const updateUserPassword = async (
   cpf: string
 ) => {
   try {
-    const res = await api.user.post(`/updateUserPassword/${cpf}`, data);
+    const res = await api.user.put(`/updateUserPassword/${cpf}`, data);
 
     return { type: "success", value: res.data };
   } catch (error) {
