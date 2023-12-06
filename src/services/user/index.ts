@@ -64,16 +64,6 @@ export const showUserByCpf = async (cpf: string): Promise<Result<User>> => {
   }
 };
 
-export const showEmailByCpf = async (cpf: string): Promise<Result<string>> => {
-  try {
-    const res = await api.user.get<User>(`/showEmailByCpf/${cpf}`);
-    return { type: "success", value: res.data.email };
-  } catch (error) {
-    const E: Error = error as Error;
-    return { type: "error", error: E, value: undefined };
-  }
-};
-
 export const updateUser = async (
   data: { email: string | null },
   cpf: string

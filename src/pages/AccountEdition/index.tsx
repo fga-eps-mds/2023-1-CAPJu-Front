@@ -68,7 +68,6 @@ function AccountEdition() {
   });
 
   const togglePasswordVisibility = () => {
-    console.log(user?.email);
     setShowPassword(!showPassword);
   };
   const togglePasswordVisibilityOld = () => {
@@ -81,6 +80,7 @@ function AccountEdition() {
 
   const onSubmit = handleSubmit(async (data) => {
     handleLoading(true);
+    let hasChanges = false;
 
     if (!user) {
       handleLogout();
@@ -110,7 +110,6 @@ function AccountEdition() {
 
     if (isOldPasswordCorrect.type === "error") {
       handleLoading(false);
-      console.log(isOldPasswordCorrect);
       toast({
         id: "login-error",
         title: "Senha atual incorreta",
@@ -129,6 +128,7 @@ function AccountEdition() {
       );
       if (name.type === "success") {
         handleLoading(false);
+        hasChanges = true;
         toast({
           id: "login-success",
           title: "Sucesso!",
@@ -157,6 +157,7 @@ function AccountEdition() {
       );
       if (emailUpdateResponse.type === "success") {
         handleLoading(false);
+        hasChanges = true;
         toast({
           id: "login-success",
           title: "Sucesso!",
@@ -186,6 +187,7 @@ function AccountEdition() {
 
       if (res.type === "success") {
         handleLoading(false);
+        hasChanges = true;
         toast({
           id: "login-success",
           title: "Sucesso!",
@@ -205,19 +207,39 @@ function AccountEdition() {
       }
     }
 
-    handleLogout();
+    if (hasChanges) {
+      handleLogout();
+    } else {
+      toast({
+        id: "login-error",
+        title: "Sem alterações",
+        description: "Altere alguma informação para salvar as alterações",
+        status: "error",
+        isClosable: true,
+      });
+    }
   });
 
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text fontSize="lg" fontWeight="semibold">
+        <Flex
+          w="100%"
+          justifyContent="space-between"
+          gap="2"
+          flexWrap="wrap"
+          marginTop="25px"
+        >
+          <Text
+            className="chakra-text css-115fr15"
+            fontSize="25px"
+            fontWeight="semibold"
+          >
             Editar conta
           </Text>
         </Flex>
       </Flex>
-      <Card p="5%" w="50%" maxW="83%" mt="2">
+      <Card p="2.5%" w="50%" maxW="83%" mt="2">
         <CardBody
           w="100%"
           p={0}
@@ -267,6 +289,14 @@ function AccountEdition() {
                   errors={errors.newEmail}
                   {...register("newEmail")}
                 />
+              </Flex>
+              <Flex
+                display="flex"
+                flexDirection="column"
+                w="100%"
+                p={0}
+                gap="5"
+              >
                 <Input
                   type="text"
                   label="Perfil"
@@ -276,17 +306,9 @@ function AccountEdition() {
                   value={user?.role.name}
                   textColor="black"
                 />
-              </Flex>
-              <Flex
-                display="flex"
-                flexDirection="column"
-                w="100%"
-                p={0}
-                gap="5"
-              >
                 <InputGroup>
                   <Input
-                    type={showPassword ? "text" : "password"} // Alterna entre text e password
+                    type={showPassword ? "text" : "password"}
                     label="Nova senha"
                     placeholder="Crie uma nova senha"
                     // errors={errors.newPassword}
@@ -367,7 +389,7 @@ function AccountEdition() {
               </InputGroup>
               <Button
                 w={["100%", "fit-content"]}
-                colorScheme="blue"
+                colorScheme="green"
                 type="submit"
                 size="sm"
               >

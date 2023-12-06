@@ -220,17 +220,13 @@ export function Header() {
                         colorScheme="red"
                         leftIcon={<MdLogout color="black" />}
                         justifyContent="flex-start"
+                        onClick={() => {
+                          handleLogout();
+                          setIsOpen(false);
+                        }}
                       >
                         <Flex alignItems="center">
-                          <Text
-                            ml="2"
-                            onClick={() => {
-                              handleLogout();
-                              setIsOpen(false);
-                            }}
-                          >
-                            Sair
-                          </Text>
+                          <Text ml="2">Sair</Text>
                         </Flex>
                       </Button>
                     </Flex>
