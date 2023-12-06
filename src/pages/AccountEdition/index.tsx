@@ -94,8 +94,8 @@ function AccountEdition() {
         handleLoading(false);
         toast({
           id: "login-error",
-          title: "Erros ao comparar os emails",
-          description: "O novo endereço de email deve ser diferente do atual.",
+          title: "Erro ao comparar os endereços de email!",
+          description: "O novo endereço de email deve ser diferente do atual",
           status: "error",
           isClosable: true,
         });
@@ -112,9 +112,9 @@ function AccountEdition() {
       handleLoading(false);
       toast({
         id: "login-error",
-        title: "Senha atual incorreta",
+        title: "Senha atual incorreta!",
         description:
-          "A senha fornecida para confirmar as alterações está incorreta.",
+          "A senha fornecida para confirmar as alterações está incorreta",
         status: "error",
         isClosable: true,
       });
@@ -132,14 +132,14 @@ function AccountEdition() {
         toast({
           id: "login-success",
           title: "Sucesso!",
-          description: "Seu nome foi atualizado.",
+          description: "Seu nome foi atualizado",
           status: "success",
         });
       } else {
         handleLoading(false);
         toast({
           id: "login-error",
-          title: "Erro na edição do nome",
+          title: "Erro ao editar nome!",
           description: name.error?.message,
           status: "error",
           isClosable: true,
@@ -168,7 +168,7 @@ function AccountEdition() {
         handleLoading(false);
         toast({
           id: "login-error",
-          title: "Erro na edição do email",
+          title: "Erro ao editar email!",
           description: emailUpdateResponse.error?.message,
           status: "error",
           isClosable: true,
@@ -191,14 +191,14 @@ function AccountEdition() {
         toast({
           id: "login-success",
           title: "Sucesso!",
-          description: "Sua senha foi atualizada.",
+          description: "Sua senha foi atualizada",
           status: "success",
         });
       } else {
         handleLoading(false);
         toast({
           id: "login-error",
-          title: "Erro na edição de senha",
+          title: "Erro ao editar senha!",
           description: res.error?.message,
           status: "error",
           isClosable: true,
@@ -212,7 +212,7 @@ function AccountEdition() {
     } else {
       toast({
         id: "login-error",
-        title: "Sem alterações",
+        title: "Sem alterações!",
         description: "Altere alguma informação para salvar as alterações",
         status: "error",
         isClosable: true,
