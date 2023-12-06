@@ -55,10 +55,7 @@ function Flows() {
   } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
-      const res = await getFlows(
-        { offset: currentPage * 10, limit: 10 },
-        filter
-      );
+      const res = await getFlows({ offset: currentPage * 5, limit: 5 }, filter);
 
       if (res.type === "error") throw new Error(res.error.message);
 
