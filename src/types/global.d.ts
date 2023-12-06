@@ -97,6 +97,11 @@ declare global {
     DataDeVencimentoDaEtapa: string | undefined;
   };
 
+  type IIIFormatedProcess = {
+    Registro: number | ReactNode;
+    Apelido: string;
+  };
+
   type ProcessesFile = {
     idProcessesFile: number;
     status: "waiting" | "inProgress" | "imported" | "error";

@@ -88,6 +88,9 @@ export default function Statistics() {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [openChart, setOpenChart] = useState(false);
+  const [preparedProcessesDownload, setPreparedProcessesDownload] = useState(
+    [] as IIIFormatedProcess[]
+  );
   const limit = 5;
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
@@ -274,9 +277,20 @@ export default function Statistics() {
     }
   };
 
+  function formatDataTable(processes: Process[]) {
+    return processes.map((process) => {
+      return {
+        Registro: process.record,
+        Apelido: process.nickname,
+      };
+    });
+  }
+
   useEffect(() => {
     if (showProcesses) {
       getProcessByPage();
+      const formatedData = formatDataTable(filteredProcess);
+      setPreparedProcessesDownload(formatedData);
     }
   }, [currentPage, showProcesses]);
 
@@ -414,7 +428,7 @@ export default function Statistics() {
 
                         {showProcesses && (
                           <ExportExcel
-                            excelData={filteredProcess}
+                            excelData={preparedProcessesDownload}
                             fileName={`Processos_do_fluxo_${selectedFlow}_na_etapa_${selectedStage}`}
                           />
                         )}
