@@ -4,7 +4,7 @@ import { getProcesses } from "services/processManagement/processes";
 import { downloadPDFQuantityProcesses } from "utils/pdf";
 import { labelByProcessStatus } from "utils/constants";
 import moment from "moment";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 // import { Container } from './styles';
 
@@ -36,9 +36,6 @@ const ExportButtons = ({
   const [preparedProcessesDownload, setPreparedProcessesDownload] = useState(
     [] as IFormatedProcess[]
   );
-  const [resAllProcess, setResAllProcess] = useState<Result<Process[]> | null>(
-    null
-  );
 
   function formatDataTable(processes: Process[]) {
     return processes.map((process) => {
@@ -51,31 +48,6 @@ const ExportButtons = ({
       };
     });
   }
-
-  async function getProcessesForDownload() {
-    const processesForDownload = await getProcesses(
-      parseInt(selectedFlowValue, 10),
-      {
-        offset: 0,
-        limit: 0,
-      },
-      filter,
-      false,
-      selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
-      fromDate === "" ? undefined : fromDate,
-      toDate === "" ? undefined : toDate
-    );
-
-    setResAllProcess(processesForDownload);
-    if (processesForDownload.value !== undefined) {
-      const formatedData = formatDataTable(processesForDownload.value);
-      setPreparedProcessesDownload(formatedData);
-    }
-  }
-
-  useEffect(() => {
-    getProcessesForDownload();
-  }, [flows]);
 
   const idFlowToFlowName = useCallback(
     (idFlow: number | number[]) => {
@@ -90,6 +62,24 @@ const ExportButtons = ({
   );
 
   const handleDownloadPDFQuantityProcesses = useCallback(async () => {
+    const processesForDownload = await getProcesses(
+      parseInt(selectedFlowValue, 10),
+      {
+        offset: 0,
+        limit: 0,
+      },
+      filter,
+      false,
+      selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
+      fromDate === "" ? undefined : fromDate,
+      toDate === "" ? undefined : toDate
+    );
+
+    if (processesForDownload.value !== undefined) {
+      const formatedData = formatDataTable(processesForDownload.value);
+      setPreparedProcessesDownload(formatedData);
+    }
+
     const flowName =
       selectedFlowValue === ""
         ? "Não Definido"
@@ -109,13 +99,13 @@ const ExportButtons = ({
       statusLabel = "Concluído";
     }
 
-    if (resAllProcess?.type === "success") {
+    if (processesForDownload?.type === "success") {
       await downloadPDFQuantityProcesses(
         flowName,
         statusLabel,
         fromDateConvert.format("DD/MM/YYYY"),
         toDateConvert.format("DD/MM/YYYY"),
-        resAllProcess.value,
+        processesForDownload.value,
         processesData?.totalProcesses,
         processesData?.totalArchived,
         processesData?.totalFinished
@@ -142,7 +132,7 @@ const ExportButtons = ({
       </Button>
       <ExportExcel
         excelData={preparedProcessesDownload}
-        fileName="Quantidade de Processos"
+        fileName="Quantidade_Processos_Concluidos_Interrompidos"
       />
     </>
   );
