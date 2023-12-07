@@ -41,14 +41,8 @@ export const getProcesses = async (
       totalFinished: res.data.totalFinished,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -65,14 +59,8 @@ export const deleteProcess = async (
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -93,14 +81,8 @@ export const createProcess = async (data: {
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -124,14 +106,8 @@ export const updateProcess = async (data: {
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -148,14 +124,8 @@ export const getProcessByRecord = async (
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -172,14 +142,8 @@ export const getProcessById = async (
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -202,14 +166,8 @@ export const updateStage = async (data: {
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -230,14 +188,8 @@ export const updateProcessStatus = async (data: {
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -254,14 +206,8 @@ export const finalizeProcess = async (
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -280,13 +226,7 @@ export const archiveProcess = async (
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };

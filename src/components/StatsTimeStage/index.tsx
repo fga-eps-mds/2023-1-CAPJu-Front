@@ -9,7 +9,6 @@ import {
   AccordionPanel,
   Box,
   Flex,
-  Image,
   Text,
   Button,
   useToast,
@@ -23,6 +22,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { formatDateTimeToBrazilian } from "utils/dates";
 import { constructTableHTMLData, imgToBase64 } from "utils/pdf";
+import assets from "utils/assets";
 import { Select } from "../FormFields";
 import {
   getFlows,
@@ -42,7 +42,7 @@ interface jsPDFCustom extends jsPDF {
   autoTable: (options: UserOptions) => void;
 }
 
-export default function Statistics() {
+export default function StatsTimeStage() {
   const toast = useToast();
   const [idFlow, setIdFlow] = useState<number>();
   const [nameFlow, setNameFlow] = useState<string>("");
@@ -175,7 +175,7 @@ export default function Statistics() {
       });
 
       pdf.addImage(
-        await imgToBase64("/src/images/UnB.png"),
+        await imgToBase64(assets.logoUnB),
         "png",
         spacingBetweenImages - 50,
         270,
@@ -183,7 +183,7 @@ export default function Statistics() {
         20
       );
       pdf.addImage(
-        await imgToBase64("/src/images/justica_federal.png"),
+        await imgToBase64(assets.justicaFederal),
         "png",
         60 + 2 * spacingBetweenImages,
         270,
@@ -200,108 +200,102 @@ export default function Statistics() {
   };
 
   return (
-    <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
+    <Flex w="100%" flexDir="column" mb="4">
       <Box backgroundColor="#ffffff" borderRadius="8px">
-        <Flex w="100%">
-          <Accordion
-            allowMultiple
-            style={{
-              width: "100%",
-            }}
-          >
-            <AccordionItem border="hidden">
-              <h2>
-                <AccordionButton>
-                  <AccordionIcon />
-                  <Box
-                    as="span"
-                    flex="1"
-                    textAlign="left"
-                    marginLeft="18"
-                    fontSize="17px"
-                    fontWeight="600"
-                    fontStyle="normal"
-                    lineHeight="24px"
-                  >
-                    Visualizar tempo médio de cada etapa
-                  </Box>
-                </AccordionButton>
-              </h2>
-              <AccordionPanel pb={4}>
-                <Box display="flex" flexDirection="row">
-                  <Flex width="100%" justifyContent="space-around">
-                    <Flex width="80%">
-                      <Select
-                        id="flowSelect"
-                        placeholder="Selecionar Fluxo"
-                        color="gray.500"
-                        onChange={(e) => {
-                          setIdFlow(parseInt(e.target.value, 10));
-                          setNameFlow(
-                            // @ts-ignore
-                            e.target.children[e.target.selectedIndex].text
-                          );
-                        }}
-                        options={
-                          flowsData?.value
-                            ? flowsData?.value?.map((flow) => {
-                                return {
-                                  value: flow.idFlow,
-                                  label: flow.name,
-                                };
-                              })
-                            : []
-                        }
-                      />
-
-                      <Button
-                        aria-label="Pesquisar"
-                        colorScheme="green"
-                        marginLeft="2"
-                        justifyContent="center"
-                        type="submit"
-                        onClick={getDataChart}
-                      >
-                        Pesquisar
-                      </Button>
-                    </Flex>
-                    <Flex justifyContent="end">
-                      <Button
-                        colorScheme="blue"
-                        size="md"
-                        gap={8}
-                        marginLeft="8px"
-                        marginRight="8px"
-                        onClick={downloadPDF}
-                      >
-                        <Image width="20px" src="src/images/pdf.svg" />
-                      </Button>
-                      <ExportExcel
-                        fileName={nameFlow}
-                        excelData={chartData || []}
-                      />
-                    </Flex>
-                  </Flex>
+        <Accordion
+          allowMultiple
+          style={{
+            width: "100%",
+          }}
+        >
+          <AccordionItem border="hidden">
+            <h2>
+              <AccordionButton>
+                <AccordionIcon />
+                <Box
+                  as="span"
+                  flex="1"
+                  textAlign="left"
+                  marginLeft="18"
+                  fontSize="17px"
+                  fontWeight="600"
+                  fontStyle="normal"
+                  lineHeight="24px"
+                >
+                  Visualizar tempo médio de cada etapa
                 </Box>
-                <Flex justifyContent="center">
-                  <Box width="60%" justifyContent="space-around">
-                    {chartData ? (
-                      <ChartTempos value={chartData} nameFlow={nameFlow} />
-                    ) : (
-                      <Text
-                        textAlign="center"
-                        fontWeight="bolder"
-                        padding="10px"
-                      >
-                        {blankText}
-                      </Text>
-                    )}
-                  </Box>
+              </AccordionButton>
+            </h2>
+            <AccordionPanel pb={4}>
+              <Box display="flex" flexDirection="row">
+                <Flex w="100%" justifyContent="space-between">
+                  <Flex width="70%" gap="5">
+                    <Select
+                      id="flowSelect"
+                      placeholder="Fluxo"
+                      color="gray.500"
+                      onChange={(e) => {
+                        setIdFlow(parseInt(e.target.value, 10));
+                        setNameFlow(
+                          // @ts-ignore
+                          e.target.children[e.target.selectedIndex].text
+                        );
+                      }}
+                      options={
+                        flowsData?.value
+                          ? flowsData?.value?.map((flow) => {
+                              return {
+                                value: flow.idFlow,
+                                label: flow.name,
+                              };
+                            })
+                          : []
+                      }
+                    />
+
+                    <Button
+                      aria-label="Confirmar"
+                      colorScheme="green"
+                      justifyContent="center"
+                      type="submit"
+                      w="20%"
+                      onClick={getDataChart}
+                    >
+                      Confirmar
+                    </Button>
+                  </Flex>
+                  <Flex justifyContent="end" gap="3">
+                    <Button
+                      hidden={!chartData}
+                      colorScheme="blue"
+                      size="md"
+                      marginLeft="8px"
+                      marginRight="8px"
+                      onClick={downloadPDF}
+                    >
+                      PDF
+                    </Button>
+                    <ExportExcel
+                      fileName={nameFlow}
+                      excelData={chartData || []}
+                    />
+                  </Flex>
                 </Flex>
-              </AccordionPanel>
-            </AccordionItem>
-          </Accordion>
-        </Flex>
+              </Box>
+              <Flex justifyContent="center">
+                <Box width="60%" justifyContent="space-around">
+                  {chartData ? (
+                    <ChartTempos value={chartData} nameFlow={nameFlow} />
+                  ) : (
+                    <Text textAlign="center" fontWeight="bolder" padding="10px">
+                      {blankText}
+                    </Text>
+                  )}
+                </Box>
+              </Flex>
+            </AccordionPanel>
+          </AccordionItem>
+        </Accordion>
       </Box>
     </Flex>
   );

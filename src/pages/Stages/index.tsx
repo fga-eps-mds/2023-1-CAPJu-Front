@@ -170,57 +170,66 @@ function Stages() {
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text fontSize="lg" fontWeight="semibold">
+      <Flex w="100%" maxWidth={1120} flexDir="column" gap="3" mb="4" mt="50px">
+        <Flex w="50%" mb="2" justifyContent="start">
+          <Text fontSize="25px" fontWeight="semibold">
             Etapas
           </Text>
-          <Button
-            colorScheme="green"
-            isDisabled={
-              !isActionAllowedToUser(
-                userData?.value?.allowedActions || [],
-                "create-stage"
-              )
-            }
-            onClick={onCreationOpen}
-          >
-            <AddIcon mr="2" boxSize={3} /> Criar Etapa
-          </Button>
         </Flex>
-        <Flex justifyContent="flex-start" w="100%">
-          <chakra.form
-            onSubmit={(e) => {
-              e.preventDefault();
-              refetchStages();
-            }}
-            w="100%"
-            display="flex"
-            flexDirection="row"
+        <Flex justifyContent="space-between" gap="2" mb="15px">
+          <Flex
+            alignItems="center"
+            justifyContent="start"
+            gap="2"
+            flexWrap="wrap"
           >
-            <Input
-              placeholder="Pesquisar etapas"
-              value={filter?.value}
-              onChange={({ target }) =>
-                setFilter({ type: "stage", value: target.value })
-              }
-              variant="filled"
-              css={{
-                "&, &:hover, &:focus": {
-                  background: "white",
-                },
-              }}
-            />
             <Button
-              aria-label="botão de busca"
               colorScheme="green"
-              marginLeft="2"
-              justifyContent="center"
-              type="submit"
+              isDisabled={
+                !isActionAllowedToUser(
+                  userData?.value?.allowedActions || [],
+                  "create-stage"
+                )
+              }
+              onClick={onCreationOpen}
             >
-              <SearchIcon boxSize={4} />
+              <AddIcon mr="2" boxSize={3} /> Criar Etapa
             </Button>
-          </chakra.form>
+          </Flex>
+          <Flex w="50%">
+            <chakra.form
+              onSubmit={(e) => {
+                e.preventDefault();
+                refetchStages();
+              }}
+              w="100%"
+              display="flex"
+              flexDirection="row"
+            >
+              <Input
+                placeholder="Pesquisar etapas"
+                value={filter?.value}
+                onChange={({ target }) =>
+                  setFilter({ type: "stage", value: target.value })
+                }
+                variant="filled"
+                css={{
+                  "&, &:hover, &:focus": {
+                    background: "white",
+                  },
+                }}
+              />
+              <Button
+                aria-label="botão de busca"
+                colorScheme="green"
+                marginLeft="2"
+                justifyContent="center"
+                type="submit"
+              >
+                <SearchIcon boxSize={4} />
+              </Button>
+            </chakra.form>
+          </Flex>
         </Flex>
       </Flex>
       <DataTable

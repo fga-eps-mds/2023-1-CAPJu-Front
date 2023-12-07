@@ -89,6 +89,14 @@ declare global {
     Status: string;
   };
 
+  type IIFormatedProcess = {
+    Registro: number | ReactNode;
+    Apelido: string;
+    Fluxo: string;
+    EtapaAtual: string | undefined;
+    DataDeVencimentoDaEtapa: string | undefined;
+  };
+
   type ProcessesFile = {
     idProcessesFile: number;
     status: "waiting" | "inProgress" | "imported" | "error";

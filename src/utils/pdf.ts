@@ -1,6 +1,6 @@
 /* eslint-disable import/no-duplicates */
 import JsPDF from "jspdf";
-import { Data } from "components/DropTempoEtapa";
+import { Data } from "components/StatsTimeStage";
 import type { UserOptions } from "jspdf-autotable";
 import html2canvas from "html2canvas";
 import { formatDateTimeToBrazilian } from "./dates";
@@ -90,8 +90,12 @@ export const downloadProcessInDue = async (
 
     const pdf = new JsPDF() as jsPDFCustom;
     pdf.setFontSize(12);
-    pdf.text("Processos em vencimento", 105, 20, { align: "center" });
-    pdf.text(`Intervalo de dias: ${minDate} à ${maxDate}`, 15, 30);
+    pdf.text(
+      "Relatório de processos filtrado pela data de vencimento",
+      105,
+      20,
+      { align: "center" }
+    );
     pdf.text(`Data emissão: ${emissionDate}`, 15, 50);
 
     const currentY = 70;
@@ -369,8 +373,6 @@ export function constructTableHTMLData(processData: Data[]): string {
               <tbody>
   `;
 
-  console.log(processData);
-
   processData.forEach((event) => {
     tableHTML += `
           <tr>
@@ -443,13 +445,11 @@ function constructTableHTMLDueDate(processData: Process[]): string {
                       <th>Apelido</th>
                       <th>Etapa</th>
                       <th>Fluxo</th>
-                      <th>Data da Validade</th>
+                      <th>Data de Vencimento na Etapa</th>
                   </tr>
               </thead>
               <tbody>
   `;
-
-  console.log(processData);
 
   processData.forEach((event) => {
     const { record, nickname, nameFlow, nameStage, dueDate } = event;

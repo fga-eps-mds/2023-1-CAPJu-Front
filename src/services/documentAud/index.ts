@@ -12,13 +12,7 @@ export const registerEvent = async (data: DocumentAudInput) => {
       value: res.data,
     };
   } catch (error: any) {
-    if (error instanceof Error)
-      return { type: "error", error, value: error.message };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };

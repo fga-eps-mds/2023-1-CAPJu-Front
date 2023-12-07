@@ -32,6 +32,7 @@ import JsPDF from "jspdf";
 import { downloadProcess } from "utils/pdf";
 import ExportExcel from "components/ExportExcel";
 import { Pagination } from "components/Pagination";
+import StatsTimeStage from "components/StatsTimeStage";
 import BarChart from "./Graphic/BarChart";
 import StepDeadlineReports from "./StepDeadlineReports";
 import FilteringProcesses from "./FilteringProcesses";
@@ -251,7 +252,6 @@ export default function Statistics() {
 
       if (processResult.type === "success") {
         const { value, totalPages: total } = processResult;
-        console.log(value);
         setFilteredProcess(value);
         setTotalPages(total ?? 0);
       } else {
@@ -321,17 +321,13 @@ export default function Statistics() {
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text
-            fontSize="22px"
-            fontWeight="600"
-            fontStyle="normal"
-            lineHeight="24px"
-          >
+      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4" mt="50px">
+        <Flex w="50%" mb="2" justifyContent="start">
+          <Text fontSize="25px" fontWeight="semibold">
             Estatísticas
           </Text>
         </Flex>
+        <StatsTimeStage />
         <Box borderRadius="8px">
           <Flex justifyContent="flex-start" w="100%" flexDirection="column">
             <CustomAccordion
@@ -340,80 +336,88 @@ export default function Statistics() {
               defaultIndex={[4]}
             >
               <>
-                <Flex>
-                  <Select
-                    placeholder="Selecione o fluxo"
-                    marginLeft="36px"
-                    width="302px"
-                    onChange={(e) => setSelectedFlow(Number(e.target.value))}
-                  >
-                    {flowsData?.value?.map((flow: any) => (
-                      <option value={flow.idFlow} key={flow.name}>
-                        {flow.name}
-                      </option>
-                    ))}
-                  </Select>
-                  <Button
-                    colorScheme="green"
-                    marginLeft="10px"
-                    onClick={() => {
-                      setOpenSelectStage(true);
-                      handleConfirmSelectionFlow();
-                      setShowProcesses(false);
-                      setOpenChart(true);
-                    }}
-                  >
-                    Confirmar
-                  </Button>
+                <Flex w="100%" gap="3">
+                  <Flex w="35%" gap="3">
+                    <Select
+                      placeholder="Fluxo"
+                      w="65%"
+                      color="gray.500"
+                      onChange={(e) => setSelectedFlow(Number(e.target.value))}
+                    >
+                      {flowsData?.value?.map((flow: any) => (
+                        <option value={flow.idFlow} key={flow.name}>
+                          {flow.name}
+                        </option>
+                      ))}
+                    </Select>
+                    <Button
+                      colorScheme="green"
+                      w="28%"
+                      onClick={() => {
+                        setOpenSelectStage(true);
+                        handleConfirmSelectionFlow();
+                        setShowProcesses(false);
+                        setOpenChart(true);
+                      }}
+                    >
+                      Confirmar
+                    </Button>
+                  </Flex>
+
                   {openSelectStage ? (
-                    <Flex alignItems="center">
-                      <Select
-                        placeholder="Selecione a etapa"
-                        marginLeft="36px"
-                        width="302px"
-                        onChange={(e) => {
-                          setSelectedStage(Number(e.target.value));
-                          setCurrentPage(0);
-                        }}
-                      >
-                        {Object.values(stages).map((stage) => (
-                          <option key={stage.idStage} value={stage.idStage}>
-                            {stage.name}
-                          </option>
-                        ))}
-                      </Select>
-                      <Button
-                        colorScheme="green"
-                        marginLeft="10px"
-                        marginRight="10%"
-                        onClick={() => {
-                          setOpenSelectStage(true);
-                          handleConfirmSelectionStages();
-                          setOpenChart(false);
-                        }}
-                      >
-                        Confirmar
-                      </Button>
-                      <Flex>
+                    <Flex
+                      alignItems="center"
+                      w="65%"
+                      gap="5"
+                      justifyContent="space-between"
+                    >
+                      <Flex w="53.85%" gap="5">
+                        <Select
+                          placeholder="Selecione a etapa"
+                          color="gray.500"
+                          width="65%"
+                          onChange={(e) => {
+                            setSelectedStage(Number(e.target.value));
+                            setCurrentPage(0);
+                          }}
+                        >
+                          {Object.values(stages).map((stage) => (
+                            <option key={stage.idStage} value={stage.idStage}>
+                              {stage.name}
+                            </option>
+                          ))}
+                        </Select>
+                        <Button
+                          colorScheme="green"
+                          w="28%"
+                          onClick={() => {
+                            setOpenSelectStage(true);
+                            handleConfirmSelectionStages();
+                            setOpenChart(false);
+                          }}
+                        >
+                          Confirmar
+                        </Button>
+                      </Flex>
+                      <Flex gap="5">
+                        <Button
+                          onClick={
+                            showProcesses
+                              ? () => DownloadPDFProcess()
+                              : DownloadPDFChart
+                          }
+                          colorScheme="blue"
+                          size="md"
+                        >
+                          <Text fontSize="16px"> PDF </Text>
+                        </Button>
+
                         {showProcesses && (
                           <ExportExcel
                             excelData={filteredProcess}
                             fileName={`Processos_do_fluxo_${selectedFlow}_na_etapa_${selectedStage}`}
                           />
                         )}
-                        <Flex marginRight="30%">
-                          <Button
-                            onClick={
-                              showProcesses
-                                ? () => DownloadPDFProcess()
-                                : DownloadPDFChart
-                            }
-                            colorScheme="blue"
-                            size="md"
-                          >
-                            <Text fontSize="16px"> PDF </Text>
-                          </Button>
-                        </Flex>
                       </Flex>
                     </Flex>
                   ) : (
