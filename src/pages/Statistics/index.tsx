@@ -152,7 +152,7 @@ export default function Statistics() {
         });
 
         doc.addImage(dataURI, "JPEG", 35, 50, 520, 0);
-        doc.save(`quantidade_processos_por_etapa_do_fluxo_${selectedFlow}`);
+        doc.save(`Quantidade_Processos_Etapas`);
       });
     }
   };
@@ -429,7 +429,7 @@ export default function Statistics() {
                         {showProcesses && (
                           <ExportExcel
                             excelData={preparedProcessesDownload}
-                            fileName={`Processos_do_fluxo_${selectedFlow}_na_etapa_${selectedStage}`}
+                            fileName="Quantidade_Processos_Etapa"
                           />
                         )}
                       </Flex>
