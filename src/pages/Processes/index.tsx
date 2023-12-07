@@ -1,9 +1,4 @@
-import {
-  useState,
-  useMemo,
-  useEffect,
-  ChangeEvent /* ChangeEvent */,
-} from "react";
+import { useState, useMemo, useEffect, ChangeEvent } from "react";
 import { useQuery } from "react-query";
 import {
   Flex,

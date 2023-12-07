@@ -32,6 +32,7 @@ export type DataTableProps<Data extends object> = {
   size?: string | string[];
   emptyTableMessage?: string;
   rawData?: any;
+  style?: any;
 };
 
 export function DataTable<Data extends object>({
@@ -44,6 +45,7 @@ export function DataTable<Data extends object>({
   size = ["sm", "md"],
   emptyTableMessage = "Esta tabela está vazia no momento.",
   rawData,
+  style = {},
 }: DataTableProps<Data>) {
   const navigate = useNavigate();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -61,7 +63,14 @@ export function DataTable<Data extends object>({
   return isDataFetching ? (
     <Skeleton w={width} maxW={maxWidth} h={skeletonHeight} />
   ) : (
-    <Table bg="white" w={width} maxW={maxWidth} borderRadius="4" size={size}>
+    <Table
+      bg="white"
+      w={width}
+      maxW={maxWidth}
+      borderRadius="4"
+      size={size}
+      style={{ ...style }}
+    >
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>

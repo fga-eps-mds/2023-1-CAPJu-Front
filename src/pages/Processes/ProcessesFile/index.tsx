@@ -49,6 +49,20 @@ export default function ProcessesFileComponent() {
         isSortable: true,
       },
     }),
+    tableColumnHelper.accessor("importedItemsCount", {
+      cell: (info) => info.getValue(),
+      header: "Importados",
+      meta: {
+        isSortable: true,
+      },
+    }),
+    tableColumnHelper.accessor("errorItemCount", {
+      cell: (info) => info.getValue(),
+      header: "Erro",
+      meta: {
+        isSortable: true,
+      },
+    }),
     tableColumnHelper.accessor("message", {
       cell: (info) => info.getValue(),
       header: "Mensagem",
@@ -262,13 +276,27 @@ export default function ProcessesFileComponent() {
       const { data, pagination } = value;
       setProcessesFileTablePaginationInfo(pagination);
       setRawFiles(data);
-      const rows = (data || []).map((processesFile) => {
+      const rows = (data || []).map((processesFile: any) => {
         const status = getProcessesFileStatusPt(processesFile.status);
         return {
           name: processesFile.name || processesFile.fileName,
           status: <Text color={status.color}>{status.text}</Text>,
           createdAt: formatDateTimeToBrazilian(processesFile.createdAt),
-          message: processesFile.message || "-",
+          message: <Text align="center">{processesFile.message || "-"}</Text>,
+          importedItemsCount: (
+            <Text align="center">
+              {processesFile.status === "imported"
+                ? processesFile.importedItemsCount
+                : "-"}
+            </Text>
+          ),
+          errorItemCount: (
+            <Text align="center">
+              {processesFile.status === "imported"
+                ? processesFile.errorItemCount
+                : "-"}
+            </Text>
+          ),
           processesFileTableActions,
           actionsProps: {
             processesFile,
@@ -383,7 +411,7 @@ export default function ProcessesFileComponent() {
         </Flex>
       </Flex>
       <DataTable
-        maxWidth="unset"
+        style={{ tableLayout: "fixed", maxWidth: "100%" }}
         width="100%"
         size="lg"
         data={processesFileTableRows}
@@ -410,7 +438,10 @@ export default function ProcessesFileComponent() {
         <VisualizationItemsModal
           processesFile={selectedFile}
           isOpen={isVisualizationOpen}
-          onClose={onVisualizationClose}
+          onClose={() => {
+            onVisualizationClose();
+            refetchProcessesFile().finally();
+          }}
         />
       )}
       <ImportProcessesModal

@@ -37,13 +37,22 @@ interface CreationModalProps {
   onClose: () => void;
   // eslint-disable-next-line no-unused-vars
   afterSubmission: (createdProcess: Result<Process>) => void;
-  recordParam?: string;
-  nicknameParam?: string;
+  externalProcess?: ExternalProcess;
+}
+
+interface ExternalProcess {
+  record?: string;
+  nickname?: string;
+  flow?: string;
+  priority?: string;
 }
 
 const validationSchema = yup.object({
   record: yup.string().required("Digite o registro do processo."),
-  nickname: yup.string().required("Dê um apelido para o processo."),
+  nickname: yup
+    .string()
+    .required("Dê um apelido para o processo.")
+    .max(50, "O apelido não pode ter mais que 50 caracteres."),
   idFlow: yup
     .number()
     .required()
@@ -60,8 +69,7 @@ export function CreationModal({
   isOpen,
   onClose,
   afterSubmission,
-  recordParam,
-  nicknameParam,
+  externalProcess,
 }: CreationModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
@@ -78,27 +86,8 @@ export function CreationModal({
     resolver: yupResolver(validationSchema),
     reValidateMode: "onChange",
   });
-  const hasLegalPriority = watch("hasLegalPriority");
 
-  const { data: prioritiesData } = useQuery({
-    queryKey: ["priorities"],
-    queryFn: async () => {
-      if (!isOpen || !hasLegalPriority) return {};
-      return getPriorities();
-    },
-    onError: () => {
-      toast({
-        id: "priorities-error",
-        title: "Erro ao carregar prioridades",
-        description:
-          "Houve um erro ao carregar prioriaddes, favor tentar novamente.",
-        status: "error",
-        isClosable: true,
-      });
-    },
-    refetchOnWindowFocus: false,
-    enabled: isOpen && hasLegalPriority,
-  });
+  const hasLegalPriority = watch("hasLegalPriority");
 
   const { data: flowsData } = useQuery({
     queryKey: ["flows"],
@@ -106,7 +95,13 @@ export function CreationModal({
       const res = await getFlows();
 
       if (res.type === "error") throw new Error(res.error.message);
-
+      else if (externalProcess?.flow) {
+        const { value } = res;
+        const externalFlow = value.find(
+          (f) => f.name === externalProcess?.flow
+        );
+        if (externalFlow?.idFlow) setValue("idFlow", externalFlow?.idFlow);
+      }
       return res;
     },
     onError: () => {
@@ -158,16 +153,35 @@ export function CreationModal({
     handleLoading(false);
   });
 
-  useEffect(() => {
-    reset();
-  }, [isOpen]);
+  useEffect(() => reset(), [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
-      if (recordParam) setValue("record", recordParam);
-      if (nicknameParam) setValue("nickname", nicknameParam);
+      const { record, nickname } = externalProcess || {};
+      if (record) setValue("record", record);
+      if (nickname) setValue("nickname", nickname);
     }
   }, [isOpen]);
+
+  const { data: prioritiesData } = useQuery({
+    queryKey: ["priorities"],
+    queryFn: async () => {
+      if (!isOpen || !hasLegalPriority) return {};
+      return getPriorities();
+    },
+    onError: () => {
+      toast({
+        id: "priorities-error",
+        title: "Erro ao carregar prioridades",
+        description:
+          "Houve um erro ao carregar prioriaddes, favor tentar novamente.",
+        status: "error",
+        isClosable: true,
+      });
+    },
+    refetchOnWindowFocus: false,
+    enabled: isOpen && hasLegalPriority,
+  });
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
@@ -209,6 +223,7 @@ export function CreationModal({
               {...register("idFlow")}
             />
             <Checkbox
+              id="legalPriorityCheckbox"
               colorScheme="green"
               borderColor="gray.600"
               isChecked={hasLegalPriority}
