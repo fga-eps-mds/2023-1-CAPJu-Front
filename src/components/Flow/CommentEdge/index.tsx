@@ -29,29 +29,35 @@ export function CommentEdge({
   sourceY,
   targetX,
   targetY,
-  sourcePosition,
-  targetPosition,
+  source,
+  target,
   style = {},
   markerEnd,
   data,
+  ...props
 }: EdgeProps) {
   const toast = useToast();
+  const { sourcePosition, targetPosition } = props;
   const { handleLoading } = useLoading();
+
   const {
     isOpen: isAddOpen,
     onOpen: onAddOpen,
     onClose: onAddClose,
   } = useDisclosure();
+
   const {
     isOpen: isDeleteOpen,
     onOpen: onDeleteOpen,
     onClose: onDeleteClose,
   } = useDisclosure();
+
   const {
     isOpen: isViewOpen,
     onOpen: onViewOpen,
     onClose: onViewClose,
   } = useDisclosure();
+
   const { from, to, commentary, refetch, idNote, idProcess } = data;
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -75,6 +81,8 @@ export function CommentEdge({
       handleLoading(false);
 
       if (refetch) refetch();
+
+      console.log("res", res);
 
       if (res.type === "success") {
         toast({
@@ -172,6 +180,7 @@ export function CommentEdge({
               <Flex flexDir="row" gap="1" ml="auto">
                 <Tooltip label="Ler observação por completo" fontSize="xs">
                   <Button
+                    data-testid="read-button-comment-edge"
                     variant="solid"
                     colorScheme="blue"
                     height="4"
@@ -186,6 +195,7 @@ export function CommentEdge({
                 </Tooltip>
                 <Tooltip label="Excluir observação" fontSize="xs">
                   <Button
+                    data-testid="delete-button-comment-edge"
                     variant="solid"
                     colorScheme="blue"
                     height="4"

@@ -46,7 +46,7 @@ export function AddModal({ isOpen, onClose, handleComment }: AddModalProps) {
   const { comment: commentValue } = watch();
 
   const onSubmit = handleSubmit(async ({ comment }) => {
-    await handleComment(comment);
+    handleComment(comment);
     onClose();
   });
 

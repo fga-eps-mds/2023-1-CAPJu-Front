@@ -325,7 +325,7 @@ function ViewProcess() {
   useEffect(() => {
     if (!process.record) return;
     refetchEvents().then();
-  }, [process]);
+  }, [process, onFinalizationClose]);
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
   const tableProcessEventsColumns = [
     tableColumnHelper.accessor("messages", {
