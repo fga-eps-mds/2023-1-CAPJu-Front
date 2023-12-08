@@ -97,7 +97,7 @@ describe("Login page", () => {
     const userCPF = "123.456.789-00";
 
     server.use(
-      rest.post(
+      rest.put(
         `${import.meta.env.VITE_USER_SERVICE_URL}updateUserPassword/${userCPF}`,
         async (req, res, ctx) => {
           const { oldPassword } = await req.json();
