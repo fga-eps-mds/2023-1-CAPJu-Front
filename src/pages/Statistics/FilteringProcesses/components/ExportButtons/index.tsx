@@ -4,7 +4,7 @@ import { getProcesses } from "services/processManagement/processes";
 import { downloadPDFQuantityProcesses } from "utils/pdf";
 import { labelByProcessStatus } from "utils/constants";
 import moment from "moment";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // import { Container } from './styles';
 
@@ -61,7 +61,7 @@ const ExportButtons = ({
     [flows]
   );
 
-  const handleDownloadPDFQuantityProcesses = useCallback(async () => {
+  async function getProcessesForDownload() {
     const processesForDownload = await getProcesses(
       parseInt(selectedFlowValue, 10),
       {
@@ -74,6 +74,19 @@ const ExportButtons = ({
       fromDate === "" ? undefined : fromDate,
       toDate === "" ? undefined : toDate
     );
+
+    if (processesForDownload?.type === "success") {
+      setPreparedProcessesDownload(formatDataTable(processesForDownload.value));
+    }
+    return processesForDownload;
+  }
+
+  useEffect(() => {
+    getProcessesForDownload();
+  }, []);
+
+  const handleDownloadPDFQuantityProcesses = useCallback(async () => {
+    const processesForDownload = await getProcessesForDownload();
 
     if (processesForDownload.value !== undefined) {
       const formatedData = formatDataTable(processesForDownload.value);
