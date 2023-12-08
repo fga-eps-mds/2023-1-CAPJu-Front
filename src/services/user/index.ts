@@ -54,7 +54,20 @@ export const getUserById = async (
   }
 };
 
-export const updateUser = async (data: { email: string }, cpf: string) => {
+export const showUserByCpf = async (cpf: string): Promise<Result<User>> => {
+  try {
+    const res = await api.user.get<User>(`/showUserByCpf/${cpf}`);
+    return { type: "success", value: res.data };
+  } catch (error) {
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
+  }
+};
+
+export const updateUser = async (
+  data: { email: string | null },
+  cpf: string
+) => {
   try {
     const res = await api.user.put(`/updateUser/${cpf}`, data);
 
@@ -65,12 +78,32 @@ export const updateUser = async (data: { email: string }, cpf: string) => {
   }
 };
 
+export const updateUserFullName = async (
+  data: { fullName: string },
+  cpf: string
+) => {
+  try {
+    const res = await api.user.put(`/updateUserFullName/${cpf}`, data);
+
+    return { type: "success", value: res.data };
+  } catch (error) {
+    if (error instanceof Error)
+      return { type: "error", error, value: undefined };
+
+    return {
+      type: "error",
+      error: new Error("Erro desconhecido"),
+      value: undefined,
+    };
+  }
+};
+
 export const updateUserPassword = async (
   data: { oldPassword: string; newPassword: string },
   cpf: string
 ) => {
   try {
-    const res = await api.user.post(`/updateUserPassword/${cpf}`, data);
+    const res = await api.user.put(`/updateUserPassword/${cpf}`, data);
 
     return { type: "success", value: res.data };
   } catch (error) {

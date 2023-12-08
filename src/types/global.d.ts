@@ -11,7 +11,7 @@ declare global {
     token: string;
     expiresIn: Date;
     idRole: number;
-    role?: string;
+    role?: string | Undefined;
     idUnit: number;
     unit?: Unit;
     firstLogin?: boolean;

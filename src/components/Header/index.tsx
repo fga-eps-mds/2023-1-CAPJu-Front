@@ -6,8 +6,18 @@ import {
   Tab,
   TabList,
   Tabs,
+  Avatar,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverArrow,
+  PopoverBody,
+  Text,
 } from "@chakra-ui/react";
-
+import { IoIosInformationCircleOutline } from "react-icons/io";
+import { MdLogout } from "react-icons/md";
+import { PiListMagnifyingGlassDuotone } from "react-icons/pi";
+import { FaUser, FaRegEdit } from "react-icons/fa";
 import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
 import { useCallback, useMemo, useState } from "react";
@@ -21,6 +31,7 @@ export function Header() {
   const { getUserData } = useAuth();
   const { isAuthenticated, handleLogout } = useAuth();
   const { isLoading } = useLoading();
+  const [isOpen, setIsOpen] = useState(false);
 
   const { data: userData } = useQuery({
     queryKey: ["user-data"],
@@ -56,7 +67,6 @@ export function Header() {
   return (
     <Flex
       py="4"
-      // mb={isAuthenticated ? "8" : 0}
       w="100%"
       alignItems="center"
       justifyContent="center"
@@ -111,14 +121,119 @@ export function Header() {
               </Tabs>
             </Flex>
             <Flex alignItems="center" ml="auto" gap="5">
-              <HeaderLink href="/contribuidores">Sobre</HeaderLink>
-              <Button
-                size={["xs", "sm"]}
-                colorScheme="red"
-                onClick={handleLogout}
-              >
-                Sair
-              </Button>
+              <Popover isOpen={isOpen} onClose={() => setIsOpen(false)}>
+                <PopoverTrigger>
+                  <Avatar
+                    bg="black"
+                    cursor="pointer"
+                    onClick={() => setIsOpen(true)}
+                  />
+                </PopoverTrigger>
+                <PopoverContent>
+                  <PopoverArrow />
+                  <PopoverBody>
+                    <Flex direction="column" gap="2">
+                      <Button
+                        size="sm"
+                        w="100%"
+                        variant="ghost"
+                        colorScheme="blackAlpha"
+                        onClick={() => {
+                          navigate("/acessos");
+                          setIsOpen(false);
+                        }}
+                        leftIcon={<FaUser color="black" />}
+                        justifyContent="flex-start"
+                      >
+                        <Flex alignItems="jus">
+                          <Text ml="2" textColor="black">
+                            Solicitações de cadastro
+                          </Text>
+                        </Flex>
+                      </Button>
+                      <hr />
+                      <Button
+                        size="sm"
+                        w="100%"
+                        variant="ghost"
+                        colorScheme="blackAlpha"
+                        onClick={() => {
+                          navigate("/perfis");
+                          setIsOpen(false);
+                        }}
+                        leftIcon={
+                          <PiListMagnifyingGlassDuotone color="black" />
+                        }
+                        justifyContent="flex-start"
+                      >
+                        <Flex alignItems="center">
+                          <Text ml="2" textColor="black">
+                            Perfis e Permissões
+                          </Text>
+                        </Flex>
+                      </Button>
+                      <hr />
+                      <Button
+                        size="sm"
+                        w="100%"
+                        variant="ghost"
+                        colorScheme="blackAlpha"
+                        leftIcon={<FaRegEdit color="black" />}
+                        onClick={() => {
+                          navigate("/editar-conta");
+                          setIsOpen(false);
+                        }}
+                        justifyContent="flex-start"
+                      >
+                        <Flex alignItems="center">
+                          <Text ml="2" textColor="black">
+                            Editar conta
+                          </Text>
+                        </Flex>
+                      </Button>
+                      <hr />
+                      <Button
+                        size="sm"
+                        w="100%"
+                        variant="ghost"
+                        colorScheme="blackAlpha"
+                        onClick={() => {
+                          navigate("/contribuidores");
+                          setIsOpen(false);
+                        }}
+                        leftIcon={
+                          <IoIosInformationCircleOutline color="black" />
+                        }
+                        justifyContent="flex-start"
+                      >
+                        <Flex alignItems="center">
+                          <Text ml="2" textColor="black">
+                            Sobre
+                          </Text>
+                        </Flex>
+                      </Button>
+                      <hr />
+                      <Button
+                        size="sm"
+                        w="100%"
+                        variant="ghost"
+                        colorScheme="red"
+                        leftIcon={<MdLogout color="black" />}
+                        justifyContent="flex-start"
+                        onClick={() => {
+                          handleLogout();
+                          navigate("/");
+                          setIsOpen(false);
+                        }}
+                      >
+                        <Flex alignItems="center">
+                          <Text ml="2">Sair</Text>
+                        </Flex>
+                      </Button>
+                    </Flex>
+                  </PopoverBody>
+                </PopoverContent>
+              </Popover>
             </Flex>
           </>
         ) : (
