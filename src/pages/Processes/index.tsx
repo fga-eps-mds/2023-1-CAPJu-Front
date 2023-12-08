@@ -1,9 +1,4 @@
-import {
-  useState,
-  useMemo,
-  useEffect,
-  ChangeEvent /* ChangeEvent */,
-} from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "react-query";
 import {
   Flex,
@@ -55,9 +50,10 @@ function Processes() {
     queryKey: ["user-data"],
     queryFn: getUserData,
   });
-  const [filter, setFilter] = useState<
-    { type: string; value: string } | undefined
-  >(undefined);
+  const [filter, setFilter] = useState<{ type: string; value: string }>({
+    type: "process",
+    value: "",
+  });
   const [legalPriority, setLegalPriority] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
   const {
@@ -85,9 +81,6 @@ function Processes() {
     setCurrentPage(selectedPage.selected);
   };
   const [selectedFilter, setSelectedFilter] = useState("process");
-  const handleFilterChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedFilter(event.target.value);
-  };
   const {
     data: processesData,
     isFetched: isProcessesFetched,
@@ -300,16 +293,20 @@ function Processes() {
   const [placeholder, setPlaceholder] = useState<string>(
     "Pesquisar processos (por registro ou apelido)"
   );
+
   useEffect(() => {
     switch (selectedFilter) {
       case "process":
-        setPlaceholder("Pesquise o processo pelo nome ou apelido:");
+        setPlaceholder("Pesquisar processos (por registro ou apelido)");
+        setFilter({ type: selectedFilter, value: filter?.value });
         break;
       case "stage":
-        setPlaceholder("Pesquise a etapa pelo nome:");
+        setPlaceholder("Pesquisar processos (pelo nome da Etapa)");
+        setFilter({ type: selectedFilter, value: filter?.value });
         break;
       case "flow":
-        setPlaceholder("Pesquise o fluxo pelo nome:");
+        setPlaceholder("Pesquisar processos (pelo nome do Fluxo)");
+        setFilter({ type: selectedFilter, value: filter?.value });
         break;
       default:
       // do nothing
@@ -418,7 +415,7 @@ function Processes() {
                   marginRight="0%"
                   w="25%"
                   value={selectedFilter}
-                  onChange={handleFilterChange}
+                  onChange={({ target }) => setSelectedFilter(target.value)}
                   border="30px"
                   outline="none"
                 >
