@@ -191,6 +191,7 @@ export default function FilteringProcesses() {
     setProcessData,
     filter,
     selectedStatus,
+    selectedFlowValue,
     fromDate,
     toDate,
     currentPage,
