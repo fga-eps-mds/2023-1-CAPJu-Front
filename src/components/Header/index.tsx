@@ -222,6 +222,7 @@ export function Header() {
                         justifyContent="flex-start"
                         onClick={() => {
                           handleLogout();
+                          navigate("/");
                           setIsOpen(false);
                         }}
                       >
