@@ -241,11 +241,10 @@ export default function Statistics() {
 
   const getProcessByPage = async () => {
     const offset = currentPage * limit;
-
     try {
       const processResult = await getStagesByIdFlow(
         selectedFlow,
-        selectedStage,
+        Number.isNaN(selectedStage) ? -1 : selectedStage,
         offset,
         limit
       );
@@ -281,7 +280,7 @@ export default function Statistics() {
   }, [currentPage, showProcesses]);
 
   const handleConfirmSelectionStages = async () => {
-    if (selectedStage) {
+    if (selectedStage !== 0) {
       setOpenSelectStage(true);
 
       await getProcessByPage();
@@ -383,7 +382,9 @@ export default function Statistics() {
                         >
                           {Object.values(stages).map((stage) => (
                             <option key={stage.idStage} value={stage.idStage}>
-                              {stage.name}
+                              {stage.name === "nao iniciado"
+                                ? "Não iniciado"
+                                : stage.name}
                             </option>
                           ))}
                         </Select>
