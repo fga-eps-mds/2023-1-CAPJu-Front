@@ -218,7 +218,7 @@ export default function Statistics() {
   }, [filteredProcess, tableActions]);
 
   const handleConfirmSelectionFlow = async () => {
-    if (selectedFlow >= 0) {
+    if (selectedFlow > 0) {
       setOpenSelectStage(true);
 
       const stagesResult = await getCountProcessByIdFlow(selectedFlow);
@@ -280,7 +280,7 @@ export default function Statistics() {
   }, [currentPage, showProcesses]);
 
   const handleConfirmSelectionStages = async () => {
-    if (selectedStage !== 0) {
+    if (selectedStage > 0 || Number.isNaN(selectedStage)) {
       setOpenSelectStage(true);
 
       await getProcessByPage();
@@ -353,10 +353,12 @@ export default function Statistics() {
                       colorScheme="green"
                       w="28%"
                       onClick={() => {
-                        setOpenSelectStage(true);
+                        if (selectedFlow > 0) {
+                          setOpenSelectStage(true);
+                          setShowProcesses(false);
+                          setOpenChart(true);
+                        }
                         handleConfirmSelectionFlow();
-                        setShowProcesses(false);
-                        setOpenChart(true);
                       }}
                     >
                       Confirmar
@@ -392,9 +394,14 @@ export default function Statistics() {
                           colorScheme="green"
                           w="28%"
                           onClick={() => {
-                            setOpenSelectStage(true);
+                            if (
+                              selectedStage > 0 ||
+                              Number.isNaN(selectedStage)
+                            ) {
+                              setOpenSelectStage(true);
+                              setOpenChart(false);
+                            }
                             handleConfirmSelectionStages();
-                            setOpenChart(false);
                           }}
                         >
                           Confirmar
