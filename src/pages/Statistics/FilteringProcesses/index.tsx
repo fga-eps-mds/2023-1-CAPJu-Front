@@ -277,7 +277,7 @@ export default function FilteringProcesses() {
               <Flex w="70%" flexDirection="column" marginBottom="4">
                 <Flex gap="5">
                   <Select
-                    placeholder="Selecione o Fluxo"
+                    placeholder="Fluxo"
                     color="gray.500"
                     value={selectedFlowValue}
                     onChange={handleSelectChange}
@@ -323,7 +323,7 @@ export default function FilteringProcesses() {
                     min={twoYearsAgoDate} // Define a data mínima como a data há dois anos
                   />
                   <Button
-                    colorScheme="whatsapp"
+                    colorScheme="green"
                     w="20%"
                     onClick={handleConfirmClick}
                   >

@@ -290,7 +290,12 @@ function Processes() {
 
   useEffect(() => {
     refetchProcesses();
-  }, [currentPage, showFinished, legalPriority]);
+  }, [currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(0);
+    refetchProcesses();
+  }, [legalPriority, showFinished]);
 
   const [placeholder, setPlaceholder] = useState<string>(
     "Pesquisar processos (por registro ou apelido)"
@@ -313,7 +318,7 @@ function Processes() {
 
   return (
     <PrivateLayout>
-      <Flex w="40%" flexDir="column" gap="3" mb="4" mt="50px">
+      <Flex w="100%" maxWidth={1120} flexDir="column" gap="3" mb="4" mt="50px">
         <Flex w="50%" mb="2" justifyContent="start">
           <Text fontSize="25px" fontWeight="semibold">
             Processos{flow ? ` - Fluxo ${flow?.name}` : ""}

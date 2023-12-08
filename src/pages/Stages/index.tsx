@@ -170,7 +170,7 @@ function Stages() {
 
   return (
     <PrivateLayout>
-      <Flex w="40%" flexDir="column" gap="3" mb="4" mt="50px">
+      <Flex w="100%" maxWidth={1120} flexDir="column" gap="3" mb="4" mt="50px">
         <Flex w="50%" mb="2" justifyContent="start">
           <Text fontSize="25px" fontWeight="semibold">
             Etapas
