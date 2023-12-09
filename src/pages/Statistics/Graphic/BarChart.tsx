@@ -3,7 +3,7 @@ import type { ChartData } from "chart.js";
 
 interface BarChartProps {
   id: string;
-  selectedFlow: Number;
+  selectedFlow: Number | String;
   chartData: ChartData<"bar">;
 }
 
@@ -16,7 +16,11 @@ const BarChart = ({ id, chartData, selectedFlow }: BarChartProps) => {
       },
       title: {
         display: true,
-        text: `Quantidade Processos por etapa do fluxo ${selectedFlow}`,
+        text: `Quantidade Processos por etapa d${
+          typeof selectedFlow === "number"
+            ? `o fluxo ${selectedFlow}`
+            : `e ${selectedFlow}`
+        } `,
         color: "black",
       },
     },
