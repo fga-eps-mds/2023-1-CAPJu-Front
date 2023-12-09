@@ -52,7 +52,12 @@ export const Input = forwardRef<InputProps, "input">((props, ref) => {
             as={InputMask}
           />
         ) : (
-          <ChakraInput autocomplete="off" variant="outline" {...rest} ref={ref} />
+          <ChakraInput
+            autocomplete="off"
+            variant="outline"
+            {...rest}
+            ref={ref}
+          />
         )}
       </InputGroup>
       <FormErrorMessage color="red.400">{errors?.message}</FormErrorMessage>

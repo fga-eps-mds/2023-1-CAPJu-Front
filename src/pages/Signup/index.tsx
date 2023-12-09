@@ -110,9 +110,11 @@ function Signup() {
   }, [unitsData]);
   const roles = useMemo(() => {
     return (
-      rolesData?.value?.map((role) => {
-        return { label: role.name, value: role.idRole };
-      }) || []
+      rolesData?.value
+        ?.filter((role: Role) => role.idRole !== 5)
+        ?.map((role: Role) => {
+          return { label: role.name, value: role.idRole };
+        }) || []
     );
   }, [rolesData]);
   const {
