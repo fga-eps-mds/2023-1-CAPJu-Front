@@ -117,8 +117,6 @@ export default function StatsTimeStage() {
       "#chart-tempo-medio-etapa"
     );
 
-    const nameFlowReplaced = nameFlow.replace(/ /g, "_");
-
     if (elem) {
       const container = document.createElement("div");
 
@@ -191,9 +189,7 @@ export default function StatsTimeStage() {
         15
       );
 
-      pdf.save(
-        `tempo_medio-previsto_por_etapa_do_fluxo_${nameFlowReplaced}.pdf`
-      );
+      pdf.save(`Tempo_Medio_Etapas.pdf`);
 
       document.body.removeChild(container);
     }
@@ -276,7 +272,7 @@ export default function StatsTimeStage() {
                       PDF
                     </Button>
                     <ExportExcel
-                      fileName={nameFlow}
+                      fileName="Tempo_Medio_Etapas"
                       excelData={chartData || []}
                     />
                   </Flex>

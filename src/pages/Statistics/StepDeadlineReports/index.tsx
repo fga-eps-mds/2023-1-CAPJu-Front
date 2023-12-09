@@ -62,8 +62,8 @@ export default function StepDeadlineReports() {
         Registro: process.record,
         Apelido: process.nickname,
         Fluxo: idFlowToFlowName(process.idFlow),
-        EtapaAtual: process.nameStage,
-        DataDeVencimentoDaEtapa: process.dueDate,
+        "Etapa Atual": process.nameStage,
+        "Data de Vencimento da Etapa": process.dueDate,
       };
     });
   }
@@ -407,7 +407,7 @@ export default function StepDeadlineReports() {
                       <>
                         <ExportExcel
                           excelData={preparedProcessesDownloadinDue}
-                          fileName="Processos_em_Vencimento"
+                          fileName="Processos_Filtrados_Data_Vencimento"
                         />
                         <Button
                           colorScheme="blue"

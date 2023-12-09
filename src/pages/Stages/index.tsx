@@ -25,9 +25,7 @@ import { EditionModal } from "./EditionModal";
 function Stages() {
   const toast = useToast();
   const [selectedStage, selectStage] = useState<Stage>();
-  const [filter, setFilter] = useState<
-    { type: string; value: string } | undefined
-  >(undefined);
+  const [filter, setFilter] = useState<string | undefined>(undefined);
   const { getUserData } = useAuth();
   const {
     isOpen: isCreationOpen,
@@ -208,10 +206,8 @@ function Stages() {
             >
               <Input
                 placeholder="Pesquisar etapas"
-                value={filter?.value}
-                onChange={({ target }) =>
-                  setFilter({ type: "stage", value: target.value })
-                }
+                value={filter || ""}
+                onChange={({ target }) => setFilter(target.value)}
                 variant="filled"
                 css={{
                   "&, &:hover, &:focus": {
@@ -238,9 +234,8 @@ function Stages() {
         isDataFetching={!isStagesFetched || !isUserFetched}
         emptyTableMessage="Não foram encontradas etapas."
       />
-      {![undefined, 0, null].includes(stagesData?.totalPages) ? (
+      {stagesData?.totalPages !== undefined ? (
         <Pagination
-          // @ts-ignore
           pageCount={stagesData?.totalPages}
           onPageChange={handlePageChange}
         />
