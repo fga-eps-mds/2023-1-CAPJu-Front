@@ -80,6 +80,7 @@ export default function Statistics() {
 
   const [openSelectStage, setOpenSelectStage] = useState(false);
   const [selectedFlow, setSelectedFlow] = useState(-1);
+  const [currentFlowName, setCurrentFlowName] = useState<Number | String>("");
   const [selectedStage, setSelectedStage] = useState(-1);
   const [stages, setStages] = useState<{ [key: number]: any }>([]);
   const [filteredProcess, setFilteredProcess] = useState<Process[]>([]);
@@ -220,6 +221,13 @@ export default function Statistics() {
     );
   }, [filteredProcess, tableActions]);
 
+  useEffect(() => {
+    if (currentFlowName !== "") {
+      handleConfirmSelectionFlow();
+      // console.log({currentFlowName})
+    }
+  }, [currentFlowName]);
+
   const handleConfirmSelectionFlow = async () => {
     if (selectedFlow > 0) {
       const flow = await getFlowById(selectedFlow);
@@ -316,7 +324,6 @@ export default function Statistics() {
   const handleConfirmSelectionStages = async () => {
     if (selectedStage > 0 || Number.isNaN(selectedStage)) {
       setOpenSelectStage(true);
-
       await getProcessByPage();
       setShowProcesses(true);
     } else {
@@ -352,6 +359,24 @@ export default function Statistics() {
     };
   }, [stages]);
 
+  const updateFlowName = () => {
+    if (flowsData?.value && selectedFlow > 0) {
+      // setOpenSelectStage(false);
+      const res = flowsData?.value?.find(
+        (flow) => flow.idFlow === selectedFlow
+      );
+      if (!res) setCurrentFlowName(selectedFlow);
+      else setCurrentFlowName(res.name);
+    } else {
+      toast({
+        id: "error-no-selection",
+        title: "Erro!",
+        description: "Selecione um fluxo antes de confirmar.",
+        status: "error",
+        isClosable: true,
+      });
+    }
+  };
   return (
     <PrivateLayout>
       <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4" mt="50px">
@@ -372,7 +397,7 @@ export default function Statistics() {
                 <Flex w="100%" gap="3">
                   <Flex w="35%" gap="3">
                     <Select
-                      placeholder="Fluxo"
+                      placeholder="Selecione o fluxo"
                       w="65%"
                       color="gray.500"
                       onChange={(e) => setSelectedFlow(Number(e.target.value))}
@@ -392,7 +417,8 @@ export default function Statistics() {
                           setShowProcesses(false);
                           setOpenChart(true);
                         }
-                        handleConfirmSelectionFlow();
+                        // handleConfirmSelectionFlow();
+                        updateFlowName();
                       }}
                     >
                       Confirmar
@@ -490,7 +516,7 @@ export default function Statistics() {
                       >
                         <BarChart
                           id="chart-etapas-fluxo"
-                          selectedFlow={selectedFlow}
+                          selectedFlow={currentFlowName}
                           chartData={chartData}
                         />
                       </Grid>
