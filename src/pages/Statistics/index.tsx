@@ -17,7 +17,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useQuery } from "react-query";
 import Chart from "chart.js/auto";
 import { PrivateLayout } from "layouts/Private";
-import { getFlows } from "services/processManagement/flows";
+import { getFlows, getFlowById } from "services/processManagement/flows";
 import {
   getAllProcessByStage,
   getCountProcessByIdFlow,
@@ -222,23 +222,43 @@ export default function Statistics() {
 
   const handleConfirmSelectionFlow = async () => {
     if (selectedFlow > 0) {
+      const flow = await getFlowById(selectedFlow);
       setOpenSelectStage(true);
 
       const stagesResult = await getCountProcessByIdFlow(selectedFlow);
-
       if (stagesResult.type === "success") {
-        setStages(stagesResult.value);
-      }
-    } else {
-      toast({
-        id: "error-no-selection",
-        title: "Erro!",
-        description: "Selecione um fluxo antes de confirmar.",
-        status: "error",
-        isClosable: true,
-      });
+        if (flow.type !== "success") setStages(stagesResult.value);
+        else {
+          const orderedStages: {
+            [key: string]: {
+              name: String;
+              countProcess?: Number;
+              idStage: Number | String;
+            };
+          } = {};
+          const values = Object.values(stagesResult.value);
 
-      setOpenSelectStage(false);
+          values.map((value) => {
+            const key = flow.value.stages.indexOf(value.idStage) + 1;
+            orderedStages[String(key)] = value;
+            if (value.name === "nao iniciado")
+              orderedStages[String(key)].name = "Não iniciado";
+
+            return false;
+          });
+          setStages(orderedStages);
+        }
+      } else {
+        toast({
+          id: "error-no-selection",
+          title: "Erro!",
+          description: "Selecione um fluxo antes de confirmar.",
+          status: "error",
+          isClosable: true,
+        });
+
+        setOpenSelectStage(false);
+      }
     }
   };
 
