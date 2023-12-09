@@ -153,7 +153,7 @@ export default function Statistics() {
         });
 
         doc.addImage(dataURI, "JPEG", 35, 50, 520, 0);
-        doc.save(`Quantidade_Processos_Etapas`);
+        doc.save(`Quantidade_Processos_Etapa`);
       });
     }
   };
