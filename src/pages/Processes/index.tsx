@@ -321,6 +321,19 @@ function Processes() {
             Processos{flow ? ` - Fluxo ${flow?.name}` : ""}
           </Text>
         </Flex>
+        <Flex>
+          {flow ? (
+            <Button
+              size="md"
+              fontSize="md"
+              colorScheme="blue"
+              onClick={() => navigate("/fluxos", { replace: true })}
+            >
+              <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar
+              aos Fluxos
+            </Button>
+          ) : null}
+        </Flex>
         <Flex justifyContent="space-between" gap="2" mb="15px">
           <Flex
             alignItems="center"
@@ -328,17 +341,6 @@ function Processes() {
             gap="2"
             flexWrap="wrap"
           >
-            {flow ? (
-              <Button
-                size="xs"
-                fontSize="sm"
-                colorScheme="blue"
-                onClick={() => navigate("/fluxos", { replace: true })}
-              >
-                <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar
-                aos Fluxos
-              </Button>
-            ) : null}
             <Button
               size="md"
               fontSize="md"
