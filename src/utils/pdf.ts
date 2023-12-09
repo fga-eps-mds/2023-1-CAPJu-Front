@@ -68,7 +68,7 @@ export const downloadProcess = async (
       15
     );
 
-    pdf.save(`quantidade_de_processos_no_fluxo_${flow}_na_etapa_${stage}`);
+    pdf.save(`Quantidade_Processos_Etapas`);
 
     document.body.removeChild(container);
   } catch (err) {
@@ -135,7 +135,7 @@ export const downloadProcessInDue = async (
       15
     );
 
-    pdf.save(`processos_em_validade_entre_${minDate}_a_${maxDate}`);
+    pdf.save(`Processos_Filtrados_Data_Vencimento`);
 
     document.body.removeChild(container);
   } catch (err) {
@@ -231,7 +231,7 @@ export const downloadPDFQuantityProcesses = async (
       15
     );
 
-    pdf.save(`quantidade_de_processos`);
+    pdf.save(`Quantidade_Processos_Concluidos_Interrompidos`);
 
     document.body.removeChild(container);
   } catch (err) {

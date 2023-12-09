@@ -203,7 +203,7 @@ describe("Testes para a função updateUserPassword", () => {
 
     expect(result).toEqual({
       type: "error",
-      error: new Error("Ocorreu um erro"),
+      error: new Error("Something went wrong"),
       value: undefined,
     });
   });

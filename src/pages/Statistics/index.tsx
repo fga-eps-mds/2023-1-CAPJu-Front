@@ -88,6 +88,9 @@ export default function Statistics() {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [openChart, setOpenChart] = useState(false);
+  const [preparedProcessesDownload, setPreparedProcessesDownload] = useState(
+    [] as IIIFormatedProcess[]
+  );
   const limit = 5;
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
@@ -149,7 +152,7 @@ export default function Statistics() {
         });
 
         doc.addImage(dataURI, "JPEG", 35, 50, 520, 0);
-        doc.save(`quantidade_processos_por_etapa_do_fluxo_${selectedFlow}`);
+        doc.save(`Quantidade_Processos_Etapas`);
       });
     }
   };
@@ -218,7 +221,7 @@ export default function Statistics() {
   }, [filteredProcess, tableActions]);
 
   const handleConfirmSelectionFlow = async () => {
-    if (selectedFlow >= 0) {
+    if (selectedFlow > 0) {
       setOpenSelectStage(true);
 
       const stagesResult = await getCountProcessByIdFlow(selectedFlow);
@@ -241,11 +244,10 @@ export default function Statistics() {
 
   const getProcessByPage = async () => {
     const offset = currentPage * limit;
-
     try {
       const processResult = await getStagesByIdFlow(
         selectedFlow,
-        selectedStage,
+        Number.isNaN(selectedStage) ? -1 : selectedStage,
         offset,
         limit
       );
@@ -274,14 +276,25 @@ export default function Statistics() {
     }
   };
 
+  function formatDataTable(processes: Process[]) {
+    return processes.map((process) => {
+      return {
+        Registro: process.record,
+        Apelido: process.nickname,
+      };
+    });
+  }
+
   useEffect(() => {
     if (showProcesses) {
       getProcessByPage();
+      const formatedData = formatDataTable(filteredProcess);
+      setPreparedProcessesDownload(formatedData);
     }
   }, [currentPage, showProcesses]);
 
   const handleConfirmSelectionStages = async () => {
-    if (selectedStage) {
+    if (selectedStage > 0 || Number.isNaN(selectedStage)) {
       setOpenSelectStage(true);
 
       await getProcessByPage();
@@ -354,10 +367,12 @@ export default function Statistics() {
                       colorScheme="green"
                       w="28%"
                       onClick={() => {
-                        setOpenSelectStage(true);
+                        if (selectedFlow > 0) {
+                          setOpenSelectStage(true);
+                          setShowProcesses(false);
+                          setOpenChart(true);
+                        }
                         handleConfirmSelectionFlow();
-                        setShowProcesses(false);
-                        setOpenChart(true);
                       }}
                     >
                       Confirmar
@@ -383,7 +398,9 @@ export default function Statistics() {
                         >
                           {Object.values(stages).map((stage) => (
                             <option key={stage.idStage} value={stage.idStage}>
-                              {stage.name}
+                              {stage.name === "nao iniciado"
+                                ? "Não iniciado"
+                                : stage.name}
                             </option>
                           ))}
                         </Select>
@@ -391,9 +408,14 @@ export default function Statistics() {
                           colorScheme="green"
                           w="28%"
                           onClick={() => {
-                            setOpenSelectStage(true);
+                            if (
+                              selectedStage > 0 ||
+                              Number.isNaN(selectedStage)
+                            ) {
+                              setOpenSelectStage(true);
+                              setOpenChart(false);
+                            }
                             handleConfirmSelectionStages();
-                            setOpenChart(false);
                           }}
                         >
                           Confirmar
@@ -414,8 +436,8 @@ export default function Statistics() {
 
                         {showProcesses && (
                           <ExportExcel
-                            excelData={filteredProcess}
-                            fileName={`Processos_do_fluxo_${selectedFlow}_na_etapa_${selectedStage}`}
+                            excelData={preparedProcessesDownload}
+                            fileName="Quantidade_Processos_Etapa"
                           />
                         )}
                       </Flex>

@@ -98,8 +98,7 @@ export default function FilteringProcesses() {
   };
 
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = event.target.value;
-    setSelectedFlowValue(selectedValue);
+    setSelectedFlowValue(event.target.value);
   };
 
   const { data: flowsData } = useQuery({
@@ -192,6 +191,7 @@ export default function FilteringProcesses() {
     setProcessData,
     filter,
     selectedStatus,
+    selectedFlowValue,
     fromDate,
     toDate,
     currentPage,
