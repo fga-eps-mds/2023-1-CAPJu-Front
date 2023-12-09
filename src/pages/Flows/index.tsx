@@ -25,9 +25,7 @@ import { EditionModal } from "./EditionModal";
 function Flows() {
   const toast = useToast();
   const [selectedFlow, selectFlow] = useState<Flow | null>(null);
-  const [filter, setFilter] = useState<
-    { type: string; value: string } | undefined
-  >(undefined);
+  const [filter, setFilter] = useState<string | undefined>(undefined);
   const { getUserData } = useAuth();
   const {
     isOpen: isCreationOpen,
@@ -199,7 +197,7 @@ function Flows() {
 
   return (
     <PrivateLayout>
-      <Flex w="40%" flexDir="column" gap="3" mb="4" mt="50px">
+      <Flex w="100%" maxWidth={1120} flexDir="column" gap="3" mb="4" mt="50px">
         <Flex w="50%" mb="2" justifyContent="start">
           <Text fontSize="25px" fontWeight="semibold">
             Fluxos
@@ -239,10 +237,8 @@ function Flows() {
             >
               <Input
                 placeholder="Pesquisar fluxos"
-                value={filter?.value}
-                onChange={({ target }) =>
-                  setFilter({ type: "flow", value: target.value })
-                }
+                value={filter || ""}
+                onChange={({ target }) => setFilter(target.value)}
                 variant="filled"
                 css={{
                   "&, &:hover, &:focus": {

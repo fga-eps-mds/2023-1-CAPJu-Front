@@ -11,7 +11,7 @@ declare global {
     token: string;
     expiresIn: Date;
     idRole: number;
-    role?: string;
+    role?: string | Undefined;
     idUnit: number;
     unit?: Unit;
     firstLogin?: boolean;
@@ -93,8 +93,13 @@ declare global {
     Registro: number | ReactNode;
     Apelido: string;
     Fluxo: string;
-    EtapaAtual: string | undefined;
-    DataDeVencimentoDaEtapa: string | undefined;
+    "Etapa Atual": string | undefined;
+    "Data de Vencimento da Etapa": string | undefined;
+  };
+
+  type IIIFormatedProcess = {
+    Registro: number | ReactNode;
+    Apelido: string;
   };
 
   type ProcessesFile = {

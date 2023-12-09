@@ -62,8 +62,8 @@ export default function StepDeadlineReports() {
         Registro: process.record,
         Apelido: process.nickname,
         Fluxo: idFlowToFlowName(process.idFlow),
-        EtapaAtual: process.nameStage,
-        DataDeVencimentoDaEtapa: process.dueDate,
+        "Etapa Atual": process.nameStage,
+        "Data de Vencimento da Etapa": process.dueDate,
       };
     });
   }
@@ -359,7 +359,7 @@ export default function StepDeadlineReports() {
             <>
               <Flex justifyContent="space-between">
                 <Flex w="70%" flexDirection="column">
-                  <Flex alignItems="center" gap="5" marginTop="15">
+                  <Flex alignItems="center" gap="5">
                     <Input
                       w="50%"
                       type="date"
@@ -386,7 +386,7 @@ export default function StepDeadlineReports() {
                       }}
                     />
                     <Button
-                      colorScheme="whatsapp"
+                      colorScheme="green"
                       w="20%"
                       onClick={() => {
                         handleConfirmClick(minDate, maxDate);
@@ -407,7 +407,7 @@ export default function StepDeadlineReports() {
                       <>
                         <ExportExcel
                           excelData={preparedProcessesDownloadinDue}
-                          fileName="Processos_em_Vencimento"
+                          fileName="Processos_Filtrados_Data_Vencimento"
                         />
                         <Button
                           colorScheme="blue"

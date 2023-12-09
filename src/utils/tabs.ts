@@ -42,14 +42,14 @@ export const tabs = [
     action: "manage-profiles",
   },
   {
+    label: "Editar Conta",
+    pathIndex: "/editar-conta",
+    path: "/editar-conta",
+  },
+  {
     label: "Sessões",
     pathIndex: "/sesssoes-usuarios",
     path: "/sesssoes-usuarios",
     action: "manage-user-sessions",
-  },
-  {
-    label: "Editar Conta",
-    pathIndex: "/editar-conta",
-    path: "/editar-conta",
   },
 ];
