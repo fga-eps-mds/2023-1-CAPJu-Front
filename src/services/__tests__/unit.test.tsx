@@ -5,6 +5,7 @@ import {
   updateUnit,
   getUnitAdmins,
   deleteUnit,
+  addUnitAdmin,
 } from "services/unit";
 import { api } from "../api";
 
@@ -197,6 +198,44 @@ describe("Testes para a função getUnitAdmins", () => {
     apiMockUnit.onGet("/unitAdmins/1").reply(400, {});
 
     const result = await getUnitAdmins(1);
+
+    expect(result).toEqual({
+      type: "error",
+      value: undefined,
+      error: new Error("Something went wrong"),
+    });
+  });
+});
+
+describe("Testes para a função addUnitAdmin", () => {
+  afterEach(() => {
+    apiMockUnit.reset();
+  });
+
+  it("sucesso put /setUnitAdmin/", async () => {
+    apiMockUnit.onPut("/setUnitAdmin/").reply(200, {
+      idUnit: 1,
+      cpf: "12345678901",
+    });
+
+    const result = await addUnitAdmin({
+      idUnit: 1,
+      cpf: "12345678901",
+    });
+
+    expect(result).toEqual({
+      type: "success",
+      value: null,
+    });
+  });
+
+  it("error put /setUnitAdmin/", async () => {
+    apiMockUnit.onGet("/setUnitAdmin/").reply(400, {});
+
+    const result = await addUnitAdmin({
+      idUnit: 1,
+      cpf: "12345678901",
+    });
 
     expect(result).toEqual({
       type: "error",
