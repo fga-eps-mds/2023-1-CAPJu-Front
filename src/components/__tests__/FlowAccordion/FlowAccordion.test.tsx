@@ -174,3 +174,63 @@ describe("FlowAccordion components", async () => {
     });
   });
 });
+
+describe("renders Flow ActionButtons", () => {
+  it("should render flow actions", async () => {
+    await act(async () => {
+      render(
+        <FlowAccordion
+          data={filteredFlows}
+          columns={tableColumns}
+          isDataFetching={false}
+          emptyTableMessage="Não foram encontrados fluxos."
+        />
+      );
+    });
+    const ActionButtons = screen.getAllByTestId("ActionButton");
+
+    ActionButtons.forEach((button) => {
+      expect(button).toBeVisible();
+    });
+  });
+
+  it("should have actions disabled", async () => {
+    const tableActionsDis = tableActions.map((action) => ({
+      ...action,
+      disabled: true,
+    }));
+
+    const filteredFlowsDisabled =
+      (mockedFlows.reduce(
+        (acc: TableRow<Flow>[] | Flow[], curr: TableRow<Flow> | Flow) => [
+          ...acc,
+          {
+            ...curr,
+            tableActionsDis,
+            actionsProps: {
+              flow: curr,
+              state: { flow: curr },
+              pathname: `/processos`,
+            },
+          },
+        ],
+        []
+      ) as TableRow<Flow>[]) || [];
+
+    await act(async () => {
+      render(
+        <FlowAccordion
+          data={filteredFlowsDisabled}
+          columns={tableColumns}
+          isDataFetching={false}
+          emptyTableMessage="Não foram encontrados fluxos."
+        />
+      );
+    });
+
+    const ActionButtons = screen.queryAllByTestId("AtionButton");
+    ActionButtons.forEach((button) => {
+      expect(button).not.toBeInTheDocument();
+    });
+  });
+});

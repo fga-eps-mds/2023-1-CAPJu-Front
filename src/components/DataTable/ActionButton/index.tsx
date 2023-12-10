@@ -25,6 +25,7 @@ export function ActionButton({
         onClick={action}
         isDisabled={disabled}
         aria-label={label}
+        data-testid="ActionButton"
       >
         {icon}
       </Button>
