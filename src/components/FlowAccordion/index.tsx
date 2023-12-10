@@ -85,6 +85,11 @@ export function FlowAccordion<DataFlow extends object>({
               const { meta } = header.column.columnDef;
               return (
                 <Td
+                  data-testid={
+                    meta?.isSortable
+                      ? "sortable-element"
+                      : "NotSortable-element"
+                  }
                   key={header.id}
                   onClick={
                     meta?.isSortable
@@ -104,11 +109,13 @@ export function FlowAccordion<DataFlow extends object>({
                     <chakra.span pl="1">
                       {header.column.getIsSorted() === "desc" ? (
                         <ChevronDownIcon
+                          data-testid="sortIcon"
                           boxSize="4"
                           aria-label="Ordenado de maneira decrescente"
                         />
                       ) : (
                         <ChevronUpIcon
+                          data-testid="sortIcon"
                           boxSize="4"
                           aria-label="Ordenado de maneira crescente"
                         />
