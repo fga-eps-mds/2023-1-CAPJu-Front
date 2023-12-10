@@ -1,4 +1,4 @@
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, useEffect } from "react";
 import {
   Table,
   Tbody,
@@ -57,6 +57,10 @@ export function DataTable<Data extends object>({
       sorting,
     },
   });
+
+  useEffect(() => {
+    console.log("tableColumns", data[0]);
+  }, [data]);
 
   return isDataFetching ? (
     <Skeleton w={width} maxW={maxWidth} h={skeletonHeight} />

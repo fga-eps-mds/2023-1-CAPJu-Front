@@ -61,7 +61,7 @@ const validationSchema = yup.object({
   passwordConfirmation: yup
     .string()
     .required("Confirme sua senha")
-    .oneOf([yup.ref("password")], "Suas senhas não batem"),
+    .oneOf([yup.ref("password")], "Suas senhas não conferem."),
   idUnit: yup.string().required("Selecione uma unidade"),
   idRole: yup.string().required("Selecione um perfil"),
 });
