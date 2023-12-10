@@ -111,6 +111,22 @@ describe("FlowAccordion components", async () => {
     expect(screen).toMatchSnapshot();
   });
 
+  it("should render a skeleton when isDataFetching", async () => {
+    const dataFetching = true;
+    await act(async () => {
+      render(
+        <FlowAccordion
+          data={filteredEmptyFlows}
+          columns={tableColumns}
+          isDataFetching={dataFetching}
+          emptyTableMessage="Não foram encontrados fluxos."
+        />
+      );
+    });
+
+    expect(screen.getByTestId("skeleton")).toBeVisible();
+  });
+
   it("should show Flows correctly", async () => {
     mockedFlows.forEach(async (flow) => {
       expect(await screen.findByText(flow.name)).toBeDefined();

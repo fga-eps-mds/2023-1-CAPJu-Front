@@ -68,7 +68,12 @@ export function FlowAccordion<DataFlow extends object>({
   });
 
   return isDataFetching ? (
-    <Skeleton w={width} maxW={maxWidth} h={skeletonHeight} />
+    <Skeleton
+      data-testid="skeleton"
+      w={width}
+      maxW={maxWidth}
+      h={skeletonHeight}
+    />
   ) : (
     <Table
       bg="white"
