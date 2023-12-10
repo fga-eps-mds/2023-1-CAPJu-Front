@@ -14,7 +14,7 @@ import {
   mockedRoleAdministrador,
 } from "utils/mocks";
 import { getPaginatedArray } from "utils/pagination";
-import Units from "../Units";
+import Units from "../../Units";
 
 const restHandlers = [
   rest.get(
