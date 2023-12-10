@@ -1,5 +1,5 @@
 import ResizeObserver from "resize-observer-polyfill";
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { vi } from "vitest";
 
 import { mockedFlows } from "utils/mocks";
@@ -91,5 +91,36 @@ describe("FlowAccordion components", async () => {
 
   it("should renders correctly", async () => {
     expect(screen).toMatchSnapshot();
+  });
+
+  it("should show Flows correctly", async () => {
+    mockedFlows.forEach(async (flow) => {
+      expect(await screen.findByText(flow.name)).toBeDefined();
+    });
+  });
+
+  describe("Sorted Flows", () => {
+    it("should sort asc flows", async () => {
+      const sortElement = screen.getByTestId("sortable-element");
+
+      fireEvent.click(sortElement);
+
+      expect(screen.findByTestId("sortIcon")).toBeDefined();
+      mockedFlows.forEach(async (flow) => {
+        expect(await screen.findByText(flow.name)).toBeDefined();
+      });
+    });
+
+    it("should sort desc flows", async () => {
+      const sortElement = screen.getByTestId("sortable-element");
+
+      fireEvent.click(sortElement);
+      fireEvent.click(sortElement);
+
+      expect(screen.findByTestId("sortIcon")).toBeDefined();
+      mockedFlows.forEach(async (flow) => {
+        expect(await screen.findByText(flow.name)).toBeDefined();
+      });
+    });
   });
 });
