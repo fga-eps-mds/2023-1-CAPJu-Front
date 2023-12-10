@@ -225,7 +225,7 @@ export function EditionModal({
               isChecked={hasLegalPriority}
               {...register("hasLegalPriority")}
             >
-              Com prioridade legal {hasLegalPriority ? "true" : "false"}
+              Com prioridade legal
             </Checkbox>
             {hasLegalPriority ? (
               <Select

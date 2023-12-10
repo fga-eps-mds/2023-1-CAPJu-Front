@@ -50,10 +50,11 @@ export const createStage = async (data: {
 export const updateStage = async (data: {
   idStage: number;
   name: string;
+  duration: number;
 }): Promise<Result<Stage>> => {
   try {
     const res = await api.processManagement.put<Stage>(
-      "/stage/updateStage",
+      `/stage/updateStage/${data.idStage}`,
       data
     );
 
