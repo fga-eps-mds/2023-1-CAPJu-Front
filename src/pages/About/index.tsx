@@ -8,8 +8,7 @@ import {
   techinicalManagerName,
 } from "utils/aboutText";
 import { colors } from "styles/colors";
-import logoJusticaFederal from "images/justica_federal.png";
-import logoUnB from "../../images/UnB.png";
+import assets from "../../utils/assets";
 import AboutAccordion from "./Accordion";
 
 function About() {
@@ -54,11 +53,11 @@ function About() {
             gap={5}
           >
             <Image
-              src={logoJusticaFederal}
+              src={assets.justicaFederal}
               alt="Logo Justiça Federal"
               width="100px"
             />
-            <Image src={logoUnB} alt="Logo UnB" width="100px" />
+            <Image src={assets.logoUnB} alt="Logo UnB" width="100px" />
           </Box>
         </Box>
         <Box
