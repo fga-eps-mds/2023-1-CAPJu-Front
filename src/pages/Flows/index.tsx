@@ -8,12 +8,12 @@ import {
   useDisclosure,
   chakra,
 } from "@chakra-ui/react";
+import { FlowAccordion } from "components/FlowAccordion";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { AddIcon, Icon, ViewIcon, SearchIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
 import { PrivateLayout } from "layouts/Private";
 import { getFlows } from "services/processManagement/flows";
-import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { isActionAllowedToUser } from "utils/permissions";
@@ -53,10 +53,7 @@ function Flows() {
   } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
-      const res = await getFlows(
-        { offset: currentPage * 10, limit: 10 },
-        filter
-      );
+      const res = await getFlows({ offset: currentPage * 5, limit: 5 }, filter);
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -259,7 +256,7 @@ function Flows() {
           </Flex>
         </Flex>
       </Flex>
-      <DataTable
+      <FlowAccordion
         data={filteredFlows}
         columns={tableColumns}
         isDataFetching={!isFlowsFetched || !isUserFetched}

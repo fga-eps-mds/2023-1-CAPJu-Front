@@ -97,6 +97,19 @@ export const mockedProcess = {
   progress: [mockedProgress1, mockedProgress2],
 };
 
+export const mockedPriorityProcess = {
+  idProcess: 1,
+  effectiveDate: "2023-06-27",
+  idFlow: 1,
+  idPriority: 1,
+  idStage: 1,
+  idUnit: 1,
+  nickname: "Processo não Iniciado",
+  record: "12345678912345678915",
+  status: "inProgress",
+  progress: [mockedProgress1, mockedProgress2],
+};
+
 export const mockedUser = {
   cpf: "12345678900",
   fullName: "User Teste",
