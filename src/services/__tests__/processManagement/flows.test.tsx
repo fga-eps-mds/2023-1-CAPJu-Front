@@ -6,6 +6,7 @@ import {
   getHistoricFlow,
   getExpectedFlow,
   updateFlow,
+  deleteFlow,
 } from "services/processManagement/flows";
 import { api } from "../../api";
 
@@ -249,6 +250,41 @@ describe("Testes para a função updateFlow", () => {
       idUsersToNotify: [],
       idFlow: 1,
     });
+
+    expect(result).toEqual({
+      type: "error",
+      value: undefined,
+      error: new Error("Something went wrong"),
+    });
+  });
+});
+
+describe("Testes para a função deleteFlow", () => {
+  afterEach(() => {
+    apiMockProcessManagement.reset();
+  });
+
+  it("sucesso delete /flow/1", async () => {
+    apiMockProcessManagement.onDelete("/flow/1").reply(200, {
+      name: "fluxo 01",
+      idFlow: 1,
+    });
+
+    const result = await deleteFlow(1);
+
+    expect(result).toEqual({
+      type: "success",
+      value: {
+        name: "fluxo 01",
+        idFlow: 1,
+      },
+    });
+  });
+
+  it("error delete /flow/1", async () => {
+    apiMockProcessManagement.onDelete("/flow/1").reply(400, {});
+
+    const result = await deleteFlow(1);
 
     expect(result).toEqual({
       type: "error",
