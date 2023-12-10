@@ -102,7 +102,7 @@ export const downloadEventsPdf = async (processInfo: {
     12
   );
   pdf.addImage(
-    await imgToBase64("/src/images/unb.png"),
+    await imgToBase64("/src/images/UnB.png"),
     "png",
     30 + spacingBetweenImages,
     tableFinalY + 10,

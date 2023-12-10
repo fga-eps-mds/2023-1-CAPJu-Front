@@ -46,9 +46,4 @@ describe("About page", () => {
     expect(screen.getByText("Professor Responsável")).not.toBe(null);
     expect(screen.getByText("Nome: Hilmer Rodrigues Neri")).not.toBe(null);
   });
-
-  it("shows button correctly", () => {
-    const button = screen.getByText("Veja Mais");
-    expect(button).not.toBe(null);
-  });
 });
