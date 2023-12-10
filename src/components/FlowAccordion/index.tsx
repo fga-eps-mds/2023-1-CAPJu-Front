@@ -219,7 +219,7 @@ export function FlowAccordion<DataFlow extends object>({
                                 ) : (
                                   <Flex
                                     key={id}
-                                    borderBottomWidth={isLastRow ? 0 : 0}
+                                    borderBottomWidth={0}
                                     w="100%"
                                     justifyContent="start"
                                   >
