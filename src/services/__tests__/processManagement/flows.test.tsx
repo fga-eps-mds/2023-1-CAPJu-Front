@@ -3,6 +3,7 @@ import {
   getFlows,
   getFlowById,
   createFlow,
+  getHistoricFlow,
 } from "services/processManagement/flows";
 import { api } from "../../api";
 
@@ -127,6 +128,41 @@ describe("Testes para a função createFlow", () => {
       idUsersToNotify: [],
       idUnit: 1,
     });
+
+    expect(result).toEqual({
+      type: "error",
+      value: undefined,
+      error: new Error("Something went wrong"),
+    });
+  });
+});
+
+describe("Testes para a função getHistoricFlow", () => {
+  afterEach(() => {
+    apiMockProcessManagement.reset();
+  });
+
+  it("sucesso get /flow/historicFlow/1", async () => {
+    apiMockProcessManagement.onGet("/flow/historicFlow/1").reply(200, {
+      name: "fluxo 01",
+      idFlow: 1,
+    });
+
+    const result = await getHistoricFlow(1);
+
+    expect(result).toEqual({
+      type: "success",
+      value: {
+        name: "fluxo 01",
+        idFlow: 1,
+      },
+    });
+  });
+
+  it("error get /flow/historicFlow/1", async () => {
+    apiMockProcessManagement.onGet("/flow/historicFlow/1").reply(400, {});
+
+    const result = await getHistoricFlow(1);
 
     expect(result).toEqual({
       type: "error",
