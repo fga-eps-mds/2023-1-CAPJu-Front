@@ -1,3 +1,4 @@
+import "@testing-library/jest-dom";
 import ResizeObserver from "resize-observer-polyfill";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { vi } from "vitest";
@@ -67,6 +68,23 @@ const filteredFlows =
     []
   ) as TableRow<Flow>[]) || [];
 
+const filteredEmptyFlows =
+  ([].reduce(
+    (acc: TableRow<Flow>[] | Flow[], curr: TableRow<Flow> | Flow) => [
+      ...acc,
+      {
+        ...curr,
+        tableActions,
+        actionsProps: {
+          flow: curr,
+          state: { flow: curr },
+          pathname: `/processos`,
+        },
+      },
+    ],
+    []
+  ) as TableRow<Flow>[]) || [];
+
 describe("FlowAccordion components", async () => {
   const mockedUseNavigate = vi.fn();
 
@@ -97,6 +115,22 @@ describe("FlowAccordion components", async () => {
     mockedFlows.forEach(async (flow) => {
       expect(await screen.findByText(flow.name)).toBeDefined();
     });
+  });
+
+  it("should show a empty message when data length is 0", async () => {
+    await act(async () => {
+      render(
+        <FlowAccordion
+          data={filteredEmptyFlows}
+          columns={tableColumns}
+          isDataFetching={false}
+          emptyTableMessage="Não foram encontrados fluxos."
+        />
+      );
+    });
+
+    expect(screen.getByTestId("data-0")).toBeVisible();
+    expect(screen.findByText("Não foram encontrados fluxos.")).toBeDefined();
   });
 
   describe("Sorted Flows", () => {

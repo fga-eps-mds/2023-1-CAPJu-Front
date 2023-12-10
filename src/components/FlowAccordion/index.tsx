@@ -132,7 +132,7 @@ export function FlowAccordion<DataFlow extends object>({
         {!data?.length ? (
           <Tr>
             <Td colSpan={columns.length}>
-              <Text textAlign="center" py="4">
+              <Text data-testid="data-0" textAlign="center" py="4">
                 {emptyTableMessage}
               </Text>
             </Td>
