@@ -5,6 +5,7 @@ import {
   createFlow,
   getHistoricFlow,
   getExpectedFlow,
+  updateFlow,
 } from "services/processManagement/flows";
 import { api } from "../../api";
 
@@ -199,6 +200,55 @@ describe("Testes para a função getExpectedFlow", () => {
     apiMockProcessManagement.onGet("/flowStage/1").reply(400, {});
 
     const result = await getExpectedFlow(1);
+
+    expect(result).toEqual({
+      type: "error",
+      value: undefined,
+      error: new Error("Something went wrong"),
+    });
+  });
+});
+
+describe("Testes para a função updateFlow", () => {
+  afterEach(() => {
+    apiMockProcessManagement.reset();
+  });
+
+  it("sucesso put /flow", async () => {
+    apiMockProcessManagement.onPut("/flow/").reply(200, {
+      name: "fluxo 01",
+      sequences: [],
+      idUsersToNotify: [],
+      idFlow: 1,
+    });
+
+    const result = await updateFlow({
+      name: "fluxo 01",
+      sequences: [],
+      idUsersToNotify: [],
+      idFlow: 1,
+    });
+
+    expect(result).toEqual({
+      type: "success",
+      value: {
+        name: "fluxo 01",
+        sequences: [],
+        idUsersToNotify: [],
+        idFlow: 1,
+      },
+    });
+  });
+
+  it("error put /flow", async () => {
+    apiMockProcessManagement.onPut("/flow/").reply(400, {});
+
+    const result = await updateFlow({
+      name: "fluxo 01",
+      sequences: [],
+      idUsersToNotify: [],
+      idFlow: 1,
+    });
 
     expect(result).toEqual({
       type: "error",
