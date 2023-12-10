@@ -52,7 +52,6 @@ export function FlowAccordion<DataFlow extends object>({
   maxWidth = 1120,
   size = ["sm", "md"],
   emptyTableMessage = "Esta tabela está vazia no momento.",
-  rawData,
 }: DataFlowProps<DataFlow>) {
   const navigate = useNavigate();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -161,25 +160,17 @@ export function FlowAccordion<DataFlow extends object>({
                               .getVisibleCells()
                               .map(({ id, column, getValue }) => {
                                 const { meta } = column.columnDef;
-                                const isLastRow =
-                                  table.getRowModel().rows?.length - 1 ===
-                                  index;
                                 const value = getValue();
                                 return meta?.isTableActions ? (
                                   <Box
                                     key={id}
                                     display="flex"
-                                    borderBottomWidth={isLastRow ? 0 : 0}
+                                    borderBottomWidth={0}
                                     maxW="20%"
                                   >
                                     {(value as TableAction[])?.map(
                                       (actionItem: TableAction) => {
-                                        const disabled =
-                                          actionItem.disabled ||
-                                          (actionItem.disabledOn &&
-                                            actionItem.disabledOn(
-                                              rawData[index]
-                                            ));
+                                        const { disabled } = actionItem;
                                         const label = disabled
                                           ? actionItem.labelOnDisable ||
                                             actionItem.label
