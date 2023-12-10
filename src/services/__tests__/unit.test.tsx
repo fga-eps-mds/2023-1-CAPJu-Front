@@ -1,5 +1,11 @@
 import MockAdapter from "axios-mock-adapter";
-import { createUnit, getUnits, updateUnit } from "services/unit";
+import {
+  createUnit,
+  getUnits,
+  updateUnit,
+  getUnitAdmins,
+  deleteUnit,
+} from "services/unit";
 import { api } from "../api";
 
 const apiMockUnit = new MockAdapter(api.unit);
@@ -121,6 +127,76 @@ describe("Testes para a função updateUnit", () => {
       name: "Unidade",
       idUnit: 1,
     });
+
+    expect(result).toEqual({
+      type: "error",
+      value: undefined,
+      error: new Error("Something went wrong"),
+    });
+  });
+});
+
+describe("Testes para a função deleteUnit", () => {
+  afterEach(() => {
+    apiMockUnit.reset();
+  });
+
+  it("sucesso delete /deleteUnit", async () => {
+    apiMockUnit.onDelete("/deleteUnit").reply(200, {
+      name: "fluxo 01",
+      idUnit: 1,
+    });
+
+    const result = await deleteUnit(1);
+
+    expect(result).toEqual({
+      type: "success",
+      value: {
+        name: "fluxo 01",
+        idUnit: 1,
+      },
+    });
+  });
+
+  it("error delete /deleteUnit", async () => {
+    apiMockUnit.onDelete("/deleteUnit").reply(400, {});
+
+    const result = await deleteUnit(1);
+
+    expect(result).toEqual({
+      type: "error",
+      value: undefined,
+      error: new Error("Something went wrong"),
+    });
+  });
+});
+
+describe("Testes para a função getUnitAdmins", () => {
+  afterEach(() => {
+    apiMockUnit.reset();
+  });
+
+  it("sucesso get /unitAdmins/1", async () => {
+    apiMockUnit.onGet("/unitAdmins/1").reply(200, {
+      name: "unidade 01",
+      idUnit: 1,
+    });
+
+    const result = await getUnitAdmins(1);
+
+    expect(result).toEqual({
+      type: "success",
+      value: {
+        name: "unidade 01",
+        idUnit: 1,
+      },
+    });
+  });
+
+  it("error get /unitAdmins/1", async () => {
+    apiMockUnit.onGet("/unitAdmins/1").reply(400, {});
+
+    const result = await getUnitAdmins(1);
 
     expect(result).toEqual({
       type: "error",
