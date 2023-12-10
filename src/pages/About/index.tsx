@@ -1,5 +1,5 @@
-import { Flex, Box, Text, Image, Button } from "@chakra-ui/react";
-
+import { Flex, Box, Text, Image } from "@chakra-ui/react";
+import { useAuth } from "hooks/useAuth";
 import {
   aboutCapju,
   creatorsEmail,
@@ -7,10 +7,7 @@ import {
   professorName,
   techinicalManagerName,
 } from "utils/aboutText";
-import { colors } from "styles/colors";
-import logoJusticaFederal from "images/justica_federal.png";
-import logoUnB from "images/unb.png";
-import { useAuth } from "hooks/useAuth";
+import assets from "../../utils/assets";
 import AboutAccordion from "./Accordion";
 
 function About() {
@@ -39,14 +36,6 @@ function About() {
           <Text textAlign="justify" mt={10}>
             {aboutCapju}
           </Text>
-          <Button
-            mt={5}
-            backgroundColor={colors.green["500"]}
-            color="white"
-            p={["10", "5"]}
-          >
-            Veja Mais
-          </Button>
           <Box
             mt={10}
             display="flex"
@@ -55,11 +44,11 @@ function About() {
             gap={5}
           >
             <Image
-              src={logoJusticaFederal}
+              src={assets.justicaFederal}
               alt="Logo Justiça Federal"
               width="100px"
             />
-            <Image src={logoUnB} alt="Logo UnB" width="100px" />
+            <Image src={assets.logoUnB} alt="Logo UnB" width="100px" />
           </Box>
         </Box>
         <Box

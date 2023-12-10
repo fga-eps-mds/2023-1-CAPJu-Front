@@ -15,13 +15,13 @@ import {
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-
 import { updateFlow } from "services/processManagement/flows";
 import { getStages } from "services/processManagement/stage";
 import { getAcceptedUsers } from "services/user";
 import { Input, MultiSelect } from "components/FormFields";
 import { Flow } from "components/Flow";
 import { useLoading } from "hooks/useLoading";
+import { sortFlowStages } from "../../../utils/sorting";
 
 type FormValues = {
   name: string;
@@ -64,8 +64,11 @@ export function EditionModal({
     refetchOnWindowFocus: false,
   });
   const [selectedStages, setSelectedStages] = useState<Stage[]>(
-    stagesData?.value?.filter((item) =>
-      flow.stages.some((stageId) => stageId === item.idStage)
+    sortFlowStages(
+      stagesData?.value?.filter((item) =>
+        flow.stages.some((stageId) => stageId === item.idStage)
+      ) || [],
+      flow.sequences
     ) || []
   );
   const [usersToNotify, setUsersToNotify] = useState<(number | string)[]>([]);

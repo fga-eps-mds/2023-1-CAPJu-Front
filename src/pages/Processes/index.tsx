@@ -400,7 +400,6 @@ function Processes() {
                   border="30px"
                 />
                 <Image
-                  zIndex="9999"
                   src={line52}
                   marginLeft="0%"
                   width="3%"

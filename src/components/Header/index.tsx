@@ -147,7 +147,7 @@ export function Header() {
                       >
                         <Flex alignItems="jus">
                           <Text ml="2" textColor="black">
-                            Solicitações de cadastro
+                            Cadastro
                           </Text>
                         </Flex>
                       </Button>
