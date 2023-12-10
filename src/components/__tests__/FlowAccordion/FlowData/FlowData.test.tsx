@@ -3,9 +3,10 @@ import ResizeObserver from "resize-observer-polyfill";
 import { act, render, screen } from "@testing-library/react";
 import { vi } from "vitest";
 
-import { mockedFlows } from "utils/mocks";
+import { mockedFlows, mockedPriorityProcess, mockedProcess } from "utils/mocks";
 import * as router from "react-router";
-import { QueryClient, QueryClientProvider } from "react-query";
+import * as query from "react-query";
+import * as processService from "services/processManagement/processes";
 import FlowData from "../../../FlowAccordion/FlowData";
 
 const tableActions = [
@@ -49,7 +50,7 @@ const filteredFlows =
     []
   ) as TableRow<Flow>[]) || [];
 
-const queryClient = new QueryClient();
+const queryClient = new query.QueryClient();
 
 describe("FlowData component", async () => {
   beforeAll(async () => {
@@ -71,14 +72,80 @@ describe("FlowData component", async () => {
 
     await act(async () => {
       render(
-        <QueryClientProvider client={queryClient}>
+        <query.QueryClientProvider client={queryClient}>
           <FlowData data={filteredFlows[0]} />
-        </QueryClientProvider>
+        </query.QueryClientProvider>
       );
     });
   });
 
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.resetAllMocks();
+  });
+
   it("should renders correctly", async () => {
     expect(screen).toMatchSnapshot();
+  });
+
+  it("should show process", async () => {
+    vi.spyOn(processService, "getProcesses").mockImplementation(async () => {
+      return {
+        type: "success",
+        value: [mockedProcess],
+        totalPages: 1,
+        totalProcesses: 1,
+        totalArchived: 0,
+        totalFinished: 0,
+      } as ResultSuccess<Process[]>;
+    });
+
+    expect(screen.findByText(`${mockedProcess.record}`)).toBeDefined();
+  });
+
+  it("process should have a priority", async () => {
+    vi.clearAllMocks();
+    vi.resetAllMocks();
+
+    const mockUseLocation = {
+      key: "useLocation",
+      pathname: "/testroute",
+      search: "",
+      hash: "",
+      state: null,
+    };
+    const mockUseNavigate = vi.fn();
+    const mockResultQueryProcesses = {
+      data: {
+        value: [mockedPriorityProcess],
+      },
+      isFetched: true,
+      refetch: vi.fn(),
+    };
+
+    const mockResultQueryGetUserData = {
+      isFetched: true,
+    };
+
+    vi.spyOn(router, "useLocation").mockImplementation(() => mockUseLocation);
+    vi.spyOn(router, "useNavigate").mockImplementation(() => mockUseNavigate);
+    vi.spyOn(query, "useQuery").mockImplementation(
+      // @ts-ignore
+      (data: any) => {
+        console.log(data);
+        if (data.queryKey[0] === "user-data") return mockResultQueryGetUserData;
+        return mockResultQueryProcesses;
+      }
+    );
+
+    await act(async () => {
+      render(
+        <query.QueryClientProvider client={queryClient}>
+          <FlowData data={filteredFlows[0]} />
+        </query.QueryClientProvider>
+      );
+    });
+
+    expect(screen.findByText("Prioridade legal")).toBeDefined();
   });
 });
