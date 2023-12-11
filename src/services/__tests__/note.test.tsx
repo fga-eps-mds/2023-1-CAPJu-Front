@@ -1,6 +1,10 @@
 import MockAdapter from "axios-mock-adapter";
 import { api } from "../api";
-import { getNotesByProcessRecord, addNoteToProcess, deleteProcessNote } from "../note";
+import {
+  getNotesByProcessRecord,
+  addNoteToProcess,
+  deleteProcessNote,
+} from "../note";
 
 const apiMockNote = new MockAdapter(api.note);
 
@@ -120,7 +124,7 @@ describe("Testes para a função getNotesByProcessRecord", () => {
 
   describe("Testes para a função deleteProcessNote", () => {
     it("Sucesso - deleteProcessNote", async () => {
-      const idNote =  '1';
+      const idNote = 1;
 
       const response = {};
 
@@ -132,7 +136,7 @@ describe("Testes para a função getNotesByProcessRecord", () => {
     });
 
     it("Falha - deleteProcessNote", async () => {
-      const idNote = '1';
+      const idNote = 1;
 
       apiMockNote.onDelete(`/deleteNote`).reply(401, "Something went wrong");
 
