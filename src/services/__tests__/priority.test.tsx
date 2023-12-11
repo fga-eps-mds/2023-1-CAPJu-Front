@@ -45,4 +45,13 @@ describe("Teste para a função getPriorities", () => {
       value: prioritiesData,
     });
   });
+
+  it("Erro getPriorities", async () => {
+    apiMockProcessManagement.onGet("/priority").reply(500);
+
+    const result = await getPriorities();
+
+    expect(result.type).toBe("error");
+    expect(result.value).toBeUndefined();
+  });
 });
