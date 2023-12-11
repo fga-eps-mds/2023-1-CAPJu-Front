@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom/extend-expect";
 import InputFile from "components/FormFields/InputFile/InputFile";
 
 describe("Componente InputFile", () => {
