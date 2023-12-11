@@ -18,7 +18,7 @@ import {
 } from "utils/mocks";
 import { getPaginatedArray } from "utils/pagination";
 import { labelByProcessStatus } from "utils/constants";
-import Processes from "../Processes";
+import Processes from "../../Processes";
 
 const restHandlers = [
   rest.get(

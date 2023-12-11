@@ -272,6 +272,11 @@ export function Profiles() {
           isOpen={isViewOpen}
           onClose={onViewClose}
           user={selectedUser}
+          unit={
+            unitsData?.value?.find(
+              (item) => item.idUnit === selectedUser.idUnit
+            )?.name || "-"
+          }
         />
       )}
       {userData?.value && selectedUser && isDeleteOpen && (

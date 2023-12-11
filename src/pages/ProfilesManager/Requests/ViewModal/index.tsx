@@ -12,11 +12,12 @@ import {
 
 interface ViewModalProps {
   user: User;
+  unit: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function ViewModal({ user, isOpen, onClose }: ViewModalProps) {
+export function ViewModal({ user, isOpen, onClose, unit }: ViewModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
@@ -32,6 +33,9 @@ export function ViewModal({ user, isOpen, onClose }: ViewModalProps) {
           </Text>
           <Text>
             <strong>Email:</strong> {user.email}
+          </Text>
+          <Text>
+            <strong>Unidade:</strong> {unit}
           </Text>
           <Text>
             <strong>Perfil:</strong> {user.role}

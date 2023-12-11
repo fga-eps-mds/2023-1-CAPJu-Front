@@ -209,7 +209,7 @@ export function Requests() {
       >
         <Flex w="50%" mb="3" justifyContent="start">
           <Text fontSize="25px" fontWeight="semibold">
-            Solicitações
+            Solicitações de Cadastro
           </Text>
         </Flex>
         <Flex justifyContent="flex-start" w="100%">
@@ -281,6 +281,11 @@ export function Requests() {
           isOpen={isViewOpen}
           onClose={onViewClose}
           user={selectedUser}
+          unit={
+            unitsData?.value?.find(
+              (item) => item.idUnit === selectedUser.idUnit
+            )?.name || "-"
+          }
         />
       ) : null}
     </>

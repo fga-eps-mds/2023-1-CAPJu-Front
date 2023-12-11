@@ -180,6 +180,7 @@ export function EditionModal({
               backgroundColor="gray.200"
               value={selectedProcess?.record as string}
               readOnly
+              textColor="grey"
               infoText={
                 <Stack spacing="0">
                   <Text>
@@ -200,7 +201,10 @@ export function EditionModal({
             <Text fontWeight={500}>Fluxo</Text>
             <Select
               placeholder="Selecionar Fluxo"
-              color="gray.500"
+              backgroundColor={
+                selectedProcess?.status !== "notStarted" ? "gray.400" : ""
+              }
+              disabled={selectedProcess?.status !== "notStarted"}
               defaultValue={
                 typeof selectedProcess?.idFlow === "number"
                   ? selectedProcess?.idFlow
@@ -225,7 +229,7 @@ export function EditionModal({
               isChecked={hasLegalPriority}
               {...register("hasLegalPriority")}
             >
-              Com prioridade legal {hasLegalPriority ? "true" : "false"}
+              Com prioridade legal
             </Checkbox>
             {hasLegalPriority ? (
               <Select

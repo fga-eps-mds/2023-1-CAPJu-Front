@@ -15,7 +15,6 @@ export function authorization(
   const authConfig = config;
 
   authConfig.headers.Authorization = `Bearer ${bearerToken}`;
-
   return authConfig;
 }
 

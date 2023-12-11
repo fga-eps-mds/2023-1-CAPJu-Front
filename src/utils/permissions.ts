@@ -88,11 +88,11 @@ export const actionsForm = [
     value: "delete-process",
   },
   {
-    label: "Arquivar Processos",
+    label: "Concluir Processos",
     value: "archive-process",
   },
   {
-    label: "Finalizar Processos",
+    label: "Interromper Processos",
     value: "end-process",
   },
   {
