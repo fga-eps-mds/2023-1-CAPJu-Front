@@ -144,7 +144,7 @@ export default function StatsTimeStage() {
       document.body.appendChild(container);
 
       pdf.autoTable({
-        html: "#flowStagesData",
+        html: "#processData",
         useCss: true,
         startY: currentY,
       });
