@@ -61,7 +61,7 @@ const validationSchema = yup.object({
   passwordConfirmation: yup
     .string()
     .required("Confirme sua senha")
-    .oneOf([yup.ref("password")], "Suas senhas não batem"),
+    .oneOf([yup.ref("password")], "Suas senhas não conferem."),
   idUnit: yup.string().required("Selecione uma unidade"),
   idRole: yup.string().required("Selecione um perfil"),
 });
@@ -110,9 +110,11 @@ function Signup() {
   }, [unitsData]);
   const roles = useMemo(() => {
     return (
-      rolesData?.value?.map((role) => {
-        return { label: role.name, value: role.idRole };
-      }) || []
+      rolesData?.value
+        ?.filter((role: Role) => role.idRole !== 5)
+        ?.map((role: Role) => {
+          return { label: role.name, value: role.idRole };
+        }) || []
     );
   }, [rolesData]);
   const {

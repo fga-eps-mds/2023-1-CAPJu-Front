@@ -46,7 +46,7 @@ const validationSchema = yup.object({
   newPassword: yup.string(),
   newPasswordConfirmation: yup
     .string()
-    .oneOf([yup.ref("newPassword")], "Suas senhas não batem."),
+    .oneOf([yup.ref("newPassword")], "Suas senhas não conferem."),
   oldPassword: yup.string().required("Informe sua senha atual"),
   fullName: yup.string().required("Informe o seu nome completo"),
 });
