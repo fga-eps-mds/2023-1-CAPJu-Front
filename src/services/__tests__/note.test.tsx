@@ -1,7 +1,6 @@
 import MockAdapter from "axios-mock-adapter";
 import { api } from "../api";
-import { getNotesByProcessRecord,
-    addNoteToProcess } from "../note";
+import { getNotesByProcessRecord, addNoteToProcess, deleteProcessNote } from "../note";
 
 const apiMockNote = new MockAdapter(api.note);
 
@@ -46,13 +45,15 @@ describe("Testes para a função getNotesByProcessRecord", () => {
   describe("Testes para a função getNotesByProcessId", () => {
     it("Sucesso - getNotesByProcessId", async () => {
       const record = "1";
-      const mockNotes = [{
-        idNote: 1,
-        commentary: "some",
-        idProcess: 1,
-        isStageA: 1,
-        idStageB: 2,
-      }];
+      const mockNotes = [
+        {
+          idNote: 1,
+          commentary: "some",
+          idProcess: 1,
+          isStageA: 1,
+          idStageB: 2,
+        },
+      ];
 
       apiMockNote.onGet(`/${record}`).reply(200, mockNotes);
 
@@ -78,17 +79,17 @@ describe("Testes para a função getNotesByProcessRecord", () => {
   describe("Testes para a função addNoteToProcess", () => {
     it("Sucesso - addNoteToProcess", async () => {
       const data = {
-            idProcess: 1,
-            idStageA: "1",
-            idStageB: "2",
-            commentary: "Blue as the serpentine"
-      }
+        idProcess: 1,
+        idStageA: "1",
+        idStageB: "2",
+        commentary: "Blue as the serpentine",
+      };
       const response = {
-            idNote: 1,
-            commentary: "some",
-            idProcess: 1,
-            isStageA: 1,
-            idStageB: 2,
+        idNote: 1,
+        commentary: "some",
+        idProcess: 1,
+        isStageA: 1,
+        idStageB: 2,
       };
 
       apiMockNote.onPost(`/newNote`).reply(200, response);
@@ -99,22 +100,48 @@ describe("Testes para a função getNotesByProcessRecord", () => {
     });
 
     it("Falha - addNoteToProcess", async () => {
-        const data = {
-            idProcess: 1,
-            idStageA: "1",
-            idStageB: "2",
-            commentary: "Blue as the serpentine"
-      }
-  
-        apiMockNote.onGet(`/newNote`).reply(401, "Something went wrong");
-  
-        const result = await addNoteToProcess(data);
-        expect(result).toEqual({
-          type: "error",
-          error: new Error("Something went wrong"),
-          value: undefined,
-        });
-      });
+      const data = {
+        idProcess: 1,
+        idStageA: "1",
+        idStageB: "2",
+        commentary: "Blue as the serpentine",
+      };
 
+      apiMockNote.onGet(`/newNote`).reply(401, "Something went wrong");
+
+      const result = await addNoteToProcess(data);
+      expect(result).toEqual({
+        type: "error",
+        error: new Error("Something went wrong"),
+        value: undefined,
+      });
+    });
+  });
+
+  describe("Testes para a função deleteProcessNote", () => {
+    it("Sucesso - deleteProcessNote", async () => {
+      const idNote =  '1';
+
+      const response = {};
+
+      apiMockNote.onDelete(`/deleteNote/${idNote}`).reply(200, response);
+
+      const result = await deleteProcessNote(idNote);
+
+      expect(result).toEqual({ type: "success", value: response });
+    });
+
+    it("Falha - deleteProcessNote", async () => {
+      const idNote = '1';
+
+      apiMockNote.onDelete(`/deleteNote`).reply(401, "Something went wrong");
+
+      const result = await deleteProcessNote(idNote);
+      expect(result).toEqual({
+        type: "error",
+        error: new Error("Something went wrong"),
+        value: undefined,
+      });
+    });
   });
 });
