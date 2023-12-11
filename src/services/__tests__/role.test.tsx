@@ -1,6 +1,6 @@
 import MockAdapter from "axios-mock-adapter";
 import { api } from "../api";
-import { getRoleById, getAllRoles } from "../role";
+import { getRoleById, getAllRoles, updateRoleAllowedActions } from "../role";
 
 const apiMockRole = new MockAdapter(api.role);
 
@@ -66,5 +66,30 @@ describe("getAllRoles", () => {
 
     expect(result.type).toBe("error");
     expect(result.value).toBeUndefined();
+  });
+});
+
+describe("updateRoleAllowedActions", () => {
+  it("deve atualizar as ações permitidas de um cargo em caso de sucesso", async () => {
+    const idRole = 1;
+    const allowedActions = ["action1", "action2"];
+
+    const mockRoleData = {
+      id: idRole,
+      name: "Admin",
+      allowedActions,
+    };
+
+    apiMockRole.onPut(`/updateRole/${idRole}`).reply(200, mockRoleData);
+
+    const resultado = await updateRoleAllowedActions({
+      idRole,
+      allowedActions,
+    });
+
+    expect(resultado).toEqual({
+      type: "success",
+      value: mockRoleData,
+    });
   });
 });
