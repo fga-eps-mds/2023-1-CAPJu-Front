@@ -32,7 +32,7 @@ describe("Teste para a função getRoleById", () => {
 });
 
 describe("getAllRoles", () => {
-  it("Deve retornar cargos", async () => {
+  it("Deve retornar todos os cargos", async () => {
     const mockRolesData = [
       { id: 3, name: "Diretor" },
       { id: 1, name: "Estagiário" },
@@ -57,5 +57,14 @@ describe("getAllRoles", () => {
       type: "success",
       value: orderedMockRolesData,
     });
+  });
+
+  it("Erro getAllRoles", async () => {
+    apiMockRole.onGet("/").reply(500);
+
+    const result = await getAllRoles();
+
+    expect(result.type).toBe("error");
+    expect(result.value).toBeUndefined();
   });
 });
