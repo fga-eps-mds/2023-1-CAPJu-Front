@@ -13,7 +13,7 @@
     "check-format": "prettier --check .",
     "check-lint": "eslint . --ext ts --ext tsx --ext js",
     "format": "prettier --write .",
-    "test": "vitest --silent",
+    "test": "vitest",
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
@@ -63,7 +63,7 @@
     "react-router-dom": "^6.17.0",
     "react-select-event": "^5.5.1",
     "react-table": "^7.8.0",
-    "reactflow": "^11.7.2",
+    "reactflow": "^11.10.1",
     "resize-observer-polyfill": "^1.5.1",
     "sheetjs-style": "^0.15.8",
     "uuid": "^9.0.1",

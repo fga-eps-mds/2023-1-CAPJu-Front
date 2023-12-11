@@ -1,5 +1,5 @@
-import { describe, expect } from "vitest";
-import { act, render, screen, fireEvent } from "@testing-library/react";
+import { describe, expect, vi } from "vitest";
+import { act, render, screen } from "@testing-library/react";
 
 import { BrowserRouter } from "react-router-dom";
 import { rest } from "msw";
@@ -11,7 +11,7 @@ import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
 import { mockedManagerUser, mockedRoles, mockedStages } from "utils/mocks";
 import { getPaginatedArray } from "utils/pagination";
-import Stages from "../Stages";
+import { EditionModal } from "pages/Stages/EditionModal";
 
 const restHandlers = [
   rest.get(
@@ -63,14 +63,22 @@ describe("Stages page", () => {
   });
 
   beforeEach(async () => {
+    const onClose = vi.fn();
+    const afterSubmission = vi.fn();
+
     await act(async () => {
-      await render(
+      render(
         <ChakraProvider>
           <LoadingProvider>
             <QueryClientProvider client={queryClient}>
               <AuthProvider>
                 <BrowserRouter>
-                  <Stages />
+                  <EditionModal
+                    stage={mockedStages[0]}
+                    isOpen
+                    onClose={onClose}
+                    afterSubmission={afterSubmission}
+                  />
                 </BrowserRouter>
               </AuthProvider>
             </QueryClientProvider>
@@ -85,55 +93,7 @@ describe("Stages page", () => {
   afterEach(() => server.resetHandlers());
 
   it("renders correctly", () => {
+    screen.debug(undefined, 1000000);
     expect(screen).toMatchSnapshot();
-  });
-
-  it("shows text content correctly", async () => {
-    expect(screen.queryAllByText("Etapas")).not.toBe(null);
-    expect(screen.queryAllByText("Criar Etapa")).not.toBe(null);
-    expect(screen.queryAllByText("Duração (em dias)")).not.toBe(null);
-    expect(screen.queryAllByText("Etapa")).not.toBe(null);
-    expect(screen.queryAllByText("Ações")).not.toBe(null);
-
-    expect(screen.queryByText("a")).not.toBe(null);
-    expect(screen.queryByText("b")).not.toBe(null);
-    expect(screen.queryByText("c")).not.toBe(null);
-    expect(screen.queryByText("d")).not.toBe(null);
-    expect(screen.queryByText("e")).not.toBe(null);
-    expect(screen.queryByText("f")).toBe(null);
-    expect(screen.queryByText("g")).toBe(null);
-    expect(screen.queryByText("h")).toBe(null);
-    expect(screen.queryByText("i")).toBe(null);
-    expect(screen.queryByText("j")).toBe(null);
-  });
-
-  it("filters stages correctly", async () => {
-    const searchStagesButton = screen.getByPlaceholderText("Pesquisar etapas");
-
-    expect(searchStagesButton).not.toBe(null);
-
-    await act(async () => {
-      await fireEvent.change(searchStagesButton, {
-        target: { value: "a" },
-      });
-      await fireEvent.submit(searchStagesButton);
-    });
-
-    const queriesByText = screen.queryByText("a");
-
-    expect(queriesByText).not.toBe(null);
-
-    const searchBarButton = screen.getByLabelText("botão de busca");
-
-    expect(searchBarButton).not.toBe(null);
-
-    await act(async () => {
-      await fireEvent.change(searchStagesButton, {
-        target: { value: "c" },
-      });
-      await fireEvent.click(searchBarButton);
-    });
-
-    expect(await screen.queryByText("c")).not.toBe(null);
   });
 });
