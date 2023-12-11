@@ -1,6 +1,6 @@
 import MockAdapter from "axios-mock-adapter";
 import { api } from "../api";
-import { getRoleById } from "../role";
+import { getRoleById, getAllRoles } from "../role";
 
 const apiMockRole = new MockAdapter(api.role);
 
@@ -28,5 +28,34 @@ describe("Teste para a função getRoleById", () => {
 
     expect(result.type).toBe("error");
     expect(result.value).toBeUndefined();
+  });
+});
+
+describe("getAllRoles", () => {
+  it("Deve retornar cargos", async () => {
+    const mockRolesData = [
+      { id: 3, name: "Diretor" },
+      { id: 1, name: "Estagiário" },
+      { id: 4, name: "Juiz" },
+      { id: 5, name: "Administrador" },
+      { id: 2, name: "Servidor" },
+    ];
+
+    const orderedMockRolesData = [
+      { id: 1, name: "Estagiário" },
+      { id: 2, name: "Servidor" },
+      { id: 3, name: "Diretor" },
+      { id: 4, name: "Juiz" },
+      { id: 5, name: "Administrador" },
+    ];
+
+    apiMockRole.onGet("/").reply(200, mockRolesData);
+
+    const result = await getAllRoles();
+
+    expect(result).toEqual({
+      type: "success",
+      value: orderedMockRolesData,
+    });
   });
 });
