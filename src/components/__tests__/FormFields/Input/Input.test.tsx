@@ -7,4 +7,13 @@ describe("Componente Input", () => {
     render(<Input />);
     expect(screen.getByRole("textbox")).toBeInTheDocument();
   });
+
+  it("exibe mensagem de erro quando a propriedade de erros é passada", () => {
+    const errorMessage = "Esta é uma mensagem de erro";
+    const error = { type: "validação", message: errorMessage };
+
+    render(<Input errors={error} />);
+
+    expect(screen.getByText(errorMessage)).toBeInTheDocument();
+  });
 });
