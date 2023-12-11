@@ -92,4 +92,19 @@ describe("updateRoleAllowedActions", () => {
       value: mockRoleData,
     });
   });
+
+  it("deve tratar um erro durante a atualização das ações permitidas", async () => {
+    const idRole = 1;
+    const allowedActions = ["action1", "action2"];
+
+    apiMockRole.onPut(`/updateRole/${idRole}`).reply(500);
+
+    const resultado = await updateRoleAllowedActions({
+      idRole,
+      allowedActions,
+    });
+
+    expect(resultado.type).toBe("error");
+    expect(resultado.value).toBeUndefined();
+  });
 });
