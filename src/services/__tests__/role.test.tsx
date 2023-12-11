@@ -20,4 +20,13 @@ describe("Teste para a função getRoleById", () => {
       value: roleData,
     });
   });
+
+  it("Erro getRoleById", async () => {
+    apiMockRole.onGet("/roleAdmins/2").reply(500);
+
+    const result = await getRoleById(2);
+
+    expect(result.type).toBe("error");
+    expect(result.value).toBeUndefined();
+  });
 });
