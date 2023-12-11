@@ -11,7 +11,7 @@ import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
 import { mockedUser, mockedFlows, mockedRoles } from "utils/mocks";
 import { getPaginatedArray } from "utils/pagination";
-import Flows from "../Flows";
+import Flows from "../../Flows";
 
 const restHandlers = [
   rest.get(
