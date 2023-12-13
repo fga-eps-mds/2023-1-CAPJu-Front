@@ -20,7 +20,7 @@ import { PiListMagnifyingGlassDuotone } from "react-icons/pi";
 import { FaUser, FaRegEdit } from "react-icons/fa";
 import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 import { HeaderLink } from "./HeaderLink";
@@ -63,6 +63,18 @@ export function Header() {
   );
   const [tabIndex, setTabIndex] = useState<number | undefined>(currentTabIndex);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const matchingTab = tabs.find((tab) =>
+      location.pathname.includes(tab.path)
+    );
+    if (matchingTab) {
+      setTabIndex(tabs.indexOf(matchingTab));
+    } else {
+      setTabIndex(0);
+      navigate(tabs[0].path);
+    }
+  }, []);
 
   return (
     <Flex

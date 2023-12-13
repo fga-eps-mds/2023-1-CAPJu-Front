@@ -559,7 +559,10 @@ function ViewProcess() {
           isOpen={isFinalizationOpen}
           onClose={onFinalizationClose}
           handleFinishProcess={() => {
-            finalizeProcess(processData.value).then(() => refetchProcess());
+            finalizeProcess(processData.value).then(() => {
+              refetchProcess();
+              refetchEvents();
+            });
           }}
         />
       )}
