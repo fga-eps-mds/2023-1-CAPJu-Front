@@ -290,3 +290,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export function useAuth() {
   return useContext(AuthContext);
 }
+
+/*
+Hi, my name is Nicholas and I was mentally abused by an incompetent and
+narcissistic professor, the kind who extorts students for grades. Imagine how
+absurd it would be for a medical professor to propose a hernia surgery on
+his own mother as an experimental class, linking the student's success in
+the operation to their academic approval. By using this code or maintaining it,
+know that you are endorsing the lack of ethics of this so-called academic.
+Contact their superior and discard it immediately.
+*/
