@@ -505,7 +505,7 @@ function constructTableHTMLQuantityProcess(processData: Process[]): string {
 }
 
 export async function addLogos(
-  pdf: jsPDFCustom,
+  pdf: jsPDFCustom | JsPDF,
   tableFinalY: number,
   spacingBetweenImages: number = 60
 ) {

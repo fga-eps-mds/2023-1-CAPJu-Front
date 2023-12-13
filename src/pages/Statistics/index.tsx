@@ -141,7 +141,7 @@ export default function Statistics() {
     const elem = document.querySelector<HTMLElement>("#chart-etapas-fluxo");
 
     if (elem) {
-      html2canvas(elem).then((canvas) => {
+      html2canvas(elem).then(async (canvas) => {
         const dataURI = canvas.toDataURL("image/jpeg");
 
         canvas.remove();
@@ -153,6 +153,7 @@ export default function Statistics() {
         });
 
         doc.addImage(dataURI, "JPEG", 35, 50, 520, 0);
+
         doc.save(`Quantidade_Processos_Etapa`);
       });
     }
