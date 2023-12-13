@@ -417,7 +417,6 @@ export default function Statistics() {
                           setShowProcesses(false);
                           setOpenChart(true);
                         }
-                        // handleConfirmSelectionFlow();
                         updateFlowName();
                       }}
                     >

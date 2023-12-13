@@ -41,8 +41,6 @@ export const downloadProcess = async (
 
     pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
 
-    const spacingBetweenImages = 60;
-
     let tableFinalY = (pdf as any).lastAutoTable.finalY;
 
     if (tableFinalY > 267) {
@@ -50,23 +48,7 @@ export const downloadProcess = async (
       tableFinalY = 20;
     }
 
-    pdf.addImage(
-      await imgToBase64(assets.logoUnB),
-      "png",
-      30 + spacingBetweenImages,
-      tableFinalY + 10,
-      20,
-      20
-    );
-
-    pdf.addImage(
-      await imgToBase64(assets.justicaFederal),
-      "png",
-      50 + 2 * spacingBetweenImages,
-      tableFinalY + 10,
-      20,
-      15
-    );
+    await addLogos(pdf, tableFinalY);
 
     pdf.save(`Quantidade_Processos_Etapas`);
 
@@ -108,8 +90,6 @@ export const downloadProcessInDue = async (
 
     pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
 
-    const spacingBetweenImages = 60;
-
     let tableFinalY = (pdf as any).lastAutoTable.finalY;
 
     if (tableFinalY > 267) {
@@ -117,23 +97,7 @@ export const downloadProcessInDue = async (
       tableFinalY = 20;
     }
 
-    pdf.addImage(
-      await imgToBase64(assets.logoUnB),
-      "png",
-      30 + spacingBetweenImages,
-      tableFinalY + 10,
-      20,
-      20
-    );
-
-    pdf.addImage(
-      await imgToBase64(assets.justicaFederal),
-      "png",
-      50 + 2 * spacingBetweenImages,
-      tableFinalY + 10,
-      20,
-      15
-    );
+    await addLogos(pdf, tableFinalY);
 
     pdf.save(`Processos_Filtrados_Data_Vencimento`);
 
@@ -189,8 +153,6 @@ export const downloadPDFQuantityProcesses = async (
 
     pdf.autoTable({ html: "#processData", useCss: true, startY: currentY });
 
-    const spacingBetweenImages = 60;
-
     let tableFinalY = (pdf as any).lastAutoTable.finalY;
 
     if (tableFinalY > 267) {
@@ -213,23 +175,7 @@ export const downloadPDFQuantityProcesses = async (
       });
     }
 
-    pdf.addImage(
-      await imgToBase64(assets.logoUnB),
-      "png",
-      spacingBetweenImages - 50,
-      270,
-      20,
-      20
-    );
-
-    pdf.addImage(
-      await imgToBase64(assets.justicaFederal),
-      "png",
-      60 + 2 * spacingBetweenImages,
-      270,
-      20,
-      15
-    );
+    await addLogos(pdf, tableFinalY);
 
     pdf.save(`Quantidade_Processos_Concluidos_Interrompidos`);
 
@@ -301,8 +247,8 @@ export function constructTableHTML(processData: Process[]): string {
     tableHTML += `
           <tr>
               <td>${record}</td>
-              <td>${nickname}</td>
-              <td>${etapa}</td>
+              <td>${nickname || "-"}</td>
+              <td>${etapa || "-"}</td>
           </tr>
       `;
   });
@@ -452,7 +398,13 @@ function constructTableHTMLDueDate(processData: Process[]): string {
   `;
 
   processData.forEach((event) => {
-    const { record, nickname, nameFlow, nameStage, dueDate } = event;
+    const {
+      record,
+      nickname = "-",
+      nameFlow,
+      nameStage = "-",
+      dueDate,
+    } = event;
     tableHTML += `
           <tr>
               <td>${record}</td>
@@ -550,6 +502,39 @@ function constructTableHTMLQuantityProcess(processData: Process[]): string {
   `;
 
   return tableHTML;
+}
+
+export async function addLogos(
+  pdf: jsPDFCustom,
+  tableFinalY: number,
+  spacingBetweenImages: number = 60
+) {
+  pdf.addImage(
+    await imgToBase64(assets.logoCAPJU),
+    "png",
+    15,
+    tableFinalY + 10,
+    20,
+    12
+  );
+
+  pdf.addImage(
+    await imgToBase64(assets.logoUnB),
+    "png",
+    30 + spacingBetweenImages,
+    tableFinalY + 10,
+    20,
+    20
+  );
+
+  pdf.addImage(
+    await imgToBase64(assets.justicaFederal),
+    "png",
+    50 + 2 * spacingBetweenImages,
+    tableFinalY + 10,
+    20,
+    15
+  );
 }
 
 export function imgToBase64(src: string): Promise<string> {
