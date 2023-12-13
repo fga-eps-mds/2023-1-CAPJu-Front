@@ -176,8 +176,8 @@ export default function FilteringProcesses() {
       filter,
       false,
       selectedStatus === "" ? ["archived", "finished"] : [selectedStatus],
-      fromDate === "" ? undefined : fromDate,
-      toDate === "" ? undefined : toDate
+      fromDate === "" ? twoYearsAgoDate : fromDate,
+      toDate === "" ? today : toDate
     );
 
     if (response.type === "success") {
