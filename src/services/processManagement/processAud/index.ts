@@ -1,11 +1,10 @@
 import { jsPDF } from "jspdf";
-import { v4 as uuidv4 } from "uuid";
 import { api } from "../../api";
 import "jspdf-autotable";
 import { formatDateTimeToBrazilian } from "../../../utils/dates";
 import { getUserInfo } from "../../../utils/user";
 import { downloadFileFromBuffer } from "../../../utils/file";
-import { registerEvent } from "../../documentAud";
+import { addLogos } from "../../../utils/pdf";
 
 const processAudUrl = "processAud";
 
@@ -41,98 +40,63 @@ export const downloadEventsPdf = async (processInfo: {
   record: any;
   idProcess: number;
 }): Promise<void> => {
-  const { record, idProcess } = processInfo;
-
-  const response = await api.processManagement.get(
-    `/${processAudUrl}/findAll`,
-    {
-      params: {
-        idProcess,
-      },
-    }
-  );
-
-  const processEvents = response.data;
-
-  const tableHTML = constructTableHTML(processEvents);
-
   const container = document.createElement("div");
-  container.style.display = "none";
-  container.innerHTML = tableHTML;
-  document.body.appendChild(container);
 
-  // eslint-disable-next-line new-cap
-  const pdf = new jsPDF();
+  try {
+    const { record, idProcess } = processInfo;
 
-  const uuid = uuidv4();
+    const response = await api.processManagement.get(
+      `/${processAudUrl}/findAll`,
+      {
+        params: {
+          idProcess,
+        },
+      }
+    );
 
-  const emitedAt = new Date();
+    const processEvents = response.data;
 
-  const emissionDate = formatDateTimeToBrazilian(emitedAt);
+    const tableHTML = constructTableHTML(processEvents);
 
-  pdf.setFontSize(12);
-  pdf.text("Histórico de eventos", 105, 20, { align: "center" });
-  pdf.text(`Processo: ${record}`, 15, 30);
-  pdf.text(`Data emissão: ${emissionDate}`, 15, 40);
-  pdf.text(
-    `Emissor: ${getUserInfo().fullName} (${(getUserInfo().role as any).name})`,
-    15,
-    50
-  );
-  pdf.text(`Documento: ${uuid}`, 15, 60);
+    container.style.display = "none";
+    container.innerHTML = tableHTML;
+    document.body.appendChild(container);
 
-  // @ts-ignore
-  pdf.autoTable({ html: "#processEvents", useCss: true, startY: 70 });
+    // eslint-disable-next-line new-cap
+    const pdf = new jsPDF();
 
-  const spacingBetweenImages = 60;
+    const emitedAt = new Date();
 
-  let tableFinalY = (pdf as any).lastAutoTable.finalY;
+    const emissionDate = formatDateTimeToBrazilian(emitedAt);
 
-  if (tableFinalY > 267) {
-    pdf.addPage();
-    tableFinalY = 20;
-  }
+    pdf.setFontSize(12);
+    pdf.text("Histórico de eventos", 105, 20, { align: "center" });
+    pdf.text(`Processo: ${record}`, 15, 30);
+    pdf.text(`Data emissão: ${emissionDate}`, 15, 40);
+    pdf.text(
+      `Emissor: ${getUserInfo().fullName} (${
+        (getUserInfo().role as any).name
+      })`,
+      15,
+      50
+    );
 
-  pdf.addImage(
-    await imgToBase64("/src/images/logo.png"),
-    "png",
-    15,
-    tableFinalY + 10,
-    20,
-    12
-  );
-  pdf.addImage(
-    await imgToBase64("/src/images/UnB.png"),
-    "png",
-    30 + spacingBetweenImages,
-    tableFinalY + 10,
-    20,
-    20
-  );
-  pdf.addImage(
-    await imgToBase64("/src/images/justica_federal.png"),
-    "png",
-    50 + 2 * spacingBetweenImages,
-    tableFinalY + 10,
-    20,
-    15
-  );
+    // @ts-ignore
+    pdf.autoTable({ html: "#processEvents", useCss: true, startY: 60 });
 
-  const result = await registerEvent({
-    emitedBy: getUserInfo().cpf,
-    emitedAt,
-    uuid,
-    type: "PROCESS_EVENTS_PDF",
-  });
+    let tableFinalY = (pdf as any).lastAutoTable.finalY;
 
-  if (result.type !== "success") {
+    if (tableFinalY > 267) {
+      pdf.addPage();
+      tableFinalY = 20;
+    }
+
+    await addLogos(pdf, tableFinalY);
+
+    pdf.save(`eventosProcesso${record}.pdf`);
+  } finally {
     document.body.removeChild(container);
-    throw new Error((result as any).value);
   }
-
-  pdf.save(`eventosProcesso${record}.pdf`);
-
-  document.body.removeChild(container);
 };
 
 export const downloadEventsXlsx = async (
@@ -221,22 +185,4 @@ function constructTableHTML(processEvents: any[]): string {
     `;
 
   return tableHTML;
-}
-
-function imgToBase64(src: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "Anonymous";
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      canvas.height = img.naturalHeight;
-      canvas.width = img.naturalWidth;
-      ctx!.drawImage(img, 0, 0);
-      const base64String = canvas.toDataURL();
-      resolve(base64String);
-    };
-    img.onerror = reject;
-    img.src = src;
-  });
 }

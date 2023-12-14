@@ -29,4 +29,10 @@ export const tabs = [
     path: "/estatisticas",
     action: "see-statistics",
   },
+  {
+    label: "Sessões",
+    pathIndex: "/sesssoes-usuarios",
+    path: "/sesssoes-usuarios",
+    action: "manage-user-sessions",
+  },
 ];

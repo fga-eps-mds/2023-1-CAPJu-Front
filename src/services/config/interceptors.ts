@@ -7,6 +7,9 @@ export function authorization(
 
   if (!bearerTokenWithQuotes) return config;
 
+  if (config.url !== "/logout/userRequested")
+    localStorage.setItem("@CAPJu:check_session_flag", "true");
+
   const bearerToken = JSON.parse(bearerTokenWithQuotes);
 
   const authConfig = config;
@@ -19,8 +22,6 @@ export const errorResponseHandler = (
   error: AxiosError<ApiResponse<string>>
 ) => {
   if (error?.response) {
-    console.log("AXIOS INTERCEPTED ERROR: ", error.response);
-
     if (typeof error?.response?.data === "string") {
       return Promise.reject(new Error(error.response.data));
     }

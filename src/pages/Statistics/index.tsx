@@ -28,14 +28,16 @@ import CustomAccordion from "components/CustomAccordion";
 import { generateColorTransition } from "utils/geradorCor";
 import { isActionAllowedToUser } from "utils/permissions";
 import html2canvas from "html2canvas";
-import JsPDF from "jspdf";
-import { downloadProcess } from "utils/pdf";
+import { jsPDF } from "jspdf";
+import { addLogos, downloadProcess } from "utils/pdf";
 import ExportExcel from "components/ExportExcel";
 import { Pagination } from "components/Pagination";
 import StatsTimeStage from "components/StatsTimeStage";
 import BarChart from "./Graphic/BarChart";
 import StepDeadlineReports from "./StepDeadlineReports";
 import FilteringProcesses from "./FilteringProcesses";
+import { formatDateTimeToBrazilian } from "../../utils/dates";
+import { getUserInfo } from "../../utils/user";
 
 export default function Statistics() {
   const { getUserData } = useAuth();
@@ -141,19 +143,36 @@ export default function Statistics() {
     const elem = document.querySelector<HTMLElement>("#chart-etapas-fluxo");
 
     if (elem) {
-      html2canvas(elem).then((canvas) => {
+      html2canvas(elem).then(async (canvas) => {
         const dataURI = canvas.toDataURL("image/jpeg");
 
         canvas.remove();
 
-        const doc = new JsPDF({
-          orientation: "p",
-          format: "a4",
-          unit: "pt",
-        });
+        // eslint-disable-next-line new-cap
+        const pdf = new jsPDF();
 
-        doc.addImage(dataURI, "JPEG", 35, 50, 520, 0);
-        doc.save(`Quantidade_Processos_Etapa`);
+        pdf.setFontSize(12);
+        pdf.text("Quantidade de processos por etapa", 105, 20, {
+          align: "center",
+        });
+        pdf.text(
+          `Data emissão: ${formatDateTimeToBrazilian(new Date())}`,
+          15,
+          40
+        );
+        pdf.text(
+          `Emissor: ${getUserInfo().fullName} (${
+            (getUserInfo().role as any).name
+          })`,
+          15,
+          50
+        );
+
+        pdf.addImage(dataURI, "JPEG", 35, 55, 150, 0);
+
+        await addLogos(pdf, 130);
+
+        pdf.save(`Quantidade_Processos_Etapa`);
       });
     }
   };
@@ -379,7 +398,7 @@ export default function Statistics() {
   };
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4" mt="50px">
+      <Flex w="90%" maxW={1140} flexDir="column" gap="3" mb="4" mt="50px">
         <Flex w="50%" mb="2" justifyContent="start">
           <Text fontSize="25px" fontWeight="semibold">
             Estatísticas
@@ -417,7 +436,6 @@ export default function Statistics() {
                           setShowProcesses(false);
                           setOpenChart(true);
                         }
-                        // handleConfirmSelectionFlow();
                         updateFlowName();
                       }}
                     >

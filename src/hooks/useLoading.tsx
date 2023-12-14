@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, ReactNode } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 
 type LoadingContextType = {
   isLoading: boolean;
@@ -28,7 +28,5 @@ export const LoadingProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export function useLoading() {
-  const context = useContext(LoadingContext);
-
-  return context;
+  return useContext(LoadingContext);
 }

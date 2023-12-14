@@ -114,6 +114,14 @@ declare global {
     dataResultingFile?: Blob;
   };
 
+  type UserSession = {
+    id: number;
+    userCPF: string;
+    loginTimestamp: Date;
+    stationIp: string;
+    userInfo?: User;
+  };
+
   type ProcessesFileItem = {
     idProcessesFileItem: number;
     idProcessesFile: number;

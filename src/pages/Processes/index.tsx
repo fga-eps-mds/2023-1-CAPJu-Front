@@ -183,7 +183,7 @@ function Processes() {
               tableActions,
               actionsProps: {
                 process: curr,
-                pathname: `/processos/${curr.record}`,
+                pathname: `/processos/${curr.idProcess}`,
                 state: {
                   process: curr,
                   ...(state || {}),
@@ -400,6 +400,7 @@ function Processes() {
                   border="30px"
                 />
                 <Image
+                  zIndex="3"
                   src={line52}
                   marginLeft="0%"
                   width="3%"

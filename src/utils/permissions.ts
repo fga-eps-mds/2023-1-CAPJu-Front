@@ -127,4 +127,8 @@ export const actionsForm = [
     label: "Gerenciar Permissões dos Perfis",
     value: "manage-profiles",
   },
+  {
+    label: "Gerenciar Sessões Usuários",
+    value: "manage-user-sessions",
+  },
 ];

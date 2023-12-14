@@ -117,8 +117,8 @@ export default function StepDeadlineReports() {
     paramCurrentPage: number
   ) => {
     const res = await getProcessesByDueDate(paramMinDate, paramMaxDate, {
-      offset: paramCurrentPage * 5,
-      limit: 5,
+      offset: paramCurrentPage * 10,
+      limit: 10,
     });
 
     if (res.type === "error") throw new Error(res.error.message);
@@ -345,7 +345,7 @@ export default function StepDeadlineReports() {
     <Flex
       justifyContent="flex-start"
       w="100%"
-      maxW={1120}
+      maxW={1140}
       flexDir="column"
       gap="3"
       mb="4"

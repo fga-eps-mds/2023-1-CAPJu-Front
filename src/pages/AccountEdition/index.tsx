@@ -16,8 +16,8 @@ import {
   updateUserPassword,
   updateUser,
   updateUserFullName,
-  signIn,
   showUserByCpf,
+  checkPasswordValidity,
 } from "services/user";
 import { PrivateLayout } from "layouts/Private";
 import { useAuth } from "hooks/useAuth";
@@ -103,7 +103,7 @@ function AccountEdition() {
       }
     }
 
-    const isOldPasswordCorrect = await signIn({
+    const isOldPasswordCorrect = await checkPasswordValidity({
       cpf: user.cpf,
       password: data.oldPassword,
     });

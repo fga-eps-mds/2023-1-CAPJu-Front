@@ -9,6 +9,7 @@ import {
   ModalFooter,
   chakra,
   Button,
+  Spacer,
   Flex,
   useToast,
 } from "@chakra-ui/react";
@@ -38,11 +39,13 @@ const validationSchema = yup.object({
         const allowedTypes = [
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "application/vnd.ms-excel",
+          "text/csv",
+          "application/csv",
         ];
         return allowedTypes.includes(value.type);
       }
     )
-    .required("Insira a planilha"),
+    .required("Insira o arquivo"),
 });
 
 interface ImportProcessesModalProps {
@@ -135,8 +138,12 @@ export function ImportProcessesModal({
             />
           </ModalBody>
           <ModalFooter>
+            <Spacer />
             <Flex gap="2">
-              <Button colorScheme="green" type="submit">
+              <Button variant="ghost" onClick={onClose}>
+                Cancelar
+              </Button>
+              <Button colorScheme="blue" type="submit">
                 Importar
               </Button>
             </Flex>

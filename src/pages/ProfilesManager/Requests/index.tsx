@@ -33,8 +33,8 @@ export function Requests() {
     queryFn: async () => {
       const res = await getUsersRequests(
         {
-          offset: 5 * currentPage,
-          limit: 5,
+          offset: 10 * currentPage,
+          limit: 10,
         },
         filter
       );
@@ -200,7 +200,7 @@ export function Requests() {
     <>
       <Flex
         w="90%"
-        maxW={1120}
+        maxW={1140}
         flexDir="column"
         gap="3"
         mb="4"

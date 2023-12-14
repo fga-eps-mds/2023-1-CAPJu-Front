@@ -41,7 +41,7 @@ const InputFile = ({
       allowedFileTypes?.length &&
       !allowedFileTypes.includes(file.type)
     ) {
-      setError("Formato inválido. Insira um .xlsx ou .xls");
+      setError("Formato inválido. Insira um .xls, .xlsx ou .csv");
     }
 
     if (file) {

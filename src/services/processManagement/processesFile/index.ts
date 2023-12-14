@@ -33,14 +33,15 @@ export const importFile = async (data: {
 
 export const findFileById = async (
   idProcessesFile: number,
-  resulting?: boolean
+  resulting: boolean = false,
+  format: string = "xlsx"
 ): Promise<Result<ProcessesFile>> => {
   try {
-    const res = await api.processManagement.get<ProcessesFile>(
-      `/processesFile/findFileById/${idProcessesFile}/${
-        resulting ? "resulting" : "original"
-      }`
-    );
+    const originalQueryParam = resulting ? "false" : "true";
+
+    const url = `/processesFile/findFileById/${idProcessesFile}?original=${originalQueryParam}&format=${format}`;
+
+    const res = await api.processManagement.get<ProcessesFile>(url);
 
     return {
       type: "success",
@@ -76,15 +77,18 @@ export const findAllPaged = async (
 
 export const findAllItemsPaged = async (
   idProcessesFile: number,
+  filter: string,
   pagination?: Pagination
 ): Promise<Result<any>> => {
   try {
     const res = await api.processManagement.get<ProcessesFileItem[]>(
-      `/${processFileUrl}/findAllItemsPaged?idProcessesFile=${idProcessesFile}`,
+      `/${processFileUrl}/findAllItemsPaged`,
       {
         params: {
           offset: pagination?.offset ?? 0,
           limit: pagination?.limit,
+          ...(filter?.trim() && { filter: filter.trim() }),
+          idProcessesFile,
         },
       }
     );

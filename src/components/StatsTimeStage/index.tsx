@@ -13,7 +13,6 @@ import {
   Button,
   useToast,
 } from "@chakra-ui/react";
-// import { useState} from "react";
 import { useState, useEffect } from "react";
 import { useQuery } from "react-query";
 import "jspdf-autotable";
@@ -21,8 +20,7 @@ import { UserOptions } from "jspdf-autotable";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { formatDateTimeToBrazilian } from "utils/dates";
-import { constructTableHTMLData, imgToBase64 } from "utils/pdf";
-import assets from "utils/assets";
+import { addLogos, constructTableHTMLData } from "utils/pdf";
 import { Select } from "../FormFields";
 import {
   getFlows,
@@ -149,7 +147,6 @@ export default function StatsTimeStage() {
         startY: currentY,
       });
 
-      const spacingBetweenImages = 60;
       let tableFinalY = (pdf as any).lastAutoTable.finalY;
 
       if (tableFinalY + 100 > 267) {
@@ -172,22 +169,7 @@ export default function StatsTimeStage() {
         canvas.remove();
       });
 
-      pdf.addImage(
-        await imgToBase64(assets.logoUnB),
-        "png",
-        spacingBetweenImages - 50,
-        270,
-        20,
-        20
-      );
-      pdf.addImage(
-        await imgToBase64(assets.justicaFederal),
-        "png",
-        60 + 2 * spacingBetweenImages,
-        270,
-        20,
-        15
-      );
+      await addLogos(pdf, tableFinalY + 80);
 
       pdf.save(`Tempo_Medio_Etapas.pdf`);
 
@@ -248,7 +230,6 @@ export default function StatsTimeStage() {
                           : []
                       }
                     />
-
                     <Button
                       aria-label="Confirmar"
                       colorScheme="green"

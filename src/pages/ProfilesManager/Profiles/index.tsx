@@ -34,8 +34,8 @@ export function Profiles() {
     queryFn: async () => {
       const res = await getAcceptedUsers(
         {
-          offset: currentPage * 5,
-          limit: 5,
+          offset: currentPage * 10,
+          limit: 10,
         },
         filter
       );
@@ -205,7 +205,7 @@ export function Profiles() {
 
   return (
     <>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4" mt="50px">
+      <Flex w="90%" maxW={1140} flexDir="column" gap="3" mb="4" mt="50px">
         <Flex w="50%" mb="3" justifyContent="start">
           <Text fontSize="25px" fontWeight="semibold">
             Perfil de acesso

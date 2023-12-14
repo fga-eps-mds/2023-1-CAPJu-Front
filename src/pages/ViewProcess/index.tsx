@@ -1,4 +1,4 @@
-import { Flex, Text, Button, useDisclosure, useToast } from "@chakra-ui/react";
+import { Button, Flex, Text, useDisclosure, useToast } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/icons";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
@@ -6,7 +6,7 @@ import { FiArchive, FiSkipBack, FiSkipForward } from "react-icons/fi";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useStatisticsFilters } from "hooks/useStatisticsFilters";
-import { FaFilePdf, FaFileExcel } from "react-icons/fa";
+import { FaFileExcel, FaFilePdf } from "react-icons/fa";
 
 import { PrivateLayout } from "layouts/Private";
 import { getFlowById } from "services/processManagement/flows";
@@ -42,6 +42,7 @@ import { formatDateTimeToBrazilian } from "../../utils/dates";
 function ViewProcess() {
   const { setContinuePage } = useStatisticsFilters();
   const [action, setAction] = useState<Boolean | undefined>();
+  const [processRaw, setProcessRaw] = useState<Process>();
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -58,7 +59,11 @@ function ViewProcess() {
   } = useQuery({
     queryKey: ["process", params.idProcess],
     queryFn: async () => {
-      return getProcessById(params.idProcess || (process.idProcess as number));
+      const p = await getProcessById(
+        params.idProcess || (process.idProcess as number)
+      );
+      setProcessRaw(p.value);
+      return p;
     },
     refetchOnWindowFocus: false,
   });
@@ -142,10 +147,7 @@ function ViewProcess() {
   });
   const { data: priorityData, isFetched: isPriorityFetched } = useQuery({
     queryKey: ["priority", process?.idPriority],
-    queryFn: async () => {
-      const res = await getPriorities(process?.idPriority);
-      return res;
-    },
+    queryFn: () => getPriorities(process?.idPriority),
     refetchOnWindowFocus: false,
   });
   const stages = useMemo<Stage[]>(() => {
@@ -557,7 +559,10 @@ function ViewProcess() {
           isOpen={isFinalizationOpen}
           onClose={onFinalizationClose}
           handleFinishProcess={() => {
-            finalizeProcess(processData.value).then(() => refetchProcess());
+            finalizeProcess(processData.value).then(() => {
+              refetchProcess();
+              refetchEvents();
+            });
           }}
         />
       )}
@@ -599,7 +604,7 @@ function ViewProcess() {
               onClick={(event) => {
                 event.preventDefault();
                 downloadEventsXlsx(
-                  process.record as string,
+                  processRaw?.record as string,
                   process.idProcess
                 ).finally();
               }}
@@ -607,12 +612,13 @@ function ViewProcess() {
               <Icon as={FaFileExcel} boxSize={4} />
             </Button>
             <Button
+              title="Baixar pdf"
               colorScheme="green"
               onClick={(event) => {
                 event.preventDefault();
                 downloadEventsPdf({
                   idProcess: process.idProcess,
-                  record: process.record,
+                  record: processRaw?.record,
                 }).catch((r) =>
                   toast({
                     description: r.message,

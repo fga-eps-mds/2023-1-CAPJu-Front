@@ -1,4 +1,4 @@
-import { useState, ReactNode, useEffect } from "react";
+import { useState, ReactNode } from "react";
 import {
   Table,
   Tbody,
@@ -32,6 +32,7 @@ export type DataTableProps<Data extends object> = {
   size?: string | string[];
   emptyTableMessage?: string;
   rawData?: any;
+  style?: any;
 };
 
 export function DataTable<Data extends object>({
@@ -40,10 +41,11 @@ export function DataTable<Data extends object>({
   isDataFetching = false,
   skeletonHeight = 272,
   width = "100%",
-  maxWidth = 1120,
+  maxWidth = 1140,
   size = ["sm", "md"],
   emptyTableMessage = "Esta tabela está vazia no momento.",
   rawData,
+  style = {},
 }: DataTableProps<Data>) {
   const navigate = useNavigate();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -58,14 +60,17 @@ export function DataTable<Data extends object>({
     },
   });
 
-  useEffect(() => {
-    console.log("tableColumns", data[0]);
-  }, [data]);
-
   return isDataFetching ? (
     <Skeleton w={width} maxW={maxWidth} h={skeletonHeight} />
   ) : (
-    <Table bg="white" w={width} maxW={maxWidth} borderRadius="4" size={size}>
+    <Table
+      bg="white"
+      w={width}
+      maxW={maxWidth}
+      borderRadius="4"
+      size={size}
+      style={{ ...style }}
+    >
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>
@@ -148,7 +153,7 @@ export function DataTable<Data extends object>({
                           return (
                             <ActionButton
                               key={actionItem.label}
-                              disabled={disabled}
+                              disabled={!!disabled}
                               {...actionItem}
                               action={() => {
                                 if (actionItem.action)
