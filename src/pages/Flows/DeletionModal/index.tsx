@@ -36,7 +36,15 @@ export function DeletionModal({
 
     if (res.type === "success") {
       refetchFlows();
-      window.location.href = `${window.location.pathname}?deleteSuccess=1`;
+      toast({
+        id: "delete-flow-success",
+        title: "Sucesso!",
+        description: "Fluxo excluído com sucesso!",
+        status: "success",
+      });
+      setTimeout(() => {
+        window.location.href = `${window.location.pathname}?deleteSuccess=1`;
+      }, 500);
     } else {
       toast({
         id: "delete-flow-error",
