@@ -183,7 +183,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         status: "error",
         isClosable: true,
       });
-      setTimeout(() => window.location.reload(), 500);
+      setTimeout(() => window.location.reload(), 1000);
     }
   }
 

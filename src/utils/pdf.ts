@@ -311,9 +311,9 @@ export function constructTableHTMLData(processData: Data[]): string {
               </style>
               <thead>
                   <tr>
-                      <th>Registro</th>
-                      <th>Apelido</th>
                       <th>Etapa</th>
+                      <th>Tempo Médio</th>
+                      <th>Tempo Previsto</th>
                   </tr>
               </thead>
               <tbody>
@@ -323,8 +323,8 @@ export function constructTableHTMLData(processData: Data[]): string {
     tableHTML += `
           <tr>
               <td>${event.Etapa}</td>
-              <td>${event["Tempo Médio"]}</td>
-              <td>${event["Tempo Previsto"]}</td>
+              <td>${event["Tempo Médio"] || "-"}</td>
+              <td>${event["Tempo Previsto"] || "-"}</td>
           </tr>
       `;
   });

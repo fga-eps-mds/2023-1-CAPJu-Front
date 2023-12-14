@@ -16,6 +16,24 @@ export const signIn = async (credentials: {
   }
 };
 
+export const checkPasswordValidity = async (credentials: {
+  cpf: string;
+  password: string;
+}): Promise<Result<string>> => {
+  try {
+    const res = await api.user.post<string>(
+      "/checkPasswordValidity",
+      credentials
+    );
+
+    return { type: "success", value: res.data };
+  } catch (error) {
+    const E: Error = error as Error;
+    console.log(error);
+    return { type: "error", error: E, value: undefined };
+  }
+};
+
 export const signUp = async (credentials: {
   fullName: string;
   cpf: string;

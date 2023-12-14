@@ -19,8 +19,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import { Input } from "components/FormFields";
 import { useLoading } from "hooks/useLoading";
-import { Icon } from "@chakra-ui/icons";
-import { FaFileCsv, FaFileExcel } from "react-icons/fa";
 import InputFile from "../../../components/FormFields/InputFile/InputFile";
 import { importFile } from "../../../services/processManagement/processesFile";
 
@@ -140,32 +138,6 @@ export function ImportProcessesModal({
             />
           </ModalBody>
           <ModalFooter>
-            <a
-              href="/files/modeloImportacaoCapju.xlsx"
-              download
-              style={{ textDecoration: "none" }}
-            >
-              <Button
-                variant="outline"
-                colorScheme="black"
-                title="Baixar modelo excel"
-              >
-                <Icon as={FaFileExcel} boxSize={5} />{" "}
-              </Button>
-            </a>
-            <a
-              href="/files/modeloImportacaoCapju.csv"
-              download
-              style={{ textDecoration: "none", marginLeft: "10px" }}
-            >
-              <Button
-                variant="outline"
-                colorScheme="black"
-                title="Baixar modelo csv"
-              >
-                <Icon as={FaFileCsv} boxSize={5} />{" "}
-              </Button>
-            </a>
             <Spacer />
             <Flex gap="2">
               <Button variant="ghost" onClick={onClose}>

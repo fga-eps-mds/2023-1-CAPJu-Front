@@ -30,23 +30,6 @@ export const tabs = [
     action: "see-statistics",
   },
   {
-    label: "Cadastro",
-    pathIndex: "/acessos",
-    path: "/acessos",
-    action: "see-request",
-  },
-  {
-    label: "Perfis e permissões",
-    pathIndex: "/perfis",
-    path: "/perfis",
-    action: "manage-profiles",
-  },
-  {
-    label: "Editar Conta",
-    pathIndex: "/editar-conta",
-    path: "/editar-conta",
-  },
-  {
     label: "Sessões",
     pathIndex: "/sesssoes-usuarios",
     path: "/sesssoes-usuarios",

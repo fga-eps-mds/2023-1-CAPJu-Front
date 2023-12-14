@@ -6,6 +6,7 @@ import {
   FaFileDownload,
   FaFileUpload,
   FaFileExcel,
+  FaFileCsv,
 } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import {
@@ -359,6 +360,39 @@ export default function ProcessesFileComponent() {
                 />{" "}
                 Importar lote
               </Button>
+              <a
+                href="/files/modeloImportacaoCapju.xlsx"
+                download
+                style={{ textDecoration: "none" }}
+              >
+                <Button variant="outline" colorScheme="black">
+                  <Icon
+                    as={FaFileExcel}
+                    boxSize={4}
+                    style={{ marginRight: "8px" }}
+                  />{" "}
+                  Modelo excel
+                </Button>
+              </a>
+              <a
+                href="/files/modeloImportacaoCapju.csv"
+                download
+                style={{ textDecoration: "none" }}
+              >
+                <Button
+                  variant="outline"
+                  colorScheme="black"
+                  style={{ marginLeft: "2px" }}
+                  title="Baixar modelo csv"
+                >
+                  <Icon
+                    as={FaFileCsv}
+                    boxSize={4}
+                    style={{ marginRight: "8px" }}
+                  />{" "}
+                  Modelo csv
+                </Button>
+              </a>
               <chakra.form
                 onSubmit={(e) => {
                   e.preventDefault();
