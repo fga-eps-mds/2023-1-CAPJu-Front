@@ -28,6 +28,7 @@ import { DeletionModal } from "./DeletionModal";
 import { VisualizationItemsModal } from "./VisualizationFileItemsModal";
 import { ImportProcessesModal } from "../ImportProcessesModal";
 import { useAuth } from "../../../hooks/useAuth";
+import template from "../../../utils/templates";
 
 export default function ProcessesFileComponent() {
   const { getUserData } = useAuth();
@@ -293,8 +294,8 @@ export default function ProcessesFileComponent() {
                 Importar lote
               </Button>
               <a
-                href="public/files/modeloImportacaoCapju.xlsx"
-                download
+                href={template.templatexlsx}
+                download="modeloImportacaoCapju.xlsx"
                 style={{ textDecoration: "none" }}
               >
                 <Button variant="outline" colorScheme="black">
