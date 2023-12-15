@@ -19,6 +19,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useQuery } from "react-query";
+import { v4 as uuidv4 } from "uuid";
 import { Pagination } from "../../../components/Pagination";
 import {
   findAllPaged,
@@ -281,7 +282,21 @@ export default function ProcessesFileComponent() {
           name: processesFile.name || processesFile.fileName,
           status: <Text color={status.color}>{status.text}</Text>,
           createdAt: formatDateTimeToBrazilian(processesFile.createdAt),
-          message: <Text align="center">{processesFile.message || "-"}</Text>,
+          message: (
+            <>
+              {processesFile.message ? (
+                processesFile.message.split("\n").map((msg: string) => (
+                  <Text key={uuidv4()} my={15} align="center">
+                    {msg}
+                  </Text>
+                ))
+              ) : (
+                <Text my={15} align="center">
+                  -
+                </Text>
+              )}
+            </>
+          ),
           importedItemsCount: (
             <Text align="center">
               {processesFile.status === "imported"

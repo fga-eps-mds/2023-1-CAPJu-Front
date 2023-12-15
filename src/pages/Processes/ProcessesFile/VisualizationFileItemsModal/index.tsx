@@ -191,11 +191,17 @@ export function VisualizationItemsModal({
           ...processesFileItem,
           message: (
             <>
-              {processesFileItem.message?.split("\n").map((msg) => (
-                <Text key={uuidv4()} my={15}>
-                  {msg}
+              {processesFileItem.message ? (
+                processesFileItem.message.split("\n").map((msg: string) => (
+                  <Text key={uuidv4()} my={15} align="center">
+                    {msg}
+                  </Text>
+                ))
+              ) : (
+                <Text my={15} align="center">
+                  -
                 </Text>
-              ))}
+              )}
             </>
           ),
           status: (
