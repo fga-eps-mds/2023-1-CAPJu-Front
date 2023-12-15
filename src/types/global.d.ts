@@ -111,7 +111,6 @@ declare global {
     message?: string;
     createdAt: Date;
     dataOriginalFile?: Blob;
-    dataResultingFile?: Blob;
   };
 
   type UserSession = {
