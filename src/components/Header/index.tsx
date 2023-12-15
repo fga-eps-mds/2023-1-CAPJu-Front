@@ -153,6 +153,7 @@ export function Header() {
                         onClick={() => {
                           navigate("/acessos");
                           setIsOpen(false);
+                          setTabIndex(-1);
                         }}
                         leftIcon={<FaUser color="black" />}
                         justifyContent="flex-start"
@@ -172,6 +173,7 @@ export function Header() {
                         onClick={() => {
                           navigate("/perfis");
                           setIsOpen(false);
+                          setTabIndex(-1);
                         }}
                         leftIcon={
                           <PiListMagnifyingGlassDuotone color="black" />
@@ -194,6 +196,7 @@ export function Header() {
                         onClick={() => {
                           navigate("/editar-conta");
                           setIsOpen(false);
+                          setTabIndex(-1);
                         }}
                         justifyContent="flex-start"
                       >
@@ -212,6 +215,7 @@ export function Header() {
                         onClick={() => {
                           navigate("/contribuidores");
                           setIsOpen(false);
+                          setTabIndex(-1);
                         }}
                         leftIcon={
                           <IoIosInformationCircleOutline color="black" />
@@ -236,6 +240,7 @@ export function Header() {
                           handleLogout();
                           navigate("/");
                           setIsOpen(false);
+                          setTabIndex(-1);
                         }}
                       >
                         <Flex alignItems="center">

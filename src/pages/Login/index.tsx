@@ -8,6 +8,9 @@ import {
   useToast,
   Text,
   Link,
+  InputGroup,
+  InputRightElement,
+  IconButton,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -17,6 +20,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
 import { Input } from "components/FormFields";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useState } from "react";
 
 type FormValues = {
   cpf: string;
@@ -32,6 +37,7 @@ const validationSchema = yup.object({
 });
 
 function Login() {
+  const [showPassword, setShowPassword] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
   const { handleLogin } = useAuth();
@@ -74,6 +80,10 @@ function Login() {
     }
   });
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <Flex flex="1" alignItems="center" justifyContent="center" w="100%">
       <Card p={["10", "20"]} w="90%" maxW="454" my="16">
@@ -107,13 +117,25 @@ function Login() {
               errors={errors.cpf}
               {...register("cpf")}
             />
-            <Input
-              type="password"
-              label="Senha"
-              placeholder="********"
-              errors={errors.password}
-              {...register("password")}
-            />
+            <InputGroup>
+              <Input
+                type={showPassword ? "text" : "password"}
+                label="Senha"
+                placeholder="********"
+                errors={errors.password}
+                {...register("password")}
+              />
+              <InputRightElement>
+                <IconButton
+                  onClick={togglePasswordVisibility}
+                  aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+                  colorScheme="blue"
+                  variant="ghost"
+                  top="8"
+                  icon={showPassword ? <FaEyeSlash /> : <FaEye />}
+                />
+              </InputRightElement>
+            </InputGroup>
             <Button colorScheme="green" w="100%" type="submit">
               Entrar
             </Button>
