@@ -47,7 +47,7 @@ const validationSchema = yup.object({
     .required("Preencha seu nome")
     .matches(
       /\b[A-Za-zÀ-ú][A-Za-zÀ-ú]+,?\s[A-Za-zÀ-ú][A-Za-zÀ-ú]{2,19}\b/gi,
-      "Nome inválido"
+      "Nome inválido - Necessário nome e sobrenome"
     ),
   cpf: yup
     .string()
