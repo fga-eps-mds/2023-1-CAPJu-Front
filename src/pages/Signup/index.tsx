@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Flex,
   Card,
@@ -11,6 +11,9 @@ import {
   AlertIcon,
   Alert,
   Stack,
+  InputGroup,
+  InputRightElement,
+  IconButton,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -26,6 +29,7 @@ import { Select } from "components/FormFields/Select";
 import { signUp } from "services/user";
 import { getAllRoles } from "services/role";
 import { validateCPF } from "utils/validators";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 type FormValues = {
   fullName: string;
@@ -43,7 +47,7 @@ const validationSchema = yup.object({
     .required("Preencha seu nome")
     .matches(
       /\b[A-Za-zÀ-ú][A-Za-zÀ-ú]+,?\s[A-Za-zÀ-ú][A-Za-zÀ-ú]{2,19}\b/gi,
-      "Nome inválido"
+      "Nome inválido - Necessário nome e sobrenome"
     ),
   cpf: yup
     .string()
@@ -61,12 +65,14 @@ const validationSchema = yup.object({
   passwordConfirmation: yup
     .string()
     .required("Confirme sua senha")
-    .oneOf([yup.ref("password")], "Suas senhas não batem"),
+    .oneOf([yup.ref("password")], "Suas senhas não conferem."),
   idUnit: yup.string().required("Selecione uma unidade"),
   idRole: yup.string().required("Selecione um perfil"),
 });
 
 function Signup() {
+  const [showPasswordValidation, setShowPasswordValidation] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
   const { handleLoading } = useLoading();
@@ -85,6 +91,7 @@ function Signup() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const { data: rolesData } = useQuery({
     queryKey: ["roles"],
@@ -98,6 +105,7 @@ function Signup() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const units = useMemo(() => {
     return (
@@ -108,9 +116,11 @@ function Signup() {
   }, [unitsData]);
   const roles = useMemo(() => {
     return (
-      rolesData?.value?.map((role) => {
-        return { label: role.name, value: role.idRole };
-      }) || []
+      rolesData?.value
+        ?.filter((role: Role) => role.idRole !== 5)
+        ?.map((role: Role) => {
+          return { label: role.name, value: role.idRole };
+        }) || []
     );
   }, [rolesData]);
   const {
@@ -152,6 +162,14 @@ function Signup() {
       isClosable: true,
     });
   });
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const togglePasswordVisibilityValidation = () => {
+    setShowPasswordValidation(!showPasswordValidation);
+  };
 
   useEffect(() => {
     if (unitsData?.type !== "error") return;
@@ -218,31 +236,63 @@ function Signup() {
               placeholder="exemplo@mail.com"
               errors={errors.email}
               {...register("email")}
+              readOnly
+              onFocus={(e) => e.target.removeAttribute("readOnly")}
             />
-            <Input
-              type="password"
-              label="Senha"
-              placeholder="Crie uma senha"
-              errors={errors.password}
-              infoText={
-                <Stack spacing="0">
-                  <Text>Deve conter ao menos um dígito;</Text>
-                  <Text>
-                    Deve conter ao menos uma letra maiúscula e uma letra
-                    minuscula;
-                  </Text>
-                  <Text>Deve conter ao menos 6 caracteres;</Text>
-                </Stack>
-              }
-              {...register("password")}
-            />
-            <Input
-              type="password"
-              label="Confirmação de senha"
-              placeholder="Confirme uma senha"
-              errors={errors.passwordConfirmation}
-              {...register("passwordConfirmation")}
-            />
+            <InputGroup>
+              <Input
+                type={showPassword ? "text" : "password"}
+                label="Senha"
+                placeholder="Crie uma senha"
+                errors={errors.password}
+                readOnly
+                onFocus={(e) => e.target.removeAttribute("readOnly")}
+                infoText={
+                  <Stack spacing="0">
+                    <Text>Deve conter ao menos um dígito;</Text>
+                    <Text>
+                      Deve conter ao menos uma letra maiúscula e uma letra
+                      minuscula;
+                    </Text>
+                    <Text>Deve conter ao menos 6 caracteres;</Text>
+                  </Stack>
+                }
+                {...register("password")}
+              />
+              <InputRightElement>
+                <IconButton
+                  onClick={togglePasswordVisibility}
+                  aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+                  colorScheme="blue"
+                  variant="ghost"
+                  top="8"
+                  icon={showPassword ? <FaEyeSlash /> : <FaEye />}
+                />
+              </InputRightElement>
+            </InputGroup>
+            <InputGroup>
+              <Input
+                type={showPasswordValidation ? "text" : "password"}
+                label="Confirmação de senha"
+                placeholder="Confirme uma senha"
+                errors={errors.passwordConfirmation}
+                {...register("passwordConfirmation")}
+                readOnly
+                onFocus={(e) => e.target.removeAttribute("readOnly")}
+              />
+              <InputRightElement>
+                <IconButton
+                  onClick={togglePasswordVisibilityValidation}
+                  aria-label={
+                    showPasswordValidation ? "Esconder senha" : "Mostrar senha"
+                  }
+                  colorScheme="blue"
+                  variant="ghost"
+                  top="8"
+                  icon={showPasswordValidation ? <FaEyeSlash /> : <FaEye />}
+                />
+              </InputRightElement>
+            </InputGroup>
             <Select
               label="Unidade"
               placeholder="Selecione sua unidade"

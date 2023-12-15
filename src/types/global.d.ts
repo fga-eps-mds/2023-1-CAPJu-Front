@@ -11,9 +11,9 @@ declare global {
     token: string;
     expiresIn: Date;
     idRole: number;
-    role?: string;
+    role?: string | Undefined;
     idUnit: number;
-    unit?: string;
+    unit?: Unit;
     firstLogin?: boolean;
   };
 
@@ -64,6 +64,7 @@ declare global {
   };
 
   type Process = {
+    idProcess: number;
     record: string | ReactNode;
     nickname: string;
     idFlow: number[] | number;
@@ -72,8 +73,64 @@ declare global {
     idUnit: number;
     effectiveDate: string;
     status: string;
+    dueDate?: string;
+    flow?: { idFlow: number; name: string; idUnit: number };
     progress?: Progress[];
     isNextSage?: boolean;
+    nameStage?: string;
+    nameFlow?: string;
+    flow?: Flow;
+  };
+
+  type IFormatedProcess = {
+    Registro: number | ReactNode;
+    Apelido: string;
+    Fluxo: string;
+    Status: string;
+  };
+
+  type IIFormatedProcess = {
+    Registro: number | ReactNode;
+    Apelido: string;
+    Fluxo: string;
+    "Etapa Atual": string | undefined;
+    "Data de Vencimento da Etapa": string | undefined;
+  };
+
+  type IIIFormatedProcess = {
+    Registro: number | ReactNode;
+    Apelido: string;
+  };
+
+  type ProcessesFile = {
+    idProcessesFile: number;
+    status: "waiting" | "inProgress" | "imported" | "error";
+    items?: ProcessesFileItem[];
+    name?: string;
+    fileName: string;
+    message?: string;
+    createdAt: Date;
+    dataOriginalFile?: Blob;
+  };
+
+  type UserSession = {
+    id: number;
+    userCPF: string;
+    loginTimestamp: Date;
+    stationIp: string;
+    userInfo?: User;
+  };
+
+  type ProcessesFileItem = {
+    idProcessesFileItem: number;
+    idProcessesFile: number;
+    status: "error" | "imported" | "manuallyImported";
+    record: string;
+    priority: string;
+    flow: string;
+    nickname: string;
+    message?: string;
+    idProcess?: number;
   };
 
   type Note = {
@@ -82,6 +139,12 @@ declare global {
     record: string;
     idStageA: number;
     idStageB: number;
+  };
+
+  type ProcessEvent = {
+    messages: string[];
+    changedBy: string;
+    changedAt: Date;
   };
 
   type SelectOption = {
@@ -96,12 +159,22 @@ declare global {
   };
 
   type Result<T> = ResultSuccess<T> | ResultError;
-  type ResultSuccess<T> = { type: "success"; value: T; totalPages?: number };
+  type ResultSuccess<T> = {
+    type: "success";
+    value: T;
+    totalPages?: number;
+    totalProcesses?: number;
+    totalArchived?: number;
+    totalFinished?: number;
+  };
   type ResultError = {
     type: "error";
     error: Error;
     value: undefined;
     totalPages?: undefined;
+    totalProcesses?: undefined;
+    totalArchived?: undefined;
+    totalFinished?: undefined;
   };
 
   type RouteObject = import("react-router-dom").RouteObject;
@@ -120,7 +193,16 @@ declare global {
     actionName: string;
     action?: (actionProps?: any) => any;
     disabled?: boolean;
+    disabledOn?: (data?: any) => boolean;
+    labelOnDisable?: string;
     isNavigate?: boolean;
+  };
+
+  type DocumentAudInput = {
+    emitedAt: Date;
+    emitedBy: string;
+    type: string;
+    uuid?: string;
   };
 
   type TableRow<T> = T & {

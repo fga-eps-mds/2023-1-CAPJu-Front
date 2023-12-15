@@ -4,7 +4,7 @@ import _ from "lodash";
 
 import { mockedStages, mockedFlowSequence, mockedProcess } from "utils/mocks";
 import { handleDateFormating, handleExpiration } from "utils/dates";
-import { Flow } from "../Flow";
+import { Flow } from "../../Flow";
 
 describe("Flow components", async () => {
   beforeAll(async () => {

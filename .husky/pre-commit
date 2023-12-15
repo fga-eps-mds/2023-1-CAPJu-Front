@@ -1,41 +1,56 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
+# Check for Yarn or Node installation
+if command -v yarn >/dev/null 2>&1; then
+    packageManager="yarn"
+elif command -v npm >/dev/null 2>&1; then
+    packageManager="npm"
+else
+    echo 'Neither Yarn nor Node.js is installed. Please install one of them to proceed.'
+    exit 1
+fi
+
 echo '🏗️👷 Estilizando, testando e buildando seu código antes de commitar . . .\n'
 
+# Define a function to run the package manager command
+runCmd() {
+    if [ "$packageManager" = "yarn" ]; then
+        yarn run "$@"
+    else
+        npm run "$@"
+    fi
+}
+
 # Check Prettier standards
-yarn check-format ||
-(
+if ! runCmd check-format; then
     echo '\n🤢🤮 Parece haver um problema de estilo 🤢🤮
-    Checagem do Prettier falhou... Rode um yarn format, adicione as alterações e tente novamente.\n';
-    false;
-)
+    Checagem do Prettier falhou... Rode um yarn/npm format, adicione as alterações e tente novamente.\n';
+    exit 1;
+fi
 
 # Check ESLint Standards
-yarn check-lint ||
-(
-    echo '\n😤🏀👋😤 Daqui não passa! 😤🏀👋😤 
+if ! runCmd check-lint; then
+    echo '\n😤🏀👋😤 Daqui não passa! 😤🏀👋😤
     Checagem do ESLint falhou... Faça as alterações listadas acima e tente novamente.\n'
-    false; 
-)
+    exit 1;
+fi
 
 # Check tsconfig standards
-yarn check-types ||
-(
+if ! runCmd check-types; then
     echo '🤡😂❌🤡 Checagem de Tipos Falhou. 🤡😂❌🤡
     Parece que tivemos um problema com TypeScript, faça as alterações citadas acima.'
-    false;
-)
+    exit 1;
+fi
 
 # If everything passes... Now we can commit
 echo '\n🤔🤔🤔🤔... Tudo bem... Parece que o código tá legal... Vamos tentar buildar. 🤔🤔🤔🤔\n'
 
-yarn build ||
-(
+if ! runCmd build; then
     echo '\n❌👷🔨❌ Seu build falhou!!!! ❌👷🔨❌
-    Falha ao buildar o React: entenda o que aconteceu vendo os erros acima.\n'
-    false;
-)
+    Falha ao buildar: entenda o que aconteceu vendo os erros acima.\n'
+    exit 1;
+fi
 
 # If everything passes... Now we can commit
 echo '\n\n✅✅✅✅ Você ganhou dessa vez, commitando agora. ✅✅✅✅\n'

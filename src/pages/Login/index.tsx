@@ -8,6 +8,9 @@ import {
   useToast,
   Text,
   Link,
+  InputGroup,
+  InputRightElement,
+  IconButton,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -17,6 +20,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from "hooks/useAuth";
 import { useLoading } from "hooks/useLoading";
 import { Input } from "components/FormFields";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useState } from "react";
 
 type FormValues = {
   cpf: string;
@@ -32,6 +37,7 @@ const validationSchema = yup.object({
 });
 
 function Login() {
+  const [showPassword, setShowPassword] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
   const { handleLogin } = useAuth();
@@ -47,29 +53,36 @@ function Login() {
 
   const onSubmit = handleSubmit(async (data) => {
     handleLoading(true);
-    const res = await handleLogin(data);
+    try {
+      const res = (await handleLogin(data)) as any;
 
-    if (res.type === "success") {
+      if (res.type === "success") {
+        handleLoading(false);
+        navigate("/", { replace: true });
+        toast({
+          id: "login-success",
+          title: "Bem-vindo(a)!",
+          description: "Login efetuado com sucesso!",
+          status: "success",
+        });
+        return;
+      }
+
       handleLoading(false);
-      navigate("/", { replace: true });
       toast({
-        id: "login-success",
-        title: "Bem vindo!",
-        description: "Login efetuado com sucesso!",
-        status: "success",
+        title: "Erro no login",
+        description: res.error?.message || res?.data?.message,
+        status: "error",
+        isClosable: true,
       });
-      return;
+    } catch (e) {
+      console.log(e);
     }
-
-    handleLoading(false);
-    toast({
-      id: "login-error",
-      title: "Erro no login",
-      description: res.error?.message,
-      status: "error",
-      isClosable: true,
-    });
   });
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <Flex flex="1" alignItems="center" justifyContent="center" w="100%">
@@ -104,17 +117,31 @@ function Login() {
               errors={errors.cpf}
               {...register("cpf")}
             />
-            <Input
-              type="password"
-              label="Senha"
-              placeholder="********"
-              errors={errors.password}
-              {...register("password")}
-            />
+            <InputGroup>
+              <Input
+                type={showPassword ? "text" : "password"}
+                label="Senha"
+                placeholder="********"
+                errors={errors.password}
+                {...register("password")}
+              />
+              <InputRightElement>
+                <IconButton
+                  onClick={togglePasswordVisibility}
+                  aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+                  colorScheme="blue"
+                  variant="ghost"
+                  top="8"
+                  icon={showPassword ? <FaEyeSlash /> : <FaEye />}
+                />
+              </InputRightElement>
+            </InputGroup>
             <Button colorScheme="green" w="100%" type="submit">
               Entrar
             </Button>
-            <Link href="/recuperar-senha">Esqueceu sua senha?</Link>
+            <Link href="/recuperar-senha" style={{ display: "none" }}>
+              Esqueceu sua senha?
+            </Link>
           </chakra.form>
         </CardBody>
       </Card>

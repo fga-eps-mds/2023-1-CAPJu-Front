@@ -34,8 +34,8 @@ export function Profiles() {
     queryFn: async () => {
       const res = await getAcceptedUsers(
         {
-          offset: currentPage * 5,
-          limit: 5,
+          offset: currentPage * 10,
+          limit: 10,
         },
         filter
       );
@@ -44,6 +44,7 @@ export function Profiles() {
 
       return res;
     },
+    refetchOnWindowFocus: false,
   });
   const {
     isOpen: isDeleteOpen,
@@ -64,6 +65,7 @@ export function Profiles() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const { data: unitsData, isFetched: isUnitsFetched } = useQuery({
     queryKey: ["units"],
@@ -74,10 +76,12 @@ export function Profiles() {
 
       return res;
     },
+    refetchOnWindowFocus: false,
   });
   const { data: rolesData, isFetched: isRolesFetched } = useQuery({
     queryKey: ["roles"],
     queryFn: getAllRoles,
+    refetchOnWindowFocus: false,
   });
   const tableActions = useMemo(
     () => [
@@ -126,7 +130,9 @@ export function Profiles() {
     if (!isUsersFetched || !isUnitsFetched || !isRolesFetched) return [];
 
     return (
+      // @ts-ignore
       (usersData?.value?.reduce(
+        // @ts-ignore
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
           const role =
             rolesData?.value?.find((i) => i.idRole === curr.idRole)?.name ||
@@ -199,10 +205,10 @@ export function Profiles() {
 
   return (
     <>
-      <Flex mt="4" w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text fontSize="lg" fontWeight="semibold">
-            Perfil de Acesso
+      <Flex w="90%" maxW={1140} flexDir="column" gap="3" mb="4" mt="50px">
+        <Flex w="50%" mb="3" justifyContent="start">
+          <Text fontSize="25px" fontWeight="semibold">
+            Perfil de acesso
           </Text>
         </Flex>
         <Flex justifyContent="flex-start" w="100%">
@@ -266,6 +272,11 @@ export function Profiles() {
           isOpen={isViewOpen}
           onClose={onViewClose}
           user={selectedUser}
+          unit={
+            unitsData?.value?.find(
+              (item) => item.idUnit === selectedUser.idUnit
+            )?.name || "-"
+          }
         />
       )}
       {userData?.value && selectedUser && isDeleteOpen && (

@@ -43,7 +43,7 @@ const validationSchema = yup.object({
   passwordConfirmation: yup
     .string()
     .required("Confirme sua senha")
-    .oneOf([yup.ref("password")], "Suas senhas não batem"),
+    .oneOf([yup.ref("password")], "Suas senhas não conferem."),
 });
 
 export function DataUpdateModal({ user }: ModalProps) {
@@ -139,7 +139,7 @@ export function DataUpdateModal({ user }: ModalProps) {
             />
           </ModalBody>
           <ModalFooter gap="2">
-            <Button colorScheme="blue" type="submit" size="sm">
+            <Button colorScheme="blue" type="submit">
               Salvar
             </Button>
           </ModalFooter>

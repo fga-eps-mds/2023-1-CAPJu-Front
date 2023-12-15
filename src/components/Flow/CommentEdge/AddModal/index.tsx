@@ -46,7 +46,7 @@ export function AddModal({ isOpen, onClose, handleComment }: AddModalProps) {
   const { comment: commentValue } = watch();
 
   const onSubmit = handleSubmit(async ({ comment }) => {
-    await handleComment(comment);
+    handleComment(comment);
     onClose();
   });
 
@@ -58,7 +58,7 @@ export function AddModal({ isOpen, onClose, handleComment }: AddModalProps) {
     <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Adicionar Observação</ModalHeader>
+        <ModalHeader>Adicionar observação</ModalHeader>
         <ModalCloseButton />
         <chakra.form
           onSubmit={(e) => {
@@ -90,7 +90,7 @@ export function AddModal({ isOpen, onClose, handleComment }: AddModalProps) {
             <Button variant="ghost" onClick={onClose} size="sm">
               Cancelar
             </Button>
-            <Button colorScheme="blue" type="submit" size="sm">
+            <Button colorScheme="blue" type="submit">
               Salvar
             </Button>
           </ModalFooter>

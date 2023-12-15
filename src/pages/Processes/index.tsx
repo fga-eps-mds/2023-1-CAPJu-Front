@@ -10,6 +10,8 @@ import {
   useToast,
   Tooltip,
   chakra,
+  Select,
+  Image,
 } from "@chakra-ui/react";
 import {
   AddIcon,
@@ -24,7 +26,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { IoReturnDownBackOutline } from "react-icons/io5";
 
 import { getProcesses } from "services/processManagement/processes";
-import { getFlows } from "services/processManagement/flows";
 import { isActionAllowedToUser } from "utils/permissions";
 import { useAuth } from "hooks/useAuth";
 import { PrivateLayout } from "layouts/Private";
@@ -35,6 +36,8 @@ import { Pagination } from "components/Pagination";
 import { DeletionModal } from "./DeletionModal";
 import { CreationModal } from "./CreationModal";
 import { EditionModal } from "./EditionModal";
+import { VisualizationFilesModal } from "./ProcessesFile/VisualizationFilesModal";
+import line52 from "../../images/Line_52.svg";
 
 function Processes() {
   const { getUserData } = useAuth();
@@ -46,8 +49,12 @@ function Processes() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
-  const [filter, setFilter] = useState<string | undefined>(undefined);
+  const [filter, setFilter] = useState<{ type: string; value: string }>({
+    type: "process",
+    value: "",
+  });
   const [legalPriority, setLegalPriority] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
   const {
@@ -65,30 +72,16 @@ function Processes() {
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+  const {
+    isOpen: isProcessesFileModalOpen,
+    onOpen: onProcessesFileModalOpen,
+    onClose: onProcessesFileModalClose,
+  } = useDisclosure();
   const [currentPage, setCurrentPage] = useState(0);
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
   };
-  const { data: flowsData, isFetched: isFlowsFetched } = useQuery({
-    queryKey: ["flows"],
-    queryFn: async () => {
-      const res = await getFlows();
-
-      if (res.type === "error") throw new Error(res.error.message);
-
-      return res;
-    },
-    onError: () => {
-      toast({
-        id: "flows-error",
-        title: "Erro ao carregar fluxos",
-        description:
-          "Houve um erro ao carregar fluxos, favor tentar novamente.",
-        status: "error",
-        isClosable: true,
-      });
-    },
-  });
+  const [selectedFilter, setSelectedFilter] = useState("process");
   const {
     data: processesData,
     isFetched: isProcessesFetched,
@@ -99,12 +92,12 @@ function Processes() {
       const res = await getProcesses(
         flow?.idFlow,
         {
-          offset: currentPage * 5,
-          limit: 5,
+          offset: currentPage * 10,
+          limit: 10,
         },
         filter,
         legalPriority,
-        showFinished
+        showFinished ? ["archived", "finished"] : ["inProgress", "notStarted"]
       );
 
       if (res.type === "error") throw new Error(res.error.message);
@@ -121,6 +114,7 @@ function Processes() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const tableActions = useMemo<TableAction[]>(
     () => [
@@ -164,7 +158,7 @@ function Processes() {
     [isProcessesFetched, isUserFetched, userData]
   );
   const processesTableRows = useMemo<TableRow<Process>[]>(() => {
-    if (!isProcessesFetched || !isFlowsFetched) return [];
+    if (!isProcessesFetched) return [];
 
     return (
       (processesData?.value?.reduce(
@@ -172,10 +166,8 @@ function Processes() {
           acc: TableRow<Process>[] | Process[],
           curr: TableRow<Process> | Process
         ) => {
-          const currFlow = flowsData?.value?.find(
-            (item) =>
-              item?.idFlow === ((curr?.idFlow as number[])[0] || curr?.idFlow)
-          ) as Flow;
+          const currFlow = curr?.flow as Flow;
+
           const sortedStagesIds = getSequencesSortedStagesIds(
             currFlow?.sequences
           );
@@ -193,7 +185,7 @@ function Processes() {
               tableActions,
               actionsProps: {
                 process: curr,
-                pathname: `/processos/${curr.record}`,
+                pathname: `/processos/${curr.idProcess}`,
                 state: {
                   process: curr,
                   ...(state || {}),
@@ -234,8 +226,6 @@ function Processes() {
     isProcessesFetched,
     userData,
     isUserFetched,
-    flowsData,
-    isFlowsFetched,
     tableActions,
   ]);
 
@@ -269,6 +259,13 @@ function Processes() {
         isSortable: true,
       },
     }),
+    tableColumnHelper.accessor("stageName", {
+      cell: (info) => info.getValue(),
+      header: "Etapa Atual",
+      meta: {
+        isSortable: true,
+      },
+    }),
     tableColumnHelper.accessor("status", {
       cell: (info) => info.getValue(),
       header: "Status",
@@ -288,35 +285,67 @@ function Processes() {
 
   useEffect(() => {
     refetchProcesses();
-  }, [flowsData, isFlowsFetched, currentPage, showFinished, legalPriority]);
+  }, [currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(0);
+    refetchProcesses();
+  }, [legalPriority, showFinished]);
+
+  const [placeholder, setPlaceholder] = useState<string>(
+    "Pesquisar processos (por registro ou apelido)"
+  );
+
+  useEffect(() => {
+    switch (selectedFilter) {
+      case "process":
+        setPlaceholder("Pesquisar processos (por registro ou apelido)");
+        setFilter({ type: selectedFilter, value: filter?.value });
+        break;
+      case "stage":
+        setPlaceholder("Pesquisar processos (pelo nome da Etapa)");
+        setFilter({ type: selectedFilter, value: filter?.value });
+        break;
+      case "flow":
+        setPlaceholder("Pesquisar processos (pelo nome do Fluxo)");
+        setFilter({ type: selectedFilter, value: filter?.value });
+        break;
+      default:
+      // do nothing
+    }
+  }, [selectedFilter]);
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text fontSize="lg" fontWeight="semibold">
+      <Flex w="100%" maxWidth={1120} flexDir="column" gap="3" mb="4" mt="50px">
+        <Flex w="50%" mb="2" justifyContent="start">
+          <Text fontSize="25px" fontWeight="semibold">
             Processos{flow ? ` - Fluxo ${flow?.name}` : ""}
           </Text>
+        </Flex>
+        <Flex>
+          {flow ? (
+            <Button
+              size="md"
+              fontSize="md"
+              colorScheme="blue"
+              onClick={() => navigate("/fluxos", { replace: true })}
+            >
+              <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar
+              aos Fluxos
+            </Button>
+          ) : null}
+        </Flex>
+        <Flex justifyContent="space-between" gap="2" mb="15px">
           <Flex
             alignItems="center"
             justifyContent="start"
             gap="2"
             flexWrap="wrap"
           >
-            {flow ? (
-              <Button
-                size="xs"
-                fontSize="sm"
-                colorScheme="blue"
-                onClick={() => navigate("/fluxos", { replace: true })}
-              >
-                <Icon as={IoReturnDownBackOutline} mr="2" boxSize={3} /> Voltar
-                aos Fluxos
-              </Button>
-            ) : null}
             <Button
-              size="xs"
-              fontSize="sm"
+              size="md"
+              fontSize="md"
               colorScheme="green"
               isDisabled={
                 !isActionAllowedToUser(
@@ -328,10 +357,17 @@ function Processes() {
             >
               <AddIcon mr="2" boxSize={3} /> Criar Processo
             </Button>
+            <Button
+              size="md"
+              fontSize="md"
+              colorScheme="green"
+              onClick={onProcessesFileModalOpen}
+            >
+              <AddIcon mr="2" boxSize={4} />
+              Importar Processos
+            </Button>
           </Flex>
-        </Flex>
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Flex justifyContent="flex-start" w="100%">
+          <Flex w="65%">
             <chakra.form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -340,20 +376,60 @@ function Processes() {
               w="100%"
               display="flex"
               flexDirection="row"
+              color="gray.500"
             >
-              <Input
-                placeholder="Pesquisar processos (por registro ou apelido)"
-                value={filter}
-                onChange={({ target }) => setFilter(target.value)}
-                variant="filled"
-                css={{
-                  "&, &:hover, &:focus": {
-                    background: "white",
-                  },
-                }}
-              />
+              <Flex
+                borderRadius="8px"
+                w="100%"
+                gap="2"
+                alignItems="center"
+                backgroundColor="white"
+              >
+                <Input
+                  placeholder={placeholder}
+                  value={filter?.value}
+                  onChange={({ target }) =>
+                    setFilter({ type: selectedFilter, value: target.value })
+                  }
+                  variant="filled"
+                  w="100%"
+                  css={{
+                    "&, &:hover, &:focus": {
+                      background: "white",
+                    },
+                  }}
+                  backgroundColor="red"
+                  border="30px"
+                />
+                <Image
+                  zIndex="3"
+                  src={line52}
+                  marginLeft="0%"
+                  width="3%"
+                  height="27px"
+                  border="30px"
+                />
+                <Select
+                  css={{
+                    "&, &:hover, &:focus": {
+                      background: "white",
+                    },
+                  }}
+                  borderWidth="0"
+                  marginRight="0%"
+                  w="25%"
+                  value={selectedFilter}
+                  onChange={({ target }) => setSelectedFilter(target.value)}
+                  border="30px"
+                  outline="none"
+                >
+                  <option value="stage">Etapa</option>
+                  <option value="flow">Fluxo</option>
+                  <option value="process">Processo</option>
+                </Select>
+              </Flex>
               <Button
-                aria-label="botão de busca"
+                aria-label="botao-busca-processes"
                 colorScheme="green"
                 marginLeft="2"
                 justifyContent="center"
@@ -363,6 +439,8 @@ function Processes() {
               </Button>
             </chakra.form>
           </Flex>
+        </Flex>
+        <Flex w="100%" gap="2" flexWrap="wrap" justifyContent="end">
           <Flex flexDir="row" rowGap="1" columnGap="3" flexWrap="wrap">
             <Checkbox
               colorScheme="green"
@@ -378,7 +456,7 @@ function Processes() {
               checked={showFinished}
               onChange={() => setShowFinished(!showFinished)}
             >
-              Mostrar processos arquivados/finalizados
+              Mostrar processos interrompidos/concluídos
             </Checkbox>
           </Flex>
         </Flex>
@@ -400,6 +478,7 @@ function Processes() {
       <CreationModal
         isOpen={isCreationOpen}
         onClose={onCreationClose}
+        // @ts-ignore
         afterSubmission={refetchProcesses}
       />
       {selectedProcess && (
@@ -418,6 +497,13 @@ function Processes() {
           refetchStages={refetchProcesses}
         />
       )}
+      <VisualizationFilesModal
+        isOpen={isProcessesFileModalOpen}
+        onClose={() => {
+          onProcessesFileModalClose();
+          refetchProcesses();
+        }}
+      />
     </PrivateLayout>
   );
 }

@@ -8,13 +8,12 @@ import {
   useDisclosure,
   chakra,
 } from "@chakra-ui/react";
+import { FlowAccordion } from "components/FlowAccordion";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { AddIcon, Icon, ViewIcon, SearchIcon } from "@chakra-ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
-
 import { PrivateLayout } from "layouts/Private";
 import { getFlows } from "services/processManagement/flows";
-import { DataTable } from "components/DataTable";
 import { Input } from "components/FormFields";
 import { useAuth } from "hooks/useAuth";
 import { isActionAllowedToUser } from "utils/permissions";
@@ -26,7 +25,7 @@ import { EditionModal } from "./EditionModal";
 function Flows() {
   const toast = useToast();
   const [selectedFlow, selectFlow] = useState<Flow | null>(null);
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<string | undefined>(undefined);
   const { getUserData } = useAuth();
   const {
     isOpen: isCreationOpen,
@@ -54,7 +53,10 @@ function Flows() {
   } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
-      const res = await getFlows({ offset: currentPage * 5, limit: 5 }, filter);
+      const res = await getFlows(
+        { offset: currentPage * 10, limit: 10 },
+        filter
+      );
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -70,10 +72,12 @@ function Flows() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
 
   const tableActions = useMemo<TableAction[]>(
@@ -169,65 +173,93 @@ function Flows() {
   ];
 
   useEffect(() => {
+    const { search } = window.location;
+    const deleteSuccess = new URLSearchParams(search).get("deleteSuccess");
+
+    if (deleteSuccess === "1") {
+      const urlSearchParams = new URLSearchParams(search);
+      urlSearchParams.delete("deleteSuccess");
+      const newURL = `${
+        window.location.pathname
+      }?${urlSearchParams.toString()}`;
+      window.history.replaceState({}, document.title, newURL);
+
+      toast({
+        id: "delete-flow-success",
+        title: "Sucesso!",
+        description: "Fluxo excluído com sucesso!",
+        status: "success",
+      });
+    }
+
     refetchFlows();
   }, [currentPage]);
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text fontSize="lg" fontWeight="semibold">
+      <Flex w="100%" maxWidth={1120} flexDir="column" gap="3" mb="4" mt="50px">
+        <Flex w="50%" mb="2" justifyContent="start">
+          <Text fontSize="25px" fontWeight="semibold">
             Fluxos
           </Text>
-          <Button
-            size="xs"
-            fontSize="sm"
-            colorScheme="green"
-            isDisabled={
-              !isActionAllowedToUser(
-                userData?.value?.allowedActions || [],
-                "create-flow"
-              )
-            }
-            onClick={onCreationOpen}
-          >
-            <AddIcon mr="2" boxSize={3} /> Criar Fluxo
-          </Button>
         </Flex>
-        <Flex justifyContent="flex-start" w="100%">
-          <chakra.form
-            onSubmit={(e) => {
-              e.preventDefault();
-              refetchFlows();
-            }}
-            w="100%"
-            display="flex"
-            flexDirection="row"
+        <Flex justifyContent="space-between" gap="2" mb="15px">
+          <Flex
+            alignItems="center"
+            justifyContent="start"
+            gap="2"
+            flexWrap="wrap"
           >
-            <Input
-              placeholder="Pesquisar fluxos"
-              value={filter}
-              onChange={({ target }) => setFilter(target.value)}
-              variant="filled"
-              css={{
-                "&, &:hover, &:focus": {
-                  background: "white",
-                },
-              }}
-            />
             <Button
-              aria-label="botão de busca"
+              size="md"
+              fontSize="md"
               colorScheme="green"
-              marginLeft="2"
-              justifyContent="center"
-              type="submit"
+              isDisabled={
+                !isActionAllowedToUser(
+                  userData?.value?.allowedActions || [],
+                  "create-flow"
+                )
+              }
+              onClick={onCreationOpen}
             >
-              <SearchIcon boxSize={4} />
+              <AddIcon mr="2" boxSize={3} /> Criar fluxo
             </Button>
-          </chakra.form>
+          </Flex>
+          <Flex w="50%">
+            <chakra.form
+              onSubmit={(e) => {
+                e.preventDefault();
+                refetchFlows();
+              }}
+              w="100%"
+              display="flex"
+              flexDirection="row"
+            >
+              <Input
+                placeholder="Pesquisar fluxos"
+                value={filter || ""}
+                onChange={({ target }) => setFilter(target.value)}
+                variant="filled"
+                css={{
+                  "&, &:hover, &:focus": {
+                    background: "white",
+                  },
+                }}
+              />
+              <Button
+                aria-label="botão de busca"
+                colorScheme="green"
+                marginLeft="2"
+                justifyContent="center"
+                type="submit"
+              >
+                <SearchIcon boxSize={4} />
+              </Button>
+            </chakra.form>
+          </Flex>
         </Flex>
       </Flex>
-      <DataTable
+      <FlowAccordion
         data={filteredFlows}
         columns={tableColumns}
         isDataFetching={!isFlowsFetched || !isUserFetched}
@@ -247,11 +279,11 @@ function Flows() {
           afterSubmission={refetchFlows}
         />
       ) : null}
-      {userData?.value?.idUnit && isCreationOpen ? (
+      {(userData?.value as any)?.unit.idUnit && isCreationOpen ? (
         <CreationModal
           isOpen={isCreationOpen}
           onClose={onCreationClose}
-          idUnit={userData?.value?.idUnit}
+          idUnit={(userData?.value as any).unit.idUnit}
           afterSubmission={refetchFlows}
         />
       ) : null}

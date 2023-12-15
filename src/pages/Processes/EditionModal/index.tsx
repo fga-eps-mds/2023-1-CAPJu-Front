@@ -33,18 +33,6 @@ type FormValues = {
   idPriority: number;
 };
 
-const validationSchema = yup.object({
-  record: yup.string().required("Digite o registro do processo."),
-  nickname: yup.string().required("Dê um apelido para o processo."),
-  idFlow: yup.number().required("Selecione um fluxo para o processo."),
-  hasLegalPriority: yup.bool(),
-  idPriority: yup.number().when("hasLegalPriority", (hasLegalPriority) => {
-    return hasLegalPriority[0]
-      ? yup.string().required("Escolha a prioridade legal do processo.")
-      : yup.string().notRequired();
-  }),
-});
-
 interface EditionModalProps {
   selectedProcess: Process;
   isOpen: boolean;
@@ -60,9 +48,41 @@ export function EditionModal({
 }: EditionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
+
+  const validationSchema = yup.object({
+    record: yup.string().required("Digite o registro do processo."),
+    nickname: yup.string().required("Dê um apelido para o processo."),
+    idFlow: yup.number().when(() => {
+      return selectedProcess?.status === "notStarted"
+        ? yup.string().required("Escolha um fluxo para o processo.")
+        : yup.string().notRequired();
+    }),
+    hasLegalPriority: yup.bool(),
+    idPriority: yup.number().when("hasLegalPriority", (hasLegalPriority) => {
+      return hasLegalPriority[0]
+        ? yup.string().required("Escolha a prioridade legal do processo.")
+        : yup.string().notRequired();
+    }),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue,
+  } = useForm<FormValues>({
+    // @ts-ignore
+    resolver: yupResolver(validationSchema),
+    reValidateMode: "onChange",
+  });
+  const hasLegalPriority = watch("hasLegalPriority");
+
   const { data: prioritiesData } = useQuery({
     queryKey: ["priorities"],
     queryFn: async () => {
+      if (!isOpen) return {};
       const res = await getPriorities();
       return res;
     },
@@ -76,7 +96,10 @@ export function EditionModal({
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
+    enabled: isOpen,
   });
+
   const { data: flowsData } = useQuery({
     queryKey: ["flows"],
     queryFn: async () => {
@@ -96,26 +119,15 @@ export function EditionModal({
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
+    enabled: isOpen,
   });
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-  } = useForm<FormValues>({
-    // @ts-ignore
-    resolver: yupResolver(validationSchema),
-    reValidateMode: "onChange",
-  });
-  const hasLegalPriority = watch("hasLegalPriority");
 
   const onSubmit = handleSubmit(async (formData) => {
     handleLoading(true);
 
     const body = {
       ...selectedProcess,
-      record: selectedProcess?.record as string,
       nickname: formData.nickname,
       idFlow: formData.idFlow,
       priority: formData.hasLegalPriority ? formData.idPriority : 0,
@@ -147,11 +159,17 @@ export function EditionModal({
   });
 
   useEffect(() => {
+    if (isOpen && selectedProcess?.idPriority !== undefined) {
+      setValue("hasLegalPriority", true);
+    }
+  }, [isOpen, selectedProcess, setValue]);
+
+  useEffect(() => {
     reset();
   }, [isOpen]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]}>
+    <Modal isOpen={isOpen} onClose={onClose} size={["full", "xl"]} isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Editar Processo</ModalHeader>
@@ -161,11 +179,12 @@ export function EditionModal({
             <Input
               type="text"
               label="Registro"
-              placeholder="N do Registro "
+              placeholder="N° do registro "
               errors={errors.record}
               backgroundColor="gray.200"
               value={selectedProcess?.record as string}
               readOnly
+              textColor="grey"
               infoText={
                 <Stack spacing="0">
                   <Text>
@@ -186,7 +205,10 @@ export function EditionModal({
             <Text fontWeight={500}>Fluxo</Text>
             <Select
               placeholder="Selecionar Fluxo"
-              color="gray.500"
+              backgroundColor={
+                selectedProcess?.status !== "notStarted" ? "gray.400" : ""
+              }
+              disabled={selectedProcess?.status !== "notStarted"}
               defaultValue={
                 typeof selectedProcess?.idFlow === "number"
                   ? selectedProcess?.idFlow
@@ -216,11 +238,13 @@ export function EditionModal({
             {hasLegalPriority ? (
               <Select
                 label="Prioridade Legal"
-                placeholder="Selecionar Prioriadade"
+                placeholder="Selecionar prioridade"
                 color="gray.500"
                 options={
+                  // @ts-ignore
                   prioritiesData?.value
-                    ? (prioritiesData.value as Priority[]).map(
+                    ? // @ts-ignore
+                      (prioritiesData.value as Priority[]).map(
                         (priority: Priority) => {
                           return {
                             value: priority.idPriority,
@@ -239,10 +263,10 @@ export function EditionModal({
             )}
           </ModalBody>
           <ModalFooter gap="2">
-            <Button variant="ghost" onClick={onClose} size="sm">
+            <Button variant="ghost" onClick={onClose}>
               Cancelar
             </Button>
-            <Button colorScheme="blue" type="submit" size="sm">
+            <Button colorScheme="blue" type="submit">
               Salvar
             </Button>
           </ModalFooter>

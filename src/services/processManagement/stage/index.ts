@@ -22,21 +22,14 @@ export const getStages = async (
       totalPages: res.data.totalPages,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
 export const createStage = async (data: {
   name: string;
   duration: number;
-  idUnit: number;
 }): Promise<Result<Stage>> => {
   try {
     const res = await api.processManagement.post<Stage>(
@@ -49,24 +42,19 @@ export const createStage = async (data: {
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
 export const updateStage = async (data: {
   idStage: number;
   name: string;
+  duration: number;
 }): Promise<Result<Stage>> => {
   try {
     const res = await api.processManagement.put<Stage>(
-      "/stage/updateStage",
+      `/stage/updateStage/${data.idStage}`,
       data
     );
 
@@ -75,14 +63,8 @@ export const updateStage = async (data: {
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -97,13 +79,7 @@ export const deleteStage = async (idStage: number): Promise<Result<Stage>> => {
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };

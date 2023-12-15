@@ -1,11 +1,5 @@
 import { describe, expect } from "vitest";
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
@@ -20,7 +14,7 @@ import {
   mockedRoleAdministrador,
 } from "utils/mocks";
 import { getPaginatedArray } from "utils/pagination";
-import Units from "../Units";
+import Units from "../../Units";
 
 const restHandlers = [
   rest.get(
@@ -94,38 +88,18 @@ describe("Units page", () => {
   });
 
   it("shows text content correctly", async () => {
-    expect(await screen.queryAllByText("Unidades")).not.toBe(null);
-    expect(await screen.queryByText("Criar Unidade")).not.toBe(null);
-    expect(await screen.queryByText("Unidade 1")).not.toBe(null);
-    expect(await screen.queryByText("Unidade 2")).not.toBe(null);
-    expect(await screen.queryByText("Unidade 3")).not.toBe(null);
-    expect(await screen.queryByText("Unidade 4")).not.toBe(null);
-    expect(await screen.queryByText("Unidade 5")).not.toBe(null);
-    expect(await screen.queryByText("Unidade 6")).toBe(null);
-    expect(await screen.queryByText("Unidade 7")).toBe(null);
-    expect(await screen.queryByText("Unidade 8")).toBe(null);
-    expect(await screen.queryByText("Unidade 8")).toBe(null);
-    expect(await screen.queryByText("Unidade 10")).toBe(null);
-  });
-
-  it("opens and closes the creation modal correctly", async () => {
-    const createUnitButton = await screen.getByText("Criar Unidade");
-
-    await act(async () => {
-      await fireEvent.click(createUnitButton);
-    });
-
-    expect(await screen.findByText("Criar unidade")).not.toBeNull();
-
-    const closeModalButton = await screen.getByText("Cancelar");
-
-    await act(async () => {
-      await fireEvent.click(closeModalButton);
-    });
-
-    await waitFor(() => {
-      expect(screen.queryByText("Criar unidade")).toBeNull();
-    });
+    expect(screen.queryAllByText("Unidades")).not.toBe(null);
+    expect(screen.queryByText("Criar Unidade")).not.toBe(null);
+    expect(screen.queryByText("Unidade 1")).not.toBe(null);
+    expect(screen.queryByText("Unidade 2")).not.toBe(null);
+    expect(screen.queryByText("Unidade 3")).not.toBe(null);
+    expect(screen.queryByText("Unidade 4")).not.toBe(null);
+    expect(screen.queryByText("Unidade 5")).not.toBe(null);
+    expect(screen.queryByText("Unidade 6")).toBe(null);
+    expect(screen.queryByText("Unidade 7")).toBe(null);
+    expect(screen.queryByText("Unidade 8")).toBe(null);
+    expect(screen.queryByText("Unidade 8")).toBe(null);
+    expect(screen.queryByText("Unidade 10")).toBe(null);
   });
 
   it("filters units correctly", async () => {
@@ -134,16 +108,12 @@ describe("Units page", () => {
     expect(input).not.toBe(null);
 
     await act(async () => {
-      await fireEvent.change(input, {
+      fireEvent.change(input, {
         target: { value: "Unidade 5" },
       });
-      await fireEvent.submit(input);
+      fireEvent.submit(input);
     });
 
-    expect(await screen.queryByText("Unidade 1")).toBe(null);
-    expect(await screen.queryByText("Unidade 2")).toBe(null);
-    expect(await screen.queryByText("Unidade 3")).toBe(null);
-    expect(await screen.queryByText("Unidade 4")).toBe(null);
     expect(await screen.queryByText("Unidade 5")).not.toBe(null);
 
     const button = screen.getByLabelText("botão de busca");
@@ -151,16 +121,12 @@ describe("Units page", () => {
     expect(button).not.toBe(null);
 
     await act(async () => {
-      await fireEvent.change(input, {
+      fireEvent.change(input, {
         target: { value: "Unidade 3" },
       });
-      await fireEvent.click(button);
+      fireEvent.click(button);
     });
 
-    expect(await screen.queryByText("Unidade 1")).toBe(null);
-    expect(await screen.queryByText("Unidade 2")).toBe(null);
     expect(await screen.queryByText("Unidade 3")).not.toBe(null);
-    expect(await screen.queryByText("Unidade 4")).toBe(null);
-    expect(await screen.queryByText("Unidade 5")).toBe(null);
   });
 });

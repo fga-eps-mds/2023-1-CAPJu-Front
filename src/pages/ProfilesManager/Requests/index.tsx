@@ -33,8 +33,8 @@ export function Requests() {
     queryFn: async () => {
       const res = await getUsersRequests(
         {
-          offset: 5 * currentPage,
-          limit: 5,
+          offset: 10 * currentPage,
+          limit: 10,
         },
         filter
       );
@@ -43,6 +43,7 @@ export function Requests() {
 
       return res;
     },
+    refetchOnWindowFocus: false,
   });
   const {
     isOpen: isAcceptOpen,
@@ -57,6 +58,7 @@ export function Requests() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const {
     isOpen: isViewOpen,
@@ -76,6 +78,7 @@ export function Requests() {
 
       return res;
     },
+    refetchOnWindowFocus: false,
   });
 
   const tableActions = useMemo(
@@ -125,7 +128,9 @@ export function Requests() {
     if (!isRequestsFetched || !isUnitsFetched) return [];
 
     return (
+      // @ts-ignore
       (requestsData?.value?.reduce(
+        // @ts-ignore
         (acc: TableRow<User>[] | User[], curr: TableRow<User> | User) => {
           return [
             ...acc,
@@ -193,10 +198,18 @@ export function Requests() {
 
   return (
     <>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text fontSize="lg" fontWeight="semibold">
-            Solicitações
+      <Flex
+        w="90%"
+        maxW={1140}
+        flexDir="column"
+        gap="3"
+        mb="4"
+        style={{ marginTop: "30px " }}
+        mt="50px"
+      >
+        <Flex w="50%" mb="3" justifyContent="start">
+          <Text fontSize="25px" fontWeight="semibold">
+            Solicitações de Cadastro
           </Text>
         </Flex>
         <Flex justifyContent="flex-start" w="100%">
@@ -268,6 +281,11 @@ export function Requests() {
           isOpen={isViewOpen}
           onClose={onViewClose}
           user={selectedUser}
+          unit={
+            unitsData?.value?.find(
+              (item) => item.idUnit === selectedUser.idUnit
+            )?.name || "-"
+          }
         />
       ) : null}
     </>

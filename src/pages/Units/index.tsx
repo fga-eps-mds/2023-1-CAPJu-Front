@@ -26,23 +26,29 @@ import { EditionModal } from "./EditionModal";
 function Units() {
   const toast = useToast();
   const [selectedUnit, selectUnit] = useState<Unit | null>(null);
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<
+    { type: string; value: string } | undefined
+  >(undefined);
   const { getUserData } = useAuth();
+
   const {
     isOpen: isCreationOpen,
     onOpen: onCreationOpen,
     onClose: onCreationClose,
   } = useDisclosure();
+
   const {
     isOpen: isDeletionOpen,
     onOpen: onDeletionOpen,
     onClose: onDeletionClose,
   } = useDisclosure();
+
   const {
     isOpen: isEditionOpen,
     onOpen: onEditionOpen,
     onClose: onEditionClose,
   } = useDisclosure();
+
   const [currentPage, setCurrentPage] = useState(0);
   const handlePageChange = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
@@ -54,7 +60,10 @@ function Units() {
   } = useQuery({
     queryKey: ["units"],
     queryFn: async () => {
-      const res = await getUnits({ offset: currentPage * 5, limit: 5 }, filter);
+      const res = await getUnits(
+        { offset: currentPage * 10, limit: 10 },
+        filter
+      );
 
       if (res.type === "error") throw new Error(res.error.message);
 
@@ -70,10 +79,12 @@ function Units() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const tableActions = useMemo(
     () => [
@@ -154,57 +165,68 @@ function Units() {
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text fontSize="lg" fontWeight="semibold">
+      <Flex w="100%" maxWidth={1120} flexDir="column" gap="3" mb="4" mt="50px">
+        <Flex w="50%" mb="2" justifyContent="start">
+          <Text fontSize="25px" fontWeight="semibold">
             Unidades
           </Text>
-          <Button
-            size="xs"
-            fontSize="sm"
-            colorScheme="green"
-            isDisabled={
-              !isActionAllowedToUser(
-                userData?.value?.allowedActions || [],
-                "create-unit"
-              )
-            }
-            onClick={onCreationOpen}
-          >
-            <AddIcon mr="2" boxSize={3} /> Criar Unidade
-          </Button>
         </Flex>
-        <Flex justifyContent="flex-start" w="100%">
-          <chakra.form
-            onSubmit={(e) => {
-              e.preventDefault();
-              refetchUnits();
-            }}
-            w="100%"
-            display="flex"
-            flexDirection="row"
+        <Flex justifyContent="space-between" gap="2" mb="15px">
+          <Flex
+            alignItems="center"
+            justifyContent="start"
+            gap="2"
+            flexWrap="wrap"
           >
-            <Input
-              placeholder="Pesquisar unidades"
-              value={filter}
-              onChange={({ target }) => setFilter(target.value)}
-              variant="filled"
-              css={{
-                "&, &:hover, &:focus": {
-                  background: "white",
-                },
-              }}
-            />
             <Button
-              aria-label="botão de busca"
+              aria-label="criar unidade"
               colorScheme="green"
-              marginLeft="2"
-              justifyContent="center"
-              type="submit"
+              isDisabled={
+                !isActionAllowedToUser(
+                  userData?.value?.allowedActions || [],
+                  "create-unit", // @ts-ignore
+                  userData
+                )
+              }
+              onClick={onCreationOpen}
             >
-              <SearchIcon boxSize={4} />
+              <AddIcon mr="2" boxSize={3} /> Criar Unidade
             </Button>
-          </chakra.form>
+          </Flex>
+          <Flex w="50%">
+            <chakra.form
+              onSubmit={(e) => {
+                e.preventDefault();
+                refetchUnits();
+              }}
+              w="100%"
+              display="flex"
+              flexDirection="row"
+            >
+              <Input
+                placeholder="Pesquisar unidades"
+                value={filter?.value}
+                onChange={({ target }) =>
+                  setFilter({ type: "unit", value: target.value })
+                }
+                variant="filled"
+                css={{
+                  "&, &:hover, &:focus": {
+                    background: "white",
+                  },
+                }}
+              />
+              <Button
+                aria-label="botão de busca"
+                colorScheme="green"
+                marginLeft="2"
+                justifyContent="center"
+                type="submit"
+              >
+                <SearchIcon boxSize={4} />
+              </Button>
+            </chakra.form>
+          </Flex>
         </Flex>
       </Flex>
       <DataTable

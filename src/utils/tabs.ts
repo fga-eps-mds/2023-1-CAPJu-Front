@@ -24,20 +24,15 @@ export const tabs = [
     action: "see-process",
   },
   {
-    label: "Cadastro",
-    pathIndex: "/acessos",
-    path: "/acessos",
-    action: "see-request",
+    label: "Estatísticas",
+    pathIndex: "/estatisticas",
+    path: "/estatisticas",
+    action: "see-statistics",
   },
   {
-    label: "Perfis e Permissões",
-    pathIndex: "/perfis",
-    path: "/perfis",
-    action: "manage-profiles",
-  },
-  {
-    label: "Editar Conta",
-    pathIndex: "/editar-conta",
-    path: "/editar-conta",
+    label: "Sessões",
+    pathIndex: "/sesssoes-usuarios",
+    path: "/sesssoes-usuarios",
+    action: "manage-user-sessions",
   },
 ];

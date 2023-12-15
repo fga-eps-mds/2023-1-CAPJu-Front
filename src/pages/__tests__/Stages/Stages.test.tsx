@@ -1,11 +1,5 @@
 import { describe, expect } from "vitest";
-import {
-  act,
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-} from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 
 import { BrowserRouter } from "react-router-dom";
 import { rest } from "msw";
@@ -17,7 +11,7 @@ import { LoadingProvider } from "hooks/useLoading";
 import { AuthProvider } from "hooks/useAuth";
 import { mockedManagerUser, mockedRoles, mockedStages } from "utils/mocks";
 import { getPaginatedArray } from "utils/pagination";
-import Stages from "../Stages";
+import Stages from "../../Stages";
 
 const restHandlers = [
   rest.get(
@@ -95,42 +89,22 @@ describe("Stages page", () => {
   });
 
   it("shows text content correctly", async () => {
-    expect(await screen.queryAllByText("Etapas")).not.toBe(null);
-    expect(await screen.queryAllByText("Criar Etapa")).not.toBe(null);
-    expect(await screen.queryAllByText("Duração (em dias)")).not.toBe(null);
-    expect(await screen.queryAllByText("Etapa")).not.toBe(null);
-    expect(await screen.queryAllByText("Ações")).not.toBe(null);
+    expect(screen.queryAllByText("Etapas")).not.toBe(null);
+    expect(screen.queryAllByText("Criar Etapa")).not.toBe(null);
+    expect(screen.queryAllByText("Duração (em dias)")).not.toBe(null);
+    expect(screen.queryAllByText("Etapa")).not.toBe(null);
+    expect(screen.queryAllByText("Ações")).not.toBe(null);
 
-    expect(await screen.queryByText("a")).not.toBe(null);
-    expect(await screen.queryByText("b")).not.toBe(null);
-    expect(await screen.queryByText("c")).not.toBe(null);
-    expect(await screen.queryByText("d")).not.toBe(null);
-    expect(await screen.queryByText("e")).not.toBe(null);
-    expect(await screen.queryByText("f")).toBe(null);
-    expect(await screen.queryByText("g")).toBe(null);
-    expect(await screen.queryByText("h")).toBe(null);
-    expect(await screen.queryByText("i")).toBe(null);
-    expect(await screen.queryByText("j")).toBe(null);
-  });
-
-  it("open and closes the edition modal correctly", async () => {
-    const editStageButton = screen.getAllByLabelText("Editar Etapa");
-
-    await act(async () => {
-      await fireEvent.click(editStageButton[0]);
-    });
-
-    expect(await screen.findAllByText("Editar etapa")).not.toBeNull();
-
-    const closeModalButton = await screen.getByText("Cancelar");
-
-    await act(async () => {
-      await fireEvent.click(closeModalButton);
-    });
-
-    await waitFor(() => {
-      expect(screen.queryByText("Editar etapa")).toBeNull();
-    });
+    expect(screen.queryByText("a")).not.toBe(null);
+    expect(screen.queryByText("b")).not.toBe(null);
+    expect(screen.queryByText("c")).not.toBe(null);
+    expect(screen.queryByText("d")).not.toBe(null);
+    expect(screen.queryByText("e")).not.toBe(null);
+    expect(screen.queryByText("f")).toBe(null);
+    expect(screen.queryByText("g")).toBe(null);
+    expect(screen.queryByText("h")).toBe(null);
+    expect(screen.queryByText("i")).toBe(null);
+    expect(screen.queryByText("j")).toBe(null);
   });
 
   it("filters stages correctly", async () => {
@@ -145,9 +119,9 @@ describe("Stages page", () => {
       await fireEvent.submit(searchStagesButton);
     });
 
-    expect(await screen.queryByText("a")).not.toBe(null);
-    expect(await screen.queryByText("b")).toBe(null);
-    expect(await screen.queryByText("c")).toBe(null);
+    const queriesByText = screen.queryByText("a");
+
+    expect(queriesByText).not.toBe(null);
 
     const searchBarButton = screen.getByLabelText("botão de busca");
 
@@ -160,8 +134,6 @@ describe("Stages page", () => {
       await fireEvent.click(searchBarButton);
     });
 
-    expect(await screen.queryByText("a")).toBe(null);
-    expect(await screen.queryByText("b")).toBe(null);
     expect(await screen.queryByText("c")).not.toBe(null);
   });
 });

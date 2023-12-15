@@ -11,19 +11,29 @@ export const getNotesByProcessRecord = async (
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
+  }
+};
+
+export const getNotesByProcessId = async (
+  idProcess: number
+): Promise<Result<Note[]>> => {
+  try {
+    const res = await api.note.get<Note[]>(`/${idProcess}`);
 
     return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
+      type: "success",
+      value: res.data,
     };
+  } catch (error) {
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
 export const addNoteToProcess = async (data: {
-  record: string;
+  idProcess: number;
   idStageA: string;
   idStageB: string;
   commentary: string;
@@ -36,14 +46,8 @@ export const addNoteToProcess = async (data: {
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -58,13 +62,7 @@ export const deleteProcessNote = async (
       value: res.data,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };

@@ -22,14 +22,8 @@ export const getFlows = async (
       totalPages: res.data.totalPages,
     };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -41,14 +35,8 @@ export const getFlowById = async (
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -63,14 +51,34 @@ export const createFlow = async (data: {
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
+  }
+};
 
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+export const getHistoricFlow = async (idFlow: number) => {
+  try {
+    const res = await api.processManagement.get<Array<number>>(
+      `/flow/historicFlow/${idFlow}`
+    );
+
+    return { type: "success", value: res.data };
+  } catch (error) {
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
+  }
+};
+
+export const getExpectedFlow = async (idFlow: number) => {
+  try {
+    const res = await api.processManagement.get<
+      Array<{ idStage: number; name: string; duration: number }>
+    >(`/flowStage/${idFlow}`);
+
+    return { type: "success", value: res.data };
+  } catch (error) {
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -81,18 +89,12 @@ export const updateFlow = async (data: {
   idFlow: number;
 }) => {
   try {
-    const res = await api.processManagement.put<Flow>(`/flow/`, data);
+    const res = await api.processManagement.put<Flow>(`/flow`, data);
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };
 
@@ -102,13 +104,7 @@ export const deleteFlow = async (id: number) => {
 
     return { type: "success", value: res.data };
   } catch (error) {
-    if (error instanceof Error)
-      return { type: "error", error, value: undefined };
-
-    return {
-      type: "error",
-      error: new Error("Erro desconhecido"),
-      value: undefined,
-    };
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
   }
 };

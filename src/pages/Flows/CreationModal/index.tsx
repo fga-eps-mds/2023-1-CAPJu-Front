@@ -72,6 +72,7 @@ export function CreationModal({
       const res = await getStages();
       return res;
     },
+    refetchOnWindowFocus: false,
   });
   const { data: usersData } = useQuery({
     queryKey: ["accepted-users"],
@@ -79,6 +80,7 @@ export function CreationModal({
       const res = await getAcceptedUsers();
       return res;
     },
+    refetchOnWindowFocus: false,
   });
   const {
     register,
@@ -91,6 +93,7 @@ export function CreationModal({
     reValidateMode: "onChange",
   });
 
+  // @ts-ignore
   const onSubmit = handleSubmit(async ({ name }) => {
     handleLoading(true);
 
@@ -134,6 +137,7 @@ export function CreationModal({
       isOpen={isOpen}
       onClose={onClose}
       size={["full", "md", "2xl", "4xl"]}
+      isCentered
     >
       <ModalOverlay />
       <ModalContent>

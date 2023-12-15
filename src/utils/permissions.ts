@@ -88,12 +88,16 @@ export const actionsForm = [
     value: "delete-process",
   },
   {
-    label: "Arquivar Processos",
+    label: "Concluir Processos",
     value: "archive-process",
   },
   {
-    label: "Finalizar Processos",
+    label: "Interromper Processos",
     value: "end-process",
+  },
+  {
+    label: "Visualizar Estatísticas",
+    value: "see-statistics",
   },
   {
     label: "Visualizar Solicitações",
@@ -122,5 +126,9 @@ export const actionsForm = [
   {
     label: "Gerenciar Permissões dos Perfis",
     value: "manage-profiles",
+  },
+  {
+    label: "Gerenciar Sessões Usuários",
+    value: "manage-user-sessions",
   },
 ];

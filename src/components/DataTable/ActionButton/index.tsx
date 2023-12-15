@@ -17,7 +17,7 @@ export function ActionButton({
   return (
     <Tooltip label={label} fontSize="xs">
       <Button
-        h="7"
+        h="5"
         w="7"
         size="xs"
         variant="ghost"
@@ -25,6 +25,7 @@ export function ActionButton({
         onClick={action}
         isDisabled={disabled}
         aria-label={label}
+        data-testid="ActionButton"
       >
         {icon}
       </Button>

@@ -26,6 +26,7 @@ export const mockedAllowedActions = [
   "edit-profile",
   "delete-profile",
   "manage-profiles",
+  "see-statistics",
 ];
 
 export const mockedRoleEstagiario = {
@@ -84,9 +85,23 @@ const mockedProgress2 = {
 };
 
 export const mockedProcess = {
+  idProcess: 1,
   effectiveDate: "2023-06-27",
   idFlow: 1,
   idPriority: 0,
+  idStage: 1,
+  idUnit: 1,
+  nickname: "Processo não Iniciado",
+  record: "12345678912345678915",
+  status: "inProgress",
+  progress: [mockedProgress1, mockedProgress2],
+};
+
+export const mockedPriorityProcess = {
+  idProcess: 1,
+  effectiveDate: "2023-06-27",
+  idFlow: 1,
+  idPriority: 1,
   idStage: 1,
   idUnit: 1,
   nickname: "Processo não Iniciado",
@@ -354,6 +369,7 @@ export const mockedFlows = [
 
 export const mockedProcesses = [
   {
+    idProcess: 1,
     effectiveDate: null,
     idFlow: 1,
     idPriority: 1,
@@ -364,6 +380,7 @@ export const mockedProcesses = [
     status: "notStarted",
   },
   {
+    idProcess: 2,
     effectiveDate: new Date(),
     idFlow: 1,
     idPriority: 1,
@@ -374,6 +391,7 @@ export const mockedProcesses = [
     status: "notStarted",
   },
   {
+    idProcess: 3,
     effectiveDate: new Date(),
     idFlow: 1,
     idPriority: null,
@@ -384,6 +402,7 @@ export const mockedProcesses = [
     status: "finished",
   },
   {
+    idProcess: 4,
     effectiveDate: new Date(),
     idFlow: 1,
     idPriority: null,
@@ -394,6 +413,7 @@ export const mockedProcesses = [
     status: "finished",
   },
   {
+    idProcess: 5,
     effectiveDate: new Date(),
     idFlow: 1,
     idPriority: null,
@@ -404,6 +424,7 @@ export const mockedProcesses = [
     status: "finished",
   },
   {
+    idProcess: 6,
     effectiveDate: new Date(),
     idFlow: 1,
     idPriority: null,
@@ -414,6 +435,7 @@ export const mockedProcesses = [
     status: "finished",
   },
   {
+    idProcess: 7,
     effectiveDate: new Date(),
     idFlow: 1,
     idPriority: null,
@@ -424,6 +446,7 @@ export const mockedProcesses = [
     status: "finished",
   },
   {
+    idProcess: 8,
     effectiveDate: new Date(),
     idFlow: 1,
     idPriority: null,
@@ -434,6 +457,7 @@ export const mockedProcesses = [
     status: "finished",
   },
   {
+    idProcess: 9,
     effectiveDate: new Date(),
     idFlow: 1,
     idPriority: null,
@@ -444,6 +468,7 @@ export const mockedProcesses = [
     status: "finished",
   },
   {
+    idProcess: 10,
     effectiveDate: new Date(),
     idFlow: 1,
     idPriority: null,
@@ -491,6 +516,7 @@ export const mockedPriorities = [
 ];
 
 export const mockedNotStartedProcess = {
+  idProcess: 1,
   effectiveDate: null,
   idFlow: 1,
   idPriority: 0,

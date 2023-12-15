@@ -25,7 +25,7 @@ import { EditionModal } from "./EditionModal";
 function Stages() {
   const toast = useToast();
   const [selectedStage, selectStage] = useState<Stage>();
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<string | undefined>(undefined);
   const { getUserData } = useAuth();
   const {
     isOpen: isCreationOpen,
@@ -49,6 +49,7 @@ function Stages() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const {
     data: stagesData,
@@ -58,7 +59,7 @@ function Stages() {
     queryKey: ["stages"],
     queryFn: async () => {
       const res = await getStages(
-        { offset: currentPage * 5, limit: 5 },
+        { offset: currentPage * 10, limit: 10 },
         filter
       );
 
@@ -76,12 +77,13 @@ function Stages() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
 
   const tableActions = useMemo(
     () => [
       {
-        label: "Editar Etapa",
+        label: "Editar etapa",
         icon: <Icon as={MdEdit} boxSize={4} />,
         action: ({ stage }: { stage: Stage }) => {
           selectStage(stage);
@@ -103,7 +105,9 @@ function Stages() {
         actionName: "delete-stage",
         disabled: !isActionAllowedToUser(
           userData?.value?.allowedActions || [],
-          "delete-stage"
+          "delete-stage",
+          // @ts-ignore
+          userData
         ),
       },
     ],
@@ -164,57 +168,64 @@ function Stages() {
 
   return (
     <PrivateLayout>
-      <Flex w="90%" maxW={1120} flexDir="column" gap="3" mb="4">
-        <Flex w="100%" justifyContent="space-between" gap="2" flexWrap="wrap">
-          <Text fontSize="lg" fontWeight="semibold">
+      <Flex w="100%" maxWidth={1120} flexDir="column" gap="3" mb="4" mt="50px">
+        <Flex w="50%" mb="2" justifyContent="start">
+          <Text fontSize="25px" fontWeight="semibold">
             Etapas
           </Text>
-          <Button
-            size="xs"
-            fontSize="sm"
-            colorScheme="green"
-            isDisabled={
-              !isActionAllowedToUser(
-                userData?.value?.allowedActions || [],
-                "create-stage"
-              )
-            }
-            onClick={onCreationOpen}
-          >
-            <AddIcon mr="2" boxSize={3} /> Criar Etapa
-          </Button>
         </Flex>
-        <Flex justifyContent="flex-start" w="100%">
-          <chakra.form
-            onSubmit={(e) => {
-              e.preventDefault();
-              refetchStages();
-            }}
-            w="100%"
-            display="flex"
-            flexDirection="row"
+        <Flex justifyContent="space-between" gap="2" mb="15px">
+          <Flex
+            alignItems="center"
+            justifyContent="start"
+            gap="2"
+            flexWrap="wrap"
           >
-            <Input
-              placeholder="Pesquisar etapas"
-              value={filter}
-              onChange={({ target }) => setFilter(target.value)}
-              variant="filled"
-              css={{
-                "&, &:hover, &:focus": {
-                  background: "white",
-                },
-              }}
-            />
             <Button
-              aria-label="botão de busca"
               colorScheme="green"
-              marginLeft="2"
-              justifyContent="center"
-              type="submit"
+              isDisabled={
+                !isActionAllowedToUser(
+                  userData?.value?.allowedActions || [],
+                  "create-stage"
+                )
+              }
+              onClick={onCreationOpen}
             >
-              <SearchIcon boxSize={4} />
+              <AddIcon mr="2" boxSize={3} /> Criar Etapa
             </Button>
-          </chakra.form>
+          </Flex>
+          <Flex w="50%">
+            <chakra.form
+              onSubmit={(e) => {
+                e.preventDefault();
+                refetchStages();
+              }}
+              w="100%"
+              display="flex"
+              flexDirection="row"
+            >
+              <Input
+                placeholder="Pesquisar etapas"
+                value={filter || ""}
+                onChange={({ target }) => setFilter(target.value)}
+                variant="filled"
+                css={{
+                  "&, &:hover, &:focus": {
+                    background: "white",
+                  },
+                }}
+              />
+              <Button
+                aria-label="botão de busca"
+                colorScheme="green"
+                marginLeft="2"
+                justifyContent="center"
+                type="submit"
+              >
+                <SearchIcon boxSize={4} />
+              </Button>
+            </chakra.form>
+          </Flex>
         </Flex>
       </Flex>
       <DataTable

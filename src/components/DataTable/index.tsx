@@ -31,6 +31,8 @@ export type DataTableProps<Data extends object> = {
   maxWidth?: string | number;
   size?: string | string[];
   emptyTableMessage?: string;
+  rawData?: any;
+  style?: any;
 };
 
 export function DataTable<Data extends object>({
@@ -38,10 +40,12 @@ export function DataTable<Data extends object>({
   columns,
   isDataFetching = false,
   skeletonHeight = 272,
-  width = "90%",
-  maxWidth = 1120,
+  width = "100%",
+  maxWidth = 1140,
   size = ["sm", "md"],
   emptyTableMessage = "Esta tabela está vazia no momento.",
+  rawData,
+  style = {},
 }: DataTableProps<Data>) {
   const navigate = useNavigate();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -59,7 +63,14 @@ export function DataTable<Data extends object>({
   return isDataFetching ? (
     <Skeleton w={width} maxW={maxWidth} h={skeletonHeight} />
   ) : (
-    <Table bg="white" w={width} maxW={maxWidth} borderRadius="4" size={size}>
+    <Table
+      bg="white"
+      w={width}
+      maxW={maxWidth}
+      borderRadius="4"
+      size={size}
+      style={{ ...style }}
+    >
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>
@@ -131,9 +142,18 @@ export function DataTable<Data extends object>({
                     >
                       {(value as TableAction[])?.map(
                         (actionItem: TableAction) => {
+                          const disabled =
+                            actionItem.disabled ||
+                            (actionItem.disabledOn &&
+                              actionItem.disabledOn(rawData[index]));
+                          const label = disabled
+                            ? actionItem.labelOnDisable || actionItem.label
+                            : actionItem.label;
+                          actionItem = { ...actionItem, label };
                           return (
                             <ActionButton
                               key={actionItem.label}
+                              disabled={!!disabled}
                               {...actionItem}
                               action={() => {
                                 if (actionItem.action)
