@@ -62,7 +62,7 @@ export default function ProcessesFileComponent() {
         isSortable: true,
       },
     }),
-    tableColumnHelper.accessor("errorItemCount", {
+    tableColumnHelper.accessor("errorItemsCount", {
       cell: (info) => info.getValue(),
       header: "Erro",
       meta: {
@@ -289,10 +289,10 @@ export default function ProcessesFileComponent() {
                 : "-"}
             </Text>
           ),
-          errorItemCount: (
+          errorItemsCount: (
             <Text align="center">
               {processesFile.status === "imported"
-                ? processesFile.errorItemCount
+                ? processesFile.errorItemsCount
                 : "-"}
             </Text>
           ),
