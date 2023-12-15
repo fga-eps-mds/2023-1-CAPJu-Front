@@ -33,17 +33,6 @@ type FormValues = {
   idPriority: number;
 };
 
-const validationSchema = yup.object({
-  record: yup.string().required("Digite o registro do processo."),
-  nickname: yup.string().required("Dê um apelido para o processo."),
-  idFlow: yup.number().required("Selecione um fluxo para o processo."),
-  hasLegalPriority: yup.bool(),
-  idPriority: yup.number().when("hasLegalPriority", (hasLegalPriority) => {
-    return hasLegalPriority[0]
-      ? yup.string().required("Escolha a prioridade legal do processo.")
-      : yup.string().notRequired();
-  }),
-});
 
 interface EditionModalProps {
   selectedProcess: Process;
@@ -51,6 +40,7 @@ interface EditionModalProps {
   onClose: () => void;
   afterSubmission: () => void;
 }
+
 
 export function EditionModal({
   selectedProcess,
@@ -60,6 +50,21 @@ export function EditionModal({
 }: EditionModalProps) {
   const toast = useToast();
   const { handleLoading } = useLoading();
+
+  const validationSchema = yup.object({
+    record: yup.string().required("Digite o registro do processo."),
+    nickname: yup.string().required("Dê um apelido para o processo."),
+    idFlow: yup.number().when(() => {
+      return selectedProcess?.status === "notStarted" ?
+        yup.string().required("Escolha um fluxo para o processo.")
+        : yup.string().notRequired()}),
+    hasLegalPriority: yup.bool(),
+    idPriority: yup.number().when("hasLegalPriority", (hasLegalPriority) => {
+      return hasLegalPriority[0]
+        ? yup.string().required("Escolha a prioridade legal do processo.")
+        : yup.string().notRequired();
+    }),
+  });
 
   const {
     register,
