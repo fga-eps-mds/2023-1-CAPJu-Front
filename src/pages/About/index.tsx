@@ -14,7 +14,7 @@ function About() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <Flex flex="2" w="90%" py={isAuthenticated ? "1" : "10"} maxW={1120}>
+    <Flex flex="2" w="90%" py={isAuthenticated ? "10" : "10"} maxW={1120}>
       <Flex
         w="100%"
         borderRadius={20}
