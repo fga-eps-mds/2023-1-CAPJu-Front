@@ -33,14 +33,12 @@ type FormValues = {
   idPriority: number;
 };
 
-
 interface EditionModalProps {
   selectedProcess: Process;
   isOpen: boolean;
   onClose: () => void;
   afterSubmission: () => void;
 }
-
 
 export function EditionModal({
   selectedProcess,
@@ -55,9 +53,10 @@ export function EditionModal({
     record: yup.string().required("Digite o registro do processo."),
     nickname: yup.string().required("Dê um apelido para o processo."),
     idFlow: yup.number().when(() => {
-      return selectedProcess?.status === "notStarted" ?
-        yup.string().required("Escolha um fluxo para o processo.")
-        : yup.string().notRequired()}),
+      return selectedProcess?.status === "notStarted"
+        ? yup.string().required("Escolha um fluxo para o processo.")
+        : yup.string().notRequired();
+    }),
     hasLegalPriority: yup.bool(),
     idPriority: yup.number().when("hasLegalPriority", (hasLegalPriority) => {
       return hasLegalPriority[0]
