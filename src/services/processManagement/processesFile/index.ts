@@ -136,3 +136,21 @@ export const updateFileItemById = async (
     return { type: "error", error: E, value: undefined };
   }
 };
+
+export const generateResultingFile = async (
+  idProcessesFile: number
+): Promise<Result<{ data: Buffer }>> => {
+  try {
+    const url = `/processesFile/generateResultingFile/${idProcessesFile}`;
+
+    const res = await api.processManagement.get<{ data: Buffer }>(url);
+
+    return {
+      type: "success",
+      value: res.data,
+    };
+  } catch (error) {
+    const E: Error = error as Error;
+    return { type: "error", error: E, value: undefined };
+  }
+};

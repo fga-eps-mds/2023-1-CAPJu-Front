@@ -16,12 +16,14 @@ import {
   Input,
   Text,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import { Pagination } from "../../../components/Pagination";
 import {
   findAllPaged,
   findFileById,
+  generateResultingFile,
 } from "../../../services/processManagement/processesFile";
 import { formatDateTimeToBrazilian } from "../../../utils/dates";
 import { DataTable } from "../../../components/DataTable";
@@ -30,9 +32,11 @@ import { VisualizationItemsModal } from "./VisualizationFileItemsModal";
 import { ImportProcessesModal } from "../ImportProcessesModal";
 import { useAuth } from "../../../hooks/useAuth";
 import template from "../../../utils/templates";
+import { downloadFileFromBuffer } from "../../../utils/file";
 
 export default function ProcessesFileComponent() {
   const { getUserData } = useAuth();
+  const toast = useToast();
 
   const tableColumnHelper = createColumnHelper<TableRow<any>>();
 
@@ -158,10 +162,9 @@ export default function ProcessesFileComponent() {
         disabledOn: (file: ProcessesFile) =>
           ["waiting", "inProgress", "error"].includes(file.status),
         action: async ({ processesFile }) =>
-          downloadProcessesFile(
+          downloadResultingFile(
             processesFile.idProcessesFile,
-            "dataResultingFile",
-            true
+            processesFile.fileName
           ),
       },
       // This is not working
@@ -215,35 +218,29 @@ export default function ProcessesFileComponent() {
       format
     )) as any;
     const bytes = result.value[fileKey].data;
-    // console.log(bytes)
-    // if(format === 'csv') {
-    //   downloadCsv(bytes);
-    //   return;
-    // }
-    const ab = new ArrayBuffer(bytes.length);
-    const ia = new Uint8Array(ab);
+    downloadFileFromBuffer(bytes, result.value.fileName);
+  };
 
-    for (let i = 0; i < bytes.length; i += 1) {
-      ia[i] = bytes[i];
+  const downloadResultingFile = async (
+    idProcessesFile: number,
+    originalFileName: string
+  ) => {
+    const result = await generateResultingFile(idProcessesFile);
+
+    if (result.type === "error") {
+      toast({
+        id: "generate-result-file-error",
+        title: "Erro ao gerar arquivo resultado.",
+        status: "error",
+        isClosable: true,
+      });
+      return;
     }
 
-    const blob = new Blob([ia], { type: "application/octet-stream" });
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-
-    a.style.display = "none";
-    a.href = url;
-
-    a.download = resulting
-      ? replaceFileExtension(result.value.fileName, format)
-      : result.value.fileName;
-
-    document.body.appendChild(a);
-    a.click();
-
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    downloadFileFromBuffer(
+      result.value.data,
+      replaceFileExtension(originalFileName, "_resultado.xlsx")
+    );
   };
 
   const [

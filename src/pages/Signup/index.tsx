@@ -236,6 +236,8 @@ function Signup() {
               placeholder="exemplo@mail.com"
               errors={errors.email}
               {...register("email")}
+              readOnly
+              onFocus={(e) => e.target.removeAttribute("readOnly")}
             />
             <InputGroup>
               <Input
@@ -243,6 +245,8 @@ function Signup() {
                 label="Senha"
                 placeholder="Crie uma senha"
                 errors={errors.password}
+                readOnly
+                onFocus={(e) => e.target.removeAttribute("readOnly")}
                 infoText={
                   <Stack spacing="0">
                     <Text>Deve conter ao menos um dígito;</Text>
@@ -273,6 +277,8 @@ function Signup() {
                 placeholder="Confirme uma senha"
                 errors={errors.passwordConfirmation}
                 {...register("passwordConfirmation")}
+                readOnly
+                onFocus={(e) => e.target.removeAttribute("readOnly")}
               />
               <InputRightElement>
                 <IconButton

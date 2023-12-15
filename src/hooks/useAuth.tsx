@@ -44,15 +44,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const sessionLifespanInSeconds = 20;
 
-  let jwtCheckInterval: any;
+  type Interval = ReturnType<typeof setInterval>;
 
-  let inactivityTimer: any;
+  type Timeout = ReturnType<typeof setTimeout>;
 
-  let inactivityLogoutTimer: any;
+  let inactivityTimer: Timeout;
 
-  let sessionStatusInterval: any;
+  let inactivityLogoutTimer: Timeout;
 
-  let sessionCheckInterval: any;
+  let jwtExpirationCheckInterval: Interval;
+
+  let jwtPresenceCheckInterval: Interval;
+
+  let sessionStatusInterval: Interval;
+
+  let sessionCheckInterval: Interval;
 
   const [disableLogout, setDisableLogout] = useState<boolean>(false);
 
@@ -203,7 +209,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   function addIntervals() {
     clearTimeoutsAndIntervals();
 
-    jwtCheckInterval = setInterval(async () => {
+    jwtExpirationCheckInterval = setInterval(async () => {
       await checkJwtExpiration();
     }, 3000); // Checked every 3s
 
@@ -215,8 +221,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (localStorage.getItem("@CAPJu:check_session_flag")) {
         await checkSession();
         await checkJwtExpiration();
-
         localStorage.removeItem("@CAPJu:check_session_flag");
+      }
+    }, 50);
+
+    jwtPresenceCheckInterval = setInterval(() => {
+      if (!localStorage.getItem("@CAPJu:jwt_user")) {
+        clearLocalUserInfo();
+        clearTimeoutsAndIntervals();
+        window.location.reload();
       }
     }, 50);
 
@@ -226,7 +239,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   function reactToLogout(result: Result<string>, afterFnc = () => {}) {
     const { type } = result;
     if (type === "success") {
-      clearInterval(jwtCheckInterval);
+      clearInterval(jwtExpirationCheckInterval);
       clearLocalUserInfo();
       clearTimeoutsAndIntervals();
       afterFnc();
@@ -267,9 +280,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const clearTimeoutsAndIntervals = () => {
     clearTimeout(inactivityTimer);
     clearTimeout(inactivityLogoutTimer);
-    clearInterval(jwtCheckInterval);
+    clearInterval(jwtExpirationCheckInterval);
     clearInterval(sessionStatusInterval);
     clearInterval(sessionCheckInterval);
+    clearInterval(jwtPresenceCheckInterval);
   };
 
   const removeMouseMoveListener = () =>
