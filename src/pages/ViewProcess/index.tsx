@@ -188,6 +188,7 @@ function ViewProcess() {
     const res = processData?.value
       ? await updateStage({
           idProcess: processData?.value?.idProcess as number,
+          record: processData?.value?.record as string,
           from: processData?.value?.idStage,
           to: isNextStage ? nextStageId : previousStageId,
           commentary: "",

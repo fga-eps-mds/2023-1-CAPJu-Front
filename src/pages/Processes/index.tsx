@@ -49,6 +49,7 @@ function Processes() {
   const { data: userData, isFetched: isUserFetched } = useQuery({
     queryKey: ["user-data"],
     queryFn: getUserData,
+    refetchOnWindowFocus: false,
   });
   const [filter, setFilter] = useState<{ type: string; value: string }>({
     type: "process",
@@ -113,6 +114,7 @@ function Processes() {
         isClosable: true,
       });
     },
+    refetchOnWindowFocus: false,
   });
   const tableActions = useMemo<TableAction[]>(
     () => [
@@ -497,7 +499,10 @@ function Processes() {
       )}
       <VisualizationFilesModal
         isOpen={isProcessesFileModalOpen}
-        onClose={onProcessesFileModalClose}
+        onClose={() => {
+          onProcessesFileModalClose();
+          refetchProcesses();
+        }}
       />
     </PrivateLayout>
   );

@@ -29,7 +29,7 @@ import { isActionAllowedToUser } from "../../utils/permissions";
 
 export function Header() {
   const { getUserData } = useAuth();
-  const { isAuthenticated, handleLogout } = useAuth();
+  const { isAuthenticated, handleLogout, allowLogout } = useAuth();
   const { isLoading } = useLoading();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -242,6 +242,7 @@ export function Header() {
                           setIsOpen(false);
                           setTabIndex(-1);
                         }}
+                        isDisabled={!allowLogout()}
                       >
                         <Flex alignItems="center">
                           <Text ml="2">Sair</Text>

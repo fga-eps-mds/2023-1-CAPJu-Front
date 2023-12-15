@@ -149,6 +149,7 @@ export const getProcessById = async (
 
 export const updateStage = async (data: {
   idProcess: number;
+  record: string;
   from: number;
   to: number;
   commentary: string;

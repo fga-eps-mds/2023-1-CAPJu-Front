@@ -27,6 +27,7 @@ type AuthContextType = {
     password: string;
   }) => Promise<Result<User>>;
   handleLogout: () => void;
+  allowLogout: () => boolean;
   checkJwtExpiration: () => void;
   getUserData: () => Promise<Result<User & { allowedActions: string[] }>>;
   validateAuthentication: () => void;
@@ -52,6 +53,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   let sessionStatusInterval: any;
 
   let sessionCheckInterval: any;
+
+  const [disableLogout, setDisableLogout] = useState<boolean>(false);
 
   const toast = useToast();
 
@@ -95,6 +98,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ): Promise<void> {
     const result = await signOut(logoutInitiator);
     reactToLogout(result, afterFnc);
+  }
+
+  function allowLogout() {
+    return !disableLogout;
   }
 
   const getUserData = useCallback(async (): Promise<
@@ -152,7 +159,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const tokenExpirationTime = getJwtFromLocalStorageDecoded().exp;
     const oneMinuteBeforeExpiration = tokenExpirationTime - 60;
     if (currentTimeInSeconds >= oneMinuteBeforeExpiration) {
+      setDisableLogout(true);
       const res = await signOutExpiredSession();
+      setDisableLogout(false);
       reactToLogout(res, () => {
         toast({
           id: "token-expired",
@@ -167,11 +176,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   async function checkSession() {
+    setDisableLogout(true);
+
     const sessionId = getJwtFromLocalStorageDecoded()?.id?.sessionId;
 
     if (!sessionId) return;
 
     const data = (await checkSessionStatus(sessionId)).value as any;
+
+    setDisableLogout(false);
 
     if (!data.active) {
       clearLocalUserInfo();
@@ -202,6 +215,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (localStorage.getItem("@CAPJu:check_session_flag")) {
         await checkSession();
         await checkJwtExpiration();
+
         localStorage.removeItem("@CAPJu:check_session_flag");
       }
     }, 50);
@@ -273,6 +287,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         handleLogin,
         checkJwtExpiration,
         handleLogout,
+        allowLogout,
         getUserData,
         validateAuthentication,
       }}

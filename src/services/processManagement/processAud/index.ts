@@ -93,7 +93,7 @@ export const downloadEventsPdf = async (processInfo: {
 
     await addLogos(pdf, tableFinalY);
 
-    pdf.save(`eventosProcesso${record}.pdf`);
+    pdf.save(`Eventos_Processo_${record}.pdf`);
   } finally {
     document.body.removeChild(container);
   }
@@ -107,7 +107,7 @@ export const downloadEventsXlsx = async (
     `/${processAudUrl}/generateXlsx/${idProcess}`
   );
 
-  downloadFileFromBuffer(response.data.data, `eventosProcesso${record}.xlsx`);
+  downloadFileFromBuffer(response.data.data, `Eventos_Processo_${record}.xlsx`);
 };
 
 function constructTableHTML(processEvents: any[]): string {

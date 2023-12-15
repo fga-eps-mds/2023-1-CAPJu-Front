@@ -363,7 +363,7 @@ export default function ProcessesFileComponent() {
               </Button>
               <a
                 href={template.templatexlsx}
-                download="modeloImportacaoCapju.xlsx"
+                download="Modelo_Importacao_Capju.xlsx"
                 style={{ textDecoration: "none" }}
               >
                 <Button variant="outline" colorScheme="black">
@@ -377,7 +377,7 @@ export default function ProcessesFileComponent() {
               </a>
               <a
                 href={template.templatecsv}
-                download="modeloImportacaoCapju.csv"
+                download="Modelo_Importacao_Capju.csv"
                 style={{ textDecoration: "none" }}
               >
                 <Button
